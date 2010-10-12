@@ -1,0 +1,12 @@
+[Global]
+CurrentProject=inadyn.vpj
+[ProjectDates]
+inadyn.vpj=20050224011350000
+[TreeExpansion2]
+- inadyn.vpj
+  - Source Files
+  - Header Files
+  + Resource Files
+  + Bitmaps
+  + Other Files
+scroll:0

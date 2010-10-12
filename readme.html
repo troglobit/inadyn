@@ -1,0 +1,554 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>inadyn - Dynamic DNS client</title>
+</head>
+<body>
+<p><b>INADYN - Simple DYNAMIC DNS client.<br>
+</b></p>
+<p><b>Version 1.96.2, 12.March.2007<br>
+</b></p>
+<h3><b>INADYN Help<br>
+</b></h3>
+<p>INADYN is a dynamic DNS client. That is, it maintains the IP address
+of a host name. It
+periodically checks whether the IP address stored by the DNS server is
+the real current address
+of the machine that is running INADYN.<br>
+</p>
+<h3><b>Download</b></h3>
+<table>
+  <tbody>
+    <tr>
+      <td>
+	<br>
+      </td>
+      <td> <br>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      <b>Last version (1.96.2) </b><br>
+      <b>Complete: source code + binaries:</b><br>
+      <a href="inadyn.v1.96.2.zip">Inadyn ver. 1.96.2 Source Code + binary
+for
+Windows and Linux</a><br>
+      <br>
+      <br>
+      <br>
+      <b>Older versions:</b><br>
+      <br>
+      <a href="inadyn.v1.96.zip">Source Code + binary for
+Windows and Linux ver. 1.96</a><br>      
+      <a href="inadyn.v1.96.mac.zip">Binary 1.96 version for MAC OS</a><br>
+      <a href="inadyn.v1.95.zip">Source Code + binary for
+Windows and Linux ver. 1.95</a><br>
+      <a href="inadyn.v1.90.zip">Source Code + binary for
+Windows and Linux ver. 1.90</a> <br>
+      </td>
+      <td> <br>
+      </td>
+    </tr>
+    <tr>
+      <td> <br>
+      <p><b>Features:</b></p>
+      <ul>
+        <li>supports the following dynamic DNS services:</li>
+        <li><a href="http://www.dyndns.org">dyndns.org</a> (in all
+three flavors: dynamic, static, custom)</li>
+        <li><a href="http://freedns.afraid.org">freedns.afraid.org</a></li>
+        <li><a href="http://www.zoneedit.com">zoneedit.com</a></li>
+        <li><a href="http://www.no-ip.com">no-ip.com</a> </li>
+        <li>maintains up multiple aliases of the same IP address</li>
+        <li>runs as a service (Windows 2000/XP, Linux)</li>
+        <li>or runs as a console application</li>
+        <li>updates the correct IP address even behind a NAT router.</li>
+        <li>supports access via http proxy</li>
+        <li>does not perform unnecessary updates.</li>
+        <li>has 'install and forget it feature'. That is, after install
+one
+can completely forget about
+it. No maintenance required. (as long as no bugs are found;-)</li>
+      </ul>
+      </td>
+      <td> <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h3><b>Installation</b></h3>
+<b>&nbsp;&nbsp;&nbsp; For Windows:</b><br>
+<ol>
+  <li>IF you are planning to let inadyn <span
+ style="font-weight: bold;">run as a service</span>. For installation
+you need <span style="font-weight: bold;">Administrator rights</span>
+and
+you need to launch the utility batch: <span style="font-style: italic;">install_inadyn_service.bat</span>
+from the same directory where <span style="font-style: italic;">inadyn.exe</span>
+is located.
+This will allow a standard console application like <span
+ style="font-style: italic;">inadyn</span> to run as a service. The
+programs <span style="font-style: italic;">intsrv.exe, srvany.exe</span>
+are standard programs that can be also found on Windows 2000 res
+Kit
+CD.&nbsp; <br>
+    <span style="font-weight: bold;">Note</span>:&nbsp; Since
+re-distributing the above mentioned programs seems to be illegal, they
+are <span style="font-weight: bold;">not</span>
+provided in&nbsp; the <span style="font-style: italic;">inadyn </span>package.
+These programs have to be downloaded (if don't already have them) and
+copied in the <span style="font-style: italic;">inadyn/bin/win32 </span>directory.<span
+ style="font-weight: bold;"> A</span>fter a bit of
+googling I found some links where one can download them:<br>
+    <a
+ href="http://www.microsoft.com/downloads/details.aspx?FamilyID=9d467a69-57ff-4ae7-96ee-b18c4790cffd&amp;displaylang=en">Download
+the whole Windows Server 2003 Resource Kit Tools from Microsoft</a> or
+the following alternate sites<br>
+    <a href="http://www.electrasoft.com/srvany/srvany.htm">http://www.electrasoft.com/srvany/srvany.htm</a><br>
+&nbsp;<a
+ href="ftp://ftp.microsoft.com/bussys/winnt/winnt-public/reskit/nt40/i386/srvany_x86.exe">ftp://ftp.microsoft.com/bussys/winnt/winnt-public/reskit/nt40/i386/srvany_x86.exe</a>
+    <br>
+  </li>
+  <li>Edit the registry file with the <span style="font-weight: bold;">correct
+name for your service </span>(e.g. 'configure_inadyn_service_<span
+ style="font-weight: bold;">dyndns</span>.reg') in order to pass your
+username,
+password, aliases, and other params to inadyn. After you have finished
+double click on the reg
+file.
+    <p>Notes:</p>
+    <ul>
+      <li>The correct path to inadyn binary has to be entered in the
+config file.</li>
+      <li>The log file is located in %System%\system32 by default</li>
+      <li>Beware of the double backslashes '\\' and the correct paths!<br>
+      </li>
+    </ul>
+    <p>After you have finished double click on the reg file.</p>
+  </li>
+  <li>Go to ControlPanel/AdministrativeTools/Services/inadyn and START
+the service. Also make
+sure that the startup mode is 'automatic'.</li>
+</ol>
+&nbsp;&nbsp;&nbsp; <b>For Linux:</b><br>
+<ol>
+  <li><b><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></b><b><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"></span></span> </span></b>No
+installation necessary. The inadyn executable found in <span
+ style="font-style: italic;">bin/linux/inadyn</span> is self contained
+and can be launched at any time<br>
+  </li>
+</ol>
+<b>&nbsp;&nbsp;&nbsp; For Macintosh</b> (thanks to Rob.S) <br>
+<ol>
+  <li>Put the binary somewhere in path (e.g. ~/bin), <br>
+Start it with the following AppleScript saved as an Application and
+dragged to <br>
+System Preferences -&gt; Accounts -&gt; Login Items:<br>
+    <p> do shell script "~/bin/inadyn -a HOST.dyndns.org -u USER -p
+PASSWORD"</p>
+    <br>
+Alternatively, one can put it in the system startup scripts. </li>
+</ol>
+<br>
+<b>&nbsp;&nbsp;&nbsp; For other operating systems:<br>
+</b>
+<ol>
+  <li><b><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></b><b><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"></span></span></span></b>Recompile and set
+the TARGET_ARCH to your own:<b><span style="font-weight: bold;">&nbsp;</span></b><br>
+  </li>
+  <li>
+    <div style="text-align: left;"><b><span style="font-weight: bold;"></span></b></div>
+    <span style="font-weight: bold;">make TARGET_ARCH=myOS clean all</span></li>
+  <li>This will produce an executable in the bin/myOS directory.<span
+ style="font-weight: bold;"><br>
+    </span></li>
+</ol>
+&nbsp; <br>
+<h3><b><i>Example usage:</i></b> <br>
+</h3>
+(See <a href="#cmd_line">command line options </a>below in order to
+build your own command line)<br>
+<br>
+&nbsp;<span style="font-weight: bold;">1. Update every minute, in
+console mode, for a dyndns.org system. </span><br>
+inadyn --username test --password test --update_period 60000 --alias
+test.homeip.net --alias my.second.domain<br>
+<br>
+<span style="font-weight: bold;">2. Update every minute, in demon mode
+(background task), with log file, of an dyndns.org address: </span><br>
+inadyn --background -u test -p test --update_period 60000 --alias
+inarcis.homeip.net --alias my.second.domain --log_file
+inadyn_srv.log<br>
+<br>
+<span style="font-weight: bold;">3. Update every minute, in daemon
+mode, with configuration read from file of an address from
+freedns.afraid.org </span><br>
+Config file (can be placed anywhere, but in linux is convenient in
+default location: /etc/inadyn.conf<br>
+Content of cfg file:<br>
+--update_period 60000 <br>
+--alias test.homeip.net,hash_for_host1 <br>
+--log_file /var/log/inadyn.log <br>
+--change_persona 10012 #to change to another user id after init. (less
+rights, more secure)
+<br>
+Launching of inadyn does not need any params. It looks for
+/etc/inadyn.config
+<br>
+<br>
+<span style="font-weight: bold;">4. Freedns update in console </span><br>
+inadyn --update_period 60000 --alias test.homeip.net,hash_for_host1 -a
+my.second.domain,hash2 --dyndns_system default@freedns.afraid.org<br>
+Note:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'hash' is extracted from the grab url batch
+file that is downloaded
+from freedns.afraid.org<br>
+(<a href="#special_freedns">See also special note</a>)<br>
+<br>
+<span style="font-weight: bold;">5. DynDns update of a <span
+ style="font-style: italic; text-decoration: underline;">custom DNS</span>
+service<br>
+</span>inadyn --dyndns_system custom@dyndns.org -u USER -p PASS -a HOST<br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">6. no-ip.com update</span><br>
+inadyn --dyndns_system default@no-ip.com -u USER-p PASS -a HOST<br>
+<br>
+<br>
+<h3><span style="font-weight: bold;">Configuration file</span></h3>
+Inadyn can read the very same <a href="#cmd_line">options </a>which
+can be present in the
+command line from a configuration file. This feature allows the user to
+write the options only once, and avoids frequent retyping.<br>
+<i>Default configuration file</i> is /etc/inadyn.conf under Unix
+systems. <br>
+The location of the config file can be given ot inadyn via --input_file
+option <br>
+<br>
+<i>The format</i> :<br>
+- '#' is a comment sign. <br>
+- the long options (those with '--' in front) can also be placed at the
+beginning of the line <span style="font-style: italic;">without</span>
+'--' signs<br>
+<p style="margin-left: 0pt;">Examples:<br>
+1.<br>
+#Some comment about&nbsp; inadyn&nbsp; cfg file<br>
+--username test --password test --update_period 60000 --alias
+test.homeip.net --alias my.second.domain<br>
+</p>
+<p style="margin-left: 0pt;">2.<br>
+--username test #user<br>
+--password test <br>
+update_period 60000&nbsp; #some other param without '--'<br>
+alias test.homeip.net <br>
+</p>
+<p style="margin-left: 0pt;"><br>
+</p>
+<b>LOG Output</b><br>
+Inadyn prints some message when the ip is updated. If no update is
+needed by default it prints a '.' every time when it performs a name
+check. So typically you will see a lot of dots in the log file. (only
+if verbose level is greater than 0).<br>
+When the connection goes down it is possible that inadyn displays some
+errors. But they should
+be followed by 'OK' messages after the connection is up again.<br>
+<br>
+<br>
+<b><a name="special_freedns"></a>Special notes for freedns.afraid.org<br>
+</b><br>
+They prefer to get as parameter a single hashed (base64 encoded) value
+instead username,
+password.<br>
+This saves some computing resources apparently. The hash cannot be
+computed by inadyn because
+it involve the database index of your username in freedns database
+which is not known.<br>
+The simplest solution seems to be the copy-paste action from the
+graburl batch file offered on
+their website.<br>
+<br>
+<i>Example</i>: The batch file looks like this:<br>
+graburl
+http://freedns.afraid.org/dynamic/update.php?YUGIUGSEIUFGOUIHEOIFEOIHJFEIO=<br>
+The user has to copy and paste the hash value after the '?' until the
+end of line.<br>
+The hash will be used as additional param in --alias option. (see
+typical usage above)<br>
+<br>
+<h3><b>Command line options<a name="cmd_line"></a></b></h3>
+<p>They are automatically printed if inadyn gets wrong parameters or if
+<span style="font-weight: bold;">--help </span>option is
+used.<br>
+</p>
+<p><i>Parameters</i>:<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--help'</span>:
+help<br>
+'-h': help<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--username'</span>:
+your membername/ hash<br>
+'-u': your membername / hash<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--password'</span>:
+your password. Optional.<br>
+'-p': your password<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--alias':</span>
+alias host name. this option
+can appear multiple
+times. (for each domain that has the same IP)<br>
+'-a': alias host name. this option can appear multiple times.<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--input_file'</span>:
+input file name that
+contains
+inadyn command options (adds to those already present in the cmd line).
+The default configuration file name is '/etc/inadyn.conf'. It is only
+used if inadyn is called without any command line options. This allows
+inadyn to be called without any arguments. The format is as expected
+for a **NIX config&nbsp; file. See below for details.<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--ip_server_name[:port]
+url':</span> The client
+IP is detected by calling 'url' from this 'ip_server_name:port'.
+Defaults to checkip.dyndns.org:80 /. <br>
+</p>
+<span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;
+'--dyndns_server_name': [</span><name style="font-weight: bold;">[:port]]</name>
+<p style="margin-left: 40px;">The server that receives the update DNS
+request.<br>
+If no proxy is wanted, then it is enough to set the dyndns system. The
+default servers will be
+taken.<br>
+</p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">
+'--dyndns_server_url' </span><name> <br>
+full URL relative to DynDNS server root.
+</name></p>
+<p style="margin-left: 20px;"><span style="font-weight: bold;">'--dyndns_system'</span>:
+[NAME] - optional
+DYNDNS service type. SHOULD
+be one of the following:</p>
+<p style="margin-left: 40px;">-For dyndns.org DNS system:
+<span style="text-decoration: underline;">dyndns@dyndns.org</span> OR<span
+ style="text-decoration: underline;">
+statdns@dyndns.org</span> OR <span style="text-decoration: underline;">custom@dyndns.org</span>.<br>
+-For freedns.afraid.org DNS system: <span
+ style="text-decoration: underline;">default@freedns.afraid.org</span> .<br>
+-For the servcie ofered by zoneedit.com: <span
+ style="text-decoration: underline;">default@zoneedit.com</span>. <br>
+- For no-ip.com :<span style="text-decoration: underline;">
+default@no-ip.com</span><br>
+-For generic DNS system:
+<span style="text-decoration: underline;">custom@http_svr_basic_auth</span><br>
+<span style="font-weight: bold;">DEFAULT </span>value is intended for <span
+ style="text-decoration: underline;">default service</span> at
+dyndns.org:
+dyndns@dyndns.org<br>
+</p>
+'<span style="font-weight: bold;">--proxy_server</span>': [NAME[:port]]
+- the
+http proxy server name and
+port. Default is none.<br>
+'<span style="font-weight: bold;">--update_period</span>': how often
+the IP is checked. The period is in [ms].
+Default is about 1 min.
+Max is 10 days<br>
+'<span style="font-weight: bold;">--update_period_sec</span>': how
+often the IP is checked. The period is in
+[sec]. Default is about 1
+min. Max is 10 days<br>
+'<span style="font-weight: bold;">--forced_update_period</span>': how
+often the IP is updated even if it is not
+changed. [in sec]<br>
+'<span style="font-weight: bold;">--log_file</span>': log file path abd
+name<br>
+'<span style="font-weight: bold;">--background</span>': runs in
+background.&nbsp; Output to syslog or to log
+file [if specified].<br>
+'<span style="font-weight: bold;">--verbose'</span>: set dbg level. 0
+to 5<br>
+'<span style="font-weight: bold;">--iterations</span>': set the number
+of DNS updates. Default is 0, which
+means infinity.<br>
+'<span style="font-weight: bold;">--syslog</span>': explicit set output
+to syslog. (e.g. /var/log/messages).
+Works on **NIX systems only.<br>
+'<span style="font-weight: bold;">--change_persona uid[:gid]'</span>:
+After init changes user ID and group ID
+to the provided ones. This allows dropping unneeded [root] privileges
+after startup. Works for **NIX only. <br>
+<br>
+<h3><b>Support and Bug reports</b></h3>
+<br>
+Since this is free software the support [for free] is quite thin.
+However, the bugs are usually
+fixed very fast if they are reported.<br>
+No active testing is performed so without user feedback the bugs won't
+get discovered and
+fixed.<br>
+<br>
+<i>Contact info</i>:<br>
+<img src="inarcis2002.jpg"><br>
+Web: inadyn.inatech.eu<br>
+<br>
+<h3><b>HISTORY</b></h3>
+<b><br>
+</b>
+Ver.&nbsp; 1.96.2 - 12 March 2007<br>
+&nbsp;&nbsp;&nbsp; Fixes:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - If the Dynamic DNS server responds with an error Inadyn will abort. This will prevent further retries with wrong dyndns credentials.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - Default port number included in the request, to support the requests via Proxy, to ports different than 80.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - Simplified main inadyn update loop function. (there was no bug there)<br>
+<br>
+
+Ver.&nbsp; 1.96 - 09 September 2005<br>
+&nbsp;&nbsp;&nbsp; New features:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - zoneedit.com supported.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - no-ip.com supported.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - support for generic DNS services that
+support HTTP updates<br>
+&nbsp;&nbsp;&nbsp;Fixes:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - immediate exit in case of
+--iterations=1 (not after a sleep period)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - added missing option for specifying
+the path in the DNS server<br>
+<br>
+Ver.&nbsp; 1.95 - 20 July 2005<br>
+&nbsp;&nbsp;&nbsp; New features:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - UNIX signals supported - inadyn will
+stop gracefully in case of&nbsp; ALRM, HUP, INT, ...<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - new dynamic dns service supported -
+www.zoneedit.com - Not tested!<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - makefile adjusted for Solaris -
+compilable under Solaris.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - support for generic DYNDNS service
+that supports update via HTTP with basic authentication<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; - not&nbsp; yet fully
+complete. Not known where might be applicable.<br>
+<br>
+Ver. 1.90 - 24 February 2005<br>
+&nbsp;&nbsp;&nbsp; New features/enhancements:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - new option '--change_persona uid:gid'
+- inadyn can switch the user after launch. Typical feature for daemons.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - addition to '--ip_server_name'
+feature,&nbsp; now it has another parameter: the URL to read from the
+given server name.<br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; -&nbsp; reduced&nbsp; some error
+messages <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - manual pages updated. (thanks to
+Shaul Karl)<br>
+&nbsp;&nbsp;&nbsp; Bugfixes:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - typo fixed (--ip_server_name option)<br>
+<br>
+Ver. 1.86 - 30 January 2005<br>
+&nbsp;&nbsp;&nbsp; Updated UNIX man pages for inadyn. Even a page for
+inadyn.conf! (thanks to Shaul Karl)<br>
+&nbsp;&nbsp;&nbsp; Enhancement: - Inadyn doesn't print anything (e.g.
+ver. number) anymore when goes to background.<br>
+&nbsp;&nbsp;&nbsp; Enhancement: - new config file parser. Accepts
+ESCAPE character: '\'.<br>
+&nbsp;&nbsp;&nbsp; Bugfix: - Corrected check of the return code from
+socket() call.<br>
+<br>
+Ver. 1.85 - 10 January 2005<br>
+&nbsp;&nbsp;&nbsp; Config file related enhancements:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - a default location for the config
+file in case of no arguments for inadyn<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - a more **NIX like format for the
+config file. Thanks to Jerome Benoit. <br>
+<br>
+&nbsp;&nbsp;&nbsp; Small bugfix:<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; - in case when 'iterations' option is
+specified as being '1', inadyn exits immediately after first update,
+not after the sleep period as before. <br>
+<span style="font-weight: bold;"><br>
+</span><b> </b>Ver. 1.81&nbsp;- 23 November 2004 <br>
+&nbsp;&nbsp; &nbsp;No new features. Just a better integration with
+Linux OS:<br>
+Reviewed usage of syslog and fork to background in 'daemon mode',
+thanks to Shaul Karl. <br>
+<br>
+Ver. 1.80&nbsp; - 16 October 2004<br>
+&nbsp;&nbsp; &nbsp;New feature:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;--syslog: output to syslog for
+Linux (should work for all **nix systems)<br>
+&nbsp;&nbsp; &nbsp;New feature:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;run in background for Linux
+(should work for all **nix systems)<br>
+<br>
+&nbsp;&nbsp; &nbsp;Minor compile warnings removed.<br>
+<br>
+Ver. 1.70&nbsp; - 5 July 2004<br>
+&nbsp;&nbsp; &nbsp;Bugfix: <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;custom dns from dyndns option was
+not accepted by the cmd line parser. "Copy-paste" error :-( !<br>
+<br>
+&nbsp;&nbsp; &nbsp;New option: (not tested. It was a debug option now
+made accessible via cmd line. It should work)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;--iterations. Now one can run
+inadyn with only one iteration. <br>
+<br>
+Ver. 1.60&nbsp; - 5 June 2004<br>
+&nbsp;&nbsp; &nbsp;On users' request the inadyn can read the options
+from file. Ver. 1.5 - 1 May 2004<br>
+- Support for dynamic DNS service offered by freedns.afraid.org<br>
+- support for http proxy<br>
+- GPL Copyright notice added.<br>
+<p>Ver. 1.4 - 1 March 2004<br>
+- Support for custom DNS and static DNS services offered by dyndns.org.<br>
+- support for forced IP update (so the account will not expire even
+though the IP never
+changes)<br>
+<br>
+Ver. 1.35 - 04 february, 2004<br>
+- Bugfixes: - It supports AGAIN the multiple aliases for the same IP
+address<br>
+- Under Windows the OS signal handler is installed only once no matter
+if IP update errors
+occur<br>
+<br>
+Ver. 1.34 - 6 Novemeber 2003<br>
+- first port *NIX (Linux)<br>
+- Linux version running as console app<br>
+- bugfixes<br>
+<br>
+</p>
+<p>Ver. 1.2 - June 2003<br>
+- port to embedded system pSOS. Runs on the Remote management card.<br>
+Note:<br>
+No DNS support under pSOS -&gt; input params are the IP addresses of
+the servers used (DynDNS,
+CGI)<br>
+</p>
+<p>Ver. 1.0 - 20 May 2003 - first stable version.<br>
+main features ready:</p>
+<p>- DYNDNS client</p>
+<p>- free<br>
+- works fine behind a NAT router<br>
+- runs fine as a service<br>
+- has a nice log file<br>
+- it is MINE ;)<br>
+<br>
+</p>
+<p><b>Future plans:<br>
+</b></p>
+<p>- port to some other DNS services.<br>
+</p>
+<br>
+<br>
+This page was visited so many times:
+<img
+ src="/cgi-sys/Count.cgi?df=inatech.dat|display=Counter|ft=6|md=5|frgb=100;139;216|dd=A">since
+11.Jan.2005 <br>
+<br>
+
+</body>
+</html>

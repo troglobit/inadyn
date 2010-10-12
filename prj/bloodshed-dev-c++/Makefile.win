@@ -1,0 +1,68 @@
+# Project: inadyn
+# Makefile created by Dev-C++ 4.9.8.0
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = inadyn_private.res
+OBJ  = ../../bin/base64utils.o ../../bin/dyndns.o ../../bin/errorcode.o ../../bin/get_cmd.o ../../bin/http_client.o ../../bin/inadyn_cmd.o ../../bin/ip.o ../../bin/main.o ../../bin/os.o ../../bin/os_psos.o ../../bin/os_unix.o ../../bin/os_windows.o ../../bin/tcp.o $(RES)
+LINKOBJ  = ../../bin/base64utils.o ../../bin/dyndns.o ../../bin/errorcode.o ../../bin/get_cmd.o ../../bin/http_client.o ../../bin/inadyn_cmd.o ../../bin/ip.o ../../bin/main.o ../../bin/os.o ../../bin/os_psos.o ../../bin/os_unix.o ../../bin/os_windows.o ../../bin/tcp.o $(RES)
+LIBS =  -L"c:/programs/Dev-Cpp/lib" ../../../../../../programs/Dev-Cpp/lib/libws2_32.a 
+INCS =  -I"c:/programs/Dev-Cpp/include" 
+CXXINCS =  -I"c:/programs/Dev-Cpp/include/c++"  -I"c:/programs/Dev-Cpp/include/c++/mingw32"  -I"c:/programs/Dev-Cpp/include/c++/backward"  -I"c:/programs/Dev-Cpp/include" 
+BIN  = ../../bin/win32/inadyn.exe
+CXXFLAGS = $(CXXINCS)  -fexpensive-optimizations -O1 -nostdlib
+CFLAGS = $(INCS)  -fexpensive-optimizations -O1 -nostdlib
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before ../../bin/win32/inadyn.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(LINKOBJ)
+	$(CC) $(LINKOBJ) -o "..\..\bin\win32\inadyn.exe" $(LIBS)
+
+../../bin/base64utils.o: ../../src/base64utils.c
+	$(CC) -c ../../src/base64utils.c -o ../../bin/base64utils.o $(CFLAGS)
+
+../../bin/dyndns.o: ../../src/dyndns.c
+	$(CC) -c ../../src/dyndns.c -o ../../bin/dyndns.o $(CFLAGS)
+
+../../bin/errorcode.o: ../../src/errorcode.c
+	$(CC) -c ../../src/errorcode.c -o ../../bin/errorcode.o $(CFLAGS)
+
+../../bin/get_cmd.o: ../../src/get_cmd.c
+	$(CC) -c ../../src/get_cmd.c -o ../../bin/get_cmd.o $(CFLAGS)
+
+../../bin/http_client.o: ../../src/http_client.c
+	$(CC) -c ../../src/http_client.c -o ../../bin/http_client.o $(CFLAGS)
+
+../../bin/inadyn_cmd.o: ../../src/inadyn_cmd.c
+	$(CC) -c ../../src/inadyn_cmd.c -o ../../bin/inadyn_cmd.o $(CFLAGS)
+
+../../bin/ip.o: ../../src/ip.c
+	$(CC) -c ../../src/ip.c -o ../../bin/ip.o $(CFLAGS)
+
+../../bin/main.o: ../../src/main.c
+	$(CC) -c ../../src/main.c -o ../../bin/main.o $(CFLAGS)
+
+../../bin/os.o: ../../src/os.c
+	$(CC) -c ../../src/os.c -o ../../bin/os.o $(CFLAGS)
+
+../../bin/os_psos.o: ../../src/os_psos.c
+	$(CC) -c ../../src/os_psos.c -o ../../bin/os_psos.o $(CFLAGS)
+
+../../bin/os_unix.o: ../../src/os_unix.c
+	$(CC) -c ../../src/os_unix.c -o ../../bin/os_unix.o $(CFLAGS)
+
+../../bin/os_windows.o: ../../src/os_windows.c
+	$(CC) -c ../../src/os_windows.c -o ../../bin/os_windows.o $(CFLAGS)
+
+../../bin/tcp.o: ../../src/tcp.c
+	$(CC) -c ../../src/tcp.c -o ../../bin/tcp.o $(CFLAGS)
+
+inadyn_private.res: inadyn_private.rc 
+	$(WINDRES) -i inadyn_private.rc -I rc -o inadyn_private.res -O coff 
