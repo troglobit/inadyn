@@ -94,6 +94,11 @@ extern "C" {
     typedef int BOOL;
 #endif
 
+#ifndef UNIX_OS
+    typedef unsigned int uid_t;
+    typedef unsigned int gid_t;
+#endif
+
 
 /* general defines */
 #ifndef SOCKET_ERROR
@@ -139,8 +144,8 @@ typedef struct
 
 typedef struct
 {
-	int uid;
-	int gid;
+	uid_t uid;
+	gid_t gid;
 } OS_USER_INFO;
 
 RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info);

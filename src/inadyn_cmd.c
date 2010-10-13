@@ -524,19 +524,19 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 	}
 
 	{
-		int gid = -1;
-		int uid = -1;
+		gid_t gid = getuid();
+		uid_t uid = getgid();
 
 		char *p_gid = strstr(p_cmd->argv[current_nr],":");
 		if (p_gid)
 		{
 			if ((strlen(p_gid + 1) > 0) &&  /* if something is present after :*/
-				sscanf(p_gid + 1, "%d",&gid) != 1)
+				sscanf(p_gid + 1, "%u",&gid) != 1)
 			{
 				return RC_DYNDNS_INVALID_OPTION;
 			}
 		}
-		if (sscanf(p_cmd->argv[current_nr], "%d",&uid) != 1)
+		if (sscanf(p_cmd->argv[current_nr], "%u",&uid) != 1)
 		{
 			return RC_DYNDNS_INVALID_OPTION;
 		}

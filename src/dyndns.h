@@ -230,8 +230,8 @@ typedef struct
 
 typedef struct
 {
-	int uid;
-	int gid;
+	uid_t uid;
+	gid_t gid;
 } USER_INFO;
 
 typedef struct DYN_DNS_CLIENT

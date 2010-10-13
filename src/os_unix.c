@@ -179,7 +179,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 	int rc;
 	do
 	{	 
-		if (p_usr_info->gid != -1) 
+		if (p_usr_info->gid != getgid())
 		{
 			if ((rc = setgid(p_usr_info->gid)) != 0)
 			{
@@ -187,7 +187,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 			}
 		}
 
-		if (p_usr_info->uid != -1) 
+		if (p_usr_info->uid != getuid())
 		{			
 			if ((rc = setuid(p_usr_info->uid)) != 0)
 			{
@@ -198,7 +198,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 	while(0);
 	if (rc != 0)
     {
-		DBG_PRINTF((LOG_WARNING, "Error changing uid/gid. OS err=0x%x\n",errno));
+		DBG_PRINTF((LOG_WARNING, "Error changing uid/gid: %s\n", strerror(errno)));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 	return RC_OK;
