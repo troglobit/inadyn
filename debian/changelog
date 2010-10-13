@@ -1,0 +1,164 @@
+inadyn (1.96.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the history specified in
+    readme.html.
+  * debian/control:
+    - bump Standards-Version - 3.8.1.
+    - add Homepage field.
+    - remove patch package build dependency.
+    - bump debhelper version dependency >= 7.
+    - remove fakeroot package build dependency. Closes: #345763.
+    - add dpatch package build dependency.
+  * debian/rules:
+    - bump DH_COMPAT - 5.
+    - move DH_COMPAT declaration to debian/compat file.
+    - move example files declaration to debian/examples.
+  * debian/patches: remove patch
+    - 01_testAndCreateOrigTarBall.dpatch: creating orig tarball not
+      necessary.
+  * debian/watch: fix watch URL. Closes: #456473.
+  * debian/copyright:
+    - add me as maintainer.
+    - update FSF address in license text.
+    - add src/base64utils.c and src/base64.h files licence.
+  * New maintainer. Closes: #514769 (ITA).
+
+ -- Timur Birsh <taem@linukz.org>  Tue, 16 Jun 2009 10:43:37 +0600
+
+inadyn (1.96-1) unstable; urgency=low
+
+  * New upstream release. Closes: #255606, 
+    src/os_unix.c:71: error: duplicate case value.
+  * debian/changes: Updating it according to the history specifyed in
+    readme.html.
+  * debian/control: Having no-ip.com mentioned in the supported servers.
+  * debian/patches/:
+    + 01_testAndCreateOrigTarBall.dpatch: Also excluding '*/bin/linux/*'
+      and '*/bin/mac/*' from the orig tar ball.
+    + 02_uid_tAndGid_t.dpatch: Updating the line numbers for the
+      patches.
+    + 03_inadyn8ManPage.dpatch: Updated according to upstream changes.
+  * dpatch: Had to build the package where dpatch was not available.
+    Consequently,
+    + The patches were applied manually.
+    + debian/rules: the 2 lines with dpatch were put into comments.
+    + debian/control: /Build-Depends/s/dpatch, //
+
+ -- Shaul Karl <shaul@debian.org>  Sun, 13 Nov 2005 07:10:21 -0600
+
+inadyn (1.95-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the history specifyed in
+    readme.html.
+  * initial uploading to the Debian archive.    closes: #255606 (ITP).
+  * debian/rules:
+    + %s/makefile.linux/makefile/ due to upstream making a similar change.
+    + install target: using bin/linux/inadyn rather then bin/inadyn. Once
+      again, this is an upstream modification.
+  * debian/patches/:
+    + 02_setUserGroup.dpatch: Removed as it was merged upstream.
+    + 02_uid_tAndGid_t.dpatch: Added to use Unix uid_t and gid_t.
+    + 03_unixSignals.dpatch: Removed since signals handling were added by
+      upstream.
+    + 03_inadyn8ManPage.dpatch: Document the signals being honored 
+      explicitly.
+  * debian/control:Standards-Version: Set to 3.6.2.
+
+ -- Shaul Karl <shaul@debian.org>  Thu,  4 Aug 2005 15:29:16 +0300
+
+inadyn (1.90-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the history specifyed in
+    readme.html.
+  * initial uploading to the Debian archives.    closes: #255606 (ITP).
+  * debian/patches/01_testAndCreateOrigTarBall: Using 
+        fakeroot debian/rules clean
+    before dpkg-source.  
+  * debian/control:Build-Depends: Replaced unzip with fakeroot because
+    of debian/patches/01_testAndCreateOrigTarBall.
+  * debian/patches/02_manPages.dpatch: Removed as it was merged 
+    upstream.
+  * debian/patches/02_setUserGroup.dpatch: Added to modify upstream
+    handling of the setuid and setgid feature.
+  * debian/patches/03_unixSignals.dpatch: Currently only a framework to
+    handle Unix signals. However it wasn't specified in 
+    debian/patches/00list because the full details should be worked with
+    the upstream author.
+  * debian/watch: 2s/net\//net\/readme.html /
+
+ -- Shaul Karl <shaul@debian.org>  Sun, 27 Feb 2005 12:29:16 +0200
+
+inadyn (1.86-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the history specifyed in
+    readme.html.
+  * debian/inadyn.conf: updating it to reflect the recognision of an
+    escape character.
+  * debian/patches/01_testAndCreateOrigTarBall: upstream no longer ships
+    .exe files in bin/win32 which distribution might be ilegal.
+  * man pages: 
+    - rm debian/inadyn.conf.5 bacuase inadyn.conf.5 is provided by the 
+      upstream author.
+    - debian/rules:
+          /dh_installman/s/debian\/inadyn.conf.5/man\/inadyn.conf.5/
+    - debian/patches/02_manPages.dpatch: Making it refelct the possible
+      usage of an escape character in the configuration file.
+
+ -- Shaul Karl <shaul@debian.org>  Tue,  1 Feb 2005 01:30:36 +0200
+
+inadyn (1.85-1) unstable; urgency=low
+
+  * New upstream release.
+  * A new home page, http://inadyn.ina-tech.net. Updating
+    debian/{copyright,control,watch}
+  * debian/changes: Updating it according to the changes specifyed in
+    readme.html.
+  * debian/patches/01_testAndCreateOrigTarBall: using it also to remove
+    the bin directory from the tar ball, partially because it is not 
+    clear whether distributing the .exe files from bin/win32 is legal.
+  * man pages: 
+    - rm debian/inadyn.8 bacuase inadyn.man is provided by the upstream
+      author.
+    - debian/rules: /dh_installman/s/debian\/inadyn.8/man\/inadyn.man/
+    - Modifying inadyn.man to be more consistent with readme.html by
+      means of debian/patches/02_manPages.dpatch
+    - Adding a new inadyn.conf.5 man page.
+  * debian/inadyn.conf: An example configuration file, which is now 
+    installed from within debian/rules with dh_installexamples
+  * debian/control: Modified the single line synopsis according to
+    suggestions made by lintian.
+
+ -- Shaul Karl <shaul@debian.org>  Fri, 28 Jan 2005 00:58:24 +0200
+
+inadyn (1.80-16.october.2004-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the changes specifyed in
+    readme.html.
+  * debian/patches: now only using 01_testAndCreateOrigTarBall.
+
+ -- Shaul Karl <shaul@debian.org>  Mon, 18 Oct 2004 11:48:39 +0200
+
+inadyn (1.70-05.july.2004-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/changes: Updating it according to the changes specifyed in
+    readme.txt.
+  * debian/patches/01_testAndCreateOrigTarBall.dpatch is now 01.
+    Adding unzip to debian/control:Build-Depends because of it.
+
+ -- Shaul Karl <shaul@debian.org>  Sun, 19 Sep 2004 01:15:32 +0300
+
+inadyn (v1.60-5.june.2004-1) unstable; urgency=low
+
+  * Initial packaging as a deb.
+
+ -- Shaul Karl <shaul@debian.org>  Sun, 20 Jun 2004 16:00:03 +0300
+
+Local variables:
+mode: debian-changelog
+End:

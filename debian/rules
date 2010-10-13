@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+
+export DH_OPTIONS=
+
+CFLAGS+=$(if $(findstring debug,$(DEB_BUILD_OPTIONS)),-g)
+CFLAGS+=$(if $(findstring noopt,$(DEB_BUILD_OPTIONS)),-O0,-O2)
+
+build: patch
+build: build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE) -f makefile all
+	touch $@
+
+clean: clean-patched unpatch
+clean-patched:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp install-stamp 
+	$(MAKE) -f makefile cleanall
+	dh_clean
+
+patch: patch-stamp
+patch-stamp:
+	dpatch apply-all
+	touch $@
+
+unpatch:
+	dpatch deapply-all
+	[ ! -d debian/patched ] || rm -rf debian/patched
+	[ ! -f patch-stamp ] || rm -f patch-stamp
+
+uninstall:
+	dh_testdir
+	dh_testroot
+	rm -f install-stamp
+	dh_clean -k
+
+install: build
+install: install-stamp
+install-stamp: DH_OPTIONS=
+install-stamp:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs usr/sbin
+	install $(CURDIR)/bin/linux/inadyn $(CURDIR)/debian/inadyn/usr/sbin 
+	dh_installdocs
+	dh_installchangelogs debian/changes
+	dh_link
+	touch $@
+
+binary-indep: DH_OPTIONS=-i
+binary-indep: install
+
+binary-arch: DH_OPTIONS=-a
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installman man/inadyn.8 man/inadyn.conf.5
+	dh_installexamples
+	dh_strip
+	dh_compress
+	dh_fixperms 
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol 
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install uninstall patch unpatch

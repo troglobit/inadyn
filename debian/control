@@ -1,0 +1,23 @@
+Source: inadyn
+Section: net
+Priority: optional
+Maintainer: Timur Birsh <taem@linukz.org>
+Build-Depends: debhelper (>= 7), dpatch
+Standards-Version: 3.8.1
+Homepage: http://www.inatech.eu/inadyn/
+
+Package: inadyn
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: client to alleviate the requirements for an Internet name
+ With this package the user can have an Internet name for his host 
+ even though he might not have a name server or a static IP. It works
+ by being a client of a supposedly open name server and updating the 
+ server's records when the need arise. A partial list of the servers
+ that are supported is http://{www.dyndns.org,freedns.afraid.org,
+ www.zoneedit.com,www.no-ip.com}. Some of the services of these servers
+ are free of charge.
+ This is a command line tool that is written in portable ANSI C with a 
+ little OS abstraction layer. It can maintain multiple host names with
+ the same IP address, and has a web based IP detection which runs well
+ behind a NAT router.

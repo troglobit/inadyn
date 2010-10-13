@@ -1,0 +1,148 @@
+Ver.  1.96.2 - 12 March 2007
+    - Fixes:
+       - If the Dynamic DNS server responds with an error Inadyn will abort.
+         This will prevent further retries with wrong dyndns credentials.
+       - Default port number included in the request, to support the requests
+         via Proxy, to ports different than 80.
+       - Simplified main inadyn update loop function. (there was no bug there)
+
+Ver. 1.96  -  9 September 2005
+    - New features:
+        - zoneedit.com supported.
+        - no-ip.com supported.
+        - support for generic DNS services that support HTTP updates
+    - Fixes:
+        - immediate exit in case of --iterations=1 (not after a sleep
+          period)
+        - added missing option for specifying the path in the DNS
+          server
+
+Ver. 1.95  - 20 July      2005
+    - New features:
+        - UNIX signals supported - inadyn will stop gracefully in case
+          of  ALRM, HUP, INT, ...
+        - new dynamic dns service supported - www.zoneedit.com - Not tested!
+        - makefile adjusted for Solaris - compilable under Solaris.
+        - support for generic DYNDNS service that supports update via HTTP
+          with basic authentication not yet fully complete. Not known where
+          might be applicable.
+
+Ver. 1.90  - 24 February  2005
+    - New features/enhancements:
+        - new option '--change_persona uid:gid' - inadyn can switch the
+          user after launch. Typical feature for daemons.
+        - addition to '--ip_server_name' feature,  now it has another
+          parameter: the URL to read from the given server name.
+        - reduced some error messages
+        - manual pages updated. (thanks to Shaul Karl)
+
+    - Bugfixes:
+        - typo fixed (--ip_server_name option)
+
+Ver. 1.86  - 30 January   2005
+    - Updated UNIX man pages for inadyn. Even a page for inadyn.conf!
+      (thanks to Shaul Karl)
+
+    - Enhancement:
+        - Inadyn doesn't print anything (e.g. ver. number) anymore when
+          goes to background.
+        - new config file parser. Accepts ESCAPE character: '\'.
+
+    - Bugfix:
+        - Corrected check of the return code from socket() call.
+ 
+Ver. 1.85  - 10 January   2005
+    - Config file related enhancements:
+        - a default location for the config file in case of no arguments
+          for inadyn
+        - a more **NIX like format for the config file. 
+          Thanks to Jerome Benoit. 
+ 
+    - Small bugfix:
+        - in case when 'iterations' option is specified as being '1',
+          inadyn exits immediately after first update, not after the
+          sleep period as before. 
+ 
+Ver. 1.81  - 23 November  2004 
+     No new features. Just a better integration with Linux OS:
+     Reviewed usage of syslog and fork to background in 'daemon mode',
+     thanks to Shaul Karl. 
+ 
+Ver. 1.80  - 16 October   2004
+    - New feature:
+        - syslog: output to syslog for Linux (should work for all **nix
+          systems)
+        - run in background for Linux (should work for all **nix
+          systems)
+ 
+    - Minor compile warnings removed.
+ 
+Ver. 1.80  - 16 October   2004
+    - New feature:
+        - syslog: output to syslog for Linux (should work for all **nix
+          systems)
+        - run in background for Linux (should work for all **nix
+          systems)
+ 
+    - Minor compile warnings removed.
+ 
+Ver. 1.70  -  5 July      2004
+	- Bugfix: 
+		- custom dns from dyndns option was not accepted by the cmd line
+		  parser. "Copy-paste" error :-( !
+    - New option:
+		- --iterations. Now one can run inadyn with only one iteration.
+		  (not tested. It was a debug option now made accessible via cmd 
+		   line. It should work)
+		   
+Ver. 1.60  -  5 June      2004
+	On users' request the inadyn can read the options from file.
+
+Ver. 1.51  -  3 May       2004
+	- support for more aliases for DNS service offered by
+	  freedns.afraid.org 
+
+Ver. 1.5   -  1 May       2004
+	- Support for dynamic DNS service offered by freedns.afraid.org
+	- support for http proxy
+	- GPL Copyright notice added.
+	
+Ver. 1.4   -  1 March     2004
+	- Support for custom DNS and static DNS services offered by 
+	  dyndns.org.
+	- support for forced IP update (so the account will not expire even
+	  though the IP never changes)
+	
+Ver. 1.35  -    February  2004
+	- Bugfixes:
+		- multiple aliases are AGAIN supported
+		- in case of error in IP update the OS signal handler is not installed again.
+Ver. 1.34  
+	- Various bugfixes. 
+	
+Ver. 1.3   -  6 November  2003 - first port to *NIX - (Linux)
+
+    - Linux version running OK as console app
+        
+	Future plans:
+		- run as a background daemon in Unix
+		- better interface
+
+Ver 1.2    -    June      2003
+    - port to pSOS
+    Note:
+        - no DNS support under pSOS -> hard coded IP addresses of the
+		  server
+
+Ver. 1.0   - 20 May       2003, first stable version.
+	main features ready: 
+		- DYNDNS client
+		- free
+		- works fine behind a NAT router
+		- runs fine as a service
+		- has a nice log file
+		- it is MINE ;)
+	Future plans:
+		- port to *NIX
+		- port to pSOS
+
