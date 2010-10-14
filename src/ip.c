@@ -92,7 +92,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 		/*remote addres */
 		if (p_self->p_remote_host_name != NULL)
 		{
-            unsigned long addr = 0;
+            		uint32_t addr = 0;
 			HOSTENT* p_remotehost = (HOSTENT*) gethostbyname(p_self->p_remote_host_name);
 			
 			if (p_remotehost == NULL)
@@ -111,7 +111,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			p_self->remote_addr.sin_family = AF_INET;
 			p_self->remote_addr.sin_port = htons(p_self->port); 
 			p_self->remote_addr.sin_addr.s_addr = (addr == 0) ?
-                    *((unsigned long *)p_remotehost->h_addr_list[0]) : addr; 
+                    *((uint32_t *)p_remotehost->h_addr_list[0]) : addr; 
 		}
 	}
 	while(0);

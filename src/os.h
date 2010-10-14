@@ -170,7 +170,7 @@ RC_TYPE os_install_signal_handler(void*);
 /*
     returns the inet addr of a char* begining with an IP address: "nnn.nnn.nnn.nnn"
 */
-RC_TYPE os_convert_ip_to_inet_addr(unsigned long *p_addr, const char *p_name);
+RC_TYPE os_convert_ip_to_inet_addr(unsigned int *p_addr, const char *p_name);
 
 /* MAIN - Dyn DNS update entry point.*/
 int inadyn_main(int argc, char* argv[]);
