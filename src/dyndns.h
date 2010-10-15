@@ -25,48 +25,49 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "http_client.h"
 #include "debug_if.h"
 
-#define DYNDNS_VERSION_STRING  "1.96.2"
-#define DYNDNS_AGENT_NAME  "inadyn/" DYNDNS_VERSION_STRING
+#define DYNDNS_VERSION_STRING	"1.96.2"
+#define DYNDNS_AGENT_NAME	"inadyn/" DYNDNS_VERSION_STRING
 #define DYNDNS_EMAIL_ADDR	"inarcis2002@hotpop.com"
 
 typedef enum
 {
-    DYNDNS_DYNAMIC,
-    DYNDNS_STATIC,
-    DYNDNS_CUSTOM,
-    DYNDNS_DEFAULT,
-    FREEDNS_AFRAID_ORG_DEFAULT,
+	DYNDNS_DYNAMIC,
+	DYNDNS_STATIC,
+	DYNDNS_CUSTOM,
+	DYNDNS_DEFAULT,
+	FREEDNS_AFRAID_ORG_DEFAULT,
 	ZONE_EDIT_DEFAULT,
 	CUSTOM_HTTP_BASIC_AUTH,
 	NOIP_DEFAULT,	
-    LAST_DNS_SYSTEM = -1
+	LAST_DNS_SYSTEM = -1
 } DYNDNS_SYSTEM_ID;
 
 /*test values*/
 #define DYNDNS_DEFAULT_DEBUG_LEVEL	1
 #define DYNDNS_DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
+#define DYNDNS_DEFAULT_CACHE_FILE	"/var/run/inadyn.cache"
 
 #define DYNDNS_MY_USERNAME		"test"
 #define DYNDNS_MY_PASSWD		"test"
 #define DYNDNS_MY_IP_SERVER		"checkip.dyndns.org"
-#define DYNDNS_MY_IP_SERVER_URL	"/"
-#define DYNDNS_MY_DNS_SERVER	"members.dyndns.org"
-#define DYNDNS_MY_DNS_SERVER_URL "/nic/update?"
-#define DYNDNS_MY_HOST_NAME_1	"test.homeip.net"
-#define DYNDNS_MY_HOST_NAME_2	"test2.homeip.net"
+#define DYNDNS_MY_IP_SERVER_URL		"/"
+#define DYNDNS_MY_DNS_SERVER		"members.dyndns.org"
+#define DYNDNS_MY_DNS_SERVER_URL	"/nic/update?"
+#define DYNDNS_MY_HOST_NAME_1		"test.homeip.net"
+#define DYNDNS_MY_HOST_NAME_2		"test2.homeip.net"
 #define DYNDNS_HTTP_PORT		80
 
 
 /*REQ/RSP definitions*/
 
 #define DYNDNS_IP_SERVER_RESPONSE_BEGIN "Current IP Address: "
-#define DYNDNS_IP_ADDR_FORMAT    "%d.%d.%d.%d"
-#define DYNDNS_ALL_DIGITS		 "0123456789"
+#define DYNDNS_IP_ADDR_FORMAT		"%d.%d.%d.%d"
+#define DYNDNS_ALL_DIGITS		"0123456789"
 
 
-#define DYNDNS_SYSTEM_CUSTOM	"custom"
-#define DYNDNS_SYSTEM_DYNAMIC	"dyndns"
-#define DYNDNS_SYSTEM_STATIC	"statdns" 
+#define DYNDNS_SYSTEM_CUSTOM		"custom"
+#define DYNDNS_SYSTEM_DYNAMIC		"dyndns"
+#define DYNDNS_SYSTEM_STATIC		"statdns"
 
 #define GENERIC_DNS_IP_SERVER_NAME DYNDNS_MY_IP_SERVER
 #define  DYNDNS_MY_DNS_SYSTEM  DYNDNS_DEFAULT
@@ -158,26 +159,26 @@ typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int nr, str
 typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, char *p_rsp, const char*p_ok_str);
 typedef struct 
 {
-    const char* p_key;
-    void* p_specific_data;
-    DNS_SYSTEM_SRV_RESPONSE_OK_FUNC p_rsp_ok_func;
-    DNS_SYSTEM_REQUEST_FUNC p_dns_update_req_func;
-    const char *p_ip_server_name;
+	const char* p_key;
+	void* p_specific_data;
+	DNS_SYSTEM_SRV_RESPONSE_OK_FUNC p_rsp_ok_func;
+	DNS_SYSTEM_REQUEST_FUNC p_dns_update_req_func;
+	const char *p_ip_server_name;
 	const char *p_ip_server_url;
-    const char *p_dyndns_server_name;
+	const char *p_dyndns_server_name;
 	const char *p_dyndns_server_url;
 	const char *p_success_string;
 }DYNDNS_SYSTEM;
 
 typedef struct 
 {
-    DYNDNS_SYSTEM_ID id;
-    DYNDNS_SYSTEM system;
+	DYNDNS_SYSTEM_ID id;
+	DYNDNS_SYSTEM system;
 } DYNDNS_SYSTEM_INFO;
 
 typedef struct 
 {
-    const char *p_system;
+	const char *p_system;
 } DYNDNS_ORG_SPECIFIC_DATA;
 
 typedef enum 
@@ -189,7 +190,7 @@ typedef enum
 
 typedef struct
 {
-    char str[DYNDNS_HASH_STRING_MAX_LENGTH];
+	char str[DYNDNS_HASH_STRING_MAX_LENGTH];
 } DYNDNS_HASH_TYPE;
 
 typedef struct 
@@ -204,12 +205,12 @@ typedef struct
 typedef struct 
 {
 	char name[DYNDNS_SERVER_NAME_LENGTH];
-    int port;
+	int port;
 } DYNDNS_SERVER_NAME;
 
 typedef struct 
 {
-    BOOL my_ip_has_changed;
+	BOOL my_ip_has_changed;
 	DYNDNS_SERVER_NAME my_ip_address;
 	DYNDNS_CREDENTIALS credentials;
 	DYNDNS_SYSTEM *p_dns_system;
@@ -236,6 +237,8 @@ typedef struct
 
 typedef struct DYN_DNS_CLIENT
 {
+	char *config_file;
+
 	DYN_DNS_CMD cmd;
 	int sleep_sec; /* time between 2 updates*/
 	int forced_update_period_sec; 
@@ -256,14 +259,13 @@ typedef struct DYN_DNS_CLIENT
 	char *p_req_buffer; /* for HTTP requests*/
 	int req_buffer_size;
 
-
 	USER_INFO sys_usr_info; /*info about the current account running inadyn*/
 	DYNDNS_INFO_TYPE info; /*servers, names, passwd*/
 	DYNDNS_ALIAS_INFO alias_info;
 
 	BOOL abort_on_network_errors;
 	BOOL force_addr_update;
-    BOOL use_proxy;
+	BOOL use_proxy;
 	BOOL abort;
 
 	/*dbg*/
@@ -357,3 +359,12 @@ void print_help_page(void);
 int inadyn_main(int argc, char* argv[]);
 
 #endif /*_DYNDNS_INCLUDED*/
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ *  c-basic-offset: 8
+ * End:
+ */

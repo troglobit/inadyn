@@ -35,6 +35,10 @@ Author: Narcis Ilisei
 #define MODULE_TAG      "INADYN: "  
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <time.h>
+
 #include "dyndns.h"
 #include "debug_if.h"
 #include "base64.h"
@@ -275,7 +279,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self)
 	char *p_ip;
 	char *p_current_str = p_self->http_tr.p_rsp;
 	BOOL found;
-    char new_ip_str[IP_V4_MAX_LENGTH];
+	char new_ip_str[IP_V4_MAX_LENGTH];
 
 	if (p_self->http_tr.rsp_len <= 0 || 
 		p_self->http_tr.p_rsp == NULL)
@@ -314,9 +318,23 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self)
 
 	if (found)
 	{        
-        sprintf(new_ip_str, DYNDNS_IP_ADDR_FORMAT, ip1, ip2, ip3, ip4);
-        p_self->info.my_ip_has_changed = (strcmp(new_ip_str, p_self->info.my_ip_address.name) != 0);
+		FILE *fp;
+
+                sprintf(new_ip_str, DYNDNS_IP_ADDR_FORMAT, ip1, ip2, ip3, ip4);
+                p_self->info.my_ip_has_changed = (strcmp(new_ip_str, p_self->info.my_ip_address.name) != 0);
 		strcpy(p_self->info.my_ip_address.name, new_ip_str);
+
+		if (p_self->info.my_ip_has_changed == 1)
+		{
+			/* write new ip to cache */
+			fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "w");
+			if (fp)
+			{
+				fprintf(fp,"%s", new_ip_str);
+				fclose(fp);
+			}
+		}
+
 		return RC_OK;
 	}
 	else
@@ -879,39 +897,39 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		return RC_INVALID_POINTER;
 	}
 
-	/* read cmd line options and set object properties*/
+	/* read cmd line options and set object properties */
 	rc = get_config_data(p_dyndns, argc, argv);
 	if (rc != RC_OK || p_dyndns->abort)
 	{
 		return rc;
 	}
 
-    /*if logfile provided, redirect output to log file*/
-    if (strlen(p_dyndns->dbg.p_logfilename) != 0)
-    {
-        rc = os_open_dbg_output(DBG_FILE_LOG, "", p_dyndns->dbg.p_logfilename);
-        if (rc != RC_OK)
-        {
-            return rc;
-        }
-    }
+	/* if logfile provided, redirect output to log file */
+	if (strlen(p_dyndns->dbg.p_logfilename) != 0)
+	{
+		rc = os_open_dbg_output(DBG_FILE_LOG, "", p_dyndns->dbg.p_logfilename);
+		if (rc != RC_OK)
+		{
+			return rc;
+		}
+	}
 
-	if (p_dyndns->debug_to_syslog == TRUE ||
-       (p_dyndns->run_in_background == TRUE))
+	if (p_dyndns->debug_to_syslog == TRUE || (p_dyndns->run_in_background == TRUE))
 	{
 		if (get_dbg_dest() == DBG_STD_LOG) /*avoid file and syslog output */
-        {
-            rc = os_open_dbg_output(DBG_SYS_LOG, "INADYN", NULL);
-            if (rc != RC_OK)
-            {
-                return rc;
-            }
-        }
+		{
+			rc = os_open_dbg_output(DBG_SYS_LOG, "INADYN", NULL);
+			if (rc != RC_OK)
+			{
+				return rc;
+			}
+		}
 	}
 
 	if (p_dyndns->change_persona)
 	{
 		OS_USER_INFO os_usr_info;
+
 		memset(&os_usr_info, 0, sizeof(os_usr_info));
 		os_usr_info.gid = p_dyndns->sys_usr_info.gid;
 		os_usr_info.uid = p_dyndns->sys_usr_info.uid;
@@ -922,21 +940,64 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		}
 	}
 
-    /*if silent required, close console window*/
-    if (p_dyndns->run_in_background == TRUE)
-    {
-        rc = close_console_window();
-        if (rc != RC_OK)
-        {
-            return rc;
-        }       
-        if (get_dbg_dest() == DBG_SYS_LOG)
-        {
-            fclose(stdout);
-        }
-    }
+	/* if silent required, close console window */
+	if (p_dyndns->run_in_background == TRUE)
+	{
+		rc = close_console_window();
+		if (rc != RC_OK)
+		{
+			return rc;
+		}
+		if (get_dbg_dest() == DBG_SYS_LOG)
+		{
+			fclose(stdout);
+		}
+	}
 
-    dyn_dns_print_hello(NULL);
+	dyn_dns_print_hello(NULL);
+
+	/* ... */
+	do
+	{
+		FILE *fp;
+		struct stat sb;
+		time_t t_mod_conf, t_mod_cache;
+
+		/* get last modification of cache and conf file, if m_time conf file is > to m_time cache file, no use cache ! */
+		if (stat(p_dyndns->config_file, &sb) != 0)
+		{
+			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on '%s' failed !\n", p_dyndns->config_file));
+			break;
+		}
+		t_mod_conf = sb.st_mtime;
+
+		if (stat(DYNDNS_DEFAULT_CACHE_FILE, &sb) != 0)
+		{
+			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on '%s' failed !\n", DYNDNS_DEFAULT_CACHE_FILE));
+			break;
+		}
+		t_mod_cache = sb.st_mtime;
+
+		if (t_mod_conf <= t_mod_cache)
+		{
+			/* read ip cache */
+			fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "r");
+			if (fp)
+			{
+				fgets(p_dyndns->info.my_ip_address.name, sizeof(p_dyndns->info.my_ip_address.name), fp); 
+				fclose(fp);
+				DBG_PRINTF((LOG_INFO, MODULE_TAG "IP read from cache file is '%s'. No update required.\n", p_dyndns->info.my_ip_address.name)); 
+			}
+			else
+			{
+				DBG_PRINTF((LOG_INFO, MODULE_TAG "Error when opening cache\n"));
+			}
+		}
+		else
+		{
+			DBG_PRINTF((LOG_INFO, MODULE_TAG "New config. No use cache.\n"));
+		}
+	} while (0);
 
 	/* the real work here */
 	do
@@ -967,18 +1028,18 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		}
 		
 		/*update IP address in a loop*/
-		while(1)
+		while (1)
 		{
 			rc = dyn_dns_update_ip(p_dyndns);
 			if (rc != RC_OK)
 			{
 				DBG_PRINTF((LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n",
 					errorcode_get_name(rc), rc, iterations)); 
-                if (rc == RC_DYNDNS_RSP_NOTOK)
-                { 
-                    DBG_PRINTF((LOG_ERR,"E: The response of DYNDNS svr was an error! Aborting.\n"));
-                    break;              			
-                }
+				if (rc == RC_DYNDNS_RSP_NOTOK)
+				{ 
+					DBG_PRINTF((LOG_ERR,"E: The response of DYNDNS svr was an error! Aborting.\n"));
+					break;
+				}
 			}
 			else /*count only the successful iterations */
 			{
@@ -1015,3 +1076,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	
 	return rc;
 }
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ *  c-basic-offset: 8
+ * End:
+ */

@@ -808,7 +808,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	FILE *p_file = NULL;
 	char *p_tmp_buffer = NULL;
 	const int buffer_size = DYNDNS_SERVER_NAME_LENGTH;
-    OPTION_FILE_PARSER parser;
+        OPTION_FILE_PARSER parser;
 	
 	if (!p_self || !p_cmd)
 	{
@@ -831,29 +831,32 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  		break;
 	  	}
 
-        if ((rc = parser_init(&parser, p_file)) != RC_OK)
-        {
-            break;
-        }
+		/* Save for later... */
+		p_self->config_file = p_cmd->argv[current_nr];
 
-    	while(!feof(p_file))
-     	{		 		
-	 		rc = parser_read_option(&parser,p_tmp_buffer, buffer_size);
-	 		if (rc != RC_OK)
-	 		{
-	 			break;
-	 		}
+                if ((rc = parser_init(&parser, p_file)) != RC_OK)
+                {
+			break;
+                }
 
-            if (!strlen(p_tmp_buffer))
-            {
-                break;
-            }
+                while(!feof(p_file))
+                {
+			rc = parser_read_option(&parser,p_tmp_buffer, buffer_size);
+			if (rc != RC_OK)
+			{
+				break;
+			}
 
-	 		rc = cmd_add_val(p_cmd, p_tmp_buffer);
-	 		if (rc != RC_OK)
-	 		{
-	 			break;
-	 		}
+			if (!strlen(p_tmp_buffer))
+			{
+				break;
+			}
+
+			rc = cmd_add_val(p_cmd, p_tmp_buffer);
+			if (rc != RC_OK)
+			{
+				break;
+			}
    		} 	     		
 	}
 	while(0);
@@ -866,6 +869,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	{
 		free(p_tmp_buffer);
 	}
+
 	return rc;
 }
 
@@ -987,5 +991,11 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 	return rc;
 }
 
-
-
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ *  c-basic-offset: 8
+ * End:
+ */
