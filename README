@@ -1,0 +1,26 @@
+README
+======
+
+Inadyn is a simple and small DDNS client written in the C language.  DDNS is a popular
+service for Internet users with dynamically allocated IP addresses.
+
+If your ISP provides you with a DHCP or PPPoE/PPPoA connection you risk losing your
+IP address every time you reconnect, or in DHCP even when the lease is renegotiated.
+
+By using a DDNS client such as inadyn you can register an Internet name at certain
+providers that the DDNS client updates, periodically and/or on demand when your IP
+changes.
+
+Inadyn can maintain multiple host names with the same IP address, and has a web based
+IP detection which runs well behind a NAT router.
+
+Common DDNS service providers:
+
+       http://www.dyndns.org
+       http://freedns.afraid.org
+       http://www.zoneedit.com
+       http://www.no-ip.com
+
+Some of these services are free of charge for non-commercial use, others take a small
+fee, but also provide more domains to chose from.
+
