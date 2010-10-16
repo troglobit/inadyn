@@ -56,25 +56,28 @@ static void *global_p_signal_handler_param = NULL;
 */
 static void unix_signal_handler(int signo)
 {	
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) global_p_signal_handler_param;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)global_p_signal_handler_param;
+
 	if (p_self == NULL)
 	{
 		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));		
 		return;
 	}
-	switch(signo)
+
+	switch (signo)
 	{
 		case SIGHUP:
 		case SIGINT:
 		case SIGQUIT:
 		case SIGALRM:
+		case SIGTERM:
 			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo));
 			p_self->cmd = CMD_STOP;			
-		break;
+			break;
 	
 		default:
 			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo));
-		break;
+			break;
 	}
 	return;
 } 
@@ -87,20 +90,21 @@ static void unix_signal_handler(int signo)
 RC_TYPE os_install_signal_handler(void *p_dyndns)
 {
 	RC_TYPE rc;
-    struct sigaction    newact;
+	struct sigaction    newact;
 	newact.sa_handler = unix_signal_handler;
 	newact.sa_flags   = 0;
 
-    rc = sigemptyset(&newact.sa_mask)              ||
-	         sigaddset(&newact.sa_mask, SIGHUP)   ||
-	         sigaddset(&newact.sa_mask, SIGINT)   ||
-	         sigaddset(&newact.sa_mask, SIGQUIT)  ||
-             sigaction(SIGALRM, &newact, NULL)    ||
-             sigemptyset(&newact.sa_mask)          ||
-	         sigaddset(&newact.sa_mask, SIGALRM)  ||
-             sigaction(SIGHUP, &newact, NULL)     ||
-             sigaction(SIGINT, &newact, NULL)     ||
-             sigaction(SIGQUIT, &newact, NULL);
+	rc = sigemptyset(&newact.sa_mask)            ||
+		sigaddset(&newact.sa_mask, SIGHUP)   ||
+		sigaddset(&newact.sa_mask, SIGINT)   ||
+		sigaddset(&newact.sa_mask, SIGQUIT)  ||
+		sigaction(SIGALRM, &newact, NULL)    ||
+		sigemptyset(&newact.sa_mask)         ||
+		sigaddset(&newact.sa_mask, SIGALRM)  ||
+		sigaction(SIGHUP, &newact, NULL)     ||
+		sigaction(SIGINT, &newact, NULL)     ||
+		sigaction(SIGQUIT, &newact, NULL)    ||
+		sigaction(SIGTERM, &newact, NULL);
  	if (rc != RC_OK)
  	{
  		DBG_PRINTF((LOG_WARNING,"DYNDNS: Error '%s' (0x%x) installing OS signal handler\n", rc));
@@ -109,6 +113,7 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 	{
 		global_p_signal_handler_param = p_dyndns;
 	}
+
 	return rc;
 }
 
@@ -135,25 +140,25 @@ RC_TYPE close_console_window(void)
 {
     pid_t pid = fork();
     
-    if(pid < 0)
+    if (pid < 0)
     {
         return RC_OS_FORK_FAILURE;
     }
     
-    if (pid == 0)
-    { /* child */
+    if (pid == 0)		/* child */
+    {
         fclose(stdin);
         fclose(stderr);
         setsid();  
         chdir("/");
         umask(0);  
+
         return RC_OK;
     }
-    else 
-    {
-        exit(0);
-    }
-    return RC_OK;
+
+    exit(0);
+
+    return RC_OK;		/* Never reached. */
 }
 
 /* MAIN - Dyn DNS update entry point.*/
@@ -204,3 +209,12 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 	return RC_OK;
 }
 #endif
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "ellemtel"
+ *  c-basic-offset: 8
+ * End:
+ */
