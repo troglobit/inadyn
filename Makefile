@@ -26,7 +26,7 @@ BASE_OBJS     = src/base64utils.o src/dyndns.o src/errorcode.o src/get_cmd.o \
 		src/http_client.o src/ip.o src/main.o src/os_unix.o src/os_windows.o \
 		src/os.o src/os_psos.o src/tcp.o src/inadyn_cmd.o
 OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
-CFLAGS        = -Iinclude $(CFG_INC) $(EXTRA_CFLAGS)
+CFLAGS        = -Iinclude -DVERSION_STRING=\"$(VERSION)\" $(CFG_INC) $(EXTRA_CFLAGS)
 CFLAGS       += -O2 -W -Wall
 LDLIBS       += $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE

@@ -149,7 +149,7 @@ static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 		return RC_OK;
 	}
 
-	while( counter --)
+	while (counter --)
 	{
 		if (p_self->cmd != old_cmd)
 		{
@@ -157,24 +157,31 @@ static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 		}
 		os_sleep_ms(p_self->cmd_check_period * 1000);
 	}
+
 	return RC_OK;
 }
 
 static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int cnt,DYNDNS_SYSTEM *p_sys_info)
 {	
-    DYNDNS_ORG_SPECIFIC_DATA *p_dyndns_specific = 
-		(DYNDNS_ORG_SPECIFIC_DATA*) p_sys_info->p_specific_data;
+	DYNDNS_ORG_SPECIFIC_DATA *p_dyndns_specific;
+
+	if (p_sys_info == NULL)
+	{
+		return 0;	/* No characters printed to req_buffer */
+	}
+
+ 	p_dyndns_specific = (DYNDNS_ORG_SPECIFIC_DATA *)p_sys_info->p_specific_data;
+
 	return sprintf(p_self->p_req_buffer, DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT,
-        p_self->info.dyndns_server_name.name,
-        p_self->info.dyndns_server_name.port,
-		p_self->info.dyndns_server_url,
-		p_dyndns_specific->p_system,
-		p_self->alias_info.names[cnt].name,
-		p_self->info.my_ip_address.name,
-		p_self->alias_info.names[cnt].name,
-        p_self->info.dyndns_server_name.name,
-		p_self->info.credentials.p_enc_usr_passwd_buffer
-		);
+		       p_self->info.dyndns_server_name.name,
+		       p_self->info.dyndns_server_name.port,
+		       p_self->info.dyndns_server_url,
+		       p_dyndns_specific->p_system,
+		       p_self->alias_info.names[cnt].name,
+		       p_self->info.my_ip_address.name,
+		       p_self->alias_info.names[cnt].name,
+		       p_self->info.dyndns_server_name.name,
+		       p_self->info.credentials.p_enc_usr_passwd_buffer);
 }
 
 static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int cnt, DYNDNS_SYSTEM *p_sys_info)
@@ -588,11 +595,11 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 /*
 	printout
 */
-void dyn_dns_print_hello(void*p)
+void dyn_dns_print_hello(void *p)
 {
 	(void) p;
 
-    DBG_PRINTF((LOG_INFO, MODULE_TAG "Started 'INADYN version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING));
+	DBG_PRINTF((LOG_INFO, MODULE_TAG "Started 'INADYN version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING));
 }
 /**
 	 basic resource allocations for the dyn_dns object

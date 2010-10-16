@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
+Copyright (C)  2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -25,9 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "http_client.h"
 #include "debug_if.h"
 
-#define DYNDNS_VERSION_STRING	"1.96.2"
+#define DYNDNS_VERSION_STRING	VERSION_STRING
 #define DYNDNS_AGENT_NAME	"inadyn/" DYNDNS_VERSION_STRING
-#define DYNDNS_EMAIL_ADDR	"inarcis2002@hotpop.com"
+#define DYNDNS_EMAIL_ADDR	"troglobit@vmlinux.org"
 
 typedef enum
 {
@@ -77,19 +77,19 @@ typedef enum
 	"GET http://%s:%d%s HTTP/1.0\r\n\r\n"
 
 /* dyndns.org specific update address format */	
-#define DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT \
-	"GET http://%s:%d%s" \
-		"system=%s&" \
-		"hostname=%s&" \
-		"myip=%s&" \
-		"wildcard=ON&" \
-		"mx=%s&" \
-	   "backmx=NO&" \
-	   "offline=NO " \
-	 "HTTP/1.0\r\n" \
-	"Host: %s\r\n" \
-	"Authorization: Basic %s\r\n" \
-	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+#define DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT				\
+	"GET http://%s:%d%s"						\
+	"system=%s&"							\
+	"hostname=%s&"							\
+	"myip=%s&"							\
+	"wildcard=ON&"							\
+	"mx=%s&"							\
+	"backmx=NO&"							\
+	"offline=NO "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
+	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
     
 /*freedns.afraid.org specific update request format */    
 #define FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT \
