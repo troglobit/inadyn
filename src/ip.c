@@ -19,10 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include <string.h>
 
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <errno.h>
+#include <stdio.h>
+
 #include "debug_if.h"
 #include "ip.h"
-
-
 
 /*public functions*/
 
@@ -40,8 +43,10 @@ RC_TYPE ip_construct(IP_SOCKET *p_self)
 	memset(p_self, 0, sizeof(IP_SOCKET));
 
 	p_self->initialized = FALSE;
+	p_self->bound = FALSE;
 	p_self->socket = 0;
-	memset( &p_self->remote_addr, 0,sizeof(p_self->remote_addr));
+	memset(&p_self->local_addr, 0, sizeof(p_self->local_addr));
+	memset(&p_self->remote_addr, 0, sizeof(p_self->remote_addr));
 	p_self->timeout = IP_DEFAULT_TIMEOUT;
 	
 	return RC_OK;
@@ -75,6 +80,10 @@ RC_TYPE ip_destruct(IP_SOCKET *p_self)
 RC_TYPE ip_initialize(IP_SOCKET *p_self)
 {
 	RC_TYPE rc = RC_OK; 
+	struct ifreq ifr;
+	char buf_nbd[8];
+	const char *interface = NULL;
+	struct sockaddr_in *addrp = NULL;
 
 	if (p_self->initialized == TRUE)
 	{
@@ -89,7 +98,39 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			break;
 		}
 
-		/*remote addres */
+		/* local bind */
+		if (p_self->ifname)
+		{
+			int sd = socket(PF_INET, SOCK_DGRAM, 0);
+
+			if (sd < 0)
+			{
+				rc = RC_IP_OS_SOCKET_INIT_FAILED;
+				break;
+			}
+
+			memset(&ifr, 0, sizeof(struct ifreq));
+			strncpy(ifr.ifr_name, p_self->ifname, IFNAMSIZ);
+			if (ioctl(sd, SIOCGIFADDR, &ifr) != -1)
+			{
+				p_self->local_addr.sin_family = AF_INET;
+				p_self->local_addr.sin_port = htons(0);
+				addrp = (struct sockaddr_in *)&(ifr.ifr_addr);
+				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
+				p_self->bound = TRUE;
+
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG "IP Adress of '%s' is '%s'\n",
+					    p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr)));
+			}
+			else
+			{
+				DBG_PRINTF((LOG_ERR, "Cannot obtain IP address of '%s': %s\n", p_self->ifname, strerror(errno)));
+				p_self->bound = FALSE;
+			}
+			close(sd);
+		}
+
+		/* remote addres */
 		if (p_self->p_remote_host_name != NULL)
 		{
             		uint32_t addr = 0;
@@ -97,21 +138,22 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			
 			if (p_remotehost == NULL)
 			{                
-                rc = os_convert_ip_to_inet_addr(&addr, p_self->p_remote_host_name);
-                if (rc != RC_OK)
-                {
-				    DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error '0x%x' resolving host name '%s'\n", 
-							    os_get_socket_error(),
-							    p_self->p_remote_host_name));
-				    rc = RC_IP_INVALID_REMOTE_ADDR;
-				    break;
-                }
+				rc = os_convert_ip_to_inet_addr(&addr, p_self->p_remote_host_name);
+				if (rc != RC_OK)
+				{
+					DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error '0x%x' resolving host name '%s'\n",
+						    os_get_socket_error(),
+						    p_self->p_remote_host_name));
+					rc = RC_IP_INVALID_REMOTE_ADDR;
+					break;
+				}
 			}
 			
 			p_self->remote_addr.sin_family = AF_INET;
-			p_self->remote_addr.sin_port = htons(p_self->port); 
-			p_self->remote_addr.sin_addr.s_addr = (addr == 0) ?
-                    *((uint32_t *)p_remotehost->h_addr_list[0]) : addr; 
+			p_self->remote_addr.sin_port = htons(p_self->port);
+			p_self->remote_addr.sin_addr.s_addr = (addr == 0) 
+				? *((uint32_t *)p_remotehost->h_addr_list[0])
+				: addr;
 		}
 	}
 	while(0);
@@ -252,7 +294,7 @@ RC_TYPE ip_set_port(IP_SOCKET *p_self, int p)
 	return RC_OK;
 }
 
-RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char* p)
+RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p)
 {
 	if (p_self == NULL)
 	{
@@ -272,6 +314,18 @@ RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t)
 	return RC_OK;
 }
 
+RC_TYPE ip_set_bind_iface(IP_SOCKET *p_self, char *ifname)
+{
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->ifname = ifname;
+
+	return RC_OK;
+}
+
 RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port)
 {
 	if (p_self == NULL || p_port == NULL)
@@ -282,7 +336,7 @@ RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port)
 	return RC_OK;
 }
 
-RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char* *p)
+RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p)
 {
 	if (p_self == NULL || p == NULL)
 	{
@@ -302,3 +356,23 @@ RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p)
 	return RC_OK;
 }
 
+RC_TYPE ip_get_bind_iface(IP_SOCKET *p_self, char **ifname)
+{
+	if (p_self == NULL || ifname == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	*ifname = p_self->ifname;
+
+	return RC_OK;
+}
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "ellemtel"
+ *  c-basic-offset: 8
+ * End:
+ */

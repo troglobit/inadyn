@@ -97,13 +97,13 @@ void os_printf(int prio, char *fmt, ... )
     vsnprintf(message, sizeof(message), fmt, args);
     va_end(args);
 
-	#ifdef HAVE_OS_SYSLOG
+#ifdef HAVE_OS_SYSLOG
     if (get_dbg_dest() == DBG_SYS_LOG)
     {
         syslog(prio, "%s",message);
     }
     else
-	#endif
+#endif
     {
         printf("%s",message); fflush(stdout);
     }

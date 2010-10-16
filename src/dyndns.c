@@ -767,29 +767,31 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 	p_self->abort_on_network_errors = FALSE;
 	p_self->force_addr_update = FALSE;
 
-    if (strlen(p_self->info.proxy_server_name.name) > 0)
-    {
-        http_client_set_port(&p_self->http_to_ip_server, p_self->info.proxy_server_name.port);
-        http_client_set_remote_name(&p_self->http_to_ip_server, p_self->info.proxy_server_name.name);
+	if (strlen(p_self->info.proxy_server_name.name) > 0)
+	{
+		http_client_set_port(&p_self->http_to_ip_server, p_self->info.proxy_server_name.port);
+		http_client_set_remote_name(&p_self->http_to_ip_server, p_self->info.proxy_server_name.name);
 
-        http_client_set_port(&p_self->http_to_dyndns, p_self->info.proxy_server_name.port);
-        http_client_set_remote_name(&p_self->http_to_dyndns, p_self->info.proxy_server_name.name);
-    }
-    else
-    {
-        http_client_set_port(&p_self->http_to_ip_server, p_self->info.ip_server_name.port);
-        http_client_set_remote_name(&p_self->http_to_ip_server, p_self->info.ip_server_name.name);
+		http_client_set_port(&p_self->http_to_dyndns, p_self->info.proxy_server_name.port);
+		http_client_set_remote_name(&p_self->http_to_dyndns, p_self->info.proxy_server_name.name);
+	}
+	else
+	{
+		http_client_set_port(&p_self->http_to_ip_server, p_self->info.ip_server_name.port);
+		http_client_set_remote_name(&p_self->http_to_ip_server, p_self->info.ip_server_name.name);
 
-        http_client_set_port(&p_self->http_to_dyndns, p_self->info.dyndns_server_name.port);
-        http_client_set_remote_name(&p_self->http_to_dyndns, p_self->info.dyndns_server_name.name);    
-    }
+		http_client_set_port(&p_self->http_to_dyndns, p_self->info.dyndns_server_name.port);
+		http_client_set_remote_name(&p_self->http_to_dyndns, p_self->info.dyndns_server_name.name);    
+	}
 
 	p_self->cmd = NO_CMD;
-    if (p_self->cmd_check_period == 0)
-    {
-	    p_self->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
-    }
+	if (p_self->cmd_check_period == 0)
+	{
+		p_self->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
+	}
 
+	http_client_set_bind_iface(&p_self->http_to_dyndns, p_self->interface);
+	http_client_set_bind_iface(&p_self->http_to_ip_server, p_self->interface);
 
 	p_self->initialized = TRUE;
 	return RC_OK;
@@ -1072,7 +1074,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			}									
 		}	 	
 	}
-	while(FALSE);	
+	while (0);
 	
 	return rc;
 }

@@ -24,10 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "os.h"
 #include "errorcode.h"
 
-
 /* SOME DEFAULT CONFIGURATIONS */
-#define IP_DEFAULT_TIMEOUT	20000 /*ms*/
-#define IP_SOCKET_MAX_PORT 65535
+#define IP_DEFAULT_TIMEOUT		20000 /* ms */
+#define IP_SOCKET_MAX_PORT		65535
 #define IP_DEFAULT_READ_CHUNK_SIZE	100
 
 /* typedefs */
@@ -40,8 +39,13 @@ typedef enum
 typedef struct 
 {
 	BOOL initialized;
+
+	char *ifname;
+        BOOL bound;             /* When bound to an interface */
+
 	int type;
 	SOCKET socket; 
+	struct sockaddr_in local_addr;
 	struct sockaddr_in remote_addr;
 	const char *p_remote_host_name;  
 
@@ -83,11 +87,22 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 
 /*Accessors */
 RC_TYPE ip_set_port(IP_SOCKET *p_self, int p);
-RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char* p);
+RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p);
 RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t);
+RC_TYPE ip_set_bind_iface(IP_SOCKET *p_self, char *ifname);
 
 RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port);
-RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char* *p);
+RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p);
 RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p);
+RC_TYPE ip_get_bind_iface(IP_SOCKET *p_self, char **ifname);
 
 #endif /*_IP_H_INCLUDED*/
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "ellemtel"
+ *  c-basic-offset: 8
+ * End:
+ */

@@ -83,10 +83,12 @@ RC_TYPE http_client_set_port(HTTP_CLIENT *p_self, int p);
 RC_TYPE http_client_set_remote_name(HTTP_CLIENT *p_self, const char* p);
 RC_TYPE http_client_set_remote_addr(HTTP_CLIENT *p_self, const char* p);
 RC_TYPE http_client_set_remote_timeout(HTTP_CLIENT *p_self, int t);
+RC_TYPE http_client_set_bind_iface(HTTP_CLIENT *p_self, char *ifname);
 
 RC_TYPE http_client_get_port(HTTP_CLIENT *p_self, int *p_port);
 RC_TYPE http_client_get_remote_name(HTTP_CLIENT *p_self, const char* *p);
 RC_TYPE http_client_get_remote_timeout(HTTP_CLIENT *p_self, int *p);
+RC_TYPE http_client_get_bind_iface(HTTP_CLIENT *p_self, char **ifname);
 
 #endif /*_HTTP_CLIENT_H_INCLUDED*/
 

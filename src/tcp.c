@@ -105,6 +105,17 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
+
+			if (p_self->super.bound == TRUE)
+			{
+				if (bind(p_self->super.socket, (struct sockaddr *)& p_self->super.local_addr, sizeof(struct sockaddr_in)) < 0)
+				{
+					close(p_self->super.socket);
+					perror("bind");
+					rc = RC_IP_SOCKET_BIND_ERROR;
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -194,30 +205,89 @@ RC_TYPE tcp_recv(TCP_SOCKET *p_self,char *p_buf, int max_recv_len, int *p_recv_l
 /* Accessors*/
 RC_TYPE tcp_set_port(TCP_SOCKET *p_self, int p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_set_port(&p_self->super, p);
 }
 
 RC_TYPE tcp_set_remote_name(TCP_SOCKET *p_self, const char* p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_set_remote_name(&p_self->super, p);
 }
 
 RC_TYPE tcp_set_remote_timeout(TCP_SOCKET *p_self, int p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_set_remote_timeout(&p_self->super, p);
+}
+
+RC_TYPE tcp_set_bind_iface(TCP_SOCKET *p_self, char *ifname)
+{
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	return ip_set_bind_iface(&p_self->super, ifname);
 }
 
 RC_TYPE tcp_get_port(TCP_SOCKET *p_self, int *p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_get_port(&p_self->super, p);
 }
 
-RC_TYPE tcp_get_remote_name(TCP_SOCKET *p_self, const char* *p)
+RC_TYPE tcp_get_remote_name(TCP_SOCKET *p_self, const char **p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_get_remote_name(&p_self->super, p);
 }
 
 RC_TYPE tcp_get_remote_timeout(TCP_SOCKET *p_self, int *p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return ip_get_remote_timeout(&p_self->super, p);
 }
+
+RC_TYPE tcp_get_bind_iface(TCP_SOCKET *p_self, char **ifname)
+{
+	if (p_self == NULL || ifname == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	return ip_get_bind_iface(&p_self->super, ifname);
+}
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "ellemtel"
+ *  c-basic-offset: 8
+ * End:
+ */

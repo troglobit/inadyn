@@ -182,29 +182,89 @@ RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr )
 
 RC_TYPE http_client_set_port(HTTP_CLIENT *p_self, int p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_set_port(&p_self->super, p);
 }
 
 RC_TYPE http_client_set_remote_name(HTTP_CLIENT *p_self, const char* p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_set_remote_name(&p_self->super, p);
 }
 
 RC_TYPE http_client_set_remote_timeout(HTTP_CLIENT *p_self, int p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_set_remote_timeout(&p_self->super, p);
+}
+
+RC_TYPE http_client_set_bind_iface(HTTP_CLIENT *p_self, char *ifname)
+{
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	return tcp_set_bind_iface(&p_self->super, ifname);
 }
 
 RC_TYPE http_client_get_port(HTTP_CLIENT *p_self, int *p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_get_port(&p_self->super, p);
 }
+
 RC_TYPE http_client_get_remote_name(HTTP_CLIENT *p_self, const char* *p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_get_remote_name(&p_self->super, p);
 }
+
 RC_TYPE http_client_get_remote_timeout(HTTP_CLIENT *p_self, int *p)
 {
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
 	return tcp_get_remote_timeout(&p_self->super, p);
 }
 
+RC_TYPE http_client_get_bind_iface(HTTP_CLIENT *p_self, char **ifname)
+{
+	if (p_self == NULL || ifname == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	return tcp_get_bind_iface(&p_self->super, ifname);
+}
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "ellemtel"
+ *  c-basic-offset: 8
+ * End:
+ */

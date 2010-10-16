@@ -78,10 +78,12 @@ RC_TYPE tcp_recv(TCP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_
 RC_TYPE tcp_set_port(TCP_SOCKET *p_self, int p);
 RC_TYPE tcp_set_remote_name(TCP_SOCKET *p_self, const char* p);
 RC_TYPE tcp_set_remote_timeout(TCP_SOCKET *p_self, int t);
+RC_TYPE tcp_set_bind_iface(TCP_SOCKET *p_self, char *ifname);
 
 RC_TYPE tcp_get_port(TCP_SOCKET *p_self, int *p_port);
 RC_TYPE tcp_get_remote_name(TCP_SOCKET *p_self, const char* *p);
 RC_TYPE tcp_get_remote_timeout(TCP_SOCKET *p_self, int *p);
+RC_TYPE tcp_get_bind_iface(TCP_SOCKET *p_self, char **ifname);
 
 
 #endif /*_TCP_H_INCLUDED*/

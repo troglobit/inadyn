@@ -61,6 +61,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 static RC_TYPE set_iterations_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_syslog_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 
 static CMD_DESCRIPTION_TYPE cmd_options_table[] = 
@@ -105,7 +106,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 			"\t\t-For generic DNS system: custom@http_svr_basic_auth\n"
             "\t\tDEFAULT value is intended for default service at dyndns.org (most users): dyndns@dyndns.org"},
 
-    {"--proxy_server", 1, {get_proxy_server_handler, NULL},
+	{"--proxy_server", 1, {get_proxy_server_handler, NULL},
             "[NAME[:port]]  - the http proxy server name and port. Default is none."},
 	{"--update_period",	1,	{get_update_period_handler, NULL},	
             "how often the IP is checked. The period is in [ms]. Default is about 1 min. Max is 10 days"},
@@ -120,7 +121,8 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--iterations",	1,	{set_iterations_handler, NULL},	"set the number of DNS updates. Default is 0, which means infinity."},
 	{"--syslog",	0,	{set_syslog_handler, NULL},	"force logging to syslog . (e.g. /var/log/messages). Works on **NIX systems only."},
 	{"--change_persona", 1, {set_change_persona_handler, NULL}, "after init switch to a new user/group. Parameters: <uid[:gid]> to change to. Works on **NIX systems only."},
-	{"--version", 0, {print_version_handler, NULL}, "print the version number\n"},
+	{"--bind_interface", 1, {set_bind_interface, NULL}, "set interface to bind. Parameters: <interface>. Works on UN*X systems only."},
+	{"--version", 0,        {print_version_handler, NULL}, "print the version number\n"},
 	{NULL,		0,	{0, NULL},	NULL }
 };
 
@@ -548,9 +550,24 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 	return RC_OK;
 }
 
+static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->interface = strdup(p_cmd->argv[current_nr]);
+
+	return RC_OK;
+}
+
 RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
@@ -558,6 +575,7 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 
 	DBG_PRINTF((LOG_INFO, "Version: %s\n", DYNDNS_VERSION_STRING));
 	p_self->abort = TRUE;
+
 	return RC_OK;
 }
 /** 
@@ -995,7 +1013,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "linux"
+ *  c-file-style: "ellemtel"
  *  c-basic-offset: 8
  * End:
  */
