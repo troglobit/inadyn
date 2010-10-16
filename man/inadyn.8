@@ -7,20 +7,18 @@
 .\" remains intact.
 .\"
 
-.TH INADYN 8 "October, 2004" "Linux applications" "System management commands"
+.TH INADYN 8 "October, 2010" "Linux applications" "System management commands"
 .SH NAME
 inadyn \- a client for open DNS servers.
 .SH SYNOPSIS
 .B inadyn
 [\-h | \-\-help] [\-u | \-\-username
 .I username
-] [\-p | \-\- password
+] [\-p | \-\-password
 .I password
 ] [\-a | \-\-alias[,hash]
-.I alias,hash
-[\-a | \-\-alias[,hash]
-.I another_alias,the_other_hash 
-\ ... ]] [\-\-input_file 
+.I alias[,hash] ...
+] [\-\-input_file
 .I path/name
 ] [\-\-ip_server_name
 .I server[:port] url
@@ -37,14 +35,16 @@ inadyn \- a client for open DNS servers.
 ] [\-\-forced_update_period
 .I sec
 ] [\-\-log_file
-.I path/name
+.I PATH
 ] [\-\-background] [\-\-verbose
 .I level
 ] [\-\-iterations
 .I iterations
-] [\-\-syslog]
-] [\-\-change_persona 
+] [\-\-change_persona
 .I uid[:gid]
+] [\-\-syslog]
+[\-\-bind_interface
+.I ifname
 ]
 .SH DESCRIPTION
 .B inadyn
@@ -156,8 +156,9 @@ Explicitly sending the output to a syslog like file, such as
 .TP
 .I \-\-change_persona uid[:gid]
 After init changes user ID and group ID to the provided ones. This allows dropping unneeded [root] privileges after startup.
-
-
+.TP
+.I \-\-bind_iface ifname
+Set interface to bind to. Works on UN*X systems only.
 .SH "TYPICAL USAGE"
 .SS
 .UR
