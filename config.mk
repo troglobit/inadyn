@@ -1,10 +1,3 @@
-# Make command to use for dependencies
-MAKECMD	      = make
-
-INADYN_BASE   = .
-SRCDIR	      = $(INADYN_BASE)/src
-OUTDIR	      = bin
-
 # Oversimplified arch setup, no smart detection.
 # Possible values: linux, mac, solaris, yourown
 ifndef TARGET_ARCH
