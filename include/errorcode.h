@@ -1,33 +1,33 @@
-/*
-  Copyright (C) 2003-2004 Narcis Ilisei
+/* Error code definitions
+ *
+ * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/* error code definitions */
 #ifndef _ERRORCODE_INCLUDED
 #define _ERRORCODE_INCLUDED
 
-typedef enum 
+typedef enum
 {
 	RC_OK = 0,
 	RC_ERROR = 1,
 	RC_INVALID_POINTER = 2,
 	RC_OUT_OF_MEMORY = 3,
 	RC_OUT_BUFFER_OVERFLOW = 4,
-    
+
 	RC_IP_SOCKET_CREATE_ERROR = 0x10,
 	RC_IP_BAD_PARAMETER = 0x11,
 	RC_IP_INVALID_REMOTE_ADDR = 0x12,
@@ -60,7 +60,7 @@ typedef enum
 	RC_OS_INVALID_IP_ADDRESS = 0x61,
 	RC_OS_FORK_FAILURE = 0x62,
 	RC_OS_CHANGE_PERSONA_FAILURE = 0x63,
-    
+
 	RC_FILE_IO_OPEN_ERROR = 0x70,
 	RC_FILE_IO_READ_ERROR = 0x71,
 	RC_FILE_IO_OUT_OF_BUFFER = 0x72
@@ -74,7 +74,7 @@ const char* errorcode_get_name(RC_TYPE rc);
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "linux"
+ *  c-file-style: "ellemtel"
  *  c-basic-offset: 8
  * End:
  */

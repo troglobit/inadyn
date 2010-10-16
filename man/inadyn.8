@@ -2,7 +2,7 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.\" Copyright 2004, by Shaul Karl. You may modify and distribute 
+.\" Copyright 2004, by Shaul Karl. You may modify and distribute
 .\" this document for any purpose as long as this copyright notice
 .\" remains intact.
 .\"
@@ -53,11 +53,11 @@ inadyn \- a client for open DNS servers.
 .B inadyn
 is a client for `open' name servers. That is, it let the user have an
 Internet recognized name for his machine by transferring to him some
-control over a name server that he does not manage. Some of the 
-services that are offered by those open name servers are free of 
+control over a name server that he does not manage. Some of the
+services that are offered by those open name servers are free of
 charge, and work even when the client machine does not have a static
 IP.
-The name servers that are supported by 
+The name servers that are supported by
 .B inayn
 are:
 .UR
@@ -96,7 +96,7 @@ looked at automatically if
 .B inadyn
 is called without any command line options. The format is as expected
 for a **NIX config   the hash character is used to comment entire
-lines. Spaces are ingored. The long options may be specified without 
+lines. Spaces are ingored. The long options may be specified without
 \-\- if placed at the beginning of the line.
 .TP
 .I \-\-ip_server_name[:port] url
@@ -108,10 +108,10 @@ The server that receives the update DNS requests. When no proxy is specified it 
 dyndns_system so that the default servers will be taken. The option is useful for generic DynDNS services that support HTTP update.
 .TP
 .I \-\-dyndns_server_url name
-The update path inside the DynDNS server. 
+The update path inside the DynDNS server.
 .TP
 .I \-\-dyndns_system
-An optional DNS service. For 
+An optional DNS service. For
 .UR
 http://www.dyndns.org
 .UE
@@ -120,7 +120,7 @@ or custom@dyndns.org. There is only one acceptable service for
 .UR
 http://freedns.afraid.org
 .UE
-, which is default@freedns.afraid.org. Other services are: default@zoneedit.com, custom@http_svr_basic_auth. The default service is 
+, which is default@freedns.afraid.org. Other services are: default@zoneedit.com, custom@http_svr_basic_auth. The default service is
 dyndns@dyndns.org, which is believed to be used by most users, at least
 initially.
 .TP
@@ -144,7 +144,7 @@ should be given in seconds.
 The name, including the full path, of a log file.
 .TP
 .I \-\-background
-run in background. Output is sent to the UNIX syslog facilities 
+run in background. Output is sent to the UNIX syslog facilities
 or to a log file, if one was specified.
 .TP
 .I \-\-verbose
@@ -154,7 +154,7 @@ Set the debug level, which is an integer between 0 to 5.
 Set the number of DNS updates. The default is 0, which means infinity.
 .TP
 .I \-\-syslog
-Explicitly sending the output to a syslog like file, such as 
+Explicitly sending the output to a syslog like file, such as
 /var/log/messages.
 .TP
 .I \-\-change_persona uid[:gid]
@@ -175,12 +175,12 @@ http://www.dyndns.org
  \-u username \-p password \-a my.registered.name
 .TP
 .B inadyn
-\-\-username test \-\-password test \-\-update_period 60000 
+\-\-username test \-\-password test \-\-update_period 60000
 \-\-alias test.homeip.net \-\-alias my.second.domain
 .TP
 .B inadyn
-\-\-background \-u test \-p test \-\-update_period 60000 
-\-\-alias inarcis.homeip.net \-\-alias my.second.domain 
+\-\-background \-u test \-p test \-\-update_period 60000
+\-\-alias inarcis.homeip.net \-\-alias my.second.domain
 \-\-log_file inadyn_srv.log
 .SS
 .UR
@@ -191,12 +191,12 @@ http://freedns.afraid.org
 \-\-dyndns_service default@freedns.afraid.org \-a my.registrated.name,hash_from_freedns
 .TP
 .B inadyn
-\-\-update_period 60000 \-\-alias test.homeip.net,hash_for_host1 
+\-\-update_period 60000 \-\-alias test.homeip.net,hash_for_host1
 \-a my.second.domain,hash2 \-\-dyndns_system default@freedns.afraid.org
 .PP
 The 'hash' should be extracted from the grab url batch file that can be
-downloaded from the site. A single hashed (base64 encoded) string is 
-preferred upon a username and password pair, apparently to reduce the 
+downloaded from the site. A single hashed (base64 encoded) string is
+preferred upon a username and password pair, apparently to reduce the
 computational resources that is required on their side. Unfortunately
 the hash can not be computed by inadyn because it requires the index to
 the username record in the freedns database, which is not known. The
@@ -205,7 +205,7 @@ file offered on their website. When the batch file looks is like
 
 graburl http://freedns.afraid.org/dynamic/update.php?YUGIUGSEIUFGOUIHEOIFEOIHJFEIO=
 
-the hash string, which is what the user should copy and paste, is the 
+the hash string, which is what the user should copy and paste, is the
 string that begins right after the '?' character and ends with the end
 of line. This string shell be used as the username in inadyn command.
 When the user has several names then each name should be followed with
@@ -216,9 +216,9 @@ inadyn
 prints a message when the IP is updated. If no update is needed then by
 default it prints a single '.' character, unless \-\-verbose is set to 0.
 Therefore, unless \-\-verbose is set to 0, the log file will contains lot
-of dots. When the connection goes down it could be that 
+of dots. When the connection goes down it could be that
 .B inadyn
-will print some error messages. Those are harmless and should be 
+will print some error messages. Those are harmless and should be
 followed by 'OK' messages after the connection is back up.
 .SH Signals
 Any of the SIG_HUP, SIG_INT, SIG_QUIT will cause inadyn to terminate gracefully.
@@ -239,6 +239,3 @@ was written by Narcis Ilisei, <inarcis2002@hotpop.com>.
 This manual page was written by Shaul Karl, <shaul@debian.org>, for the
 .B Debian GNU/Linux
 system, based on the readme.html file that is found in the source.
-
-
-

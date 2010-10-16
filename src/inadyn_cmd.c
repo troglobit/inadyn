@@ -1,33 +1,21 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
+ * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/*
-	Dyn Dns update main implementation file
-	Author: narcis Ilisei
-	Date: May 2003
-
-	History:
-		- first implemetnation
-		- 18 May 2003 : cmd line option reading added -
-		- many options added
-		- january 2005 - new format for the config file =Thanks to Jerome Benoit.
-	- january 30 2005 - new parser for config file -
-*/
 #define MODULE_TAG "CMD_OPTS: "
 
 #include <stdlib.h>
@@ -38,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "debug_if.h"
 #include "base64.h"
 #include "get_cmd.h"
+
+static int curr_info;
 
 /* command line options */
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
@@ -167,7 +157,11 @@ void print_help_page(void)
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
@@ -211,7 +205,11 @@ static RC_TYPE set_iterations_handler(CMD_DATA *p_cmd, int current_nr, void *p_c
 
 static RC_TYPE set_silent_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
@@ -220,7 +218,6 @@ static RC_TYPE set_silent_handler(CMD_DATA *p_cmd, int current_nr, void *p_conte
 	p_self->run_in_background = TRUE;
 	return RC_OK;
 }
-
 
 static RC_TYPE get_logfile_name(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
@@ -238,7 +235,6 @@ static RC_TYPE get_logfile_name(CMD_DATA *p_cmd, int current_nr, void *p_context
 	return RC_OK;
 }
 
-
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
@@ -248,11 +244,11 @@ static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_con
 	}
 
 	/*user*/
-	if (sizeof(p_self->info.credentials.my_username) < strlen(p_cmd->argv[current_nr]))
+	if (sizeof(p_self->info[curr_info].credentials.my_username) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
-	strcpy(p_self->info.credentials.my_username, p_cmd->argv[current_nr]);
+	strcpy(p_self->info[curr_info].credentials.my_username, p_cmd->argv[current_nr]);
 
 	return RC_OK;
 }
@@ -265,13 +261,13 @@ static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_con
 		return RC_INVALID_POINTER;
 	}
 
-	/*user*/
-	if (sizeof(p_self->info.credentials.my_password) < strlen(p_cmd->argv[current_nr]))
+	/*password*/
+	if (sizeof(p_self->info[curr_info].credentials.my_password) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
 
-	strcpy(p_self->info.credentials.my_password, (p_cmd->argv[current_nr]));
+	strcpy(p_self->info[curr_info].credentials.my_password, (p_cmd->argv[current_nr]));
 	return RC_OK;
 }
 
@@ -292,7 +288,7 @@ static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_contex
 		return RC_INVALID_POINTER;
 	}
 
-	if (p_self->alias_info.count >= DYNDNS_MAX_ALIAS_NUMBER)
+	if (p_self->info[curr_info].alias_count >= DYNDNS_MAX_ALIAS_NUMBER)
 	{
 		return RC_DYNDNS_TOO_MANY_ALIASES;
 	}
@@ -301,23 +297,23 @@ static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_contex
 	p_hash = strstr(p_cmd->argv[current_nr],",");
 	if (p_hash)
 	{
-		if (sizeof(*p_self->alias_info.hashes) < strlen(p_hash))
+		if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes) < strlen(p_hash))
 		{
 			return RC_DYNDNS_BUFFER_TOO_SMALL;
 		}
-		strcpy(p_self->alias_info.hashes[p_self->alias_info.count].str, p_hash);
+		strcpy(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes.str, p_hash);
 		*p_hash = '\0';
 	}
 
 
 	/*user*/
-	if (sizeof(p_self->alias_info.names[p_self->alias_info.count]) < strlen(p_cmd->argv[current_nr]))
+	if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].names) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
-	strcpy(p_self->alias_info.names[p_self->alias_info.count].name, (p_cmd->argv[current_nr]));
+	strcpy(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].names.name, (p_cmd->argv[current_nr]));
 
-	p_self->alias_info.count ++;
+	p_self->info[curr_info].alias_count++;
 	return RC_OK;
 }
 
@@ -359,28 +355,27 @@ static RC_TYPE get_ip_server_name_handler(CMD_DATA *p_cmd, int current_nr, void 
 		return RC_INVALID_POINTER;
 	}
 
-	/*user*/
-	if (sizeof(p_self->info.ip_server_name) < strlen(p_cmd->argv[current_nr]) + 1)
+	/*ip_server_name*/
+	if (sizeof(p_self->info[curr_info].ip_server_name) < strlen(p_cmd->argv[current_nr]) + 1)
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
 
-	p_self->info.ip_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info.ip_server_name.name, &port);
+	p_self->info[curr_info].ip_server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info[curr_info].ip_server_name.name, &port);
 	if (rc == RC_OK && port != -1)
 	{
-		p_self->info.ip_server_name.port = port;
+		p_self->info[curr_info].ip_server_name.port = port;
 	}
 
-	if (sizeof(p_self->info.ip_server_url) < strlen(p_cmd->argv[current_nr + 1]) + 1)
+	if (sizeof(p_self->info[curr_info].ip_server_url) < strlen(p_cmd->argv[current_nr + 1]) + 1)
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
-	strcpy(p_self->info.ip_server_url, p_cmd->argv[current_nr + 1]);
+	strcpy(p_self->info[curr_info].ip_server_url, p_cmd->argv[current_nr + 1]);
 
 	return rc;
 }
-
 static RC_TYPE get_dns_server_name_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
@@ -392,21 +387,20 @@ static RC_TYPE get_dns_server_name_handler(CMD_DATA *p_cmd, int current_nr, void
 		return RC_INVALID_POINTER;
 	}
 
-	/*user*/
-	if (sizeof(p_self->info.dyndns_server_name) < strlen(p_cmd->argv[current_nr]))
+	/*dyndns_server_name*/
+	if (sizeof(p_self->info[curr_info].dyndns_server_name) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
 
-	p_self->info.dyndns_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info.dyndns_server_name.name, &port);
+	p_self->info[curr_info].dyndns_server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info[curr_info].dyndns_server_name.name, &port);
 	if (rc == RC_OK && port != -1)
 	{
-		p_self->info.dyndns_server_name.port = port;
+		p_self->info[curr_info].dyndns_server_name.port = port;
 	}
 	return rc;
 }
-
 RC_TYPE get_dns_server_url_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
@@ -415,12 +409,12 @@ RC_TYPE get_dns_server_url_handler(CMD_DATA *p_cmd, int current_nr, void *p_cont
 		return RC_INVALID_POINTER;
 	}
 
-	/*name*/
-	if (sizeof(p_self->info.dyndns_server_url) < strlen(p_cmd->argv[current_nr]))
+	/*dyndns_server_url*/
+	if (sizeof(p_self->info[curr_info].dyndns_server_url) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
-	strcpy(p_self->info.dyndns_server_url, p_cmd->argv[current_nr]);
+	strcpy(p_self->info[curr_info].dyndns_server_url, p_cmd->argv[current_nr]);
 	return RC_OK;
 }
 
@@ -437,21 +431,20 @@ static RC_TYPE get_proxy_server_handler(CMD_DATA *p_cmd, int current_nr, void *p
 		return RC_INVALID_POINTER;
 	}
 
-	/*user*/
-	if (sizeof(p_self->info.proxy_server_name) < strlen(p_cmd->argv[current_nr]))
+	/*proxy_server_name*/
+	if (sizeof(p_self->info[curr_info].proxy_server_name) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
 	}
 
-	p_self->info.proxy_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info.proxy_server_name.name, &port);
+	p_self->info[curr_info].proxy_server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(p_cmd->argv[current_nr], p_self->info[curr_info].proxy_server_name.name, &port);
 	if (rc == RC_OK && port != -1)
 	{
-		p_self->info.proxy_server_name.port = port;
+		p_self->info[curr_info].proxy_server_name.port = port;
 	}
 	return rc;
 }
-
 /* Read the dyndnds name update period.
    and impose the max and min limits
 */
@@ -512,12 +505,17 @@ static RC_TYPE get_forced_update_period_handler(CMD_DATA *p_cmd, int current_nr,
 
 static RC_TYPE set_syslog_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
 	}
 	p_self->debug_to_syslog = TRUE;
+
 	return RC_OK;
 }
 
@@ -590,6 +588,9 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
 
+	(void)p_cmd;
+	(void)current_nr;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
@@ -601,16 +602,17 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	return RC_OK;
 }
 /**
-    Searches the DYNDNS system by the argument.
-    Input is like: system@server.name
-    system=statdns|custom|dyndns|default
-    server name = dyndns.org | freedns.afraid.org
-    The result is a pointer in the table of DNS systems.
+   Searches the DYNDNS system by the argument.
+   Input is like: system@server.name
+   system=statdns|custom|dyndns|default
+   server name = dyndns.org | freedns.afraid.org
+   The result is a pointer in the table of DNS systems.
 */
 static RC_TYPE get_dyndns_system_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYNDNS_SYSTEM *p_dns_system = NULL;
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
@@ -632,12 +634,24 @@ static RC_TYPE get_dyndns_system_handler(CMD_DATA *p_cmd, int current_nr, void *
 		return RC_DYNDNS_INVALID_OPTION;
 	}
 
-	p_self->info.p_dns_system = p_dns_system;
+	for (curr_info = 0; curr_info < p_self->info_count &&
+		     curr_info < DYNDNS_MAX_SERVER_NUMBER &&
+		     p_self->info[curr_info].p_dns_system != p_dns_system; curr_info++)
+	{
+	}
+	if (curr_info >= p_self->info_count)
+	{
+		if (curr_info < DYNDNS_MAX_SERVER_NUMBER)
+		{
+			p_self->info_count++;
+			p_self->info[curr_info].p_dns_system = p_dns_system;
+		}
+	   	else
+			return RC_DYNDNS_BUFFER_TOO_SMALL;
+	}
 
 	return RC_OK;
 }
-
-
 static RC_TYPE push_in_buffer(char* p_src, int src_len, char *p_buffer, int* p_act_len, int max_len)
 {
 	if (*p_act_len + src_len > max_len)
@@ -914,22 +928,23 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 }
 
 /*
-   Set up all details:
-   - ip server name
-   - dns server name
-   - username, passwd
-   - ...
-   Implementation:
-   - load defaults
-   - parse cmd line
-   - assign settings that may change due to cmd line options
-   - check data
-   Note:
-   - if no argument is specified tries to call the cmd line parser
-   with the default cfg file path.
+  Set up all details:
+  - ip server name
+  - dns server name
+  - username, passwd
+  - ...
+  Implementation:
+  - load defaults
+  - parse cmd line
+  - assign settings that may change due to cmd line options
+  - check data
+  Note:
+  - if no argument is specified tries to call the cmd line parser
+  with the default cfg file path.
 */
 RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 {
+	int i;
 	RC_TYPE rc = RC_OK;
 
 	do
@@ -975,50 +990,54 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			break;
 		}
 
-		/*settings that may change due to cmd line options*/
+		/* settings that may change due to cmd line options */
+		i = 0;
+		do
 		{
 			/*ip server*/
-			if (strlen(p_self->info.ip_server_name.name) == 0)
+			if (strlen(p_self->info[i].ip_server_name.name) == 0)
 			{
-				if (sizeof(p_self->info.ip_server_name.name) < strlen(p_self->info.p_dns_system->p_ip_server_name))
+				if (sizeof(p_self->info[i].ip_server_name.name) < strlen(p_self->info[i].p_dns_system->p_ip_server_name))
 				{
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(p_self->info.ip_server_name.name, p_self->info.p_dns_system->p_ip_server_name);
+				strcpy(p_self->info[i].ip_server_name.name, p_self->info[i].p_dns_system->p_ip_server_name);
 
-				if (sizeof(p_self->info.ip_server_url) < strlen(p_self->info.p_dns_system->p_ip_server_url))
+				if (sizeof(p_self->info[i].ip_server_url) < strlen(p_self->info[i].p_dns_system->p_ip_server_url))
 				{
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(p_self->info.ip_server_url, p_self->info.p_dns_system->p_ip_server_url);
+				strcpy(p_self->info[i].ip_server_url, p_self->info[i].p_dns_system->p_ip_server_url);
 			}
 
 			/*dyndns server*/
-			if (strlen(p_self->info.dyndns_server_name.name) == 0)
+			if (strlen(p_self->info[i].dyndns_server_name.name) == 0)
 			{
-				if (sizeof(p_self->info.dyndns_server_name.name) < strlen(p_self->info.p_dns_system->p_dyndns_server_name))
+				if (sizeof(p_self->info[i].dyndns_server_name.name) < strlen(p_self->info[i].p_dns_system->p_dyndns_server_name))
 				{
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(p_self->info.dyndns_server_name.name, p_self->info.p_dns_system->p_dyndns_server_name);
+				strcpy(p_self->info[i].dyndns_server_name.name, p_self->info[i].p_dns_system->p_dyndns_server_name);
 
-				if (sizeof(p_self->info.dyndns_server_url) < strlen(p_self->info.p_dns_system->p_dyndns_server_url))
+				if (sizeof(p_self->info[i].dyndns_server_url) < strlen(p_self->info[i].p_dns_system->p_dyndns_server_url))
 				{
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(p_self->info.dyndns_server_url, p_self->info.p_dns_system->p_dyndns_server_url);
+				strcpy(p_self->info[i].dyndns_server_url, p_self->info[i].p_dns_system->p_dyndns_server_url);
 			}
 		}
+		while(++i < p_self->info_count);
 
 		/*check if the neccessary params have been provided*/
 		if (
-			(strlen(p_self->info.dyndns_server_name.name) == 0)  ||
-			(strlen(p_self->info.ip_server_name.name)	  == 0)  ||
-			(p_self->alias_info.count == 0)
+			(p_self->info_count == 0) ||
+			(p_self->info[0].alias_count == 0) ||
+			(strlen(p_self->info[0].dyndns_server_name.name) == 0)  ||
+			(strlen(p_self->info[0].ip_server_name.name)	 == 0)
 			)
 		{
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;

@@ -24,3 +24,31 @@ Common DDNS service providers:
 Some of these services are free of charge for non-commercial use, others take a small
 fee, but also provide more domains to chose from.
 
+Multiple Accounts Support
+=========================
+Inadyn supports updating several DDNS servers, several accounts even on different
+DDNS providers.  The following example config file illustrates how it can be used.
+
+Feature is courtesy of Christian Eyrich <http://eyrich-net.org/programmiertes.html>
+
+background
+verbose 1
+log_file /var/log/inadyn.log
+pid_file /var/run/inadyn.pid
+
+the block for provider A follows
+
+dyndns_system dyndns@dyndns.org
+username yxxx
+password xyxx
+update_period_sec 300
+alias yyyy
+alias yyyy
+
+But now further blocks for other providers can follow:
+
+dyndns_system default@no-ip.com
+username xxyx
+password xxxy
+update_period_sec 300
+alias yyyy

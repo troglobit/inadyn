@@ -1,22 +1,22 @@
-/*
-Copyright (C)  2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
+/* Interface for main ddns functions
+ *
+ * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/*interface for main dydns functions */
 #ifndef _DYNDNS_INCLUDED
 #define _DYNDNS_INCLUDED
 
@@ -38,7 +38,7 @@ typedef enum
 	FREEDNS_AFRAID_ORG_DEFAULT,
 	ZONE_EDIT_DEFAULT,
 	CUSTOM_HTTP_BASIC_AUTH,
-	NOIP_DEFAULT,	
+	NOIP_DEFAULT,
 	LAST_DNS_SYSTEM = -1
 } DYNDNS_SYSTEM_ID;
 
@@ -77,7 +77,7 @@ typedef enum
 #define DYNDNS_GET_MY_IP_HTTP_REQUEST  \
 	"GET http://%s:%d%s HTTP/1.0\r\n\r\n"
 
-/* dyndns.org specific update address format */	
+/* dyndns.org specific update address format */
 #define DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT				\
 	"GET http://%s:%d%s"						\
 	"system=%s&"							\
@@ -91,8 +91,8 @@ typedef enum
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
-    
-/*freedns.afraid.org specific update request format */    
+
+/*freedns.afraid.org specific update request format */
 #define FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT \
     "GET http://%s:%d%s" \
     "%s " \
@@ -135,7 +135,8 @@ typedef enum
 #define DYNDNS_DEFAULT_ITERATIONS	0 /*forever*/
 #define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE	(2500) /*Bytes*/
 #define DYNDNS_HTTP_REQUEST_BUFFER_SIZE		(2500) /*Bytes*/
-#define DYNDNS_MAX_ALIAS_NUMBER		10 /*maximum number of aliases that can be maintained*/
+#define DYNDNS_MAX_ALIAS_NUMBER		10 /*maximum number of aliases per server that can be maintained*/
+#define DYNDNS_MAX_SERVER_NUMBER	5 /*maximum number of servers that can be maintained*/
 
 /*local configs*/
 #define DYNDNS_MY_IP_ADDRESS_LENGTH	20 /*chars*/
@@ -151,14 +152,14 @@ typedef enum
 struct _DYN_DNS_CLIENT;
 struct DYNDNS_SYSTEM;
 
-/** Types used for DNS system specific configuration 
+/** Types used for DNS system specific configuration
 */
-/** Function to prepare DNS system specific server requests 
+/** Function to prepare DNS system specific server requests
 */
 
-typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int nr, struct DYNDNS_SYSTEM *p_sys_info);
-typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, char *p_rsp, const char*p_ok_str);
-typedef struct 
+typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, char *p_rsp, int infnr, const char*p_ok_str);
+typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr, struct DYNDNS_SYSTEM *p_sys_info);
+typedef struct
 {
 	const char* p_key;
 	void* p_specific_data;
@@ -171,18 +172,18 @@ typedef struct
 	const char *p_success_string;
 }DYNDNS_SYSTEM;
 
-typedef struct 
+typedef struct
 {
 	DYNDNS_SYSTEM_ID id;
 	DYNDNS_SYSTEM system;
 } DYNDNS_SYSTEM_INFO;
 
-typedef struct 
+typedef struct
 {
 	const char *p_system;
 } DYNDNS_ORG_SPECIFIC_DATA;
 
-typedef enum 
+typedef enum
 {
 	NO_CMD = 0,
 	CMD_STOP = 1
@@ -194,7 +195,7 @@ typedef struct
 	char str[DYNDNS_HASH_STRING_MAX_LENGTH];
 } DYNDNS_HASH_TYPE;
 
-typedef struct 
+typedef struct
 {
 	char my_username[DYNDNS_MY_USERNAME_LENGTH];
 	char my_password[DYNDNS_MY_PASSWORD_LENGTH];
@@ -203,13 +204,21 @@ typedef struct
 	BOOL encoded;
 } DYNDNS_CREDENTIALS;
 
-typedef struct 
+typedef struct
 {
 	char name[DYNDNS_SERVER_NAME_LENGTH];
 	int port;
 } DYNDNS_SERVER_NAME;
 
-typedef struct 
+
+typedef struct
+{
+	DYNDNS_SERVER_NAME names;
+	int update_required;
+	DYNDNS_HASH_TYPE hashes;
+} DYNDNS_ALIAS_INFO;
+
+typedef struct
 {
 	BOOL my_ip_has_changed;
 	DYNDNS_SERVER_NAME my_ip_address;
@@ -220,15 +229,9 @@ typedef struct
 	DYNDNS_SERVER_NAME ip_server_name;
 	char ip_server_url[DYNDNS_SERVER_URL_LENGTH];
 	DYNDNS_SERVER_NAME proxy_server_name;
+	DYNDNS_ALIAS_INFO alias_info[DYNDNS_MAX_ALIAS_NUMBER];
+	int alias_count;
 } DYNDNS_INFO_TYPE;
-
-typedef struct 
-{
-	DYNDNS_SERVER_NAME names[DYNDNS_MAX_ALIAS_NUMBER];
-	int update_required[DYNDNS_MAX_ALIAS_NUMBER];
-	DYNDNS_HASH_TYPE hashes[DYNDNS_MAX_ALIAS_NUMBER]; 
-	int count;
-} DYNDNS_ALIAS_INFO;
 
 typedef struct
 {
@@ -243,7 +246,7 @@ typedef struct DYN_DNS_CLIENT
 
 	DYN_DNS_CMD cmd;
 	int sleep_sec; /* time between 2 updates*/
-	int forced_update_period_sec; 
+	int forced_update_period_sec;
 	int times_since_last_update;
 	int forced_update_times; /* the same forced update period counted in sleep periods*/
 	int cmd_check_period; /*time to wait for a command*/
@@ -254,28 +257,27 @@ typedef struct DYN_DNS_CLIENT
 	BOOL debug_to_syslog;
 	BOOL change_persona;
 
-	HTTP_CLIENT http_to_ip_server;
-	HTTP_CLIENT http_to_dyndns;
+	HTTP_CLIENT http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
+	HTTP_CLIENT http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
 	HTTP_TRANSACTION http_tr;
 	char *p_work_buffer; /* for HTTP responses*/
 	int work_buffer_size;
 	char *p_req_buffer; /* for HTTP requests*/
 	int req_buffer_size;
 
+
+
 	USER_INFO sys_usr_info; /*info about the current account running inadyn*/
-	DYNDNS_INFO_TYPE info; /*servers, names, passwd*/
-	DYNDNS_ALIAS_INFO alias_info;
+	DYNDNS_INFO_TYPE info[DYNDNS_MAX_SERVER_NUMBER]; /*servers, names, passwd*/
+	int info_count;
 
 	BOOL abort_on_network_errors;
 	BOOL force_addr_update;
 	BOOL use_proxy;
 	BOOL abort;
 
-	/*dbg*/
 	DBG_TYPE dbg;
 } DYN_DNS_CLIENT;
-
-
 /*public functions*/
 /** Returns the table of supported dyndns systems
 */
@@ -286,7 +288,7 @@ DYNDNS_SYSTEM_INFO* get_dyndns_system_table(void);
 */
 RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self);
 
-/* 
+/*
 	Set up all details:
 		- ip server name
 		- dns server name
@@ -295,7 +297,7 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self);
 	Implementation:
 		- load defaults
 		- parse cmd line
-        - assign settings that may change due to cmd line options
+	- assign settings that may change due to cmd line options
 		- check data
 */
 RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv);
@@ -312,17 +314,17 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self);
 
 /*
 	Resource free.
-*/	
+*/
 RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self);
 
-/* 
+/*
 	Sets up the object.
-	- sets the IPs of the DYN DNS server 
+	- sets the IPs of the DYN DNS server
 	- ...
 */
 RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self);
 
-/* 
+/*
 	Disconnect and some other clean up.
 */
 RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
@@ -331,7 +333,7 @@ RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
 
 /* the real action:
 	- detect current IP
-		- connect to an HTTP server 
+		- connect to an HTTP server
 		- parse the response for IP addr
 
 	- for all the names that have to be maintained
@@ -342,12 +344,12 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self);
 
 /* MAIN - Dyn DNS update entry point.*/
 
-/* 
+/*
 	Actions:
 		- read the configuration options
 		- create and init dyn_dns object.
 		- launch the IP update action
-*/		
+*/
 int dyn_dns_main(DYN_DNS_CLIENT *p_self, int argc, char* argv[]);
 
 

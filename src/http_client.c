@@ -1,35 +1,32 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
+ * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
 #include <string.h>
 #include "http_client.h"
 #include "errorcode.h"
-
 
 #define super_construct(p) tcp_construct(p)
 #define super_destruct(p)  tcp_destruct(p)
 #define super_init(p)	   tcp_initialize(p)
 #define super_shutdown(p)  tcp_shutdown(p)
 
-
-/*public functions*/
-
 /*
-	 basic resource allocations for the tcp object
+  basic resource allocations for the http object
 */
 RC_TYPE http_client_construct(HTTP_CLIENT *p_self)
 {
@@ -49,17 +46,23 @@ RC_TYPE http_client_construct(HTTP_CLIENT *p_self)
 	/*init*/
 	memset( (char*)p_self + sizeof(p_self->super), 0 , sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = FALSE;
-	
+
 	return RC_OK;
 }
 
 /*
-	Resource free.
-*/	
-RC_TYPE http_client_destruct(HTTP_CLIENT *p_self)
+  Resource free.
+*/
+RC_TYPE http_client_destruct(HTTP_CLIENT *p_self, int num)
 {
-	/*free*/
-	return super_destruct(&p_self->super);
+	int i = 0, rv = RC_OK;
+
+	while (i < num)
+	{
+		rv = super_destruct(&p_self[i++].super);
+	}
+
+	return rv;
 }
 
 
@@ -76,7 +79,7 @@ static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 		}
 	}
 
-	{		
+	{
 		int port;
 		http_client_get_port(p_self, &port);
 		if ( port == 0)
@@ -87,10 +90,10 @@ static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 	return RC_OK;
 }
 
-/* 
-	Sets up the object.
+/*
+  Sets up the object.
 
-	- ...
+  - ...
 */
 RC_TYPE http_client_init(HTTP_CLIENT *p_self)
 {
@@ -119,18 +122,18 @@ RC_TYPE http_client_init(HTTP_CLIENT *p_self)
 
 	if (rc != RC_OK)
 	{
-		http_client_shutdown(p_self);		
+		http_client_shutdown(p_self);
 	}
 	else
 	{
 		p_self->initialized = TRUE;
 	}
-	
+
 	return rc;
 }
 
-/* 
-	Disconnect and some other clean up.
+/*
+  Disconnect and some other clean up.
 */
 RC_TYPE http_client_shutdown(HTTP_CLIENT *p_self)
 {
@@ -164,7 +167,7 @@ RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr )
 	}
 
 	do
-	{		
+	{
 		rc = tcp_send(&p_self->super, p_tr->p_req, p_tr->req_len);
 		if (rc != RC_OK)
 		{

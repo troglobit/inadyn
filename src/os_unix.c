@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MODULE_TAG "OS_UNIX:"
 #include "debug_if.h"
-  
+
 #include "os.h"
 #include "dyndns.h"
 
@@ -51,16 +51,16 @@ RC_TYPE os_ip_support_cleanup(void)
 /* storage fot the parameter needed by the handler */
 static void *global_p_signal_handler_param = NULL;
 
-/** The actual handler 
+/** The actual handler
 	Stops on almost everything .
 */
 static void unix_signal_handler(int signo)
-{	
+{
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)global_p_signal_handler_param;
 
 	if (p_self == NULL)
 	{
-		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));		
+		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));
 		return;
 	}
 
@@ -72,20 +72,20 @@ static void unix_signal_handler(int signo)
 		case SIGALRM:
 		case SIGTERM:
 			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo));
-			p_self->cmd = CMD_STOP;			
+			p_self->cmd = CMD_STOP;
 			break;
-	
+
 		default:
 			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo));
 			break;
 	}
 	return;
-} 
+}
 
 /**
 	install handler for SIGALRM and HUP, INT, QUIT.
-	avoid receiving HIP,INT, QUIT during ALRM and 
-	
+	avoid receiving HIP,INT, QUIT during ALRM and
+
 */
 RC_TYPE os_install_signal_handler(void *p_dyndns)
 {
@@ -118,42 +118,45 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 }
 
 /*
-    closes current console 
+    closes current console
 
   July 5th, 2004 - Krev
   ***
-  This function is used to close the console window to start the 
+  This function is used to close the console window to start the
   software as a service on Windows. On Unix, closing the console window
   isn't used for a daemon, but rather it forks. Modified this function
   to fork into a daemon mode under Unix-compatible systems.
-  
+
   Actions:
     - for child:
-        - close in and err console
-        - become session leader 
-        - change working directory 
-        - clear the file mode creation mask 
-    - for parent 
-        just exit
+	- close in and err console
+	- become session leader
+	- change working directory
+	- clear the file mode creation mask
+    - for parent
+	just exit
 */
 RC_TYPE close_console_window(void)
 {
     pid_t pid = fork();
-    
+
     if (pid < 0)
     {
-        return RC_OS_FORK_FAILURE;
+	return RC_OS_FORK_FAILURE;
     }
-    
+
     if (pid == 0)		/* child */
     {
-        fclose(stdin);
-        fclose(stderr);
-        setsid();  
-        chdir("/");
-        umask(0);  
+	fclose(stdin);
+	fclose(stderr);
+	setsid();
+	if (-1 == chdir("/"))
+	{
+		DBG_PRINTF((LOG_WARNING, "Failed changing cwd to /: %s\n", strerror(errno)));
+	}
+	umask(0);
 
-        return RC_OK;
+	return RC_OK;
     }
 
     exit(0);
@@ -183,7 +186,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 {
 	int rc;
 	do
-	{	 
+	{
 		if (p_usr_info->gid != getgid())
 		{
 			if ((rc = setgid(p_usr_info->gid)) != 0)
@@ -193,11 +196,11 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 		}
 
 		if (p_usr_info->uid != getuid())
-		{			
+		{
 			if ((rc = setuid(p_usr_info->uid)) != 0)
 			{
 				break;
-			}    	
+			}
 		}
 	}
 	while(0);

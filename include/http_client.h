@@ -61,7 +61,7 @@ RC_TYPE http_client_construct(HTTP_CLIENT *p_self);
 /*
 	Resource free.
 */	
-RC_TYPE http_client_destruct(HTTP_CLIENT *p_self);
+RC_TYPE http_client_destruct(HTTP_CLIENT *p_self, int num);
 
 /* 
 	Sets up the object.

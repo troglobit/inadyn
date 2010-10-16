@@ -1,20 +1,21 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
+ * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
 #define MODULE_TAG "INADYN:IP: "
 #include <stdlib.h>
 #include <string.h>
@@ -27,12 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "debug_if.h"
 #include "ip.h"
 
-/*public functions*/
-
-
-/*
-	 basic resource allocations for the ip object
-*/
+/* basic resource allocations for the ip object */
 RC_TYPE ip_construct(IP_SOCKET *p_self)
 {
 	if (p_self == NULL)
@@ -48,13 +44,13 @@ RC_TYPE ip_construct(IP_SOCKET *p_self)
 	memset(&p_self->local_addr, 0, sizeof(p_self->local_addr));
 	memset(&p_self->remote_addr, 0, sizeof(p_self->remote_addr));
 	p_self->timeout = IP_DEFAULT_TIMEOUT;
-	
+
 	return RC_OK;
 }
 
 /*
-	Resource free.
-*/	
+  Resource free.
+*/
 RC_TYPE ip_destruct(IP_SOCKET *p_self)
 {
 	if (p_self == NULL)
@@ -66,23 +62,21 @@ RC_TYPE ip_destruct(IP_SOCKET *p_self)
 	{
 		ip_shutdown(p_self);
 	}
-		
+
 	return RC_OK;
 }
 
 
 
-/* 
-	Sets up the object.
-	
-	- ...
+/*
+  Sets up the object.
+
+  - ...
 */
 RC_TYPE ip_initialize(IP_SOCKET *p_self)
 {
-	RC_TYPE rc = RC_OK; 
+	RC_TYPE rc = RC_OK;
 	struct ifreq ifr;
-	char buf_nbd[8];
-	const char *interface = NULL;
 	struct sockaddr_in *addrp = NULL;
 
 	if (p_self->initialized == TRUE)
@@ -133,11 +127,11 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 		/* remote addres */
 		if (p_self->p_remote_host_name != NULL)
 		{
-            		uint32_t addr = 0;
+			uint32_t addr = 0;
 			HOSTENT* p_remotehost = (HOSTENT*) gethostbyname(p_self->p_remote_host_name);
-			
+
 			if (p_remotehost == NULL)
-			{                
+			{
 				rc = os_convert_ip_to_inet_addr(&addr, p_self->p_remote_host_name);
 				if (rc != RC_OK)
 				{
@@ -148,10 +142,10 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 					break;
 				}
 			}
-			
+
 			p_self->remote_addr.sin_family = AF_INET;
 			p_self->remote_addr.sin_port = htons(p_self->port);
-			p_self->remote_addr.sin_addr.s_addr = (addr == 0) 
+			p_self->remote_addr.sin_addr.s_addr = (addr == 0)
 				? *((uint32_t *)p_remotehost->h_addr_list[0])
 				: addr;
 		}
@@ -160,18 +154,18 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 
 	if (rc != RC_OK)
 	{
-		ip_shutdown(p_self);		
+		ip_shutdown(p_self);
 	}
 	else
 	{
 		p_self->initialized = TRUE;
 	}
-			
+
 	return rc;
 }
 
-/* 
-	Disconnect and some other clean up.
+/*
+  Disconnect and some other clean up.
 */
 RC_TYPE ip_shutdown(IP_SOCKET *p_self)
 {
@@ -208,7 +202,7 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 	{
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 	}
-	
+
 	if( send(p_self->socket, (char*) p_buf, len, 0) == SOCKET_ERROR )
 	{
 		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error 0x%x in send()\n", os_get_socket_error()));
@@ -217,14 +211,14 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 	return RC_OK;
 }
 
-/* 
-	Receive data into user's buffer.
-	return 
-		if the max len has been received 
-		if a timeout occures
-	In p_recv_len the total number of bytes are returned.
-	Note:
-		if the recv_len is bigger than 0, no error is returned.
+/*
+  Receive data into user's buffer.
+  return
+  if the max len has been received
+  if a timeout occures
+  In p_recv_len the total number of bytes are returned.
+  Note:
+  if the recv_len is bigger than 0, no error is returned.
 */
 RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 {
@@ -245,12 +239,12 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 
 	while (remaining_buf_len > 0)
 	{
-		int chunk_size = remaining_buf_len > IP_DEFAULT_READ_CHUNK_SIZE ? 
-					IP_DEFAULT_READ_CHUNK_SIZE : remaining_buf_len;
+		int chunk_size = remaining_buf_len > IP_DEFAULT_READ_CHUNK_SIZE ?
+			IP_DEFAULT_READ_CHUNK_SIZE : remaining_buf_len;
 		recv_len = recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
 		if (recv_len < 0)
 		{
-			
+
 			{
 				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error 0x%x in recv()\n", os_get_socket_error()));
 				rc = RC_IP_RECV_ERROR;
@@ -258,11 +252,11 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 			break;
 		}
 
-		if (recv_len == 0)			
+		if (recv_len == 0)
 		{
 			if (total_recv_len == 0)
 			{
-				rc = RC_IP_RECV_ERROR;				
+				rc = RC_IP_RECV_ERROR;
 			}
 			break;
 		}
@@ -270,7 +264,7 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 		total_recv_len += recv_len;
 		remaining_buf_len = max_recv_len - total_recv_len;
 	}
-	
+
 
 	*p_recv_len = total_recv_len;
 	return rc;

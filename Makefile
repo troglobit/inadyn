@@ -63,10 +63,10 @@ uninstall:
 	-@$(RM) $(DESTDIR)$(mandir)/man8/MAN8
 
 clean:
-	-@$(RM) $(OBJS) $(EXECS)
+	-@$(RM) $(OBJS) $(EXEC)
 
 distclean:
-	-@$(RM) $(OBJS) core $(EXECS) *.o *.map .*.d *.out tags TAGS
+	-@$(RM) $(OBJS) core $(EXEC) *.o *.map .*.d *.out tags TAGS
 
 dist:
 	@echo "Building bzip2 tarball of $(PKG) in parent dir..."
@@ -75,4 +75,3 @@ dist:
 
 build-deb:
 	git-buildpackage --git-ignore-new --git-upstream-branch=master
-
