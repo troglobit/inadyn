@@ -19,7 +19,7 @@ inadyn \- a client for open DNS servers.
 ] [\-a | \-\-alias[,hash]
 .I alias[,hash] ...
 ] [\-\-input_file
-.I path/name
+.I PATH
 ] [\-\-ip_server_name
 .I server[:port] url
 ] [\-\-dyndns_server_name[:port]
@@ -45,6 +45,9 @@ inadyn \- a client for open DNS servers.
 ] [\-\-syslog]
 [\-\-bind_interface
 .I ifname
+]
+[\-\-pifdile
+.I PATH
 ]
 .SH DESCRIPTION
 .B inadyn
@@ -85,7 +88,7 @@ The password, if applicable.
 A host name alias. This option can appear multiple times, for each
 domain that has the same IP.
 .TP
-.I \-\-input_file
+.I \-\-input_file PATH
 The file name that contains inadyn command options exactly as specified in
 the command line syntax (adds to those already present in the cmd
 line). The default configuration file name is '/etc/inadyn.conf'. It is
@@ -137,7 +140,7 @@ is about 1 minute. The maximum value is 10 days.
 How often the IP should be updated even if it is not changed. The time
 should be given in seconds.
 .TP
-.I \-\-log_file
+.I \-\-log_file PATH
 The name, including the full path, of a log file.
 .TP
 .I \-\-background
@@ -159,6 +162,9 @@ After init changes user ID and group ID to the provided ones. This allows droppi
 .TP
 .I \-\-bind_iface ifname
 Set interface to bind to. Works on UN*X systems only.
+.TP
+.I \-\-pidfile PATH
+Set pidfile, defaults to /var/run/inadyn.pid.
 .SH "TYPICAL USAGE"
 .SS
 .UR

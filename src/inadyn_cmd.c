@@ -62,6 +62,7 @@ static RC_TYPE set_iterations_handler(CMD_DATA *p_cmd, int current_nr, void *p_c
 static RC_TYPE set_syslog_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 
 static CMD_DESCRIPTION_TYPE cmd_options_table[] =
@@ -78,7 +79,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--alias",	1,	{get_alias_handler, NULL},	"alias host name. this option can appear multiple times." },
 	{"-a",		1,	{get_alias_handler, NULL},	"alias host name. this option can appear multiple times." },
 
-	{DYNDNS_INPUT_FILE_OPT_STRING, 1, {get_options_from_file_handler, NULL}, "<PATH>\n"
+	{DYNDNS_INPUT_FILE_OPT_STRING, 1, {get_options_from_file_handler, NULL}, "<FILE>\n"
 	 "\t\t\tThe file containing (further) options.  The default\n"
 	 "\t\t\tconfig file, " DYNDNS_DEFAULT_CONFIG_FILE ", is used if inadyn is\n"
 	 "\t\t\tcalled without any command line options." },
@@ -131,6 +132,8 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--bind_interface", 1, {set_bind_interface, NULL}, "<ifname>\n"
 	 "\t\t\tSet interface to bind. Parameters: <interface>.\n"
 	 "\t\t\tWorks on UN*X systems only."},
+	{"--pidfile", 1,	{set_pidfile, NULL}, "<FILE>\n"
+	 "\t\t\tSet pidfile, default /var/run/inadyn.pid."},
 	{"--version", 0,        {print_version_handler, NULL}, "Print the version number\n"},
 	{NULL,		0,	{0, NULL},	NULL }
 };
@@ -569,6 +572,20 @@ static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_conte
 	return RC_OK;
 }
 
+static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->pidfile = strdup (p_cmd->argv[current_nr]);
+
+	return RC_OK;
+}
+
 RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
@@ -855,7 +872,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	}
 
 		/* Save for later... */
-		p_self->config_file = p_cmd->argv[current_nr];
+		p_self->cfgfile = p_cmd->argv[current_nr];
 
 		if ((rc = parser_init(&parser, p_file)) != RC_OK)
 		{
@@ -936,12 +953,15 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		/* in case of no options, assume the default cfg file may be present */
 		if (argc == 1)
 		{
-			char* custom_argv[] = {"", DYNDNS_INPUT_FILE_OPT_STRING, DYNDNS_DEFAULT_CONFIG_FILE};
+			char *custom_argv[] = {"", DYNDNS_INPUT_FILE_OPT_STRING, DYNDNS_DEFAULT_CONFIG_FILE};
 			int custom_argc = sizeof(custom_argv) / sizeof(char*);
+
 			if (p_self->dbg.level > 0)
 			{
 				DBG_PRINTF((LOG_NOTICE,"I:" MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE));
 			}
+
+			p_self->cfgfile = strdup(DYNDNS_DEFAULT_CONFIG_FILE);
 			rc = get_cmd_parse_data(custom_argv, custom_argc, cmd_options_table);
 		}
 		else

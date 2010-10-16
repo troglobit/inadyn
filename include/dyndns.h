@@ -45,7 +45,8 @@ typedef enum
 /*test values*/
 #define DYNDNS_DEFAULT_DEBUG_LEVEL	1
 #define DYNDNS_DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
-#define DYNDNS_DEFAULT_CACHE_FILE	"/var/run/inadyn.cache"
+#define DYNDNS_DEFAULT_CACHE_FILE	"/var/tmp/inadyn.cache"
+#define DYNDNS_DEFAULT_PIDFILE		"/var/run/inadyn.pid"
 
 #define DYNDNS_MY_USERNAME		"test"
 #define DYNDNS_MY_PASSWD		"test"
@@ -237,7 +238,8 @@ typedef struct
 
 typedef struct DYN_DNS_CLIENT
 {
-	char *config_file;
+	char *cfgfile;
+	char *pidfile;
 
 	DYN_DNS_CMD cmd;
 	int sleep_sec; /* time between 2 updates*/
