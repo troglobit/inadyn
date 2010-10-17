@@ -623,8 +623,8 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 		/* update period */
 		p_self->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 
-		/* Domain wildcarding enabled by default */
-		p_self->wildcard = TRUE;
+		/* Domain wildcarding disabled by default */
+		p_self->wildcard = FALSE;
 
 		/* pidfile */
 		p_self->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);

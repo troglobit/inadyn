@@ -49,6 +49,7 @@ inadyn \- a client for open DNS servers.
 [\-\-pifdile
 .I PATH
 ]
+[\-\-wildcard]
 .SH DESCRIPTION
 .B inadyn
 is a client for `open' name servers. That is, it let the user have an
@@ -60,14 +61,13 @@ IP.
 The name servers that are supported by
 .B inayn
 are:
-.UR
-http://www.dyndns.org
-.UE
-and
-.UR
-http://freedns.afraid.org
-.UE
-
+.IP http://www.dyndns.org
+.IP http://freedns.afraid.org
+.IP http://zoneedit.com
+.IP http://www.no-ip.com
+.IP http://www.easydns.com
+.IP http://www.3322.org
+.P
 Its basic operation is to periodically check whether the actual IP
 of the client machine is the same one that is recorded in the name
 server, and update the name server records when there is a mismatch.
@@ -165,6 +165,9 @@ Set interface to bind to. Works on UN*X systems only.
 .TP
 .I \-\-pidfile PATH
 Set pidfile, defaults to /var/run/inadyn.pid.
+.TP
+.I \-\-wildcard
+Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default disabled.
 .SH "TYPICAL USAGE"
 .SS
 .UR

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ * Copyright (C) 2006  Steve Horbachuk
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +23,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+
 #include "dyndns.h"
 #include "debug_if.h"
 #include "base64.h"
@@ -33,6 +35,7 @@ static int curr_info;
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -95,11 +98,13 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"--dyndns_system",	1,	{get_dyndns_system_handler, NULL},
 	 "[NAME] - optional DYNDNS service type. SHOULD be one of the following: \n"
-	 "\t\t\to For dyndns.org DNS system: dyndns@dyndns.org OR statdns@dyndns.org OR customdns@dyndns.org.\n"
-	 "\t\t\to For freedns.afraid.org DNS system: default@freedns.afraid.org\n"
-	 "\t\t\to For www.zoneedit.com DNS system: default@zoneedit.com\n"
+	 "\t\t\to For dyndns.org: dyndns@dyndns.org OR statdns@dyndns.org OR customdns@dyndns.org\n"
+	 "\t\t\to For freedns.afraid.org: default@freedns.afraid.org\n"
+	 "\t\t\to For www.zoneedit.com: default@zoneedit.com\n"
 	 "\t\t\to For www.no-ip.com DNS system: default@no-ip.com\n"
-	 "\t\t\to For generic DNS system: custom@http_svr_basic_auth\n"
+	 "\t\t\to For easydns.com: default@easydns.com\n"
+	 "\t\t\to For 3322.org: dyndns@3322.org\n"
+	 "\t\t\to For generic: custom@http_svr_basic_auth\n"
 	 "\t\t\tDEFAULT value is intended for default service at dyndns.org (most users): dyndns@dyndns.org"},
 
 	{"--proxy_server",	1,	{get_proxy_server_handler, NULL},
@@ -125,6 +130,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--pidfile",		1,	{set_pidfile, NULL}, "<FILE>\n"
 	 "\t\t\tSet pidfile, default /var/run/inadyn.pid."},
 	{"--version",		0,	{print_version_handler, NULL}, "Print the version number\n"},
+	{"--wildcard",		0,	{wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
 	{NULL,			0,	{0, NULL},	NULL }
 };
 
@@ -166,8 +172,27 @@ static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	p_self->abort = TRUE;
 	print_help_page();
+
+	return RC_OK;
+}
+
+static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->wildcard = TRUE;
+
 	return RC_OK;
 }
 
