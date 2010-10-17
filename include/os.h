@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-  
+
 #ifndef _OS_H_INCLUDED
 #define _OS_H_INCLUDED
 
@@ -24,26 +24,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
    Must be another way of doing it.
 */
 #define OS_DEF_OK 0
-    
-#ifdef _WIN32 
+
+#ifdef _WIN32
 	#include <Windows.h>
     #undef OS_DEF_OK
     #define OS_DEF_OK  1
     #ifndef BOOL
-        #define BOOL WINBOOL 
-        #define HAVE_OS_BOOL 1
+	#define BOOL WINBOOL
+	#define HAVE_OS_BOOL 1
     #endif
 #endif
 
 #ifdef RMC_DEBUG_VERSION
     #undef OS_DEF_OK
     #define OS_DEF_OK 1
-    #define PSOS_OS 1    
+    #define PSOS_OS 1
     #include <rmctypes.h>
     #include <rmcmacros.h>
 
-    #define HAVE_OS_BOOL 1    
-    #include <psos.h>    
+    #define HAVE_OS_BOOL 1
+    #include <psos.h>
     #include "psos_net.h"
 #endif
 
@@ -51,7 +51,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
   /*default to Unix*/
     #define UNIX_OS  1
     #define HAVE_OS_SYSLOG 1
-    
+
     #include <unistd.h>
     #include <stdio.h>
     #include <stdlib.h>
@@ -66,11 +66,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     #include <sys/socket.h>
     #include <netdb.h>
     #include <syslog.h>
-    
+
     typedef int SOCKET;
     #define closesocket close
-    
-    #define FAR         
+
+    #define FAR
     typedef struct hostent HOSTENT;
 #endif
 
@@ -90,7 +90,7 @@ extern "C" {
     #define TRUE  !FALSE
 #endif
 
-#ifndef HAVE_OS_BOOL     
+#ifndef HAVE_OS_BOOL
     typedef int BOOL;
 #endif
 
@@ -107,7 +107,7 @@ extern "C" {
 #define IP_V4_IP_ADDR_FORMAT "%u.%u.%u.%u"
 
 /** Syslog support */
-#ifndef HAVE_OS_SYSLOG    
+#ifndef HAVE_OS_SYSLOG
     #define LOG_EMERG       0       /* system is unusable */
     #define LOG_ALERT       1       /* action must be taken immediately */
     #define LOG_CRIT        2       /* critical conditions */
@@ -118,11 +118,11 @@ extern "C" {
     #define LOG_DEBUG       7       /* debug-level messages */
 #endif
 
-typedef enum 
+typedef enum
 {
 		OS_CTRL_C_SIGNAL = 0,
 		OS_CTRL_CLOSE_SIGNAL = 1,
-		OS_CTRL_BREAK_SIGNAL = 2,	
+		OS_CTRL_BREAK_SIGNAL = 2,
 		OS_CTRL_LOGOFF_SIGNAL = 3,
 		OS_CTRL_SHUTDOWN_SIGNAL = 4,
 		LAST_SIGNAL = -1
@@ -176,13 +176,13 @@ RC_TYPE os_convert_ip_to_inet_addr(unsigned int *p_addr, const char *p_name);
 int inadyn_main(int argc, char* argv[]);
 
 /* Threads */
-typedef struct 
+typedef struct
 {
 	void (*p_func) (void*);
 	void *p_params;
 	int priority;
 	unsigned int nStackSize;
-	unsigned int dwCreateFlags;	
+	unsigned int dwCreateFlags;
 } OS_THREAD_TYPE;
 
 
@@ -200,7 +200,7 @@ typedef enum
 
 /**
  * Opens the dbg output for the required destination.
- * 
+ *
  */
 RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name);
 
