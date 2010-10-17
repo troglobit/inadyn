@@ -886,7 +886,9 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	}
 
 		/* Save for later... */
-		p_self->cfgfile = p_cmd->argv[current_nr];
+		if (p_self->cfgfile)
+			free(p_self->cfgfile);
+		p_self->cfgfile = strdup(p_cmd->argv[current_nr]);
 
 		if ((rc = parser_init(&parser, p_file)) != RC_OK)
 		{
@@ -976,6 +978,8 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 				DBG_PRINTF((LOG_NOTICE,"I:" MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE));
 			}
 
+			if (p_self->cfgfile)
+				free(p_self->cfgfile);
 			p_self->cfgfile = strdup(DYNDNS_DEFAULT_CONFIG_FILE);
 			rc = get_cmd_parse_data(custom_argv, custom_argc, cmd_options_table);
 		}
