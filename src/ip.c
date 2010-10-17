@@ -40,7 +40,7 @@ RC_TYPE ip_construct(IP_SOCKET *p_self)
 
 	p_self->initialized = FALSE;
 	p_self->bound = FALSE;
-	p_self->socket = 0;
+	p_self->socket = -1;	/* Initialize to 'error', not a possible socket id. */
 	memset(&p_self->local_addr, 0, sizeof(p_self->local_addr));
 	memset(&p_self->remote_addr, 0, sizeof(p_self->remote_addr));
 	p_self->timeout = IP_DEFAULT_TIMEOUT;
@@ -92,13 +92,17 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			break;
 		}
 
-		/* local bind */
+		/* local bind, to interface */
 		if (p_self->ifname)
 		{
 			int sd = socket(PF_INET, SOCK_DGRAM, 0);
 
 			if (sd < 0)
 			{
+				int code = os_get_socket_error();
+
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d during bind to iface %s: %s\n",
+					    code, p_self->ifname, strerror(code)));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -118,7 +122,9 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			}
 			else
 			{
-				DBG_PRINTF((LOG_ERR, "Cannot obtain IP address of '%s': %s\n", p_self->ifname, strerror(errno)));
+				int code = os_get_socket_error();
+
+				DBG_PRINTF((LOG_ERR, "Cannot obtain IP address of iface %s: %s\n", p_self->ifname, strerror(code)));
 				p_self->bound = FALSE;
 			}
 			close(sd);
@@ -128,16 +134,17 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 		if (p_self->p_remote_host_name != NULL)
 		{
 			uint32_t addr = 0;
-			HOSTENT* p_remotehost = (HOSTENT*) gethostbyname(p_self->p_remote_host_name);
+			HOSTENT* p_remotehost = (HOSTENT *)gethostbyname(p_self->p_remote_host_name);
 
 			if (p_remotehost == NULL)
 			{
 				rc = os_convert_ip_to_inet_addr(&addr, p_self->p_remote_host_name);
 				if (rc != RC_OK)
 				{
-					DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error '0x%x' resolving host name '%s'\n",
-						    os_get_socket_error(),
-						    p_self->p_remote_host_name));
+					int code = os_get_socket_error();
+
+					DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error %d when resolving host name %s: %s\n",
+						    code, p_self->p_remote_host_name, strerror(code)));
 					rc = RC_IP_INVALID_REMOTE_ADDR;
 					break;
 				}
@@ -150,18 +157,17 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				: addr;
 		}
 	}
-	while(0);
+	while (0);
 
 	if (rc != RC_OK)
 	{
 		ip_shutdown(p_self);
-	}
-	else
-	{
-		p_self->initialized = TRUE;
+		return rc;
 	}
 
-	return rc;
+	p_self->initialized = TRUE;
+
+	return RC_OK;
 }
 
 /*
@@ -179,15 +185,16 @@ RC_TYPE ip_shutdown(IP_SOCKET *p_self)
 		return RC_OK;
 	}
 
-	if (p_self->socket)
+	if (p_self->socket > -1)
 	{
 		closesocket(p_self->socket);
-		p_self->socket = 0;
+		p_self->socket = -1;
 	}
 
 	os_ip_support_cleanup();
 
 	p_self->initialized = FALSE;
+
 	return RC_OK;
 }
 
@@ -203,11 +210,14 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 	}
 
-	if( send(p_self->socket, (char*) p_buf, len, 0) == SOCKET_ERROR )
+	if (send(p_self->socket, (char*) p_buf, len, 0) == SOCKET_ERROR)
 	{
-		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error 0x%x in send()\n", os_get_socket_error()));
+		int code = os_get_socket_error();
+
+		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error %d in send(): %s\n", code, strerror(code)));
 		return RC_IP_SEND_ERROR;
 	}
+
 	return RC_OK;
 }
 
@@ -241,14 +251,14 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 	{
 		int chunk_size = remaining_buf_len > IP_DEFAULT_READ_CHUNK_SIZE ?
 			IP_DEFAULT_READ_CHUNK_SIZE : remaining_buf_len;
+
 		recv_len = recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
 		if (recv_len < 0)
 		{
+			int code = os_get_socket_error();
 
-			{
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error 0x%x in recv()\n", os_get_socket_error()));
-				rc = RC_IP_RECV_ERROR;
-			}
+			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d in recv(): %s\n", code, strerror(code)));
+			rc = RC_IP_RECV_ERROR;
 			break;
 		}
 
@@ -265,8 +275,8 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 		remaining_buf_len = max_recv_len - total_recv_len;
 	}
 
-
 	*p_recv_len = total_recv_len;
+
 	return rc;
 }
 
@@ -284,7 +294,9 @@ RC_TYPE ip_set_port(IP_SOCKET *p_self, int p)
 	{
 		return RC_IP_BAD_PARAMETER;
 	}
+
 	p_self->port = p;
+
 	return RC_OK;
 }
 
@@ -294,7 +306,9 @@ RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	p_self->p_remote_host_name = p;
+
 	return RC_OK;
 }
 
@@ -304,7 +318,9 @@ RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	p_self->timeout = t;
+
 	return RC_OK;
 }
 
@@ -326,7 +342,9 @@ RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	*p_port = p_self->port;
+
 	return RC_OK;
 }
 
@@ -336,7 +354,9 @@ RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	*p = p_self->p_remote_host_name;
+
 	return RC_OK;
 }
 
@@ -346,7 +366,9 @@ RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p)
 	{
 		return RC_INVALID_POINTER;
 	}
+
 	*p = p_self->timeout;
+
 	return RC_OK;
 }
 
