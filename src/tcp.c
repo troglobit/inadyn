@@ -16,9 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#define MODULE_TAG "INADYN:TCP: "
 #include <stdlib.h>
 #include <string.h>
 
+#include "debug_if.h"
 #include "tcp.h"
 
 /* basic resource allocations for the tcp object */
@@ -38,7 +40,7 @@ RC_TYPE tcp_construct(TCP_SOCKET *p_self)
 	}
 
 	/*reset its part of the struct (skip IP part)*/
-	memset( ((char*)p_self + sizeof(p_self->super)) , 0, sizeof(*p_self) - sizeof(p_self->super));
+	memset(((char*)p_self + sizeof(p_self->super)) , 0, sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = FALSE;
 
 	return RC_OK;
@@ -65,13 +67,15 @@ RC_TYPE tcp_destruct(TCP_SOCKET *p_self)
 static RC_TYPE local_set_params(TCP_SOCKET *p_self)
 {
 	int timeout;
-	/*set default TCP specififc params*/
+
+	/* Set default TCP specififc params */
 	tcp_get_remote_timeout(p_self, &timeout);
 
 	if (timeout == 0)
 	{
 		tcp_set_remote_timeout(p_self, TCP_DEFAULT_TIMEOUT);
 	}
+
 	return RC_OK;
 }
 
@@ -95,22 +99,30 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 			break;
 		}
 
-		/*local object initalizations*/
+		/* local object initalizations */
 		if (p_self->super.type == TYPE_TCP)
 		{
-			p_self->super.socket = socket(AF_INET,SOCK_STREAM,0);
+			p_self->super.socket = socket(AF_INET, SOCK_STREAM, 0);
 			if (p_self->super.socket == -1)
 			{
+				int code = os_get_socket_error();
+
+				DBG_PRINTF((LOG_ERR, MODULE_TAG "Error %d when creating client socket: %s\n", code, strerror(code)));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
 
+			/* Call to socket() OK, allow tcp_shutdown() to run to
+			 * prevent socket leak if any of the below calls fail. */
+			p_self->initialized = TRUE;
+
 			if (p_self->super.bound == TRUE)
 			{
-				if (bind(p_self->super.socket, (struct sockaddr *)& p_self->super.local_addr, sizeof(struct sockaddr_in)) < 0)
+				if (bind(p_self->super.socket, (struct sockaddr *)&p_self->super.local_addr, sizeof(struct sockaddr_in)) < 0)
 				{
-					close(p_self->super.socket);
-					perror("bind");
+					int code = os_get_socket_error();
+
+					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when attempting to bind to client socket: %s\n", code, strerror(code)));
 					rc = RC_IP_SOCKET_BIND_ERROR;
 					break;
 				}
@@ -118,36 +130,35 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 		}
 		else
 		{
+			p_self->initialized = TRUE; /* Allow tcp_shutdown() to run. */
 			rc = RC_IP_BAD_PARAMETER;
 		}
 
 		/* set timeouts */
-		setsockopt(p_self->super.socket,SOL_SOCKET,SO_RCVTIMEO,
-			   (char*)&p_self->super.timeout,sizeof(p_self->super.timeout));
-		setsockopt(p_self->super.socket,SOL_SOCKET,SO_SNDTIMEO,
-			   (char*)&p_self->super.timeout,sizeof(p_self->super.timeout));
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO,
+			   (char*)&p_self->super.timeout, sizeof(p_self->super.timeout));
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO,
+			   (char*)&p_self->super.timeout, sizeof(p_self->super.timeout));
 
-		/*connect*/
 		if (0 != connect(p_self->super.socket,
-				 (struct sockaddr *)&p_self->super.remote_addr,sizeof(p_self->super.remote_addr)))
+				 (struct sockaddr *)&p_self->super.remote_addr, sizeof(p_self->super.remote_addr)))
 		{
+			int code = os_get_socket_error();
+
+			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when connecting to remote server: %s\n", code, strerror(code)));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}
-
 	}
 	while (0);
 
 	if (rc != RC_OK)
 	{
 		tcp_shutdown(p_self);
-	}
-	else
-	{
-		p_self->initialized = TRUE;
+		return rc;
 	}
 
-	return rc;
+	return RC_OK;
 }
 /*
   Disconnect and some other clean up.
