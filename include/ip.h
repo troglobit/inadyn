@@ -32,22 +32,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /* typedefs */
 typedef enum
 {
-	TYPE_TCP,
+	TYPE_TCP = 0,
 	TYPE_UDP
 } IP_TYPES;
 
-typedef struct 
+typedef struct
 {
 	BOOL initialized;
 
 	char *ifname;
-        BOOL bound;             /* When bound to an interface */
+	BOOL bound;             /* When bound to an interface */
 
 	int type;
-	SOCKET socket; 
+	SOCKET socket;
 	struct sockaddr_in local_addr;
 	struct sockaddr_in remote_addr;
-	const char *p_remote_host_name;  
+	const char *p_remote_host_name;
 
 	unsigned short port;
 	int timeout;
@@ -63,17 +63,17 @@ RC_TYPE ip_construct(IP_SOCKET *p_self);
 
 /*
 	Resource free .
-*/	
+*/
 RC_TYPE ip_destruct(IP_SOCKET *p_self);
 
-/* 
+/*
 	Sets up the object.
 
 	- ...
 */
 RC_TYPE ip_initialize(IP_SOCKET *p_self);
 
-/* 
+/*
 	Disconnect and some other clean up.
 */
 RC_TYPE ip_shutdown(IP_SOCKET *p_self);
