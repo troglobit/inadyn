@@ -102,30 +102,30 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\to For generic DNS system: custom@http_svr_basic_auth\n"
 	 "\t\t\tDEFAULT value is intended for default service at dyndns.org (most users): dyndns@dyndns.org"},
 
-	{"--proxy_server", 1, {get_proxy_server_handler, NULL},
+	{"--proxy_server",	1,	{get_proxy_server_handler, NULL},
 	 "[NAME[:port]]  - the http proxy server name and port. Default is none."},
 	{"--update_period",	1,	{get_update_period_handler, NULL},
 	 "how often the IP is checked. The period is in [ms]. Default is about 1 min. Max is 10 days"},
 	{"--update_period_sec",	1,	{get_update_period_sec_handler, NULL},	"how often the IP is checked. The period is in [sec]. Default is about 1 min. Max is 10 days"},
 	{"--forced_update_period", 1,   {get_forced_update_period_handler, NULL},"how often the IP is updated even if it is not changed. [in sec]"},
 
-	{"--log_file",	1,	{get_logfile_name, NULL},		"log file path abd name"},
-	{"--background", 0,	{set_silent_handler, NULL},		"run in background. output to log file or to syslog"},
+	{"--log_file",		1,	{get_logfile_name, NULL},	"log file path abd name"},
+	{"--background",	0,	{set_silent_handler, NULL},	"run in background. output to log file or to syslog"},
 
-	{"--verbose",	1,	{set_verbose_handler, NULL},	"set dbg level. 0 to 5"},
+	{"--verbose",		1,	{set_verbose_handler, NULL},	"set dbg level. 0 to 5"},
 
 	{"--iterations",	1,	{set_iterations_handler, NULL},	"Set the number of DNS updates. Default is 0 (forever)."},
-	{"--syslog",	0,	{set_syslog_handler, NULL},	"Force logging to syslog, e.g., /var/log/messages.  Works on UN*X systems only."},
-	{"--change_persona", 1, {set_change_persona_handler, NULL}, "<uid[:gid]>\n"
+	{"--syslog",		0,	{set_syslog_handler, NULL},	"Force logging to syslog, e.g., /var/log/messages.  Works on UN*X systems only."},
+	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<uid[:gid]>\n"
 	 "\t\t\tAfter init switch to a new user/group.\n"
 	 "\t\t\tWorks on UN*X systems only."},
-	{"--bind_interface", 1, {set_bind_interface, NULL}, "<ifname>\n"
+	{"--bind_interface",	1,	{set_bind_interface, NULL}, "<ifname>\n"
 	 "\t\t\tSet interface to bind. Parameters: <interface>.\n"
 	 "\t\t\tWorks on UN*X systems only."},
-	{"--pidfile", 1,	{set_pidfile, NULL}, "<FILE>\n"
+	{"--pidfile",		1,	{set_pidfile, NULL}, "<FILE>\n"
 	 "\t\t\tSet pidfile, default /var/run/inadyn.pid."},
-	{"--version", 0,        {print_version_handler, NULL}, "Print the version number\n"},
-	{NULL,		0,	{0, NULL},	NULL }
+	{"--version",		0,	{print_version_handler, NULL}, "Print the version number\n"},
+	{NULL,			0,	{0, NULL},	NULL }
 };
 
 

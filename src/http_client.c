@@ -66,27 +66,23 @@ RC_TYPE http_client_destruct(HTTP_CLIENT *p_self, int num)
 }
 
 
+/* Set default TCP specififc params */
 static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 {
-	{
-		int timeout;
-		/*set default TCP specififc params*/
-		http_client_get_remote_timeout(p_self, &timeout);
+	int timeout, port;
 
-		if (timeout == 0)
-		{
-			http_client_set_remote_timeout(p_self, HTTP_DEFAULT_TIMEOUT);
-		}
+	http_client_get_remote_timeout(p_self, &timeout);
+	if (timeout == 0)
+	{
+		http_client_set_remote_timeout(p_self, HTTP_DEFAULT_TIMEOUT);
 	}
 
+	http_client_get_port(p_self, &port);
+	if (port == 0)
 	{
-		int port;
-		http_client_get_port(p_self, &port);
-		if ( port == 0)
-		{
-			http_client_set_port(p_self, HTTP_DEFAULT_PORT);
-		}
+		http_client_set_port(p_self, HTTP_DEFAULT_PORT);
 	}
+
 	return RC_OK;
 }
 
@@ -98,38 +94,32 @@ static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 RC_TYPE http_client_init(HTTP_CLIENT *p_self)
 {
 	RC_TYPE rc;
+
 	do
 	{
-		/*set local params*/
 		rc = local_set_params(p_self);
 		if (rc != RC_OK)
 		{
 			break;
 		}
 
-
-		/*call super*/
 		rc = super_init(&p_self->super);
 		if (rc != RC_OK)
 		{
 			break;
 		}
-
-		/*local init*/
-
 	}
-	while(0);
+	while (0);
 
 	if (rc != RC_OK)
 	{
 		http_client_shutdown(p_self);
-	}
-	else
-	{
-		p_self->initialized = TRUE;
+		return rc;
 	}
 
-	return rc;
+	p_self->initialized = TRUE;
+
+	return RC_OK;
 }
 
 /*
@@ -153,7 +143,7 @@ RC_TYPE http_client_shutdown(HTTP_CLIENT *p_self)
 }
 
 /* Send req and get response */
-RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr )
+RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr)
 {
 	RC_TYPE rc;
 	if (p_self == NULL || p_tr == NULL)
@@ -176,7 +166,7 @@ RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr )
 
 		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len, &p_tr->rsp_len);
 	}
-	while(0);
+	while (0);
 
 	return rc;
 }
