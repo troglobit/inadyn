@@ -495,7 +495,8 @@ static RC_TYPE get_forced_update_period_handler(CMD_DATA *p_cmd, int current_nr,
 		return RC_INVALID_POINTER;
 	}
 
-	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec) != 1)
+	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec) != 1 ||
+	    sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec_orig) != 1)
 	{
 		return RC_DYNDNS_INVALID_OPTION;
 	}
