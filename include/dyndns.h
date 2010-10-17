@@ -265,7 +265,6 @@ typedef struct DYN_DNS_CLIENT
 	DYN_DNS_CMD  cmd;
 	int          sleep_sec; /* time between 2 updates*/
 	int          forced_update_period_sec;
-	int          forced_update_period_sec_orig; /* Original value from conf-file, or cmd line */
 	int          times_since_last_update;
 	int          forced_update_times; /* the same forced update period counted in sleep periods*/
 	int          cmd_check_period; /*time to wait for a command*/

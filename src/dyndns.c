@@ -588,7 +588,6 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 		FILE *fp;
 
 		/* Recalculate forced update period */
-		p_self->forced_update_period_sec = p_self->forced_update_period_sec_orig;
 		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
 
 		/* Update cache with new IP */
@@ -625,7 +624,6 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 
 		/* forced update period */
 		p_self->forced_update_period_sec = DYNDNS_MY_FORCED_UPDATE_PERIOD_S;
-		p_self->forced_update_period_sec_orig = DYNDNS_MY_FORCED_UPDATE_PERIOD_S;
 
 		/* update period */
 		p_self->sleep_sec = DYNDNS_DEFAULT_SLEEP;
@@ -1114,6 +1112,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	/* ... */
 	do
 	{
+		int diff;
 		struct stat sb;
 		time_t t_mod_conf, t_mod_cache;
 
@@ -1143,7 +1142,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 				if (fgets(name, sizeof(name), fp))
 				{
-					DBG_PRINTF((LOG_INFO, MODULE_TAG "IP read from cache file is '%s'. No update required.\n", name));
+					DBG_PRINTF((LOG_INFO, MODULE_TAG "IP read from cache file: %s\n", name));
 
 					for (i = 0; i < p_dyndns->info_count; i++)
 					{
@@ -1152,6 +1151,14 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				}
 				fclose(fp);
 			}
+		}
+
+		diff = time(NULL) - t_mod_cache;
+		if (diff < 0 || ((p_dyndns->forced_update_period_sec - diff) < 0))
+		{
+			/* Forced update */
+			p_dyndns->times_since_last_update = 1;
+			p_dyndns->forced_update_times = 0;
 		}
 	} while (0);
 
@@ -1204,8 +1211,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			}
 
 			/* check if the user wants us to stop */
-			if (iterations >= p_dyndns->total_iterations &&
-			    p_dyndns->total_iterations != 0)
+			if (p_dyndns->total_iterations != 0 && iterations >= p_dyndns->total_iterations)
 			{
 				break;
 			}

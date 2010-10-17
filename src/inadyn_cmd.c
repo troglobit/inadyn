@@ -522,8 +522,7 @@ static RC_TYPE get_forced_update_period_handler(CMD_DATA *p_cmd, int current_nr,
 		return RC_INVALID_POINTER;
 	}
 
-	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec) != 1 ||
-	    sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec_orig) != 1)
+	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->forced_update_period_sec) != 1)
 	{
 		return RC_DYNDNS_INVALID_OPTION;
 	}
@@ -1082,18 +1081,17 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		}
 		while(++i < p_self->info_count);
 
-		/*check if the neccessary params have been provided*/
-		if (
-			(p_self->info_count == 0) ||
-			(p_self->info[0].alias_count == 0) ||
-			(strlen(p_self->info[0].dyndns_server_name.name) == 0)  ||
-			(strlen(p_self->info[0].ip_server_name.name)	 == 0)
-			)
+		/* Check if the neccessary params have been provided */
+		if ((p_self->info_count == 0) ||
+		    (p_self->info[0].alias_count == 0) ||
+		    (strlen(p_self->info[0].dyndns_server_name.name) == 0)  ||
+		    (strlen(p_self->info[0].ip_server_name.name) == 0))
 		{
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
 		}
-		/*forced update*/
+
+		/* Forced update */
 		p_self->times_since_last_update = 0;
 		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
 
