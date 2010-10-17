@@ -582,6 +582,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 		}
 	}
 
+	/* Successful change! */
 	if (anychange)
 	{
 		FILE *fp;
@@ -596,6 +597,12 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 		{
 			fprintf(fp,"%s", p_self->info[0].my_ip_address.name);
 			fclose(fp);
+		}
+
+		/* Run external command hook on update. */
+		if (p_self->external_command)
+		{
+			os_shell_execute(p_self->external_command);
 		}
 	}
 

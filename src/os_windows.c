@@ -1,20 +1,21 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * Copyright (C) 2003-2004  Narcis Ilisei
+ * Copyright (C) 2006  Steve Horbachuk
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 #define MODULE_TAG "OS_WIN:"
 #include "debug_if.h"
@@ -44,9 +45,9 @@ RC_TYPE os_ip_support_startup(void)
 
     err = WSAStartup( wVersionRequested, &wsaData );
     if ( err != 0 ) {
-        /* Tell the user that we could not find a usable */
-        /* WinSock DLL.                                  */
-        return RC_IP_OS_SOCKET_INIT_FAILED;
+	/* Tell the user that we could not find a usable */
+	/* WinSock DLL.                                  */
+	return RC_IP_OS_SOCKET_INIT_FAILED;
     }
 
     /* The WinSock DLL is acceptable. Proceed. */
@@ -63,7 +64,7 @@ RC_TYPE os_ip_support_cleanup(void)
 /* OS SIGNALS Support */
     static OS_SIGNAL_HANDLER_TYPE global_os_handler = { NULL, NULL};
 
-typedef struct 
+typedef struct
 {
     DWORD	original;
     int		translated;
@@ -85,12 +86,12 @@ static int translate_os_signal(DWORD in)
     const OS_EVENT_TYPE *it = os_events_table;
     while (it->original != -1)
     {
-        if (it->original == in)
-        {
-            return it->translated;
-        }
-        ++it;
-    }	
+	if (it->original == in)
+	{
+	    return it->translated;
+	}
+	++it;
+    }
     return -1;
 }
 
@@ -103,17 +104,17 @@ static BOOL WINAPI os_signal_wrapper_handler( DWORD dwCtrlType)
 
     if (global_os_handler.p_func != NULL)
     {
-        return global_os_handler.p_func(signal, global_os_handler.p_in_data) ? 1 : 0;
+	return global_os_handler.p_func(signal, global_os_handler.p_in_data) ? 1 : 0;
     }
     else
     {
-        return 0;
+	return 0;
     }
 }
 
 /**
 	The actual signal handler for Windows.
-	Does not respond on LOGOFF signal. 
+	Does not respond on LOGOFF signal.
 	Exits on shutdown ..., Ctl-C,...
 */
 static int dyndns_win32_signal_handler_func(OS_SIGNAL_TYPE signal, void *p_in)
@@ -136,8 +137,8 @@ static int dyndns_win32_signal_handler_func(OS_SIGNAL_TYPE signal, void *p_in)
 				ret_flag = 1;
 				p_self->cmd = CMD_STOP;
 			break;
-			
-		case OS_CTRL_LOGOFF_SIGNAL :						
+
+		case OS_CTRL_LOGOFF_SIGNAL :
 		default:
 				DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. NO ACTION.\n", signal));
 	}
@@ -150,36 +151,36 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
     BOOL fSuccess;
     if (global_os_handler.p_func != NULL || p_dyndns == NULL)
     {
-        return RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER;
+	return RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER;
     }
 
-    fSuccess = SetConsoleCtrlHandler( 
-        (PHANDLER_ROUTINE) os_signal_wrapper_handler,  /* handler function */
-        TRUE);                           /* add to list */
+    fSuccess = SetConsoleCtrlHandler(
+	(PHANDLER_ROUTINE) os_signal_wrapper_handler,  /* handler function */
+	TRUE);                           /* add to list */
 
-    if (fSuccess) 
+    if (fSuccess)
     {
-        global_os_handler.p_func = dyndns_win32_signal_handler_func;
+	global_os_handler.p_func = dyndns_win32_signal_handler_func;
 		global_os_handler.p_in_data = p_dyndns;
-        return RC_OK;
+	return RC_OK;
     }
     else
     {
-        return RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER;
+	return RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER;
     }
 }
 
 /*
-    closes current console 
-    A rather bad function. I am pretty sure that there is 
+    closes current console
+    A rather bad function. I am pretty sure that there is
     another way to into background under Windows.
- 
+
 */
 RC_TYPE close_console_window(void)
 {
     fclose(stdin);
     fclose(stderr);
-    FreeConsole( );  
+    FreeConsole( );
     return RC_OK;
 }
 
@@ -191,6 +192,28 @@ RC_TYPE os_syslog_open(const char *p_prg_name)
 RC_TYPE os_syslog_close(void)
 {
     return RC_OK;
+}
+
+/*
+    thanks pagedude
+*/
+RC_TYPE os_shell_execute(char * p_cmd)
+{
+	RC_TYPE rc = RC_OK;
+	HANDLE hProcess = NULL;
+	SHELLEXECUTEINFO shellInfo;
+
+	ZeroMemory(&shellInfo, sizeof(shellInfo));
+	shellInfo.cbSize = sizeof(shellInfo);
+	shellInfo.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
+	shellInfo.lpFile = p_cmd;
+	/*shellInfo.lpParameters = args;*/
+	if (!ShellExecuteEx(&shellInfo))
+	{
+		rc = RC_OS_FORK_FAILURE;
+	}
+
+	return rc;
 }
 
 static unsigned long os_get_inet_addr(char* addr)
@@ -206,7 +229,7 @@ static unsigned long os_get_inet_addr(char* addr)
     n = sscanf(addr, "%d.%d.%d.%d", &b3, &b2, &b1, &b0);
     if (n == 4)
     {
-        ipa = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
+	ipa = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
     }
     ipa = htonl(ipa);
     return(ipa);
@@ -224,4 +247,3 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 }
 
 #endif /*WIN32*/
-

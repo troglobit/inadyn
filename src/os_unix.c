@@ -1,20 +1,21 @@
 /*
-Copyright (C) 2003-2004 Narcis Ilisei
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * Copyright (C) 2003-2004  Narcis Ilisei
+ * Copyright (C) 2006  Steve Horbachuk
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 #define MODULE_TAG "OS_UNIX:"
 #include "debug_if.h"
@@ -48,7 +49,31 @@ RC_TYPE os_ip_support_cleanup(void)
     return RC_OK;
 }
 
-/* storage fot the parameter needed by the handler */
+RC_TYPE os_shell_execute(char * p_cmd)
+{
+	RC_TYPE rc = RC_OK;
+	int child;
+
+	child = vfork();
+	switch (child)
+	{
+		case 0: /* child */
+			execl("/bin/sh", "sh", "-c", p_cmd, (char *) 0);
+			exit(1);
+			break;
+
+		case -1:
+			rc = RC_OS_FORK_FAILURE;
+			break;
+
+		default: /* parent */
+			break;
+	}
+
+	return rc;
+}
+
+/* storage for the parameter needed by the handler */
 static void *global_p_signal_handler_param = NULL;
 
 /** The actual handler

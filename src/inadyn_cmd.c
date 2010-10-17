@@ -57,6 +57,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 
 static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 {
@@ -131,6 +132,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\tSet pidfile, default /var/run/inadyn.pid."},
 	{"--version",		0,	{print_version_handler, NULL}, "Print the version number\n"},
 	{"--wildcard",		0,	{wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
+	{"--exec",		1,	{get_exec_handler, NULL}, "Full path to external command to run after an IP update."},
 	{NULL,			0,	{0, NULL},	NULL }
 };
 
@@ -627,6 +629,24 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 
 	return RC_OK;
 }
+
+static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->external_command = strdup(p_cmd->argv[current_nr]);
+
+	return RC_OK;
+}
+
 /**
    Searches the DYNDNS system by the argument.
    Input is like: system@server.name

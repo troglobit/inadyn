@@ -49,6 +49,9 @@ inadyn \- a client for open DNS servers.
 [\-\-pifdile
 .I PATH
 ]
+[\-\-exec
+.I PATH
+]
 [\-\-wildcard]
 .SH DESCRIPTION
 .B inadyn
@@ -165,6 +168,9 @@ Set interface to bind to. Works on UN*X systems only.
 .TP
 .I \-\-pidfile PATH
 Set pidfile, defaults to /var/run/inadyn.pid.
+.TP
+.I \-\-exec PATH
+Full path to external command to run after an IP update.
 .TP
 .I \-\-wildcard
 Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default disabled.
