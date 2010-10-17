@@ -45,8 +45,9 @@ typedef enum
 /*test values*/
 #define DYNDNS_DEFAULT_DEBUG_LEVEL	1
 #define DYNDNS_DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
-#define DYNDNS_DEFAULT_CACHE_FILE	"/var/tmp/inadyn.cache"
-#define DYNDNS_DEFAULT_PIDFILE		"/var/run/inadyn.pid"
+#define DYNDNS_RUNTIME_DATA_DIR		"/var/run/inadyn"
+#define DYNDNS_DEFAULT_CACHE_FILE	"/var/run/inadyn/inadyn.cache"
+#define DYNDNS_DEFAULT_PIDFILE		"/var/run/inadyn/inadyn.pid"
 
 #define DYNDNS_MY_USERNAME		"test"
 #define DYNDNS_MY_PASSWD		"test"

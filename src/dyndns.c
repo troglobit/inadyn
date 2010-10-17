@@ -259,6 +259,7 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 {
 	RC_TYPE rc = RC_OK;
 	HTTP_CLIENT *p_http;
+	HTTP_TRANSACTION *p_tr;
 
 	if (p_self == NULL)
 	{
@@ -272,28 +273,21 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 		return rc;
 	}
 
-	do
+	/* Prepare request for IP server */
+	p_tr = &p_self->http_tr;
+	p_tr->req_len = get_req_for_ip_server(p_self, servernum,
+					      p_self->info[servernum].p_dns_system->p_specific_data);
+	if (p_self->dbg.level > 2)
 	{
-		/* Prepare request for IP server */
-		HTTP_TRANSACTION *p_tr = &p_self->http_tr;
-
-		p_tr->req_len = get_req_for_ip_server((DYN_DNS_CLIENT*) p_self,
-						      servernum,
-						      p_self->info[servernum].p_dns_system->p_specific_data);
-		if (p_self->dbg.level > 2)
-		{
-			DBG_PRINTF((LOG_DEBUG, "The request for IP server:\n%s\n",p_self->p_req_buffer));
-		}
-		p_tr->p_req = (char*) p_self->p_req_buffer;
-		p_tr->p_rsp = (char*) p_self->p_work_buffer;
-		p_tr->max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
-		p_tr->rsp_len = 0;
-
-		rc = http_client_transaction(p_http, &p_self->http_tr);
-		p_self->p_work_buffer[p_tr->rsp_len] = 0;
+		DBG_PRINTF((LOG_DEBUG, "The request for IP server:\n%s\n",p_self->p_req_buffer));
 	}
-	while (0);
+	p_tr->p_req = (char*) p_self->p_req_buffer;
+	p_tr->p_rsp = (char*) p_self->p_work_buffer;
+	p_tr->max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
+	p_tr->rsp_len = 0;
 
+	rc = http_client_transaction(p_http, &p_self->http_tr);
+	p_self->p_work_buffer[p_tr->rsp_len] = 0;
 	http_client_shutdown(p_http);
 
 	return rc;
@@ -473,95 +467,81 @@ BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, c
 static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 {
 	int i, j;
-	RC_TYPE rc = RC_OK;
+	RC_TYPE rc = RC_OK, rc2;
+	HTTP_TRANSACTION http_tr;
 
-	do
+	for (i = 0; i < p_self->info_count; i++)
 	{
-		for (i = 0; i < p_self->info_count; i++)
+		for (j = 0; j < p_self->info[i].alias_count; j++)
 		{
-			for (j = 0; j < p_self->info[i].alias_count; j++)
+			if (p_self->info[i].alias_info[j].update_required != TRUE)
 			{
-				if (p_self->info[i].alias_info[j].update_required != TRUE)
-				{
-					continue;
-				}
-
-				rc = http_client_init(&p_self->http_to_dyndns[i]);
-				if (rc != RC_OK)
-				{
-					break;
-				}
-
-				/* Build dyndns transaction */
-				{
-					HTTP_TRANSACTION http_tr;
-
-					http_tr.req_len = p_self->info[i].p_dns_system->p_dns_update_req_func(
-						(struct _DYN_DNS_CLIENT*) p_self, i, j,
-						(struct DYNDNS_SYSTEM*) p_self->info[i].p_dns_system);
-					http_tr.p_req = (char*) p_self->p_req_buffer;
-					http_tr.p_rsp = (char*) p_self->p_work_buffer;
-					http_tr.max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
-					http_tr.rsp_len = 0;
-					p_self->p_work_buffer[http_tr.rsp_len+1] = 0;
-
-					rc = http_client_transaction(&p_self->http_to_dyndns[i], &http_tr);
-
-					if (p_self->dbg.level > 2)
-					{
-						p_self->p_req_buffer[http_tr.req_len] = 0;
-						DBG_PRINTF((LOG_DEBUG,"DYNDNS my Request:\n%s\n", p_self->p_req_buffer));
-					}
-
-					if (rc == RC_OK)
-					{
-						BOOL update_ok =
-							p_self->info[i].p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
-												    http_tr.p_rsp,
-												    i,
-												    p_self->info[i].p_dns_system->p_success_string);
-						if (update_ok)
-						{
-							p_self->info[i].alias_info[j].update_required = FALSE;
-
-							DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "Alias '%s' to IP '%s' updated successful.\n",
-								    p_self->info[i].alias_info[j].names.name,
-								    p_self->info[i].my_ip_address.name));
-							p_self->times_since_last_update = 0;
-						}
-						else
-						{
-							DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "Error validating DYNDNS svr answer. Check usr,pass,hostname,abuse...!\n", http_tr.p_rsp));
-							rc = RC_DYNDNS_RSP_NOTOK;
-						}
-						if (p_self->dbg.level > 2 || !update_ok)
-						{
-							http_tr.p_rsp[http_tr.rsp_len] = 0;
-							DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "DYNDNS Server response:\n%s\n", http_tr.p_rsp));
-						}
-					}
-				}
-
-				{
-					RC_TYPE rc2 = http_client_shutdown(&p_self->http_to_dyndns[i]);
-					if (rc == RC_OK)
-					{
-						rc = rc2;
-					}
-				}
-				if (rc != RC_OK)
-				{
-					break;
-				}
-				os_sleep_ms(1000);
+				continue;
 			}
-		}
-		if (rc != RC_OK)
-		{
-			break;
+
+			rc = http_client_init(&p_self->http_to_dyndns[i]);
+			if (rc != RC_OK)
+			{
+				break;
+			}
+
+			/* Build dyndns transaction */
+			http_tr.req_len = p_self->info[i].p_dns_system->p_dns_update_req_func(
+				(struct _DYN_DNS_CLIENT*) p_self, i, j,
+				(struct DYNDNS_SYSTEM*) p_self->info[i].p_dns_system);
+			http_tr.p_req = (char*) p_self->p_req_buffer;
+			http_tr.p_rsp = (char*) p_self->p_work_buffer;
+			http_tr.max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
+			http_tr.rsp_len = 0;
+			p_self->p_work_buffer[http_tr.rsp_len+1] = 0;
+
+			rc = http_client_transaction(&p_self->http_to_dyndns[i], &http_tr);
+
+			if (p_self->dbg.level > 2)
+			{
+				p_self->p_req_buffer[http_tr.req_len] = 0;
+				DBG_PRINTF((LOG_DEBUG,"DYNDNS my Request:\n%s\n", p_self->p_req_buffer));
+			}
+
+			if (rc == RC_OK)
+			{
+				BOOL update_ok =
+					p_self->info[i].p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
+										    http_tr.p_rsp, i,
+										    p_self->info[i].p_dns_system->p_success_string);
+				if (update_ok)
+				{
+					p_self->info[i].alias_info[j].update_required = FALSE;
+
+					DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "Alias '%s' to IP '%s' updated successful.\n",
+						    p_self->info[i].alias_info[j].names.name,
+						    p_self->info[i].my_ip_address.name));
+					p_self->times_since_last_update = 0;
+				}
+				else
+				{
+					DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "Error validating DYNDNS svr answer. Check usr,pass,hostname,abuse...!\n", http_tr.p_rsp));
+					rc = RC_DYNDNS_RSP_NOTOK;
+				}
+				if (p_self->dbg.level > 2 || !update_ok)
+				{
+					http_tr.p_rsp[http_tr.rsp_len] = 0;
+					DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "DYNDNS Server response:\n%s\n", http_tr.p_rsp));
+				}
+			}
+
+			rc2 = http_client_shutdown(&p_self->http_to_dyndns[i]);
+			if (rc == RC_OK)
+			{
+				rc = rc2;
+			}
+			if (rc != RC_OK)
+			{
+				break;
+			}
+			os_sleep_ms(1000);
 		}
 	}
-	while (0);
 
 	return rc;
 }
@@ -703,7 +683,7 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 		}
 
 		i = 0;
-		while(i < DYNDNS_MAX_SERVER_NUMBER)
+		while (i < DYNDNS_MAX_SERVER_NUMBER)
 		{
 			rc = http_client_construct(&p_self->http_to_ip_server[i++]);
 			if (rc != RC_OK)
@@ -925,7 +905,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
-		/*ask IP server something so he will respond and give me my IP */
+		/* Ask IP server something so he will respond and give me my IP */
 		rc = do_ip_server_transaction(p_self, servernum);
 		if (rc != RC_OK)
 		{
@@ -944,7 +924,6 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		{
 			break;
 		}
-
 
 		if (p_self->dbg.level > 1)
 		{
@@ -989,6 +968,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	{
 		return RC_INVALID_POINTER;
 	}
+
+	/* Create pid and cache file repository. */
+	mkdir(DYNDNS_RUNTIME_DATA_DIR, 0755);
 
 	/* read cmd line options and set object properties */
 	rc = get_config_data(p_dyndns, argc, argv);
@@ -1068,14 +1050,14 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		/* get last modification of cache and conf file, if m_time conf file is > to m_time cache file, no use cache ! */
 		if (stat(p_dyndns->cfgfile, &sb) != 0)
 		{
-			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on '%s' failed !\n", p_dyndns->cfgfile));
+//			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on conf file '%s' failed!\n", p_dyndns->cfgfile));
 			break;
 		}
 		t_mod_conf = sb.st_mtime;
 
 		if (stat(DYNDNS_DEFAULT_CACHE_FILE, &sb) != 0)
 		{
-			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on '%s' failed !\n", DYNDNS_DEFAULT_CACHE_FILE));
+//			DBG_PRINTF((LOG_INFO, MODULE_TAG "stat on cache file '%s' failed!\n", DYNDNS_DEFAULT_CACHE_FILE));
 			break;
 		}
 		t_mod_cache = sb.st_mtime;
@@ -1100,14 +1082,6 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				}
 				fclose(fp);
 			}
-			else
-			{
-				DBG_PRINTF((LOG_INFO, MODULE_TAG "Error when opening cache\n"));
-			}
-		}
-		else
-		{
-			DBG_PRINTF((LOG_INFO, MODULE_TAG "New config. No use cache.\n"));
 		}
 	} while (0);
 
@@ -1145,8 +1119,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			rc = dyn_dns_update_ip(p_dyndns);
 			if (rc != RC_OK)
 			{
-				DBG_PRINTF((LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n",
-					    errorcode_get_name(rc), rc, iterations));
+				DBG_PRINTF((LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n", errorcode_get_name(rc), rc, iterations));
 				if (rc == RC_DYNDNS_RSP_NOTOK)
 				{
 					DBG_PRINTF((LOG_ERR,"E: The response of DYNDNS svr was an error! Aborting.\n"));
