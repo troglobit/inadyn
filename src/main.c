@@ -47,14 +47,14 @@ int inadyn_main(int argc, char* argv[])
 	{
 //		print_help_page();
 		/* log error*/
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Main: Error '%s' (0x%x).\n", errorcode_get_name(rc), rc));
+		logit(LOG_WARNING, MODULE_TAG "Main: Error '%s' (0x%x).\n", errorcode_get_name(rc), rc);
 	}
 
 	/* destroy DYN_DNS_CLIENT object*/
 	rc = dyn_dns_destruct(p_dyndns);
 	if (rc != RC_OK)
 	{
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Main: Error '%s' (0x%x) in dyn_dns_destruct().\n", errorcode_get_name(rc), rc));
+		logit(LOG_WARNING, MODULE_TAG "Main: Error '%s' (0x%x) in dyn_dns_destruct().\n", errorcode_get_name(rc), rc);
 	}
 
 	os_close_dbg_output();

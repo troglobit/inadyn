@@ -623,7 +623,7 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 		return RC_INVALID_POINTER;
 	}
 
-	DBG_PRINTF((LOG_INFO, "Version: %s\n", DYNDNS_VERSION_STRING));
+	logit(LOG_INFO, "Version: %s\n", DYNDNS_VERSION_STRING);
 	p_self->abort = TRUE;
 
 	return RC_OK;
@@ -925,7 +925,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
-			DBG_PRINTF((LOG_ERR, MODULE_TAG "Cannot open conf file %s: \n", p_cmd->argv[current_nr], strerror(errno)));
+			logit(LOG_ERR, MODULE_TAG "Cannot open conf file %s: \n", p_cmd->argv[current_nr], strerror(errno));
 	  		rc = RC_FILE_IO_OPEN_ERROR;
 	  		break;
 	  	}
@@ -1020,7 +1020,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 
 			if (p_self->dbg.level > 0)
 			{
-				DBG_PRINTF((LOG_NOTICE, MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE));
+				logit(LOG_NOTICE, MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE);
 			}
 
 			if (p_self->cfgfile)

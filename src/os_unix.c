@@ -85,7 +85,7 @@ static void unix_signal_handler(int signo)
 
 	if (p_self == NULL)
 	{
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));
+		logit(LOG_WARNING, MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo);
 		return;
 	}
 
@@ -96,12 +96,12 @@ static void unix_signal_handler(int signo)
 		case SIGQUIT:
 		case SIGALRM:
 		case SIGTERM:
-			DBG_PRINTF((LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo));
+			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo);
 			p_self->cmd = CMD_STOP;
 			break;
 
 		default:
-			DBG_PRINTF((LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo));
+			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo);
 			break;
 	}
 	return;
@@ -173,7 +173,7 @@ RC_TYPE close_console_window(void)
 	setsid();
 	if (-1 == chdir("/"))
 	{
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s\n", strerror(errno)));
+		logit(LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s\n", strerror(errno));
 	}
 	umask(0);
 
@@ -229,7 +229,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 
 	if (rc != 0)
 	{
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error while attempting to drop privileges: %s\n", strerror(errno)));
+		logit(LOG_WARNING, MODULE_TAG "Error while attempting to drop privileges: %s\n", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 

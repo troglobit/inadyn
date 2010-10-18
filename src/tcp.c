@@ -107,7 +107,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 			{
 				int code = os_get_socket_error();
 
-				DBG_PRINTF((LOG_ERR, MODULE_TAG "Error %d when creating client socket: %s\n", code, strerror(code)));
+				logit(LOG_ERR, MODULE_TAG "Error %d when creating client socket: %s\n", code, strerror(code));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
@@ -122,7 +122,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 				{
 					int code = os_get_socket_error();
 
-					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when attempting to bind to client socket: %s\n", code, strerror(code)));
+					logit(LOG_WARNING, MODULE_TAG "Error %d when attempting to bind to client socket: %s\n", code, strerror(code));
 					rc = RC_IP_SOCKET_BIND_ERROR;
 					break;
 				}
@@ -145,7 +145,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 		{
 			int code = os_get_socket_error();
 
-			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when connecting to remote server: %s\n", code, strerror(code)));
+			logit(LOG_WARNING, MODULE_TAG "Error %d when connecting to remote server: %s\n", code, strerror(code));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}

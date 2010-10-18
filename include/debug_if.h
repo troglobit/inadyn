@@ -50,17 +50,17 @@ void set_dbg_dest(DBG_DEST dest);
 */
 void os_printf(int prio, char *fmt, ... );
 
-#ifndef DBG_PRINT_DISABLED 
-    #ifndef DBG_PRINTF
-        #ifndef PSOS_OS            
-	        #define DBG_PRINTF(msg) os_printf msg
-        #else
-            #define _BMC_MOD_DEBUG 1             
-            #include <debug_if.h>
-        #endif
-    #endif
+#ifndef DBG_PRINT_DISABLED
+#  ifndef logit
+#    ifndef PSOS_OS
+#      define logit(prio, fmt, args...) os_printf(prio, fmt, ##args)
+#    else
+#      define _BMC_MOD_DEBUG 1
+#      include <debug_if.h>
+#    endif
+#  endif
 #else
-	#define DBG_PRINTF(msg)
+#  define logit(fmt, args...)
 #endif
 
-#endif
+#endif /* _DEBUG_IF_INCLUDED */

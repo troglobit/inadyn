@@ -198,8 +198,8 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			if (p_curr_opt == NULL)
 			{
 				rc = RC_CMD_PARSER_INVALID_OPTION;
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Invalid option name at position %d ('%s')\n",
-					    curr_arg_nr + 1, cmd.argv[curr_arg_nr]));
+				logit(LOG_WARNING, MODULE_TAG "Invalid option name at position %d ('%s')\n",
+				      curr_arg_nr + 1, cmd.argv[curr_arg_nr]);
 				break;
 			}
 
@@ -209,16 +209,16 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			if (curr_arg_nr + p_curr_opt->arg_nr > cmd.argc)
 			{
 				rc = RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Missing option value at position %d ('%s')\n",
-					    curr_arg_nr + 1, p_curr_opt->p_option));
+				logit(LOG_WARNING, MODULE_TAG "Missing option value at position %d ('%s')\n",
+				      curr_arg_nr + 1, p_curr_opt->p_option);
 				break;
 			}
 
 			rc = p_curr_opt->p_handler.p_func(&cmd, curr_arg_nr, p_curr_opt->p_handler.p_context);
 			if (rc != RC_OK)
 			{
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error parsing option %d ('%s')\n",
-					    curr_arg_nr, cmd.argv[curr_arg_nr-1]));
+				logit(LOG_WARNING, MODULE_TAG "Error parsing option %d ('%s')\n",
+				      curr_arg_nr, cmd.argv[curr_arg_nr-1]);
 				break;
 			}
 

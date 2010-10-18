@@ -101,7 +101,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			{
 				int code = os_get_socket_error();
 
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d during bind to iface %s: %s\n", code, p_self->ifname, strerror(code)));
+				logit(LOG_WARNING, MODULE_TAG "Error %d during bind to iface %s: %s\n", code, p_self->ifname, strerror(code));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -116,13 +116,13 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
 				p_self->bound = TRUE;
 
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "IP Adress of '%s' is '%s'\n", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr)));
+				logit(LOG_WARNING, MODULE_TAG "IP Adress of '%s' is '%s'\n", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
 			}
 			else
 			{
 				int code = os_get_socket_error();
 
-				DBG_PRINTF((LOG_ERR, MODULE_TAG "Cannot obtain IP address of iface %s: %s\n", p_self->ifname, strerror(code)));
+				logit(LOG_ERR, MODULE_TAG "Cannot obtain IP address of iface %s: %s\n", p_self->ifname, strerror(code));
 				p_self->bound = FALSE;
 			}
 			close(sd);
@@ -141,7 +141,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				{
 					int code = os_get_socket_error();
 
-					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when resolving host name %s: %s\n", code, p_self->p_remote_host_name, strerror(code)));
+					logit(LOG_WARNING, MODULE_TAG "Error %d when resolving host name %s: %s\n", code, p_self->p_remote_host_name, strerror(code));
 					rc = RC_IP_INVALID_REMOTE_ADDR;
 					break;
 				}
@@ -211,7 +211,7 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 	{
 		int code = os_get_socket_error();
 
-		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d in send(): %s\n", code, strerror(code)));
+		logit(LOG_WARNING, MODULE_TAG "Error %d in send(): %s\n", code, strerror(code));
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -254,7 +254,7 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 		{
 			int code = os_get_socket_error();
 
-			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d in recv(): %s\n", code, strerror(code)));
+			logit(LOG_WARNING, MODULE_TAG "Error %d in recv(): %s\n", code, strerror(code));
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}
