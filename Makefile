@@ -4,7 +4,7 @@
 VERSION      ?= 1.97.0
 NAME          = inadyn
 EXEC          = src/$(NAME)
-PKG           = $(EXEC)-$(VERSION)
+PKG           = $(NAME)-$(VERSION)
 ARCHIVE       = $(PKG).tar.bz2
 MAN5          = inadyn.conf.5
 MAN8          = inadyn.8
