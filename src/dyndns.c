@@ -306,11 +306,6 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 	p_http = &p_self->http_to_ip_server[servernum];
 
-	if (p_self->dbg.level > 0)
-	{
-		DBG_PRINTF((LOG_DEBUG, "Initialize HTTP client.\n"));
-	}
-
 	rc = http_client_init(p_http);
 	if (rc != RC_OK)
 	{
@@ -318,34 +313,21 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 
 	/* Prepare request for IP server */
-	if (p_self->dbg.level > 0)
-	{
-		DBG_PRINTF((LOG_DEBUG, "Prepare HTTP request for IP server.\n"));
-	}
-
 	p_tr = &p_self->http_tr;
 	p_tr->req_len = get_req_for_ip_server(p_self, servernum,
 					      p_self->info[servernum].p_dns_system->p_specific_data);
 	if (p_self->dbg.level > 2)
 	{
-		DBG_PRINTF((LOG_DEBUG, "The request for IP server:\n%s\n",p_self->p_req_buffer));
+		DBG_PRINTF((LOG_DEBUG, MODULE_TAG "Request to send to DDNS server:\n%s\n", p_self->p_req_buffer));
 	}
 	p_tr->p_req = (char*) p_self->p_req_buffer;
 	p_tr->p_rsp = (char*) p_self->p_work_buffer;
 	p_tr->max_rsp_len = p_self->work_buffer_size - 1; /* Save place for terminating \0 in string. */
 	p_tr->rsp_len = 0;
 
-	if (p_self->dbg.level > 0)
-	{
-		DBG_PRINTF((LOG_DEBUG, "Do HTTP transaction with server.\n"));
-	}
 	rc = http_client_transaction(p_http, &p_self->http_tr);
 	p_self->p_work_buffer[p_tr->rsp_len] = 0;
 
-	if (p_self->dbg.level > 0)
-	{
-		DBG_PRINTF((LOG_DEBUG, "Shut down HTTP client.\n"));
-	}
 	http_client_shutdown(p_http);
 
 	return rc;
@@ -401,13 +383,25 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 
 	if (found)
 	{
+		int anychange = 0;
+
 		for (i = 0; i < p_self->info_count; i++)
 		{
 			DYNDNS_INFO_TYPE *info = &p_self->info[i];
 
 			sprintf(new_ip_str, DYNDNS_IP_ADDR_FORMAT, ip1, ip2, ip3, ip4);
-			info->my_ip_has_changed = strcmp(new_ip_str, info->my_ip_address.name) != 0;
-			strcpy(info->my_ip_address.name, new_ip_str);
+
+			info->my_ip_has_changed = strcmp(info->my_ip_address.name, new_ip_str) != 0;
+			if (info->my_ip_has_changed)
+			{
+				anychange++;
+				strcpy(info->my_ip_address.name, new_ip_str);
+			}
+		}
+
+		if (!anychange)
+		{
+			DBG_PRINTF((LOG_WARNING, MODULE_TAG "No IP change detected, still at %s\n", new_ip_str));
 		}
 
 		return RC_OK;
@@ -442,7 +436,7 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 			for (j = 0; j < info->alias_count; j++)
 			{
 				info->alias_info[j].update_required = TRUE;
-				DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "IP address for alias '%s' needs update to '%s'\n",
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG "IP address for alias '%s' needs update to '%s'\n",
 					    info->alias_info[j].names.name,
 					    info->my_ip_address.name));
 			}
@@ -500,7 +494,7 @@ static BOOL is_generic_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
    CODE=200
    CODE=707, for duplicated updates
 */
-BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -513,7 +507,7 @@ BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, c
 /**
    NOERROR is the OK code here
 */
-BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -561,7 +555,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			if (p_self->dbg.level > 2)
 			{
 				p_self->p_req_buffer[http_tr.req_len] = 0;
-				DBG_PRINTF((LOG_DEBUG,"DYNDNS my Request:\n%s\n", p_self->p_req_buffer));
+				DBG_PRINTF((LOG_DEBUG, MODULE_TAG "DDNS server request:\n%s\n", p_self->p_req_buffer));
 			}
 
 			if (rc == RC_OK)
@@ -574,21 +568,22 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				{
 					info->alias_info[j].update_required = FALSE;
 
-					DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "Alias '%s' to IP '%s' updated successful.\n",
+					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Alias '%s' to IP '%s' updated successfully.\n",
 						    info->alias_info[j].names.name,
 						    info->my_ip_address.name));
 					p_self->times_since_last_update = 0;
 				}
 				else
 				{
-					DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "Error validating DYNDNS svr answer. Check usr,pass,hostname,abuse...!\n", http_tr.p_rsp));
+					http_tr.p_rsp[http_tr.rsp_len] = 0;
+					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error validating DDNS server reply: check username, password, hostname, abuse:\n%s\n", http_tr.p_rsp));
 					rc = RC_DYNDNS_RSP_NOTOK;
 				}
 
 				if (p_self->dbg.level > 2 || !update_ok)
 				{
 					http_tr.p_rsp[http_tr.rsp_len] = 0;
-					DBG_PRINTF((LOG_WARNING,"W:" MODULE_TAG "DYNDNS Server response:\n%s\n", http_tr.p_rsp));
+					DBG_PRINTF((LOG_WARNING, MODULE_TAG "DDNS server response:\n%s\n", http_tr.p_rsp));
 				}
 
 				anychange += update_ok; /* Adjust forced update period on success */
@@ -597,6 +592,8 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			rc2 = http_client_shutdown(&p_self->http_to_dyndns[i]);
 			if (rc == RC_OK)
 			{
+				/* Only overwrite rc with of http_client_shutdown() rc if previous call, in
+				 * e.g., http_client_transaction() or the p_rsp_ok_func() callback was OK. */
 				rc = rc2;
 			}
 			if (rc != RC_OK)
@@ -720,13 +717,11 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 	return rc;
 }
 
-/*************PUBLIC FUNCTIONS ******************/
-
 void dyn_dns_print_hello(void *p)
 {
 	(void) p;
 
-	DBG_PRINTF((LOG_INFO, MODULE_TAG "Started 'INADYN version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING));
+	DBG_PRINTF((LOG_INFO, "Started 'INADYN version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING));
 }
 
 /**
@@ -1001,30 +996,20 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
-		if (p_self->dbg.level > 0)
-		{
-			DBG_PRINTF((LOG_DEBUG, "Ask IP server something so it responds and gives us our IP\n"));
-		}
-
 		/* Ask IP server something so he will respond and give me my IP */
 		rc = do_ip_server_transaction(p_self, servernum);
 		if (rc != RC_OK)
 		{
-			DBG_PRINTF((LOG_WARNING,"W: DYNDNS: Error '%s' (0x%x) when talking to IP server\n",
+			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Failed periodic query of IP address change.  Error '%s' (0x%x)\n",
 				    errorcode_get_name(rc), rc));
 			break;
 		}
 		if (p_self->dbg.level > 1)
 		{
-			DBG_PRINTF((LOG_DEBUG,"DYNDNS: IP server response: %s\n", p_self->p_work_buffer));
+			DBG_PRINTF((LOG_DEBUG, MODULE_TAG "IP server response: %s\n", p_self->p_work_buffer));
 		}
 
-		if (p_self->dbg.level > 0)
-		{
-			DBG_PRINTF((LOG_DEBUG, "Extract our IP, check if different than previous one.\n"));
-		}
-
-		/* Extract my IP, check if different than previous one */
+		/* Extract our IP, check if different than previous one */
 		rc = do_parse_my_ip_address(p_self, servernum);
 		if (rc != RC_OK)
 		{
@@ -1033,12 +1018,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 		if (p_self->dbg.level > 1)
 		{
-			DBG_PRINTF((LOG_WARNING,"W: DYNDNS: My IP address: %s\n", p_self->info[servernum].my_ip_address.name));
-		}
-
-		if (p_self->dbg.level > 0)
-		{
-			DBG_PRINTF((LOG_DEBUG, "Iterate through aliases list, resolve them and check if any of them point to our IP.\n"));
+			DBG_PRINTF((LOG_WARNING, MODULE_TAG "Our current external IP address: %s\n", p_self->info[servernum].my_ip_address.name));
 		}
 
 		/* Step through aliases list, resolve them and check if they point to my IP */
@@ -1046,11 +1026,6 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		if (rc != RC_OK)
 		{
 			break;
-		}
-
-		if (p_self->dbg.level > 0)
-		{
-			DBG_PRINTF((LOG_DEBUG, "Update IPs marked as not identical with our IP.\n"));
 		}
 
 		/* Update IPs marked as not identical with my IP */
@@ -1135,8 +1110,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	fp = fopen(p_dyndns->pidfile, "w");
 	if (!fp)
 	{
-		DBG_PRINTF((LOG_ERR, MODULE_TAG "Failed opening pidfile %s for writing: %s\n",
-			    p_dyndns->pidfile, strerror(errno)));
+		DBG_PRINTF((LOG_ERR, MODULE_TAG "Failed opening pidfile %s for writing: %s\n", p_dyndns->pidfile, strerror(errno)));
 		return RC_ERROR;
 	}
 	fprintf(fp, "%u", getpid());
@@ -1191,7 +1165,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 				if (fgets(name, sizeof(name), fp))
 				{
-					DBG_PRINTF((LOG_INFO, MODULE_TAG "IP read from cache file: %s\n", name));
+					DBG_PRINTF((LOG_INFO, MODULE_TAG "Cached IP from previous invocation: %s\n", name));
 
 					for (i = 0; i < p_dyndns->info_count; i++)
 					{
@@ -1230,8 +1204,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			rc = os_install_signal_handler(p_dyndns);
 			if (rc != RC_OK)
 			{
-				DBG_PRINTF((LOG_WARNING,"DYNDNS: Error '%s' (0x%x) installing OS signal handler\n",
-					    errorcode_get_name(rc), rc));
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG  "Failed installing OS signal handler: Error '%s' (0x%x)\n", errorcode_get_name(rc), rc));
 				break;
 			}
 			os_handler_installed = TRUE;
@@ -1240,18 +1213,13 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		/* DDNS client main loop */
 		while (1)
 		{
-			if (p_dyndns->dbg.level > 0)
-			{
-				DBG_PRINTF((LOG_INFO, "Calling DDNS update IP.\n"));
-			}
-
 			rc = dyn_dns_update_ip(p_dyndns);
 			if (rc != RC_OK)
 			{
-				DBG_PRINTF((LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n", errorcode_get_name(rc), rc, iterations));
+//				DBG_PRINTF((LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n", errorcode_get_name(rc), rc, iterations));
 				if (rc == RC_DYNDNS_RSP_NOTOK)
 				{
-					DBG_PRINTF((LOG_ERR,"E: The response of DYNDNS svr was an error! Aborting.\n"));
+					DBG_PRINTF((LOG_ERR, MODULE_TAG "DDNS server response was an error, exiting!\n"));
 					break;
 				}
 			}
@@ -1267,16 +1235,11 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				break;
 			}
 
-			if (p_dyndns->dbg.level > 0)
-			{
-				DBG_PRINTF((LOG_DEBUG, "Sleep for a while.\n"));
-			}
-
 			/* also sleep the time set in the ->sleep_sec data memeber*/
 			dyn_dns_wait_for_cmd(p_dyndns);
 			if (p_dyndns->cmd == CMD_STOP)
 			{
-				DBG_PRINTF((LOG_DEBUG,"STOP command received. Exiting.\n"));
+				DBG_PRINTF((LOG_DEBUG, MODULE_TAG "STOP command received. Exiting.\n"));
 				rc = RC_OK;
 				break;
 			}

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG "CMD_OPTS: "
+#define MODULE_TAG "INADYN: "
 
 #include <stdlib.h>
 #include <string.h>
@@ -925,7 +925,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
-			DBG_PRINTF((LOG_ERR, "W:" MODULE_TAG "Cannot open cfg file:%s\n", p_cmd->argv[current_nr]));
+			DBG_PRINTF((LOG_ERR, MODULE_TAG "Cannot open conf file %s: \n", p_cmd->argv[current_nr], strerror(errno)));
 	  		rc = RC_FILE_IO_OPEN_ERROR;
 	  		break;
 	  	}
@@ -1020,7 +1020,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 
 			if (p_self->dbg.level > 0)
 			{
-				DBG_PRINTF((LOG_NOTICE,"I:" MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE));
+				DBG_PRINTF((LOG_NOTICE, MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE));
 			}
 
 			if (p_self->cfgfile)
@@ -1033,8 +1033,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			rc = get_cmd_parse_data(argv, argc, cmd_options_table);
 		}
 
-		if (rc != RC_OK ||
-		    p_self->abort)
+		if (rc != RC_OK || p_self->abort)
 		{
 			break;
 		}

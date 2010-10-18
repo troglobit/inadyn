@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG "INADYN:IP: "
+#define MODULE_TAG "INADYN: "
 #include <stdlib.h>
 #include <string.h>
 
@@ -101,8 +101,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			{
 				int code = os_get_socket_error();
 
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d during bind to iface %s: %s\n",
-					    code, p_self->ifname, strerror(code)));
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d during bind to iface %s: %s\n", code, p_self->ifname, strerror(code)));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -117,14 +116,13 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
 				p_self->bound = TRUE;
 
-				DBG_PRINTF((LOG_WARNING, MODULE_TAG "IP Adress of '%s' is '%s'\n",
-					    p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr)));
+				DBG_PRINTF((LOG_WARNING, MODULE_TAG "IP Adress of '%s' is '%s'\n", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr)));
 			}
 			else
 			{
 				int code = os_get_socket_error();
 
-				DBG_PRINTF((LOG_ERR, "Cannot obtain IP address of iface %s: %s\n", p_self->ifname, strerror(code)));
+				DBG_PRINTF((LOG_ERR, MODULE_TAG "Cannot obtain IP address of iface %s: %s\n", p_self->ifname, strerror(code)));
 				p_self->bound = FALSE;
 			}
 			close(sd);
@@ -143,8 +141,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				{
 					int code = os_get_socket_error();
 
-					DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error %d when resolving host name %s: %s\n",
-						    code, p_self->p_remote_host_name, strerror(code)));
+					DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d when resolving host name %s: %s\n", code, p_self->p_remote_host_name, strerror(code)));
 					rc = RC_IP_INVALID_REMOTE_ADDR;
 					break;
 				}
@@ -214,7 +211,7 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 	{
 		int code = os_get_socket_error();
 
-		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Error %d in send(): %s\n", code, strerror(code)));
+		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error %d in send(): %s\n", code, strerror(code)));
 		return RC_IP_SEND_ERROR;
 	}
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG "OS_UNIX:"
+#define MODULE_TAG "INADYN: "
 #include "debug_if.h"
 
 #include "os.h"
@@ -85,7 +85,7 @@ static void unix_signal_handler(int signo)
 
 	if (p_self == NULL)
 	{
-		DBG_PRINTF((LOG_WARNING,MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));
+		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo));
 		return;
 	}
 
@@ -96,12 +96,12 @@ static void unix_signal_handler(int signo)
 		case SIGQUIT:
 		case SIGALRM:
 		case SIGTERM:
-			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo));
+			DBG_PRINTF((LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo));
 			p_self->cmd = CMD_STOP;
 			break;
 
 		default:
-			DBG_PRINTF((LOG_DEBUG,MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo));
+			DBG_PRINTF((LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo));
 			break;
 	}
 	return;
@@ -130,12 +130,8 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 		sigaction(SIGINT, &newact, NULL)     ||
 		sigaction(SIGQUIT, &newact, NULL)    ||
 		sigaction(SIGTERM, &newact, NULL);
- 	if (rc != RC_OK)
+ 	if (rc == RC_OK)
  	{
- 		DBG_PRINTF((LOG_WARNING,"DYNDNS: Error '%s' (0x%x) installing OS signal handler\n", rc));
-	}
-	else
-	{
 		global_p_signal_handler_param = p_dyndns;
 	}
 
@@ -177,7 +173,7 @@ RC_TYPE close_console_window(void)
 	setsid();
 	if (-1 == chdir("/"))
 	{
-		DBG_PRINTF((LOG_WARNING, "Failed changing cwd to /: %s\n", strerror(errno)));
+		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s\n", strerror(errno)));
 	}
 	umask(0);
 
@@ -210,6 +206,7 @@ RC_TYPE os_syslog_close(void)
 RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 {
 	int rc;
+
 	do
 	{
 		if (p_usr_info->gid != getgid())
@@ -229,11 +226,13 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 		}
 	}
 	while(0);
+
 	if (rc != 0)
-    {
-		DBG_PRINTF((LOG_WARNING, "Error changing uid/gid: %s\n", strerror(errno)));
+	{
+		DBG_PRINTF((LOG_WARNING, MODULE_TAG "Error while attempting to drop privileges: %s\n", strerror(errno)));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
+
 	return RC_OK;
 }
 #endif
