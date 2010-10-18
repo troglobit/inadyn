@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG "OS_WIN:"
+#define MODULE_TAG ""
 #include "debug_if.h"
 
 #include "os.h"

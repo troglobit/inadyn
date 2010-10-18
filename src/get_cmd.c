@@ -24,7 +24,7 @@
   Basic, table driven option line parsing.
 */
 
-#define MODULE_TAG "INADYN: "
+#define MODULE_TAG ""
 #include <string.h>
 #include <stdlib.h>
 #include "get_cmd.h"
