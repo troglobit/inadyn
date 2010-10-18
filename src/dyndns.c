@@ -306,6 +306,11 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 	p_http = &p_self->http_to_ip_server[servernum];
 
+	if (p_self->dbg.level > 0)
+	{
+		DBG_PRINTF((LOG_DEBUG, "Initialize HTTP client.\n"));
+	}
+
 	rc = http_client_init(p_http);
 	if (rc != RC_OK)
 	{
@@ -313,6 +318,11 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 
 	/* Prepare request for IP server */
+	if (p_self->dbg.level > 0)
+	{
+		DBG_PRINTF((LOG_DEBUG, "Prepare HTTP request for IP server.\n"));
+	}
+
 	p_tr = &p_self->http_tr;
 	p_tr->req_len = get_req_for_ip_server(p_self, servernum,
 					      p_self->info[servernum].p_dns_system->p_specific_data);
@@ -325,8 +335,17 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	p_tr->max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
 	p_tr->rsp_len = 0;
 
+	if (p_self->dbg.level > 0)
+	{
+		DBG_PRINTF((LOG_DEBUG, "Do HTTP transaction with server.\n"));
+	}
 	rc = http_client_transaction(p_http, &p_self->http_tr);
 	p_self->p_work_buffer[p_tr->rsp_len] = 0;
+
+	if (p_self->dbg.level > 0)
+	{
+		DBG_PRINTF((LOG_DEBUG, "Shut down HTTP client.\n"));
+	}
 	http_client_shutdown(p_http);
 
 	return rc;
@@ -970,6 +989,11 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
+		if (p_self->dbg.level > 0)
+		{
+			DBG_PRINTF((LOG_DEBUG, "Ask IP server something so it responds and gives us our IP\n"));
+		}
+
 		/* Ask IP server something so he will respond and give me my IP */
 		rc = do_ip_server_transaction(p_self, servernum);
 		if (rc != RC_OK)
@@ -983,7 +1007,12 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 			DBG_PRINTF((LOG_DEBUG,"DYNDNS: IP server response: %s\n", p_self->p_work_buffer));
 		}
 
-		/*extract my IP, check if different than previous one*/
+		if (p_self->dbg.level > 0)
+		{
+			DBG_PRINTF((LOG_DEBUG, "Extract our IP, check if different than previous one.\n"));
+		}
+
+		/* Extract my IP, check if different than previous one */
 		rc = do_parse_my_ip_address(p_self, servernum);
 		if (rc != RC_OK)
 		{
@@ -995,11 +1024,21 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 			DBG_PRINTF((LOG_WARNING,"W: DYNDNS: My IP address: %s\n", p_self->info[servernum].my_ip_address.name));
 		}
 
+		if (p_self->dbg.level > 0)
+		{
+			DBG_PRINTF((LOG_DEBUG, "Iterate through aliases list, resolve them and check if any of them point to our IP.\n"));
+		}
+
 		/* Step through aliases list, resolve them and check if they point to my IP */
 		rc = do_check_alias_update_table(p_self);
 		if (rc != RC_OK)
 		{
 			break;
+		}
+
+		if (p_self->dbg.level > 0)
+		{
+			DBG_PRINTF((LOG_DEBUG, "Update IPs marked as not identical with our IP.\n"));
 		}
 
 		/* Update IPs marked as not identical with my IP */
@@ -1027,8 +1066,6 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	FILE *fp;
 	RC_TYPE rc = RC_OK;
 	int iterations = 0;
-	BOOL quit_flag = FALSE;
-	BOOL init_flag = FALSE;
 	BOOL os_handler_installed = FALSE;
 
 	if (p_dyndns == NULL)
@@ -1162,16 +1199,13 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		}
 	} while (0);
 
-	/* the real work here */
 	do
 	{
-		/* init object */
 		rc = dyn_dns_init(p_dyndns);
 		if (rc != RC_OK)
 		{
 			break;
 		}
-		init_flag = TRUE;
 
 		rc = get_encoded_user_passwd(p_dyndns);
 		if (rc != RC_OK)
@@ -1191,9 +1225,14 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			os_handler_installed = TRUE;
 		}
 
-		/*update IP address in a loop*/
+		/* DDNS client main loop */
 		while (1)
 		{
+			if (p_dyndns->dbg.level > 0)
+			{
+				DBG_PRINTF((LOG_INFO, "Calling DDNS update IP.\n"));
+			}
+
 			rc = dyn_dns_update_ip(p_dyndns);
 			if (rc != RC_OK)
 			{
@@ -1216,6 +1255,11 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				break;
 			}
 
+			if (p_dyndns->dbg.level > 0)
+			{
+				DBG_PRINTF((LOG_DEBUG, "Sleep for a while.\n"));
+			}
+
 			/* also sleep the time set in the ->sleep_sec data memeber*/
 			dyn_dns_wait_for_cmd(p_dyndns);
 			if (p_dyndns->cmd == CMD_STOP)
@@ -1233,25 +1277,13 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				}
 				p_dyndns->times_since_last_update ++;
 			}
-			else
-			{
-			    dyn_dns_shutdown(p_dyndns);
-			    init_flag = FALSE;
-			    break;
-			}
-		}
-
-		/* if everything ok here we should exit. End of program */
-		if (rc == RC_OK)
-		{
-		    break;
 		}
 	}
-	while (quit_flag == FALSE);
+	while (0);
 
-	if (init_flag == TRUE)
+	/* if everything ok here we should exit. End of program */
+	if (rc == RC_OK)
 	{
-	    /* dyn_dns_shutdown object */
 	    rc = dyn_dns_shutdown(p_dyndns);
 	}
 
