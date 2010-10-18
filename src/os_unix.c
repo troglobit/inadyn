@@ -92,6 +92,10 @@ static void unix_signal_handler(int signo)
 	switch (signo)
 	{
 		case SIGHUP:
+			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Restart cmd'.\n", signo);
+			p_self->cmd = CMD_RESTART;
+			break;
+
 		case SIGINT:
 		case SIGQUIT:
 		case SIGALRM:
@@ -123,6 +127,7 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 		sigaddset(&newact.sa_mask, SIGHUP)   ||
 		sigaddset(&newact.sa_mask, SIGINT)   ||
 		sigaddset(&newact.sa_mask, SIGQUIT)  ||
+		sigaddset(&newact.sa_mask, SIGTERM)  ||
 		sigaction(SIGALRM, &newact, NULL)    ||
 		sigemptyset(&newact.sa_mask)         ||
 		sigaddset(&newact.sa_mask, SIGALRM)  ||

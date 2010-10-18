@@ -63,7 +63,9 @@ typedef enum
 
 	RC_FILE_IO_OPEN_ERROR = 0x70,
 	RC_FILE_IO_READ_ERROR = 0x71,
-	RC_FILE_IO_OUT_OF_BUFFER = 0x72
+	RC_FILE_IO_OUT_OF_BUFFER = 0x72,
+
+	RC_RESTART = 0xff,
 } RC_TYPE;
 
 const char* errorcode_get_name(RC_TYPE rc);

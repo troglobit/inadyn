@@ -1051,7 +1051,6 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	FILE *fp;
 	RC_TYPE rc = RC_OK;
 	int iterations = 0;
-	BOOL os_handler_installed = FALSE;
 
 	if (p_dyndns == NULL)
 	{
@@ -1197,23 +1196,19 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			break;
 		}
 
-		if (!os_handler_installed)
-		{
-			rc = os_install_signal_handler(p_dyndns);
-			if (rc != RC_OK)
-			{
-				logit(LOG_WARNING, MODULE_TAG  "Failed installing OS signal handler: Error '%s' (0x%x)\n", errorcode_get_name(rc), rc);
-				break;
-			}
-			os_handler_installed = TRUE;
-		}
-
 		/* DDNS client main loop */
 		while (1)
 		{
 			rc = dyn_dns_update_ip(p_dyndns);
 			if (rc != RC_OK)
 			{
+				if (p_dyndns->cmd == CMD_RESTART)
+				{
+					logit(LOG_DEBUG, "RESTART command received. Restarting.\n");
+					rc = RC_RESTART;
+					break;
+				}
+
 //				logit(LOG_WARNING,"W:'%s' (0x%x) updating the IPs. (it %d)\n", errorcode_get_name(rc), rc, iterations);
 				if (rc == RC_DYNDNS_RSP_NOTOK)
 				{
@@ -1239,6 +1234,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			{
 				logit(LOG_DEBUG, MODULE_TAG "STOP command received. Exiting.\n");
 				rc = RC_OK;
+				break;
+			}
+			else if (p_dyndns->cmd == CMD_RESTART)
+			{
+				logit(LOG_DEBUG, "RESTART command received. Restarting.\n");
+				rc = RC_RESTART;
 				break;
 			}
 

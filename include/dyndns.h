@@ -203,7 +203,8 @@ typedef struct
 typedef enum
 {
 	NO_CMD = 0,
-	CMD_STOP = 1
+	CMD_STOP = 1,
+	CMD_RESTART = 2,
 } DYN_DNS_CMD;
 
 
