@@ -332,7 +332,7 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 	p_tr->p_req = (char*) p_self->p_req_buffer;
 	p_tr->p_rsp = (char*) p_self->p_work_buffer;
-	p_tr->max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
+	p_tr->max_rsp_len = p_self->work_buffer_size - 1; /* Save place for terminating \0 in string. */
 	p_tr->rsp_len = 0;
 
 	if (p_self->dbg.level > 0)
@@ -403,9 +403,11 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 	{
 		for (i = 0; i < p_self->info_count; i++)
 		{
+			DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
 			sprintf(new_ip_str, DYNDNS_IP_ADDR_FORMAT, ip1, ip2, ip3, ip4);
-			p_self->info[i].my_ip_has_changed = strcmp(new_ip_str, p_self->info[i].my_ip_address.name) != 0;
-			strcpy(p_self->info[i].my_ip_address.name, new_ip_str);
+			info->my_ip_has_changed = strcmp(new_ip_str, info->my_ip_address.name) != 0;
+			strcpy(info->my_ip_address.name, new_ip_str);
 		}
 
 		return RC_OK;
@@ -435,12 +437,14 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 	{
 		for (i = 0; i < p_self->info_count; i++)
 		{
-			for (j = 0; j < p_self->info[i].alias_count; j++)
+			DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
+			for (j = 0; j < info->alias_count; j++)
 			{
-				p_self->info[i].alias_info[j].update_required = TRUE;
+				info->alias_info[j].update_required = TRUE;
 				DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "IP address for alias '%s' needs update to '%s'\n",
-					    p_self->info[i].alias_info[j].names.name,
-					    p_self->info[i].my_ip_address.name));
+					    info->alias_info[j].names.name,
+					    info->my_ip_address.name));
 			}
 		}
 	}
@@ -527,9 +531,11 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 
 	for (i = 0; i < p_self->info_count; i++)
 	{
-		for (j = 0; j < p_self->info[i].alias_count; j++)
+		DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
+		for (j = 0; j < info->alias_count; j++)
 		{
-			if (p_self->info[i].alias_info[j].update_required != TRUE)
+			if (info->alias_info[j].update_required != TRUE)
 			{
 				continue;
 			}
@@ -541,9 +547,9 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			}
 
 			/* Build dyndns transaction */
-			http_tr.req_len = p_self->info[i].p_dns_system->p_dns_update_req_func(
+			http_tr.req_len = info->p_dns_system->p_dns_update_req_func(
 				(struct _DYN_DNS_CLIENT*) p_self, i, j,
-				(struct DYNDNS_SYSTEM*) p_self->info[i].p_dns_system);
+				(struct DYNDNS_SYSTEM*) info->p_dns_system);
 			http_tr.p_req = (char*) p_self->p_req_buffer;
 			http_tr.p_rsp = (char*) p_self->p_work_buffer;
 			http_tr.max_rsp_len = p_self->work_buffer_size - 1;/*save place for a \0 at the end*/
@@ -561,16 +567,16 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			if (rc == RC_OK)
 			{
 				BOOL update_ok =
-					p_self->info[i].p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
+					info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
 										    http_tr.p_rsp, i,
-										    p_self->info[i].p_dns_system->p_success_string);
+										    info->p_dns_system->p_success_string);
 				if (update_ok)
 				{
-					p_self->info[i].alias_info[j].update_required = FALSE;
+					info->alias_info[j].update_required = FALSE;
 
 					DBG_PRINTF((LOG_WARNING,"I:" MODULE_TAG "Alias '%s' to IP '%s' updated successful.\n",
-						    p_self->info[i].alias_info[j].names.name,
-						    p_self->info[i].my_ip_address.name));
+						    info->alias_info[j].names.name,
+						    info->my_ip_address.name));
 					p_self->times_since_last_update = 0;
 				}
 				else
@@ -669,8 +675,10 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
-		size = strlen(p_self->info[i].credentials.my_password) +
-			strlen(p_self->info[i].credentials.my_username) +
+		DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
+		size = strlen(info->credentials.my_password) +
+			strlen(info->credentials.my_username) +
 			strlen(format) + 1;
 
 		p_tmp_buff = (char *) malloc(size);
@@ -681,8 +689,8 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 		}
 
 		actual_len = sprintf(p_tmp_buff, format,
-				     p_self->info[i].credentials.my_username,
-				     p_self->info[i].credentials.my_password);
+				     info->credentials.my_username,
+				     info->credentials.my_password);
 		if (actual_len >= size)
 		{
 			rc = RC_OUT_BUFFER_OVERFLOW;
@@ -690,10 +698,10 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 		}
 
 		/*encode*/
-		p_self->info[i].credentials.p_enc_usr_passwd_buffer = b64encode(p_tmp_buff);
-		p_self->info[i].credentials.encoded =
-			(p_self->info[i].credentials.p_enc_usr_passwd_buffer != NULL);
-		p_self->info[i].credentials.size = strlen(p_self->info[i].credentials.p_enc_usr_passwd_buffer);
+		info->credentials.p_enc_usr_passwd_buffer = b64encode(p_tmp_buff);
+		info->credentials.encoded =
+			(info->credentials.p_enc_usr_passwd_buffer != NULL);
+		info->credentials.size = strlen(info->credentials.p_enc_usr_passwd_buffer);
 
 		if (p_tmp_buff != NULL)
 		{
@@ -874,12 +882,14 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 	}
 
 	i = 0;
-	while(i < DYNDNS_MAX_SERVER_NUMBER)
+	while (i < DYNDNS_MAX_SERVER_NUMBER)
 	{
-		if (p_self->info[i].credentials.p_enc_usr_passwd_buffer != NULL)
+		DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
+		if (info->credentials.p_enc_usr_passwd_buffer != NULL)
 		{
-			free(p_self->info[i].credentials.p_enc_usr_passwd_buffer);
-			p_self->info[i].credentials.p_enc_usr_passwd_buffer = NULL;
+			free(info->credentials.p_enc_usr_passwd_buffer);
+			info->credentials.p_enc_usr_passwd_buffer = NULL;
 		}
 		i++;
 	}
@@ -915,21 +925,23 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
-		if (strlen(p_self->info[i].proxy_server_name.name) > 0)
-		{
-			http_client_set_port(&p_self->http_to_ip_server[i], p_self->info[i].proxy_server_name.port);
-			http_client_set_remote_name(&p_self->http_to_ip_server[i], p_self->info[i].proxy_server_name.name);
+		DYNDNS_INFO_TYPE *info = &p_self->info[i];
 
-			http_client_set_port(&p_self->http_to_dyndns[i], p_self->info[i].proxy_server_name.port);
-			http_client_set_remote_name(&p_self->http_to_dyndns[i], p_self->info[i].proxy_server_name.name);
+		if (strlen(info->proxy_server_name.name) > 0)
+		{
+			http_client_set_port(&p_self->http_to_ip_server[i], info->proxy_server_name.port);
+			http_client_set_remote_name(&p_self->http_to_ip_server[i], info->proxy_server_name.name);
+
+			http_client_set_port(&p_self->http_to_dyndns[i], info->proxy_server_name.port);
+			http_client_set_remote_name(&p_self->http_to_dyndns[i], info->proxy_server_name.name);
 		}
 		else
 		{
-			http_client_set_port(&p_self->http_to_ip_server[i], p_self->info[i].ip_server_name.port);
-			http_client_set_remote_name(&p_self->http_to_ip_server[i], p_self->info[i].ip_server_name.name);
+			http_client_set_port(&p_self->http_to_ip_server[i], info->ip_server_name.port);
+			http_client_set_remote_name(&p_self->http_to_ip_server[i], info->ip_server_name.name);
 
-			http_client_set_port(&p_self->http_to_dyndns[i], p_self->info[i].dyndns_server_name.port);
-			http_client_set_remote_name(&p_self->http_to_dyndns[i], p_self->info[i].dyndns_server_name.name);
+			http_client_set_port(&p_self->http_to_dyndns[i], info->dyndns_server_name.port);
+			http_client_set_remote_name(&p_self->http_to_dyndns[i], info->dyndns_server_name.name);
 		}
 
 		http_client_set_bind_iface(&p_self->http_to_dyndns[i], p_self->interface);
