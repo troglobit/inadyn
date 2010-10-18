@@ -20,6 +20,8 @@ Common DDNS service providers:
        http://freedns.afraid.org
        http://www.zoneedit.com
        http://www.no-ip.com
+       http://www.easydns.com
+       http://www.3322.org
 
 Some of these services are free of charge for non-commercial use, others take a small
 fee, but also provide more domains to chose from.
@@ -36,8 +38,6 @@ verbose 1
 log_file /var/log/inadyn.log
 pid_file /var/run/inadyn.pid
 
-the block for provider A follows
-
 dyndns_system dyndns@dyndns.org
 username yxxx
 password xyxx
@@ -45,10 +45,9 @@ update_period_sec 300
 alias yyyy
 alias yyyy
 
-But now further blocks for other providers can follow:
-
 dyndns_system default@no-ip.com
 username xxyx
 password xxxy
 update_period_sec 300
 alias yyyy
+
