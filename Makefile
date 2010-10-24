@@ -50,8 +50,8 @@ install: $(EXEC)
 	@install -d $(DESTDIR)$(mandir)/man8
 	@install -d $(DESTDIR)$(mandir)/man5
 	@install -m 0755 $(EXEC) $(DESTDIR)$(prefix)/sbin/
-	@install -m 0644 man/MAN5 $(DESTDIR)$(mandir)/man5/MAN5
-	@install -m 0644 man/MAN8 $(DESTDIR)$(mandir)/man8/MAN8
+	@install -m 0644 man/$(MAN5) $(DESTDIR)$(mandir)/man5/$(MAN5)
+	@install -m 0644 man/$(MAN8) $(DESTDIR)$(mandir)/man8/$(MAN8)
 	@for file in $(DISTFILES); do \
 		install -m 0644 $$file $(DESTDIR)$(datadir)/$$file; \
 	done
@@ -59,8 +59,8 @@ install: $(EXEC)
 uninstall:
 	-@$(RM) $(DESTDIR)$(prefix)/sbin/$(EXEC)
 	-@$(RM) -r $(DESTDIR)$(datadir)
-	-@$(RM) $(DESTDIR)$(mandir)/man5/MAN5
-	-@$(RM) $(DESTDIR)$(mandir)/man8/MAN8
+	-@$(RM) $(DESTDIR)$(mandir)/man5/$(MAN5)
+	-@$(RM) $(DESTDIR)$(mandir)/man8/$(MAN8)
 
 clean:
 	-@$(RM) $(OBJS) $(EXEC)
