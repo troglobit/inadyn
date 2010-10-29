@@ -87,6 +87,10 @@ static RC_TYPE local_set_params(TCP_SOCKET *p_self)
 RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 {
 	RC_TYPE rc;
+	struct timeval sv;
+	int svlen = sizeof(sv);
+	struct sockaddr *sa;
+	socklen_t salen = sizeof(struct sockaddr);
 
 	do
 	{
@@ -135,13 +139,13 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self)
 		}
 
 		/* set timeouts */
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO,
-			   (char*)&p_self->super.timeout, sizeof(p_self->super.timeout));
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO,
-			   (char*)&p_self->super.timeout, sizeof(p_self->super.timeout));
+		sv.tv_sec  = p_self->super.timeout / 1000;	    /* msec to sec */
+		sv.tv_usec = (p_self->super.timeout % 1000) * 1000; /* reminder to usec */
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, svlen);
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, svlen);
 
-		if (0 != connect(p_self->super.socket,
-				 (struct sockaddr *)&p_self->super.remote_addr, sizeof(p_self->super.remote_addr)))
+		sa = (struct sockaddr *)&p_self->super.remote_addr;
+		if (0 != connect(p_self->super.socket, sa, salen))
 		{
 			int code = os_get_socket_error();
 
