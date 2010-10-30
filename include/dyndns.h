@@ -60,13 +60,12 @@ typedef enum
 #define DYNDNS_MY_DNS_SERVER_URL	"/nic/update?"
 #define DYNDNS_MY_HOST_NAME_1		"test.homeip.net"
 #define DYNDNS_MY_HOST_NAME_2		"test2.homeip.net"
-#define DYNDNS_HTTP_PORT		80
 
 /* botho 30/07/06 : add www.3322.org */
-#define DYNDNS_3322_MY_IP_SERVER		"bliao.com"
+#define DYNDNS_3322_MY_IP_SERVER	"bliao.com"
 #define DYNDNS_3322_MY_IP_SERVER_URL	"/ip.phtml"
 #define DYNDNS_3322_MY_DNS_SERVER	"members.3322.org"
-#define DYNDNS_3322_MY_DNS_SERVER_URL "/dyndns/update?"
+#define DYNDNS_3322_MY_DNS_SERVER_URL	"/dyndns/update?"
 
 /*REQ/RSP definitions*/
 
