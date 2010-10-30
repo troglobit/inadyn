@@ -40,6 +40,7 @@ static int get_req_for_dyndns_server(DYN_DNS_CLIENT *this, int infcnt, int alcnt
 static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_generic_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_noip_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
+static int get_req_for_zoneedit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
 static BOOL is_dyndns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
@@ -88,7 +89,7 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	{ZONE_EDIT_DEFAULT,
 	 {"default@zoneedit.com", NULL,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_zoneedit_server_rsp_ok,
-	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_generic_http_dns_server,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_zoneedit_http_dns_server,
 	  "dynamic.zoneedit.com", "/checkip.html",
 	  "dynamic.zoneedit.com", "/auth/dynamic.html?host=", ""}},
 
@@ -239,6 +240,24 @@ static int get_req_for_noip_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, 
 	}
 
 	return sprintf(p_self->p_req_buffer, GENERIC_NOIP_AUTH_MY_IP_REQUEST_FORMAT,
+		       p_self->info[infcnt].dyndns_server_url,
+		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].my_ip_address.name,
+		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer,
+		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
+static int get_req_for_zoneedit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt,  DYNDNS_SYSTEM *p_sys_info)
+{
+	(void)p_sys_info;
+
+	if (p_self == NULL)
+	{
+		/* 0 == "No characters written" */
+		return 0;
+	}
+
+	return sprintf(p_self->p_req_buffer, GENERIC_ZONEEDIT_AUTH_MY_IP_REQUEST_FORMAT,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].my_ip_address.name,
@@ -478,7 +497,7 @@ static BOOL is_generic_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
 
 /**
    the OK codes are:
-   CODE=200
+   CODE=200, 201
    CODE=707, for duplicated updates
 */
 static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
@@ -488,6 +507,7 @@ static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int i
 	(void)p_ok_string;
 
 	return  strstr(p_rsp, "CODE=\"200\"") != NULL ||
+		strstr(p_rsp, "CODE=\"201\"") != NULL ||
 		strstr(p_rsp, "CODE=\"707\"") != NULL;
 }
 

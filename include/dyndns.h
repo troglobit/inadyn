@@ -129,6 +129,13 @@ typedef enum
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
+#define GENERIC_ZONEEDIT_AUTH_MY_IP_REQUEST_FORMAT			\
+	"GET %s%s&dnsto=%s "						\
+	"HTTP/1.0\r\n"							\
+	"Authorization: Basic %s\r\n"					\
+	"Host: %s\r\n"							\
+	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+
 /* dont ask me why easydns is so picky
  * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
 #define GENERIC_EASYDNS_AUTH_MY_IP_REQUEST_FORMAT			\
