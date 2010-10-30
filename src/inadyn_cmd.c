@@ -106,6 +106,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\to For easydns.com: default@easydns.com\n"
 	 "\t\t\to For tzo.com: default@tzo.com\n"
 	 "\t\t\to For 3322.org: dyndns@3322.org\n"
+	 "\t\t\to For dnsomatic.com: default@dnsomatic.com\n"
 	 "\t\t\to For generic: custom@http_svr_basic_auth\n"
 	 "\t\t\tDEFAULT value is intended for default service at dyndns.org (most users): dyndns@dyndns.org"},
 

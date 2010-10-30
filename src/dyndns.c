@@ -123,6 +123,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  DYNDNS_3322_MY_IP_SERVER, DYNDNS_3322_MY_IP_SERVER_URL,
 	  DYNDNS_3322_MY_DNS_SERVER, DYNDNS_3322_MY_DNS_SERVER_URL, NULL}},
 
+        {DNSOMATIC_DEFAULT,
+         {"default@dnsomatic.com", &dyndns_org_dynamic,
+          (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
+          (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
+          DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+          "updates.dnsomatic.com", "/nic/update?", NULL}},
+
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_svr_basic_auth", NULL,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_generic_server_rsp_ok,
