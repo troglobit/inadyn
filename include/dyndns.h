@@ -83,12 +83,12 @@ typedef enum
 
 /* Conversation with the IP server */
 #define DYNDNS_GET_MY_IP_HTTP_REQUEST  \
-	"GET http://%s:%d%s HTTP/1.0\r\n\r\n"
+	"GET http://%s%s HTTP/1.0\r\n\r\n"
 
 /* dyndns.org specific update address format
  * 3322.org has the same parameters ... */
 #define DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT				\
-	"GET http://%s:%d%s"						\
+	"GET %s"							\
 	"system=%s&"							\
 	"hostname=%s&"							\
 	"myip=%s&"							\
@@ -103,8 +103,7 @@ typedef enum
 
 /* freedns.afraid.org specific update request format */
 #define FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT				\
-	"GET http://%s:%d%s"						\
-	"%s "								\
+	"GET %s%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
@@ -117,14 +116,14 @@ typedef enum
 	The parameter here is the entire request but NOT including the alias.
 */
 #define GENERIC_DNS_BASIC_AUTH_MY_IP_REQUEST_FORMAT			\
-	"GET http://%s:%d%s%s "						\
+	"GET %s%s "							\
 	"HTTP/1.0\r\n"							\
 	"Authorization: Basic %s\r\n"					\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 #define GENERIC_NOIP_AUTH_MY_IP_REQUEST_FORMAT				\
-	"GET http://%s:%d%s%s&myip=%s "					\
+	"GET %s%s&myip=%s "						\
 	"HTTP/1.0\r\n"							\
 	"Authorization: Basic %s\r\n"					\
 	"Host: %s\r\n"							\
@@ -133,7 +132,7 @@ typedef enum
 /* dont ask me why easydns is so picky
  * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
 #define GENERIC_EASYDNS_AUTH_MY_IP_REQUEST_FORMAT			\
-	"GET http://%s:%d%s%s&"						\
+	"GET %s%s&"							\
 	"myip=%s&"							\
 	"wildcard=%s "							\
 	"HTTP/1.0\r\n"							\

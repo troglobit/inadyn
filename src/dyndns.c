@@ -185,8 +185,6 @@ static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alc
 
 	ptr = (DYNDNS_ORG_SPECIFIC_DATA *)p_sys_info->p_specific_data;
 	return sprintf(p_self->p_req_buffer, DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT,
-		       p_self->info[infcnt].dyndns_server_name.name,
-		       p_self->info[infcnt].dyndns_server_name.port,
 		       p_self->info[infcnt].dyndns_server_url,
 		       ptr->p_system,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
@@ -208,8 +206,6 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 	}
 
 	return sprintf(p_self->p_req_buffer, FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT,
-		       p_self->info[infcnt].dyndns_server_name.name,
-		       p_self->info[infcnt].dyndns_server_name.port,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].hashes.str,
 		       p_self->info[infcnt].dyndns_server_name.name);
@@ -227,8 +223,6 @@ static int get_req_for_generic_http_dns_server(DYN_DNS_CLIENT *p_self, int infcn
 	}
 
 	return sprintf(p_self->p_req_buffer, GENERIC_DNS_BASIC_AUTH_MY_IP_REQUEST_FORMAT,
-		       p_self->info[infcnt].dyndns_server_name.name,
-		       p_self->info[infcnt].dyndns_server_name.port,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer,
@@ -245,8 +239,6 @@ static int get_req_for_noip_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, 
 	}
 
 	return sprintf(p_self->p_req_buffer, GENERIC_NOIP_AUTH_MY_IP_REQUEST_FORMAT,
-		       p_self->info[infcnt].dyndns_server_name.name,
-		       p_self->info[infcnt].dyndns_server_name.port,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].my_ip_address.name,
@@ -265,8 +257,6 @@ static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcn
 	}
 
 	return sprintf(p_self->p_req_buffer, GENERIC_EASYDNS_AUTH_MY_IP_REQUEST_FORMAT,
-		       p_self->info[infcnt].dyndns_server_name.name,
-		       p_self->info[infcnt].dyndns_server_name.port,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].my_ip_address.name,
@@ -286,9 +276,7 @@ static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt, void *p_spe
 	}
 
 	return sprintf(p_self->p_req_buffer, DYNDNS_GET_MY_IP_HTTP_REQUEST,
-		       p_self->info[infcnt].ip_server_name.name,
-		       p_self->info[infcnt].ip_server_name.port,
-		       p_self->info[infcnt].ip_server_url);
+		       p_self->info[infcnt].ip_server_name.name, p_self->info[infcnt].ip_server_url);
 }
 
 /*
