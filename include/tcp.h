@@ -59,7 +59,7 @@ RC_TYPE tcp_destruct(TCP_SOCKET *p_self);
 
 	- ...
 */
-RC_TYPE tcp_initialize(TCP_SOCKET *p_self);
+RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg);
 
 /* 
 	Disconnect and some other clean up.

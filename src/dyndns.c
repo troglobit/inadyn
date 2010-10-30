@@ -306,7 +306,7 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	}
 	p_http = &p_self->http_to_ip_server[servernum];
 
-	rc = http_client_init(p_http);
+	rc = http_client_init(p_http, "Checking for IP# change");
 	if (rc != RC_OK)
 	{
 		return rc;
@@ -401,7 +401,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 
 		if (!anychange)
 		{
-			logit(LOG_WARNING, MODULE_TAG "No IP change detected, still at %s\n", new_ip_str);
+			logit(LOG_INFO, MODULE_TAG "No IP# change detected, still at %s\n", new_ip_str);
 		}
 
 		return RC_OK;
@@ -533,7 +533,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				continue;
 			}
 
-			rc = http_client_init(&p_self->http_to_dyndns[i]);
+			rc = http_client_init(&p_self->http_to_dyndns[i], "Updating DDNS server with new IP#");
 			if (rc != RC_OK)
 			{
 				break;
@@ -1079,9 +1079,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 	if (p_dyndns->debug_to_syslog == TRUE || (p_dyndns->run_in_background == TRUE))
 	{
-		if (get_dbg_dest() == DBG_STD_LOG) /*avoid file and syslog output */
+		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
 		{
-			rc = os_open_dbg_output(DBG_SYS_LOG, "INADYN", NULL);
+			rc = os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL);
 			if (rc != RC_OK)
 			{
 				return rc;

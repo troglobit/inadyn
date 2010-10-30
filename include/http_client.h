@@ -32,46 +32,46 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	HTTP_DEFAULT_PORT       80
 
 
-typedef struct 
+typedef struct
 {
-	TCP_SOCKET super;
-	BOOL initialized;
+        TCP_SOCKET super;
+        BOOL initialized;
 } HTTP_CLIENT;
 
 typedef struct
 {
-	char *p_req;
-	int req_len;
+        char *p_req;
+        int req_len;
 
-	char *p_rsp;
-	int max_rsp_len;
-	int rsp_len;
-	
-	int status;
+        char *p_rsp;
+        int max_rsp_len;
+        int rsp_len;
+
+        int status;
 } HTTP_TRANSACTION;
 
 
 /*public functions*/
 
 /*
-	 basic resource allocations for the tcp object
+         basic resource allocations for the tcp object
 */
 RC_TYPE http_client_construct(HTTP_CLIENT *p_self);
 
 /*
-	Resource free.
-*/	
+        Resource free.
+*/
 RC_TYPE http_client_destruct(HTTP_CLIENT *p_self, int num);
 
-/* 
-	Sets up the object.
+/*
+        Sets up the object.
 
-	- ...
+        - ...
 */
-RC_TYPE http_client_init(HTTP_CLIENT *p_self);
+RC_TYPE http_client_init(HTTP_CLIENT *p_self, char *msg);
 
-/* 
-	Disconnect and some other clean up.
+/*
+        Disconnect and some other clean up.
 */
 RC_TYPE http_client_shutdown(HTTP_CLIENT *p_self);
 
@@ -91,4 +91,3 @@ RC_TYPE http_client_get_remote_timeout(HTTP_CLIENT *p_self, int *p);
 RC_TYPE http_client_get_bind_iface(HTTP_CLIENT *p_self, char **ifname);
 
 #endif /*_HTTP_CLIENT_H_INCLUDED*/
-

@@ -131,27 +131,31 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 		/* remote addres */
 		if (p_self->p_remote_host_name != NULL)
 		{
-			uint32_t addr = 0;
-			HOSTENT* p_remotehost = (HOSTENT *)gethostbyname(p_self->p_remote_host_name);
+			int s;
+			char port[10];
+			struct addrinfo hints, *result;
 
-			if (p_remotehost == NULL)
+			/* Obtain address(es) matching host/port */
+			memset(&hints, 0, sizeof(struct addrinfo));
+			hints.ai_family = AF_INET; /* Use AF_UNSPEC to allow IPv4 or IPv6 */
+			hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+			snprintf(port, sizeof(port), "%d", p_self->port);
+
+			s = getaddrinfo(p_self->p_remote_host_name, port, &hints, &result);
+			if (s != 0 || !result)
 			{
-				rc = os_convert_ip_to_inet_addr(&addr, p_self->p_remote_host_name);
-				if (rc != RC_OK)
-				{
-					int code = os_get_socket_error();
-
-					logit(LOG_WARNING, MODULE_TAG "Error %d when resolving host name %s: %s\n", code, p_self->p_remote_host_name, strerror(code));
-					rc = RC_IP_INVALID_REMOTE_ADDR;
-					break;
-				}
+				logit(LOG_WARNING, MODULE_TAG "Failed resolving host name %s: %s\n", p_self->p_remote_host_name, gai_strerror(s));
+				rc = RC_IP_INVALID_REMOTE_ADDR;
+				break;
 			}
 
-			p_self->remote_addr.sin_family = AF_INET;
-			p_self->remote_addr.sin_port = htons(p_self->port);
-			p_self->remote_addr.sin_addr.s_addr = (addr == 0)
-				? *((uint32_t *)p_remotehost->h_addr_list[0])
-				: addr;
+			/* XXX: Here we should iterate over all of the records returned by
+			 * getaddrinfo(), but with this code here in ip.c and connect() being
+			 * in tcp.c that's hardly feasible.  Needs refactoring!  --Troglobit */
+			p_self->remote_addr = *result->ai_addr;
+			p_self->remote_len = result->ai_addrlen;
+
+			freeaddrinfo(result);           /* No longer needed */
 		}
 	}
 	while (0);

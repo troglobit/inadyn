@@ -27,48 +27,6 @@
 
 #define MAXSTRING 1024
 
-/*
-    returns the inet addr of a char* begining with an IP address: "nnn.nnn.nnn.nnn"
-*/
-RC_TYPE os_convert_ip_to_inet_addr(unsigned int *p_addr, const char *p_name)
-{
-    RC_TYPE rc = RC_OK;
-
-    if (p_name == NULL || p_addr == NULL)
-    {
-	return RC_INVALID_POINTER;
-    }
-
-    *p_addr = 0;
-    if (strlen(p_name) == 0)
-    {
-	rc = RC_OS_INVALID_IP_ADDRESS;
-    }
-
-    {
-	unsigned int b3;
-	unsigned int b2;
-	unsigned int b1;
-	unsigned int b0;
-	unsigned int ipa;
-	int n;
-
-	ipa = 0x0;
-	n = sscanf(p_name, IP_V4_IP_ADDR_FORMAT, &b3, &b2, &b1, &b0);
-	if (n == 4)
-	{
-	    ipa = (b3 << 24) | (b2 << 16) | (b1 << 8) | b0;
-	    *p_addr = htonl(ipa);
-
-	}
-	else
-	{
-	    rc = RC_OS_INVALID_IP_ADDRESS;
-	}
-    }
-    return rc;
-}
-
 /**
     The dbg destination.
     DBG_SYS_LOG for SysLog

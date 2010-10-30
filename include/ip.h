@@ -46,7 +46,8 @@ typedef struct
 	int type;
 	SOCKET socket;
 	struct sockaddr_in local_addr;
-	struct sockaddr_in remote_addr;
+	struct sockaddr remote_addr;
+	socklen_t remote_len;
 	const char *p_remote_host_name;
 
 	unsigned short port;

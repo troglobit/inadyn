@@ -22,7 +22,7 @@
 
 #define super_construct(p) tcp_construct(p)
 #define super_destruct(p)  tcp_destruct(p)
-#define super_init(p)	   tcp_initialize(p)
+#define super_init(p,msg)  tcp_initialize(p, msg)
 #define super_shutdown(p)  tcp_shutdown(p)
 
 /*
@@ -91,7 +91,7 @@ static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 
   - ...
 */
-RC_TYPE http_client_init(HTTP_CLIENT *p_self)
+RC_TYPE http_client_init(HTTP_CLIENT *p_self, char *msg)
 {
 	RC_TYPE rc;
 
@@ -103,7 +103,7 @@ RC_TYPE http_client_init(HTTP_CLIENT *p_self)
 			break;
 		}
 
-		rc = super_init(&p_self->super);
+		rc = super_init(&p_self->super, msg);
 		if (rc != RC_OK)
 		{
 			break;
