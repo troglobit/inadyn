@@ -28,7 +28,10 @@
 #include "dyndns.h"
 #include "debug_if.h"
 #include "base64.h"
+#include "md5.h"
 #include "get_cmd.h"
+
+#define MD5_DIGEST_BYTES (16)
 
 /* DNS systems specific configurations*/
 
@@ -43,6 +46,7 @@ static int get_req_for_noip_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, 
 static int get_req_for_zoneedit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
+static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
 static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 static BOOL is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
@@ -50,6 +54,7 @@ static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int inf
 static BOOL is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 static BOOL is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 static BOOL is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_he_ipv6_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
 {
@@ -129,6 +134,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
           (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
           DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
           "updates.dnsomatic.com", "/nic/update?", NULL}},
+
+	{HE_IPV6TB,
+	 {"ipv6tb@he.net", NULL,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_he_ipv6_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_he_ipv6tb_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "ipv4.tunnelbroker.net", "/ipv4_end.php?", NULL}},
 
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_svr_basic_auth", NULL,
@@ -319,6 +331,33 @@ static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, i
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
 
+static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info)
+{
+	unsigned char digestbuf[MD5_DIGEST_BYTES];
+	char digeststr[MD5_DIGEST_BYTES*2+1];
+	int i;
+
+	(void)p_sys_info;
+
+	if (p_self == NULL)
+	{
+		/* 0 == "No characters written" */
+		return 0;
+	}
+
+	md5_buffer(p_self->info[infcnt].credentials.my_password,
+		   strlen(p_self->info[infcnt].credentials.my_password), digestbuf);
+	for (i = 0; i < MD5_DIGEST_BYTES; i++)
+		sprintf(&digeststr[i*2], "%02x", digestbuf[i]);
+	return sprintf(p_self->p_req_buffer, HE_IPV6TB_UPDATE_MY_IP_REQUEST_FORMAT,
+		       p_self->info[infcnt].dyndns_server_url,
+		       p_self->info[infcnt].my_ip_address.name,
+		       p_self->info[infcnt].credentials.my_username,
+		       digeststr,
+		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
 static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt, void *p_specific_data)
 {
 	(void)p_specific_data;
@@ -491,7 +530,7 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 /* DynDNS org.specific response validator.
    'good' or 'nochange' are the good answers,
 */
-static BOOL is_dyndns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -506,7 +545,7 @@ static BOOL is_dyndns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int inf
     fail blabla and n.n.n.n
     are the good answers. We search our own IP address in response and that's enough.
 */
-static BOOL is_freedns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void) p_ok_string;
 
@@ -517,7 +556,7 @@ static BOOL is_freedns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
     parses a given string. If found is ok,
     Example : 'SUCCESS CODE='
 */
-static BOOL is_generic_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -535,7 +574,7 @@ static BOOL is_generic_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
    CODE=200, 201
    CODE=707, for duplicated updates
 */
-static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -549,7 +588,7 @@ static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int i
 /**
    NOERROR is the OK code here
 */
-static BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
@@ -561,13 +600,24 @@ static BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
 /* TZO specific response validator.
    If we have an HTTP 302 the update wasn't good and we're being redirected 
 */
-static BOOL is_tzo_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static BOOL is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
 	return strstr(p_rsp, " HTTP/1.%*c 302") == NULL;
+}
+
+/* HE ipv6 tunnelbroker specific response validator.
+   own IP address and 'already in use' are the good answers.
+*/
+static BOOL is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+{
+	(void)p_ok_string;
+
+	return ((strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL) ||
+		(strstr(p_rsp, "already in use") != NULL));
 }
 
 static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)

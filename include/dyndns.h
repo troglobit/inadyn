@@ -44,6 +44,7 @@ typedef enum
 	TZO_DEFAULT,
 	DYNDNS_3322_DYNAMIC,
 	DNSOMATIC_DEFAULT,
+	HE_IPV6TB,
 	LAST_DNS_SYSTEM = -1
 } DYNDNS_SYSTEM_ID;
 
@@ -155,6 +156,17 @@ typedef enum
 	"Email=%s&"							\
 	"TZOKey=%s&"							\
 	"IPAddress=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+
+/* HE tunnelbroker.com specific update request format */
+#define HE_IPV6TB_UPDATE_MY_IP_REQUEST_FORMAT				\
+	"GET %s"							\
+	"ipv4b=%s&"							\
+	"user_id=%s&"							\
+	"pass=%s&"							\
+	"tunnel_id=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
