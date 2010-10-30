@@ -42,12 +42,14 @@ static int get_req_for_generic_http_dns_server(DYN_DNS_CLIENT *p_self, int infcn
 static int get_req_for_noip_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_zoneedit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
+static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
-static BOOL is_dyndns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_freedns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_generic_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_zoneedit_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static BOOL is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
 {
@@ -106,6 +108,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_easydns_http_dns_server,
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
 	  "members.easydns.com", "/dyn/dyndns.php?hostname=", ""}},
+	
+	{TZO_DEFAULT,
+	 {"default@tzo.com", NULL,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_tzo_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_tzo_http_dns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "cgi.tzo.com", "/webclient/signedon.html?TZOName=", NULL}},
 
 	{DYNDNS_3322_DYNAMIC,
 	 {"dyndns@3322.org", &dyndns_org_dynamic,
@@ -281,6 +290,25 @@ static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcn
 		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->wildcard ? "ON" : "OFF",
 		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer,
+		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
+static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info)
+{
+	(void)p_sys_info;
+
+	if (p_self == NULL)
+	{
+		/* 0 == "No characters written" */
+		return 0;
+	}
+
+	return sprintf(p_self->p_req_buffer, GENERIC_TZO_AUTH_MY_IP_REQUEST_FORMAT,
+		       p_self->info[infcnt].dyndns_server_url,
+		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].credentials.my_username,
+		       p_self->info[infcnt].credentials.my_password,
+		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
 
@@ -521,6 +549,18 @@ static BOOL is_easydns_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int in
 	(void)p_ok_string;
 
 	return strstr(p_rsp, "NOERROR") != NULL;
+}
+
+/* TZO specific response validator.
+   If we have an HTTP 302 the update wasn't good and we're being redirected 
+*/
+static BOOL is_tzo_server_rsp_ok( DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+{
+	(void)p_self;
+	(void)infnr;
+	(void)p_ok_string;
+
+	return strstr(p_rsp, " HTTP/1.%*c 302") == NULL;
 }
 
 static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
