@@ -14,14 +14,17 @@ changes.
 Inadyn can maintain multiple host names with the same IP address, and has a web based
 IP detection which runs well behind a NAT router.
 
-Common DDNS service providers:
+Common DDNS service providers supported by inadyn:
 
        http://www.dyndns.org
        http://freedns.afraid.org
        http://www.zoneedit.com
        http://www.no-ip.com
        http://www.easydns.com
+       http://www.tzo.com
        http://www.3322.org
+       http://www.dnsomatic.com
+       http://www.tunnelbroker.net, i.e., http://dns.he.net/
 
 Some of these services are free of charge for non-commercial use, others take a small
 fee, but also provide more domains to chose from.

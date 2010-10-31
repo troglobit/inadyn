@@ -1,62 +1,73 @@
+.\"  -*- nroff -*-
 .\"
 .\" Process this file with
 .\" groff -man -Tascii foo.1
 .\"
-.\" Copyright 2005, by Shaul Karl. You may modify and distribute 
-.\" this document for any purpose as long as this copyright notice
-.\" remains intact.
+.\" Copyright 2005, by Shaul Karl.
+.\" Copyright 2010, by Joachim Nilsson.
 .\"
-
-.TH INADYN.CONF 5 "January, 2005" "Linux applications" "File formats and conventions"
-.SH NAME
-inadyn.conf \- configuration for the inadyn client for open DNS servers.
-.SH DESCRIPTION
-.B inadyn
-can read the very same options which can be present in the command line 
-from a configuration file. This feature allows the user to write the
-options only once, and avoids frequent retyping.
-
-The format of the file follows the *NIX tradition:
-.IP
-a '#' character denotes a comment. 
-.IP
-The long options (those with '\-\-' in front) can also be placed at the 
+.\" You may modify and distribute this document for any purpose, as
+.\" long as this copyright notice remains intact.
+.\"
+.Dd $Mdocdate: October 31 2010 $
+.Dt INADYN 5 SMM
+.Os
+.Sh NAME
+.Nm inadyn.conf
+.Nd Inadyn DDNS client configuration file
+.Sh SYNOPSIS
+.Nm /etc/inadyn.conf
+.Sh DESCRIPTION
+.Nm inadyn
+can read the very same command line options from a configuration file. This
+feature allows the user to write the options only once, and avoids frequent
+retyping.
+.Pp
+The format of the file follows the UN*X tradition:
+.Bl -bullet -offset abcd
+.It
+The '#' character denotes a comment. 
+.It
+Long options (those with '\-\-' in front) can also be placed at the 
 beginning of the line without '\-\-' signs.
-.IP
-a \\ can be used as an escape character.
-.SH EXAMPLES
-.SS 1.
-#Some comment about inadyn cfg file
-
-\-\-username test \-\-password test \-\-update_period 60000 
-
-\-\-alias test.homeip.net \-\-alias my.second.domain
- 
-.SS 2.
-\-\-username test # user
-
-\-\-password test 
-
+.It
+The \\ character can be used as an escape character.
+.El
+.Sh EXAMPLES
+.Ss 1.  Config file with long options
+# Some comments about the inadyn conf file
+.br
+--username test
+.br
+--password test
+.br
+--update_period 60000 
+.br
+--alias test.homeip.net
+.br
+--alias my.second.domain
+.Ss 2.  Config file without '\-\-'
+username test # user
+.br
+password test 
+.br
 update_period 60000  # some other param without '\-\-'
-
+.br
 alias test.homeip.net 
-
-.SH "SEE ALSO"
-.SS "Other manual pages"
-.RB inadyn(8).
-.SS "Internet resources"
-.B Inadyn
-\'s home page is
-.UR
-http://inadyn.ina-tech.net.
-.UE
-.SH AUTHOR
-.B inadyn
-was written by Narcis Ilisei, <inarcis2002@hotpop.com>.
-
-This manual page was written by Shaul Karl, <shaul@debian.org>, for the
-.B Debian GNU/Linux
-system, based on the readme.html file that is found in the source.
-
-
-
+.Sh "SEE ALSO"
+.Xr inadyn 8
+.Ss "Internet resources"
+The
+.Nm inadyn
+home page is
+.Ur
+http://troglobit.com/inadyn.shtml
+.Ue
+.Sh AUTHOR
+.Nm inadyn
+was written by Narcis Ilisei <inarcis2002@hotpop.com>, Steve Horbachuk and later
+Joachim Nilsson <troglobit@vmlinux.org>.
+.Pp
+This manual page was initially written for the
+.Em Debian GNU/Linux
+system by Shaul Karl <shaul@debian.org>. Later Joachim Nilsson picked it 
