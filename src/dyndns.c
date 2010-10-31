@@ -517,7 +517,7 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 			for (j = 0; j < info->alias_count; j++)
 			{
 				info->alias_info[j].update_required = TRUE;
-				logit(LOG_WARNING, MODULE_TAG "IP address for alias '%s' needs update to '%s'\n",
+				logit(LOG_WARNING, MODULE_TAG "IP# for alias '%s' needs update to '%s'\n",
 				      info->alias_info[j].names.name, info->my_ip_address.name);
 			}
 		}
@@ -672,7 +672,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				{
 					info->alias_info[j].update_required = FALSE;
 
-					logit(LOG_WARNING, MODULE_TAG "Alias '%s' to IP '%s' updated successfully.\n",
+					logit(LOG_WARNING, MODULE_TAG "Alias '%s' to IP# '%s' updated successfully.\n",
 					      info->alias_info[j].names.name, info->my_ip_address.name);
 					p_self->times_since_last_update = 0;
 				}
@@ -707,13 +707,10 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 		}
 	}
 
-	/* Successful change! */
-	if (anychange)
+	/* Successful change and when cache file does not yet exist! */
+	if (anychange || access(DYNDNS_DEFAULT_CACHE_FILE, F_OK))
 	{
 		FILE *fp;
-
-		/* Recalculate forced update period */
-		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
 
 		/* Update cache with new IP */
 		fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "w");
@@ -723,10 +720,16 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			fclose(fp);
 		}
 
-		/* Run external command hook on update. */
-		if (p_self->external_command)
+		if (anychange)
 		{
-			os_shell_execute(p_self->external_command);
+			/* Recalculate forced update period */
+			p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
+
+			/* Run external command hook on update. */
+			if (p_self->external_command)
+			{
+				os_shell_execute(p_self->external_command);
+			}
 		}
 	}
 
@@ -824,7 +827,7 @@ void dyn_dns_print_hello(void *p)
 {
 	(void) p;
 
-	logit(LOG_INFO, "Started 'INADYN version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING);
+	logit(LOG_INFO, "Started 'Inadyn version %s' - dynamic DNS updater.\n", DYNDNS_VERSION_STRING);
 }
 
 /**
@@ -1103,13 +1106,13 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		rc = do_ip_server_transaction(p_self, servernum);
 		if (rc != RC_OK)
 		{
-			logit(LOG_WARNING, MODULE_TAG "Failed periodic query of IP address change.  Error '%s' (0x%x)\n",
+			logit(LOG_WARNING, MODULE_TAG "Failed periodic query of IP# change.  Error '%s' (0x%x)\n",
 			      errorcode_get_name(rc), rc);
 			break;
 		}
 		if (p_self->dbg.level > 1)
 		{
-			logit(LOG_DEBUG, MODULE_TAG "IP server response: %s\n", p_self->p_work_buffer);
+			logit(LOG_DEBUG, MODULE_TAG "DDNS server response: %s\n", p_self->p_work_buffer);
 		}
 
 		/* Extract our IP, check if different than previous one */
@@ -1121,7 +1124,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 		if (p_self->dbg.level > 1)
 		{
-			logit(LOG_WARNING, MODULE_TAG "Our current external IP address: %s\n", p_self->info[servernum].my_ip_address.name);
+			logit(LOG_WARNING, MODULE_TAG "Our current external IP#: %s\n", p_self->info[servernum].my_ip_address.name);
 		}
 
 		/* Step through aliases list, resolve them and check if they point to my IP */
@@ -1155,7 +1158,8 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 {
 	FILE *fp;
 	RC_TYPE rc = RC_OK;
-	int iterations = 0;
+	int i, iterations = 0;
+	char name[DYNDNS_SERVER_NAME_LENGTH];
 
 	if (p_dyndns == NULL)
 	{
@@ -1234,58 +1238,54 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 	dyn_dns_print_hello(NULL);
 
-	/* ... */
-	do
+	fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "r");
+	if (!fp)
 	{
-		int diff;
-		struct stat sb;
-		time_t t_mod_conf, t_mod_cache;
+		struct addrinfo hints;
+		struct addrinfo *result;
 
-		/* get last modification of cache and conf file, if m_time conf file is > to m_time cache file, no use cache ! */
-		if (stat(p_dyndns->cfgfile, &sb) != 0)
+		/* Check DNS "cache" instead for our last IP, if ever updated. */
+		for (i = 0; i < p_dyndns->info_count; i++)
 		{
-//			logit(LOG_INFO, MODULE_TAG "stat on conf file '%s' failed!\n", p_dyndns->cfgfile);
-			break;
-		}
-		t_mod_conf = sb.st_mtime;
-
-		if (stat(DYNDNS_DEFAULT_CACHE_FILE, &sb) != 0)
-		{
-//			logit(LOG_INFO, MODULE_TAG "stat on cache file '%s' failed!\n", DYNDNS_DEFAULT_CACHE_FILE);
-			break;
-		}
-		t_mod_cache = sb.st_mtime;
-
-		if (t_mod_conf <= t_mod_cache)
-		{
-			/* read ip cache */
-			fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "r");
-			if (fp)
+			if (p_dyndns->info[i].alias_count)
 			{
-				int i;
-				char name[DYNDNS_SERVER_NAME_LENGTH];
+				/* DNS Lookup */
+				memset(&hints, 0, sizeof(struct addrinfo));
+				hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+				hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+				hints.ai_flags = 0;
+				hints.ai_protocol = 0;          /* Any protocol */
 
-				if (fgets(name, sizeof(name), fp))
+				if (!getaddrinfo(p_dyndns->info[i].alias_info[0].names.name, NULL, &hints, &result))
 				{
-					logit(LOG_INFO, MODULE_TAG "Cached IP from previous invocation: %s\n", name);
-
-					for (i = 0; i < p_dyndns->info_count; i++)
+					/* DNS reply for alias found, convert to IP# */
+					if (!getnameinfo(result->ai_addr, result->ai_addrlen, name, sizeof(name), NULL, 0, NI_NUMERICHOST))
 					{
+						/* Update local record for next checkip call. */
 						strncpy(p_dyndns->info[i].my_ip_address.name, name, sizeof(p_dyndns->info[i].my_ip_address.name));
+						logit(LOG_INFO, MODULE_TAG "DNS lookup of '%s' gives IP# '%s'\n", 
+						      p_dyndns->info[i].alias_info[0].names.name, name);
 					}
 				}
-				fclose(fp);
+
+				freeaddrinfo(result);
 			}
 		}
-
-		diff = time(NULL) - t_mod_cache;
-		if (diff < 0 || ((p_dyndns->forced_update_period_sec - diff) < 0))
+	}
+	else
+	{
+		/* Read cache from system cache file. */
+		if (fgets(name, sizeof(name), fp))
 		{
-			/* Forced update */
-			p_dyndns->times_since_last_update = 1;
-			p_dyndns->forced_update_times = 0;
+			logit(LOG_INFO, MODULE_TAG "Cached IP# from previous invocation '%s'\n", name);
+
+			for (i = 0; i < p_dyndns->info_count; i++)
+			{
+				strncpy(p_dyndns->info[i].my_ip_address.name, name, sizeof(p_dyndns->info[i].my_ip_address.name));
+			}
 		}
-	} while (0);
+		fclose(fp);
+	}
 
 	do
 	{
