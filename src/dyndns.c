@@ -104,8 +104,8 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	 {"default@no-ip.com", NULL,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_noip_http_dns_server,
-	    "ip1.dynupdate.no-ip.com", "/",
-			"dynupdate.no-ip.com", "/nic/update?hostname=", ""}},
+	  "ip1.dynupdate.no-ip.com", "/",
+	  "dynupdate.no-ip.com", "/nic/update?hostname=", ""}},
 
 	{EASYDNS_DEFAULT,
 	 {"default@easydns.com", NULL,
@@ -141,6 +141,14 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_he_ipv6tb_server,
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
 	  "ipv4.tunnelbroker.net", "/ipv4_end.php?", NULL}},
+
+	/* Support for dynsip.org by milkfish, from DD-WRT */
+	{DYNSIP_DEFAULT,
+	 {"default@dynsip.org", NULL,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC)get_req_for_generic_http_dns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "dynsip.org", "/nic/update?hostname=", ""}},
 
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_svr_basic_auth", NULL,

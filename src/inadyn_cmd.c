@@ -98,18 +98,21 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\tEx: /some_script.php?hostname=\n"},
 
 	{"--dyndns_system",	1,	{get_dyndns_system_handler, NULL},
-	 "[NAME] - optional DYNDNS service type. SHOULD be one of the following: \n"
-	 "\t\t\to For dyndns.org: dyndns@dyndns.org OR statdns@dyndns.org OR customdns@dyndns.org\n"
+	 "<NAME> - Select DDNS service provider, one of the following.\n"
+	 "\t\t\to For dyndns.org:         dyndns@dyndns.org, or\n"
+	 "\t\t\t                          statdns@dyndns.org, or\n"
+	 "\t\t\t                          customdns@dyndns.org\n"
 	 "\t\t\to For freedns.afraid.org: default@freedns.afraid.org\n"
-	 "\t\t\to For www.zoneedit.com: default@zoneedit.com\n"
-	 "\t\t\to For www.no-ip.com DNS system: default@no-ip.com\n"
-	 "\t\t\to For easydns.com: default@easydns.com\n"
-	 "\t\t\to For tzo.com: default@tzo.com\n"
-	 "\t\t\to For 3322.org: dyndns@3322.org\n"
-	 "\t\t\to For dnsomatic.com: default@dnsomatic.com\n"
-	 "\t\t\to For tunnelbroker.net: ipv6tb@he.net\n"
-	 "\t\t\to For generic: custom@http_svr_basic_auth\n"
-	 "\t\t\tDEFAULT value is intended for default service at dyndns.org (most users): dyndns@dyndns.org"},
+	 "\t\t\to For www.zoneedit.com:   default@zoneedit.com\n"
+	 "\t\t\to For www.no-ip.com:      default@no-ip.com\n"
+	 "\t\t\to For easydns.com:        default@easydns.com\n"
+	 "\t\t\to For tzo.com:            default@tzo.com\n"
+	 "\t\t\to For 3322.org:           dyndns@3322.org\n"
+	 "\t\t\to For dnsomatic.com:      default@dnsomatic.com\n"
+	 "\t\t\to For tunnelbroker.net:   ipv6tb@he.net\n"
+	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
+	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
+	 "\t\t\tDefault value:            dyndns@dyndns.org"},
 
 	{"--proxy_server",	1,	{get_proxy_server_handler, NULL},
 	 "[NAME[:port]]  - the http proxy server name and port. Default is none."},
