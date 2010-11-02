@@ -43,6 +43,7 @@ typedef enum
 	EASYDNS_DEFAULT,
 	TZO_DEFAULT,
 	DYNDNS_3322_DYNAMIC,
+	SITELUTIONS_DOMAIN,
 	DNSOMATIC_DEFAULT,
 	HE_IPV6TB,
 	DYNSIP_DEFAULT,
@@ -157,6 +158,17 @@ typedef enum
 	"Email=%s&"							\
 	"TZOKey=%s&"							\
 	"IPAddress=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+
+/* sitelutions.com specific update address format */
+#define SITELUTIONS_GET_MY_IP_HTTP_REQUEST_FORMAT			\
+	"GET %s"							\
+	"user=%s&"							\
+	"pass=%s&"							\
+	"id=%s&"							\
+	"detectip=1&"							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"

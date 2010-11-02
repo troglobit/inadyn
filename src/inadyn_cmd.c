@@ -111,6 +111,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\to For dnsomatic.com:      default@dnsomatic.com\n"
 	 "\t\t\to For tunnelbroker.net:   ipv6tb@he.net\n"
 	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
+	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
 	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
 	 "\t\t\tDefault value:            dyndns@dyndns.org"},
 

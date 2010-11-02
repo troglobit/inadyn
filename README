@@ -26,6 +26,7 @@ Common DDNS service providers supported by inadyn:
        http://www.dnsomatic.com
        http://www.tunnelbroker.net, i.e., http://dns.he.net/
        http://www.dynsip.org
+       http://www.sitelutions.com
 
 Some of these services are free of charge for non-commercial use, others take a small
 fee, but also provide more domains to chose from.
