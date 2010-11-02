@@ -28,7 +28,7 @@ BASE_OBJS     = src/base64utils.o src/md5.o src/dyndns.o src/errorcode.o src/get
 OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
 CFLAGS        = -Iinclude -DVERSION_STRING=\"$(VERSION)\" $(CFG_INC) $(EXTRA_CFLAGS)
 CFLAGS       += -O2 -W -Wall
-LDLIBS       += $(EXTRA_LIBS)
+LDLIBS       += -lresolv $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE
 
 # Pattern rules

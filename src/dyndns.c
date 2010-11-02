@@ -19,6 +19,7 @@
  */
 
 #define MODULE_TAG ""
+#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
@@ -1282,13 +1283,21 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 	dyn_dns_print_hello(NULL);
 
+	/* At boot, or when restarting inadyn at runtime, the memory struct holding
+	 * our current IP# is empty.  We want to avoid unnecessary updates of our
+	 * DDNS server record, since we might get locked out for abuse, so we "seed"
+	 * each of the DDNS records of our struct with the cached IP# from our cache
+	 * file, or from a regular DNS query. */
 	fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "r");
 	if (!fp)
 	{
 		struct addrinfo hints;
 		struct addrinfo *result;
 
-		/* Check DNS "cache" instead for our last IP, if ever updated. */
+		/* Clear DNS cache before querying for the IP below. */
+		res_init();
+
+		/* Try a DNS lookup of our last known IP#. */
 		for (i = 0; i < p_dyndns->info_count; i++)
 		{
 			if (p_dyndns->info[i].alias_count)
@@ -1318,11 +1327,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	}
 	else
 	{
-		/* Read cache from system cache file. */
+		/* Read cached IP# from inadyn cache file. */
 		if (fgets(name, sizeof(name), fp))
 		{
 			logit(LOG_INFO, MODULE_TAG "Cached IP# from previous invocation '%s'\n", name);
 
+			/* Update local record for next checkip call. */
 			for (i = 0; i < p_dyndns->info_count; i++)
 			{
 				strncpy(p_dyndns->info[i].my_ip_address.name, name, sizeof(p_dyndns->info[i].my_ip_address.name));

@@ -17,6 +17,7 @@
  */
 
 #define MODULE_TAG ""
+#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -134,6 +135,9 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			int s;
 			char port[10];
 			struct addrinfo hints, *result;
+
+			/* Clear DNS cache before calling getaddrinfo(). */
+			res_init();
 
 			/* Obtain address(es) matching host/port */
 			memset(&hints, 0, sizeof(struct addrinfo));
