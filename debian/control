@@ -2,13 +2,15 @@ Source: inadyn
 Section: net
 Priority: optional
 Maintainer: Timur Birsh <taem@linukz.org>
-Build-Depends: debhelper (>= 7), dpatch
-Standards-Version: 3.8.1
-Homepage: http://www.inatech.eu/inadyn/
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.9.1
+Homepage: http://troglobit.com/inadyn.shtml
+Vcs-Git: git://github.com/taem/inadyn.git
+Vcs-Browser: http://github.com/taem/inadyn/tree/master
 
 Package: inadyn
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: client to alleviate the requirements for an Internet name
  With this package the user can have an Internet name for his host 
  even though he might not have a name server or a static IP. It works
