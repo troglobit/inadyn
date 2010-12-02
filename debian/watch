@@ -1,2 +1,2 @@
 version=3
-http://www.inatech.eu/inadyn/readme.html inadyn\.v(.*)\.zip debian
+ftp://ftp.vmlinux.org/pub/People/jocke/inadyn/inadyn-(.*)\.tar\.bz2
