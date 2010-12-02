@@ -1,3 +1,36 @@
+inadyn (1.97.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * New upstream maintainer Joachim Nilsson <troglobit@vmlinux.org>.
+  * New upstream homepage http://troglobit.com/inadyn.shtml.
+  * man/inadyn.8: fix typo in the example for freedns.afraid.org.
+    Fixed in an upstream. Closes: #575549.
+  * Update source package in accordance with the version 3.0 (quilt).
+  * debian/control:
+    - bump Standards-Version to 3.9.1 (no changes needed).
+    - bump debhelper build dependency to 7.0.50~ (needed by debhelper's
+      override mechanism).
+    - add Vcs-* fields.
+    - add ${misc:Depends} to the binary package dependency.
+  * debian/rules: use debhelper's override mechanism.
+  * debian/copyright:
+    - update according to the new upstream source.
+    - follow DEP5.
+  * Add debian/{manpages,docs,install}.
+  * Update debian/watch with the new URL.
+  * debian/patches: merged upstream - remove.
+  * Remove debian/changes.
+  * debian/inadyn.conf: use example config from the upstream README.
+
+ -- Timur Birsh <taem@linukz.org>  Sat, 27 Nov 2010 22:40:53 +0600
+
+inadyn (1.96.2-2) unstable; urgency=low
+
+  * Package provides dyndns-client virtual package. Closes: #433822.
+  * Update 02_inadyn8ManPage.dpatch to make some man page corrections.
+
+ -- Timur Birsh <taem@linukz.org>  Mon, 13 Jul 2009 11:51:26 +0600
+
 inadyn (1.96.2-1) unstable; urgency=low
 
   * New upstream release.
