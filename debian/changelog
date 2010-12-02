@@ -1,10 +1,24 @@
 inadyn (1.97.4-1) unstable; urgency=low
 
-  * New upstream release.
-  * New upstream maintainer Joachim Nilsson <troglobit@vmlinux.org>.
-  * New upstream homepage http://troglobit.com/inadyn.shtml.
-  * man/inadyn.8: fix typo in the example for freedns.afraid.org.
-    Fixed in an upstream. Closes: #575549.
+  * New upstream release:
+    - new upstream maintainer Joachim Nilsson <troglobit@vmlinux.org>.
+    - new upstream homepage http://troglobit.com/inadyn.shtml.
+    - network timeout was fixed. Closes: #539240.
+    - man/inadyn.8: fix typo in the example for freedns.afraid.org.
+      Closes: #575549.
+    - fix socket leak.
+    - for following DDNS services support was added: tunnelbroker.net
+      (dns.he.net), tzo.com, dnsomatic.com, dynsip.org and
+      sitelutions.com.
+    - add support for updating several DDNS servers, several accounts
+      even on different DDNS providers. Please see example config
+      inadyn.conf.
+  * New upstream release is based on the several sources: original INADYN
+    implementation from Narcis Ilisei, INADYN by Christoph Brill
+    (https://sourceforge.net/projects/inadyn/), inadyn-advanced
+    (https://sourceforge.net/projects/inadyn-advanced/),
+    Neufbox4 patches from http://dev.efixo.net and wl500g patches from
+    http://code.google.com/p/wl500g.
   * Update source package in accordance with the version 3.0 (quilt).
   * debian/control:
     - bump Standards-Version to 3.9.1 (no changes needed).
