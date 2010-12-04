@@ -172,8 +172,8 @@ Set the number of DNS updates. The default is 0, which means infinity.
 Use the system
 .RB syslog(3)
 mechanism for log messages, warnings and error conditions.
-.It Fl -change_persona Ar uid[:gid]
-After init changes user ID and group ID to the provided ones. This allows dropping unneeded [root] privileges after startup.
+.It Fl -change_persona Ar user[:group]
+After init changes user and group to the provided ones. This allows dropping unneeded [root] privileges after startup.
 .It Fl -bind_iface Ar ifname
 Set interface to bind to. Works on UN*X systems only.
 .It Fl -pidfile pid_file

@@ -23,6 +23,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <unistd.h> /* sysconf() */
+#include <pwd.h> /* getpwnam_r() */
+#include <grp.h> /* getgrnam_r() */
 
 #include "dyndns.h"
 #include "debug_if.h"
@@ -129,7 +132,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"--iterations",	1,	{set_iterations_handler, NULL},	"Set the number of DNS updates. Default is 0 (forever)."},
 	{"--syslog",		0,	{set_syslog_handler, NULL},	"Force logging to syslog, e.g., /var/log/messages.  Works on UN*X systems only."},
-	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<uid[:gid]>\n"
+	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<user[:group]>\n"
 	 "\t\t\tAfter init switch to a new user/group.\n"
 	 "\t\t\tWorks on UN*X systems only."},
 	{"--bind_interface",	1,	{set_bind_interface, NULL}, "<ifname>\n"
@@ -569,18 +572,108 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 		gid_t gid = getuid();
 		uid_t uid = getgid();
 
+		/* Determine max length of a username */
+		long login_len_max = sysconf(_SC_LOGIN_NAME_MAX);
+		if (login_len_max <= 0)
+		{
+			login_len_max = 32;
+		}
+		char username[login_len_max];
+		/* As per groupadd(8) manpage group name may only be up to 32 characters long */
+		char groupname[32];
+
+		memset(&groupname, 0, sizeof(groupname));
 		char *p_gid = strstr(p_cmd->argv[current_nr],":");
 		if (p_gid)
 		{
 			if ((strlen(p_gid + 1) > 0) &&  /* if something is present after :*/
-			    sscanf(p_gid + 1, "%u",&gid) != 1)
+			    sscanf(p_gid + 1, "%s", groupname) != 1)
 			{
 				return RC_DYNDNS_INVALID_OPTION;
 			}
 		}
-		if (sscanf(p_cmd->argv[current_nr], "%u",&uid) != 1)
+		memset(&username, 0, sizeof(username));
+		if (sscanf(p_cmd->argv[current_nr], "%[a-z]", username) != 1)
 		{
 			return RC_DYNDNS_INVALID_OPTION;
+		}
+
+		/* Get uid and gid by their names */
+		char *buf;
+		ssize_t bufsize;
+		int s;
+
+		if (strlen(groupname) > 0)
+		{
+			struct group grp;
+			struct group *grp_res;
+			
+			bufsize = sysconf(_SC_GETGR_R_SIZE_MAX);
+			if (bufsize == -1)          /* Value was indeterminate */
+			{
+				bufsize = 16384;        /* Should be more than enough */
+			}
+
+			buf = malloc(bufsize);
+			if (buf == NULL)
+			{
+				return RC_OUT_OF_MEMORY;
+			}
+
+			s = getgrnam_r(groupname, &grp, buf, bufsize, &grp_res);
+			if (grp_res != NULL)
+			{
+				gid = grp.gr_gid;
+			}
+			free(buf);
+			if (grp_res == NULL)
+			{
+				if (s == 0)
+				{
+					return RC_OS_INVALID_GID;
+				}
+				else
+				{
+					return RC_ERROR;
+				}
+			}
+		}
+					
+		struct passwd pwd;
+		struct passwd *pwd_res;
+		
+		bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
+		if (bufsize == -1)          /* Value was indeterminate */
+		{
+			bufsize = 16384;        /* Should be more than enough */
+		}
+
+		buf = malloc(bufsize);
+		if (buf == NULL)
+		{
+			return RC_OUT_OF_MEMORY;
+		}
+
+		s = getpwnam_r(username, &pwd, buf, bufsize, &pwd_res);
+		if (pwd_res != NULL)
+		{
+			uid = pwd.pw_uid;
+			if (gid == getgid())
+			{
+				gid = pwd.pw_gid;
+			}
+		}
+		free(buf);
+		if (pwd_res == NULL)
+		{
+			if (s == 0)
+			{
+				return RC_OS_INVALID_UID;
+			}
+			else
+			{
+				return RC_ERROR;
+			}
 		}
 
 		p_self->change_persona = TRUE;
