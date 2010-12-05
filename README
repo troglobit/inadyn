@@ -41,7 +41,7 @@ Feature is courtesy of Christian Eyrich <http://eyrich-net.org/programmiertes.ht
 background
 verbose 1
 log_file /var/log/inadyn.log
-pid_file /var/run/inadyn.pid
+pidfile /var/run/inadyn.pid
 
 dyndns_system dyndns@dyndns.org
 username yxxx
