@@ -136,7 +136,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\tSet interface to bind. Parameters: <interface>.\n"
 	 "\t\t\tWorks on UN*X systems only."},
 	{"--pidfile",		1,	{set_pidfile, NULL}, "<FILE>\n"
-	 "\t\t\tSet pidfile, default /var/run/inadyn.pid."},
+	 "\t\t\tSet pidfile, default /var/run/inadyn/inadyn.pid."},
 	{"--version",		0,	{print_version_handler, NULL}, "Print the version number\n"},
 	{"--wildcard",		0,	{wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
 	{"--exec",		1,	{get_exec_handler, NULL}, "Full path to external command to run after an IP update."},
