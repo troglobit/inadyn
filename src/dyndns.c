@@ -1221,6 +1221,20 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		return rc;
 	}
 
+	if (p_dyndns->change_persona)
+	{
+		OS_USER_INFO os_usr_info;
+
+		memset(&os_usr_info, 0, sizeof(os_usr_info));
+		os_usr_info.gid = p_dyndns->sys_usr_info.gid;
+		os_usr_info.uid = p_dyndns->sys_usr_info.uid;
+		rc = os_change_persona(&os_usr_info);
+		if (rc != RC_OK)
+		{
+			return rc;
+		}
+	}
+
 	/* if logfile provided, redirect output to log file */
 	if (strlen(p_dyndns->dbg.p_logfilename) != 0)
 	{
@@ -1266,20 +1280,6 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	}
 	fprintf(fp, "%u", getpid());
 	fclose(fp);
-
-	if (p_dyndns->change_persona)
-	{
-		OS_USER_INFO os_usr_info;
-
-		memset(&os_usr_info, 0, sizeof(os_usr_info));
-		os_usr_info.gid = p_dyndns->sys_usr_info.gid;
-		os_usr_info.uid = p_dyndns->sys_usr_info.uid;
-		rc = os_change_persona(&os_usr_info);
-		if (rc != RC_OK)
-		{
-			return rc;
-		}
-	}
 
 	dyn_dns_print_hello(NULL);
 
