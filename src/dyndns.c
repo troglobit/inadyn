@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -1270,6 +1271,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			fclose(stdout);
 		}
 	}
+
+	/* Create files with permissions 0644 */
+	umask(S_IWGRP | S_IWOTH);
 
 	/* write pid file */
 	fp = fopen(p_dyndns->pidfile, "w");
