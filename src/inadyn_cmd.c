@@ -23,9 +23,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <unistd.h> /* sysconf() */
-#include <pwd.h> /* getpwnam_r() */
-#include <grp.h> /* getgrnam_r() */
+#include <unistd.h>		/* sysconf() */
+#include <pwd.h>		/* getpwnam_r() */
+#include <grp.h>		/* getgrnam_r() */
 
 #include "dyndns.h"
 #include "debug_if.h"
@@ -132,7 +132,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"--iterations",	1,	{set_iterations_handler, NULL},	"Set the number of DNS updates. Default is 0 (forever)."},
 	{"--syslog",		0,	{set_syslog_handler, NULL},	"Force logging to syslog, e.g., /var/log/messages.  Works on UN*X systems only."},
-	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<user[:group]>\n"
+	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<USER[:GROUP]>\n"
 	 "\t\t\tAfter init switch to a new user/group.\n"
 	 "\t\t\tWorks on UN*X systems only."},
 	{"--bind_interface",	1,	{set_bind_interface, NULL}, "<ifname>\n"
@@ -562,28 +562,36 @@ static RC_TYPE set_syslog_handler(CMD_DATA *p_cmd, int current_nr, void *p_conte
  */
 static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
+	int s, result = RC_OK;
+	char *arg, *buf, *p_gid;
+	ssize_t bufsize;
+	gid_t gid;
+	uid_t uid;
+	struct passwd pwd, *pwd_res;
+	long login_len_max;
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+
 	if (p_self == NULL)
 	{
 		return RC_INVALID_POINTER;
 	}
 
+	/* Determine max length of a username */
+	login_len_max = sysconf(_SC_LOGIN_NAME_MAX);
+	if (login_len_max <= 0)
 	{
-		gid_t gid = getuid();
-		uid_t uid = getgid();
+		login_len_max = 32;
+	}
 
-		/* Determine max length of a username */
-		long login_len_max = sysconf(_SC_LOGIN_NAME_MAX);
-		if (login_len_max <= 0)
-		{
-			login_len_max = 32;
-		}
+	arg = p_cmd->argv[current_nr];
+	{
+		char groupname[32] = ""; /* MAX 32 chars, groupadd(8) */
 		char username[login_len_max];
-		/* As per groupadd(8) manpage group name may only be up to 32 characters long */
-		char groupname[32];
 
-		memset(&groupname, 0, sizeof(groupname));
-		char *p_gid = strstr(p_cmd->argv[current_nr],":");
+		gid = getuid();
+		uid = getgid();
+
+		p_gid = strstr(arg, ":");
 		if (p_gid)
 		{
 			if ((strlen(p_gid + 1) > 0) &&  /* if something is present after :*/
@@ -592,24 +600,20 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 				return RC_DYNDNS_INVALID_OPTION;
 			}
 		}
-		memset(&username, 0, sizeof(username));
-		if (sscanf(p_cmd->argv[current_nr], "%[a-z]", username) != 1)
+
+		if (sscanf(arg, "%[a-z]", username) != 1)
 		{
 			return RC_DYNDNS_INVALID_OPTION;
 		}
 
 		/* Get uid and gid by their names */
-		char *buf;
-		ssize_t bufsize;
-		int s;
-
 		if (strlen(groupname) > 0)
 		{
 			struct group grp;
 			struct group *grp_res;
-			
+
 			bufsize = sysconf(_SC_GETGR_R_SIZE_MAX);
-			if (bufsize == -1)          /* Value was indeterminate */
+			if (bufsize == -1)
 			{
 				bufsize = 16384;        /* Should be more than enough */
 			}
@@ -625,23 +629,26 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 			{
 				gid = grp.gr_gid;
 			}
-			free(buf);
-			if (grp_res == NULL)
+			else
 			{
 				if (s == 0)
 				{
-					return RC_OS_INVALID_GID;
+					logit(LOG_ERR, MODULE_TAG "Cannot find GROUP %s\n", groupname);
+					result = RC_OS_INVALID_GID;
 				}
 				else
 				{
-					return RC_ERROR;
+					result = RC_ERROR;
 				}
 			}
+			free(buf);
+
+			if (RC_OK != result)
+			{
+				return result;
+			}
 		}
-					
-		struct passwd pwd;
-		struct passwd *pwd_res;
-		
+
 		bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
 		if (bufsize == -1)          /* Value was indeterminate */
 		{
@@ -663,23 +670,30 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 				gid = pwd.pw_gid;
 			}
 		}
-		free(buf);
-		if (pwd_res == NULL)
+		else
 		{
 			if (s == 0)
 			{
-				return RC_OS_INVALID_UID;
+				logit(LOG_ERR, MODULE_TAG "Cannot find USER %s\n", username);
+				result = RC_OS_INVALID_UID;
 			}
 			else
 			{
-				return RC_ERROR;
+				result = RC_ERROR;
 			}
+		}
+		free(buf);
+
+		if (RC_OK != result)
+		{
+			return result;
 		}
 
 		p_self->change_persona = TRUE;
 		p_self->sys_usr_info.gid = gid;
 		p_self->sys_usr_info.uid = uid;
 	}
+
 	return RC_OK;
 }
 
@@ -1025,7 +1039,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
-			logit(LOG_ERR, MODULE_TAG "Cannot open conf file %s: \n", p_cmd->argv[current_nr], strerror(errno));
+			logit(LOG_ERR, MODULE_TAG "Cannot open conf file %s: %s\n", p_cmd->argv[current_nr], strerror(errno));
 	  		rc = RC_FILE_IO_OPEN_ERROR;
 	  		break;
 	  	}
