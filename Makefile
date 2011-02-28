@@ -1,7 +1,7 @@
 # Makefile for INADYN, a simple and small ddns client.          -*-Makefile-*-
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.97.4
+VERSION      ?= 1.98.0
 NAME          = inadyn
 EXEC          = src/$(NAME)
 PKG           = $(NAME)-$(VERSION)
@@ -73,5 +73,3 @@ dist:
 	git archive --format=tar --prefix=$(PKG)/ $(VERSION) | bzip2 >../$(ARCHIVE)
 	@(cd ..; md5sum $(ARCHIVE) | tee $(ARCHIVE).md5)
 
-build-deb:
-	git-buildpackage --git-ignore-new --git-upstream-branch=master
