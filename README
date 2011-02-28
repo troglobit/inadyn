@@ -40,19 +40,19 @@ Feature is courtesy of Christian Eyrich <http://eyrich-net.org/programmiertes.ht
 
 background
 verbose 1
-log_file /var/log/inadyn.log
+logfile /var/log/inadyn.log
 pidfile /var/run/inadyn.pid
 
-dyndns_system dyndns@dyndns.org
+system dyndns@dyndns.org
 username yxxx
 password xyxx
-update_period_sec 300
+period 300
 alias yyyy
 alias yyyy
 
-dyndns_system default@no-ip.com
+system default@no-ip.com
 username xxyx
 password xxxy
-update_period_sec 300
+period 300
 alias yyyy
 

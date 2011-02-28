@@ -64,44 +64,73 @@ static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context
 
 static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 {
-	{"--help",	0,	{help_handler, NULL},	"help" },
-	{"-h",		0,	{help_handler, NULL},	"help" },
+	{"-a",			1,	{get_alias_handler, NULL},	"" },
+	{"--alias",		1,	{get_alias_handler, NULL},	"<NAME>\n"
+	 "\t\t\tAlias host name. This option can appear multiple times." },
 
-	{"--username",	1,	{get_username_handler, NULL},	"your  membername/ hash"},
-	{"-u",		1,	{get_username_handler, NULL},	"your  membername / hash"},
+	{"-b",			0,	{set_silent_handler, NULL},	""},
+	{"--background",	0,	{set_silent_handler, NULL},	"Run in background."},
 
-	{"--password",	1,	{get_password_handler, NULL},	"your password. Optional."},
-	{"-p",		1,	{get_password_handler, NULL},	"your password"},
+	{"-d",			1,	{set_change_persona_handler, NULL}, ""},
+	{"--drop-privs", 	1,	{set_change_persona_handler, NULL}, "<USER[:GROUP]>\n"
+	 "\t\t\tAfter init switch to a new user/group.\n"
+	 "\t\t\tOnly on UNIX systems."},
+	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, NULL}, /* COMPAT */
 
-	{"--alias",	1,	{get_alias_handler, NULL},	"alias host name. this option can appear multiple times." },
-	{"-a",		1,	{get_alias_handler, NULL},	"alias host name. this option can appear multiple times." },
+	{"-e",			1,	{get_exec_handler, NULL}, ""},
+	{"--exec",		1,	{get_exec_handler, NULL}, "Full path to external command to run after an IP update."},
 
-	{DYNDNS_INPUT_FILE_OPT_STRING, 1, {get_options_from_file_handler, NULL}, "<FILE>\n"
-	 "\t\t\tThe file containing (further) options.  The default\n"
-	 "\t\t\tconfig file, " DYNDNS_DEFAULT_CONFIG_FILE ", is used if inadyn is\n"
+	{"-f",			   1,   {get_forced_update_period_handler, NULL}, ""},
+	{"--forced-update",        1,   {get_forced_update_period_handler, NULL}, "<SEC>\n"
+	 "\t\t\tForced DDNS server update interval. Default: 1 week"},
+	{"--forced_update_period", 1,   {get_forced_update_period_handler, NULL}, NULL}, /* COMPAT */
+
+	{"-F",				1, {get_options_from_file_handler, NULL}, ""},
+	{"--config",			1, {get_options_from_file_handler, NULL}, "<FILE>\n"
+	 "\t\t\tConfiguration file, containing further options.  Default\n"
+	 "\t\t\tconfig file: " DYNDNS_DEFAULT_CONFIG_FILE ", is used if inadyn is\n"
 	 "\t\t\tcalled without any command line options." },
+	{DYNDNS_INPUT_FILE_OPT_STRING,	1, {get_options_from_file_handler, NULL}, NULL},
 
-	{"--ip_server_name",	2, {get_ip_server_name_handler, NULL},
-	 "<srv_name[:port] local_url>\n"
+	{"-H",			2, {get_ip_server_name_handler, NULL}, ""},
+	{"--checkip-url",	2, {get_ip_server_name_handler, NULL}, "<NAME[:PORT] URL>\n"
 	 "\t\t\tLocal IP is detected by parsing the response after\n"
 	 "\t\t\treturned by this server and URL.  The first IP found\n"
 	 "\t\t\tin the HTTP response is considered 'my IP'.\n"
-	 "\t\t\tDefault value: 'checkip.dyndns.org /"},
+	 "\t\t\tDefault value: 'checkip.dyndns.org /'"},
+	{"--ip_server_name",	2, {get_ip_server_name_handler, NULL}, NULL},
 
-	{"--dyndns_server_name", 1, {get_dns_server_name_handler, NULL},
-	 "[<NAME>[:port]]\n"
+	{"-n",			1,	{set_iterations_handler, NULL},	""},
+	{"--iterations",	1,	{set_iterations_handler, NULL},	"<NUM>\n"
+	 "\t\t\tSet the number of DNS updates. Default: 0 (forever)"},
+
+	{"-i",			1,	{set_bind_interface, NULL}, ""},
+	{"--iface",		1,	{set_bind_interface, NULL}, "<IFNAME>\n"
+	 "\t\t\tSet interface to bind to, only on UNIX systems."},
+	{"--bind_interface",	1,	{set_bind_interface, NULL}, NULL},
+
+	{"-L",			1,	{get_logfile_name, NULL}, ""},
+	{"--logfile",		1,	{get_logfile_name, NULL}, "<FILE>\n"
+	 "\t\t\tFull path to log file"},
+	{"--log_file",		1,	{get_logfile_name, NULL}, NULL},
+
+	{"-N",		 	 1, {get_dns_server_name_handler, NULL}, ""},
+	{"--server-name", 	 1, {get_dns_server_name_handler, NULL}, "[<NAME>[:port]]\n"
 	 "\t\t\tThe server that receives the update DNS request.\n"
 	 "\t\t\tAllows the use of unknown DNS services that accept HTTP\n"
 	 "\t\t\tupdates.  If no proxy is wanted, then it is enough to\n"
 	 "\t\t\tset the dyndns system.  Default servers will be taken."},
+	{"--dyndns_server_name", 1, {get_dns_server_name_handler, NULL}, NULL},
 
-	{"--dyndns_server_url", 1, {get_dns_server_url_handler, NULL},
-	 "<name>\n"
+	{"-U",		 	1, {get_dns_server_url_handler, NULL}, ""},
+	{"--server-url", 	1, {get_dns_server_url_handler, NULL}, "<URL>\n"
 	 "\t\t\tFull URL relative to DynDNS server root.\n"
 	 "\t\t\tEx: /some_script.php?hostname=\n"},
+	{"--dyndns_server_url", 1, {get_dns_server_url_handler, NULL}, NULL},
 
-	{"--dyndns_system",	1,	{get_dyndns_system_handler, NULL},
-	 "<NAME> - Select DDNS service provider, one of the following.\n"
+	{"-S",			1,	{get_dyndns_system_handler, NULL}, ""},
+	{"--system",		1,	{get_dyndns_system_handler, NULL}, "<PROVIDER>\n"
+	 "\t\t\tSelect DDNS service provider, one of the following.\n"
 	 "\t\t\to For dyndns.org:         dyndns@dyndns.org, or\n"
 	 "\t\t\t                          statdns@dyndns.org, or\n"
 	 "\t\t\t                          customdns@dyndns.org\n"
@@ -117,32 +146,47 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
 	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
 	 "\t\t\tDefault value:            dyndns@dyndns.org"},
+	{"--dyndns_system",	1,	{get_dyndns_system_handler, NULL}, NULL},
 
-	{"--proxy_server",	1,	{get_proxy_server_handler, NULL},
-	 "[NAME[:port]]  - the http proxy server name and port. Default is none."},
-	{"--update_period",	1,	{get_update_period_handler, NULL},
-	 "how often the IP is checked. The period is in [ms]. Default is about 1 min. Max is 10 days"},
-	{"--update_period_sec",	1,	{get_update_period_sec_handler, NULL},	"how often the IP is checked. The period is in [sec]. Default is about 1 min. Max is 10 days"},
-	{"--forced_update_period", 1,   {get_forced_update_period_handler, NULL},"how often the IP is updated even if it is not changed. [in sec]"},
+	{"-x",			1,	{get_proxy_server_handler, NULL}, ""},
+	{"--proxy-server",	1,	{get_proxy_server_handler, NULL}, "[NAME[:port]]\n"
+	 "\t\t\tHTTP proxy server name, and optional port. Default: N/A"},
+	{"--proxy_server",	1,	{get_proxy_server_handler, NULL}, NULL}, /* COMPAT */
 
-	{"--log_file",		1,	{get_logfile_name, NULL},	"log file path abd name"},
-	{"--background",	0,	{set_silent_handler, NULL},	"run in background. output to log file or to syslog"},
+	{"-T",			1,	{get_update_period_sec_handler, NULL},	""},
+	{"--period",		1,	{get_update_period_sec_handler, NULL},	"<SEC>\n"
+	 "\t\t\tIP change check interval.  Default: 1 min. Max: 10 days"},
+	{"--update_period_sec",	1,	{get_update_period_sec_handler, NULL},	NULL},
+	{"--update_period",	1,	{get_update_period_handler, NULL},      NULL},
 
-	{"--verbose",		1,	{set_verbose_handler, NULL},	"set dbg level. 0 to 5"},
-
-	{"--iterations",	1,	{set_iterations_handler, NULL},	"Set the number of DNS updates. Default is 0 (forever)."},
-	{"--syslog",		0,	{set_syslog_handler, NULL},	"Force logging to syslog, e.g., /var/log/messages.  Works on UN*X systems only."},
-	{"--change_persona", 	1,	{set_change_persona_handler, NULL}, "<USER[:GROUP]>\n"
-	 "\t\t\tAfter init switch to a new user/group.\n"
-	 "\t\t\tWorks on UN*X systems only."},
-	{"--bind_interface",	1,	{set_bind_interface, NULL}, "<ifname>\n"
-	 "\t\t\tSet interface to bind. Parameters: <interface>.\n"
-	 "\t\t\tWorks on UN*X systems only."},
+	{"-P",			1,	{set_pidfile, NULL}, ""},
 	{"--pidfile",		1,	{set_pidfile, NULL}, "<FILE>\n"
 	 "\t\t\tSet pidfile, default /var/run/inadyn/inadyn.pid."},
-	{"--version",		0,	{print_version_handler, NULL}, "Print the version number\n"},
+
+	{"-s",			0,	{set_syslog_handler, NULL}, ""},
+	{"--syslog",		0,	{set_syslog_handler, NULL},
+	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
+
+	{"-u",			1,	{get_username_handler, NULL},	""},
+	{"--username",		1,	{get_username_handler, NULL},	"<USERNAME>\n"
+	 "\t\t\tYour DDNS user name, or hash"},
+
+	{"-p",			1,	{get_password_handler, NULL},	""},
+	{"--password",		1,	{get_password_handler, NULL},	"<PASSWORD>\n"
+	 "\t\t\tYour DDNS user password."},
+
+	{"-w",			0,	{wildcard_handler, NULL}, ""},
 	{"--wildcard",		0,	{wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
-	{"--exec",		1,	{get_exec_handler, NULL}, "Full path to external command to run after an IP update."},
+
+	{"-h",			0,	{help_handler, NULL},	"" },
+	{"--help",		0,	{help_handler, NULL},	"This online help." },
+
+	{"-V",			1,	{set_verbose_handler, NULL},   ""},
+	{"--verbose",		1,	{set_verbose_handler, NULL},   "Debug level: 0 - 5"},
+
+	{"-v",			0,	{print_version_handler, NULL}, ""},
+	{"--version",		0,	{print_version_handler, NULL}, "Show inadyn version"},
+
 	{NULL,			0,	{0, NULL},	NULL }
 };
 
@@ -168,7 +212,12 @@ void print_help_page(void)
 	while (it->p_option != NULL)
 	{
 		if (it->p_description)
-			printf("  %-20s  %s\n\r", it->p_option, it->p_description);
+		{
+			if (strlen(it->p_option) == 2)
+				printf("  %s, ", it->p_option);
+			else
+				printf("%-16s  %s\n\r", it->p_option, it->p_description);
+		}
 		++it;
 	}
 }
