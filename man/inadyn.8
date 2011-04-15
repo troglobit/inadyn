@@ -47,7 +47,7 @@
 is a client for `open' name servers, also known as DDNS service providers.  That is,
 it lets you have a public Internet name for your DHCP/PPPoE assigned system.  Some of
 these services are free of charge for non-commercial use, others take a small fee,
-but also provide more domains to chose from.
+but also provide more domains to choose from.
 .Pp
 Common DDNS service providers supported by
 .Nm inadyn:
@@ -95,7 +95,9 @@ The password, if applicable.
 A host name alias. This option can appear multiple times, for each
 domain that has the same IP.
 .It Fl F, -config Ar FILE
-The file name that contains inadyn command options exactly as specified in the
+The file name that contains
+.Nm inadyn
+command options exactly as specified in the
 command line syntax (adds to those already present on the cmd line). The default
 configuration file name, /etc/inadyn.conf, is looked at automatically if
 .Nm inadyn
@@ -105,11 +107,11 @@ lines.  Spaces are ingored.  The long options may be specified without
 \-\- if placed at the beginning of the line.
 .It Fl H, -checkip-url Ar SERVER[:PORT] URL
 The client IP is detected by calling 'url' from this 'server:port'.
-Defaults to http://checkip.dyndns.org /
+Defaults to http://checkip.dyndns.org.
 .TP
 .It Fl N, -server-name Ar SERVER[:PORT]
 The server that receives the update DNS requests.  When no proxy is specified it is
-sufficient to set the dyndns_system so that the default servers will be taken. The
+sufficient to set the --system so that the default servers will be taken. The
 option is useful for generic DynDNS services that support HTTP update.
 .It Fl U, -server-url Ar PATH
 The update path on the DynDNS server.
@@ -170,10 +172,10 @@ mechanism for log messages, warnings and error conditions.
 Drop privileges after initial setup to the given user and group.
 .It Fl i, -iface Ar IFNAME
 Set interface to bind to. Only on UNIX systems.
-.It Fl P, -pidfile FILE
+.It Fl P, -pidfile Ar FILE
 Set pidfile, defaults to
-.Pa /var/run/inadyn/inadyn.pid.
-.It Fl e, -exec SCRIPT
+.Pa /var/run/inadyn/inadyn.pid .
+.It Fl e, -exec Ar SCRIPT
 Full path to external command, or script, to run after a successful DDNS update.
 .It Fl w, -wildcard
 Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default
@@ -189,12 +191,12 @@ disabled. For inadyn < 1.96.3 wildcarding was enabled by default.
 .No --alias test.homeip.net --alias my.second.domain
 .Pp
 .Nm inadyn
-.No ---background -u test -p test --period 60
-.No ---alias inarcis.homeip.net --alias my.second.domain
+.No --background -u test -p test --period 60
+.No --alias inarcis.homeip.net --alias my.second.domain
 .No --logfile inadyn_srv.log
 .Ss http://freedns.afraid.org
 .Nm inadyn
-.No --dyndns_system default@freedns.afraid.org -a my.registrated.name,hash_from_freedns
+.No --system default@freedns.afraid.org -a my.registrated.name,hash_from_freedns
 .Pp
 .Nm inadyn
 .No --period 60 --alias test.homeip.net,hash_for_host1
