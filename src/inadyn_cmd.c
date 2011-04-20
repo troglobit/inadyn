@@ -637,8 +637,8 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 		char groupname[32] = ""; /* MAX 32 chars, groupadd(8) */
 		char username[login_len_max];
 
-		gid = getuid();
-		uid = getgid();
+		uid = getuid();
+		gid = getgid();
 
 		p_gid = strstr(arg, ":");
 		if (p_gid)
