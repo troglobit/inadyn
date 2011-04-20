@@ -635,7 +635,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 	arg = p_cmd->argv[current_nr];
 	{
 		char groupname[33] = ""; /* MAX 32 chars + '\0', groupadd(8) */
-		char username[login_len_max];
+		char username[login_len_max+1];
 		char fmt[65]; /* Conversion string for username */
 
 		uid = getuid();
