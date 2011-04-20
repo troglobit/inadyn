@@ -634,8 +634,9 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 
 	arg = p_cmd->argv[current_nr];
 	{
-		char groupname[32] = ""; /* MAX 32 chars, groupadd(8) */
+		char groupname[33] = ""; /* MAX 32 chars + '\0', groupadd(8) */
 		char username[login_len_max];
+		char fmt[65]; /* Conversion string for username */
 
 		uid = getuid();
 		gid = getgid();
@@ -643,14 +644,15 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 		p_gid = strstr(arg, ":");
 		if (p_gid)
 		{
-			if ((strlen(p_gid + 1) > 0) &&  /* if something is present after :*/
-			    sscanf(p_gid + 1, "%s", groupname) != 1)
+			if ((strlen(p_gid + 1) > 0) &&  /* if something is present after : */
+			    sscanf(p_gid + 1, "%32[a-zA-Z-]", groupname) != 1)
 			{
 				return RC_DYNDNS_INVALID_OPTION;
 			}
 		}
 
-		if (sscanf(arg, "%[a-z]", username) != 1)
+		snprintf(fmt, sizeof(fmt), "%%%ld[a-zA-Z-]", login_len_max);
+		if (sscanf(arg, fmt, username) != 1)
 		{
 			return RC_DYNDNS_INVALID_OPTION;
 		}
