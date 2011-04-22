@@ -1323,9 +1323,8 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 						logit(LOG_INFO, MODULE_TAG "DNS lookup of '%s' gives IP# '%s'\n", 
 						      p_dyndns->info[i].alias_info[0].names.name, name);
 					}
+					freeaddrinfo(result);
 				}
-
-				freeaddrinfo(result);
 			}
 		}
 	}
