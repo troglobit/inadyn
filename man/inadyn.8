@@ -9,18 +9,18 @@
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd $Mdocdate: October 31 2010 $
+.Dd October 31, 2010
 .Dt INADYN 8 SMM
 .Os
 .Sh NAME
 .Nm inadyn
-.Nd A small DDNS client to maintain your presence on the Internet.
+.Nd a small DDNS client to maintain your presence on the Internet
 .Sh SYNOPSIS
 .Nm inadyn
 .Bk
-.Op Fl a, -alias Ar ALIAS[,HASH]
+.Op Fl a, -alias Ar ALIAS Ns Op , Ns Ar HASH
 .Op Fl b, -background
-.Op Fl d, -drop-privs Ar USER[:GROUP]
+.Op Fl d, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 .Op Fl e, -exec Ar SCRIPT
 .Op Fl f, -forced-update Ar SEC
 .Op Fl F, -config Ar FILE
@@ -30,8 +30,8 @@
 .Op Fl h, -help
 .Op Fl i, -iface Ar IFNAME
 .Op Fl n, -iterations Ar NUM
-.Op Fl H, -checkip-url Ar SERVER[:PORT] URL
-.Op Fl N, -server-name Ar SERVER[:PORT]
+.Op Fl H, -checkip-url Ar SERVER Ns Oo : Ns Ar PORT Oc Ar URL
+.Op Fl N, -server-name Ar SERVER Ns Op : Ns Ar PORT
 .Op Fl U, -server-url Ar PATH
 .Op Fl S, -system Ar PROVIDER
 .Op Fl T, -period Ar SEC
@@ -40,17 +40,19 @@
 .Op Fl v, -version
 .Op Fl V, -verbose Ar LEVEL
 .Op Fl w, -wildcard
-.Op Fl x, -proxy-server Ar SERVER[:PORT]
+.Op Fl x, -proxy-server Ar SERVER Ns Op : Ns Ar PORT
 .Ek
 .Sh DESCRIPTION
 .Nm inadyn
-is a client for `open' name servers, also known as DDNS service providers.  That is,
+is a client for
+.Dq open
+name servers, also known as DDNS service providers.  That is,
 it lets you have a public Internet name for your DHCP/PPPoE assigned system.  Some of
 these services are free of charge for non-commercial use, others take a small fee,
-but also provide more domains to chose from.
+but also provide more domains to choose from.
 .Pp
 Common DDNS service providers supported by
-.Nm inadyn:
+.Nm inadyn :
 .Bl -bullet -compact
 .It
 http://www.dyndns.org
@@ -84,37 +86,44 @@ when there is a mismatch.
 .Sh OPTIONS
 .Bl -tag -width Ds
 .It Fl h, -help
-Print a summary of the options to
-.Nm inadyn
-and exit.
+Print a summary of the options and exit.
 .It Fl u, -username Ar USERNAME
 The username, if applicable. This might be referred to as hash.
 .It Fl p, -password Ar PASSWORD
 The password, if applicable.
-.It Fl a, -alias Ar ALIAS[,HASH]
+.It Fl a, -alias Ar ALIAS Ns Op , Ns Ar HASH
 A host name alias. This option can appear multiple times, for each
 domain that has the same IP.
 .It Fl F, -config Ar FILE
-The file name that contains inadyn command options exactly as specified in the
+The file name that contains
+.Nm inadyn
+command options exactly as specified in the
 command line syntax (adds to those already present on the cmd line). The default
-configuration file name, /etc/inadyn.conf, is looked at automatically if
+configuration file name,
+.Pa /etc/inadyn.conf ,
+is looked at automatically if
 .Nm inadyn
 is called without any command line options. The format is as expected
 for a UNIX config file; the hash character is used to comment entire
 lines.  Spaces are ingored.  The long options may be specified without
 \-\- if placed at the beginning of the line.
-.It Fl H, -checkip-url Ar SERVER[:PORT] URL
-The client IP is detected by calling 'url' from this 'server:port'.
-Defaults to http://checkip.dyndns.org /
-.TP
-.It Fl N, -server-name Ar SERVER[:PORT]
+.It Fl H, -checkip-url Ar SERVER Ns Oo : Ns Ar PORT Oc Ar URL
+The client IP is detected by calling
+.Ar URL
+from this
+.Ar SERVER Ns Oo : Ns Ar PORT Oc .
+Defaults to http://checkip.dyndns.org.
+.It Fl N, -server-name Ar SERVER Ns Op : Ns Ar PORT
 The server that receives the update DNS requests.  When no proxy is specified it is
-sufficient to set the dyndns_system so that the default servers will be taken. The
+sufficient to set the
+.Fl -system
+option so that the default servers will be taken. The
 option is useful for generic DynDNS services that support HTTP update.
 .It Fl U, -server-url Ar PATH
 The update path on the DynDNS server.
 .It Fl S, -system Ar email@ddns-service.tld
-DNS service to connect to.  Defaults to dyndns@dyndns.org
+DNS service to connect to.  Defaults to
+.Ar dyndns@dyndns.org .
 .Bl -tag -width TERM -compact -offset indent
 .It Cm dyndns@dyndns.org
 http://www.dyndns.org
@@ -144,40 +153,47 @@ http://www.dynsip.org
 http://www.sitelutions.com
 .It Cm custom@http_svr_basic_auth
 .El
-.It Fl x, -proxy-server Ar SERVER[:PORT]
-HTTP proxy server name and port.  Default: N/A
+.It Fl x, -proxy-server Ar SERVER Ns Op : Ns Ar PORT
+HTTP proxy server name and port.  Default: N/A.
 .It Fl T, -period Ar SEC
 How often the IP is checked, in seconds. Default: apx 1 minute. Max: 10 days.
 .It Fl f, -forced-update Ar SEC
 How often the IP should be updated even if it is not changed. The time
 should be given in seconds.
 .It Fl -L, -logfile Ar FILE
-The name, including the full path, of a log file.  See also the --syslog option, below.
+The name, including the full path, of a log file.  See also the
+.Fl --syslog
+option, below.
 .It Fl b, -background
 Run in background. Output is sent to the UNIX syslog facilities
 or to a log file, if one was specified.
 .It Fl V, -verbose Ar LEVEL
-Set the debug level, which is an integer between 0 to 5.
-.TP
+Set the debug level, which is an integer between
+.Ar 0
+to
+.Ar 5 .
 .It Fl n, -iterations Ar NUM
-Set the number of DNS updates. The default is 0, which means infinity.
-.TP
+Set the number of DNS updates. The default is
+.Ar 0 ,
+which means infinity.
 .It Fl s, -syslog
 Use the system
-.RB syslog(3)
+.Xr syslog 3
 mechanism for log messages, warnings and error conditions.
-.It Fl d, -drop-privs Ar USER[:GROUP]
+.It Fl d, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 Drop privileges after initial setup to the given user and group.
 .It Fl i, -iface Ar IFNAME
 Set interface to bind to. Only on UNIX systems.
-.It Fl P, -pidfile FILE
+.It Fl P, -pidfile Ar FILE
 Set pidfile, defaults to
-.Pa /var/run/inadyn/inadyn.pid.
-.It Fl e, -exec SCRIPT
+.Pa /var/run/inadyn/inadyn.pid .
+.It Fl e, -exec Ar SCRIPT
 Full path to external command, or script, to run after a successful DDNS update.
 .It Fl w, -wildcard
 Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default
-disabled. For inadyn < 1.96.3 wildcarding was enabled by default.
+disabled. For
+.Nm inadyn
+< 1.96.3 wildcarding was enabled by default.
 .El
 .Sh "TYPICAL USAGE"
 .Ss http://www.dyndns.org
@@ -189,22 +205,26 @@ disabled. For inadyn < 1.96.3 wildcarding was enabled by default.
 .No --alias test.homeip.net --alias my.second.domain
 .Pp
 .Nm inadyn
-.No ---background -u test -p test --period 60
-.No ---alias inarcis.homeip.net --alias my.second.domain
+.No --background -u test -p test --period 60
+.No --alias inarcis.homeip.net --alias my.second.domain
 .No --logfile inadyn_srv.log
 .Ss http://freedns.afraid.org
 .Nm inadyn
-.No --dyndns_system default@freedns.afraid.org -a my.registrated.name,hash_from_freedns
+.No --system default@freedns.afraid.org -a my.registrated.name,hash_from_freedns
 .Pp
 .Nm inadyn
 .No --period 60 --alias test.homeip.net,hash_for_host1
 .No -a my.second.domain,hash2 --system default@freedns.afraid.org
 .Pp
-The 'hash' should be extracted from the grab url batch file that can be
+The
+.Dq hash
+should be extracted from the grab url batch file that can be
 downloaded from the site. A single hashed (base64 encoded) string is
 preferred upon a username and password pair, apparently to reduce the
 computational resources that is required on their side. Unfortunately
-the hash can not be computed by inadyn because it requires the index to
+the hash can not be computed by
+.Nm inadyn
+because it requires the index to
 the username record in the freedns database, which is not known. The
 simplest solution seems to be a copy&paste action from the grab url batch
 file offered on their website. When the batch file looks is like
@@ -212,19 +232,34 @@ file offered on their website. When the batch file looks is like
 .No graburl http://freedns.afraid.org/dynamic/update.php?YUGIUGSEIUFGOUIHEOIFEOIHJFEIO=
 .Pp
 the hash string, which is what the user should copy and paste, is the
-string that begins right after the '?' character and ends with the end
-of line. This string shell be used as the username in inadyn command.
+string that begins right after the
+.Dq ?\&
+character and ends with the end
+of line. This string shell be used as the username in
+.Nm inadyn
+command.
 When the user has several names then each name should be followed with
 that name hash string.
 .Sh OUTPUT
 .Nm inadyn
 prints a message when the IP is updated. If no update is needed then by
-default it prints a single '.' character, unless \-\-verbose is set to 0.
-Therefore, unless \-\-verbose is set to 0, the log file will contains lot
+default it prints a single
+.Dq .\&
+character, unless
+.Fl -verbose
+is set to
+.Ar 0 .
+Therefore, unless
+.Fl -verbose
+is set to
+.Ar 0 ,
+the log file will contains lot
 of dots. When the connection goes down it could be that
 .Nm inadyn
 will print some error messages. Those are harmless and should be
-followed by 'OK' messages after the connection is back up.
+followed by
+.Dq OK
+messages after the connection is back up.
 .Sh SIGNALS
 .Nm
 responds to the following signals:
@@ -256,20 +291,21 @@ upon startup.
 .It Pa /var/run/inadyn/inadyn.pid
 .El
 .Sh SEE ALSO
-.SS "Other manual pages"
 .Xr inadyn.conf 5
 .br
 The
 .Nm inadyn
-home page is
-.Ur
-http://troglobit.com/inadyn.shtml
-.Ue
-.Sh AUTHOR
+home page is http://troglobit.com/inadyn.shtml.
+.Sh AUTHORS
 .Nm inadyn
-was written by Narcis Ilisei <inarcis2002@hotpop.com>, Steve Horbachuk and later
-Joachim Nilsson <troglobit@vmlinux.org>.
+was written by
+.An -nosplit
+.An Narcis Ilisei Aq inarcis2002@hotpop.com ,
+.An Steve Horbachuk and later
+.An Joachim Nilsson Aq troglobit@vmlinux.org .
 .Pp
 This manual page was initially written for the
 .Em Debian GNU/Linux
-system by Shaul Karl <shaul@debian.org>. Later Joachim Nilsson picked up maintenance.
+system by
+.An Shaul Karl Aq shaul@debian.org .
+Later Joachim Nilsson picked up maintenance.

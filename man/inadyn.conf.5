@@ -9,12 +9,12 @@
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd $Mdocdate: October 31 2010 $
+.Dd October 31, 2010
 .Dt INADYN 5 SMM
 .Os
 .Sh NAME
 .Nm inadyn.conf
-.Nd Inadyn DDNS client configuration file
+.Nd inadyn DDNS client configuration file
 .Sh SYNOPSIS
 .Nm /etc/inadyn.conf
 .Sh DESCRIPTION
@@ -26,10 +26,16 @@ retyping.
 The format of the file follows the UN*X tradition:
 .Bl -bullet -offset abcd
 .It
-The '#' character denotes a comment. 
+The
+.Dq #\&
+character denotes a comment. 
 .It
-Long options (those with '\-\-' in front) can also be placed at the 
-beginning of the line without '\-\-' signs.
+Long options (those with
+.Dq \-\-
+in front) can also be placed at the 
+beginning of the line without
+.Dq \-\-
+signs.
 .It
 The \\ character can be used as an escape character.
 .El
@@ -46,7 +52,7 @@ The \\ character can be used as an escape character.
 --alias test.homeip.net
 .br
 --alias my.second.domain
-.Ss 2.  Config file without '\-\-'
+.Ss 2.  Config file without Dq \-\-
 username test # user
 .br
 password test 
@@ -59,15 +65,17 @@ alias test.homeip.net
 .Ss "Internet resources"
 The
 .Nm inadyn
-home page is
-.Ur
-http://troglobit.com/inadyn.shtml
-.Ue
-.Sh AUTHOR
+home page is http://troglobit.com/inadyn.shtml.
+.Sh AUTHORS
 .Nm inadyn
-was written by Narcis Ilisei <inarcis2002@hotpop.com>, Steve Horbachuk and later
-Joachim Nilsson <troglobit@vmlinux.org>.
+was written by
+.An -nosplit
+.An Narcis Ilisei Aq inarcis2002@hotpop.com ,
+.An Steve Horbachuk and later
+.An Joachim Nilsson Aq troglobit@vmlinux.org .
 .Pp
 This manual page was initially written for the
 .Em Debian GNU/Linux
-system by Shaul Karl <shaul@debian.org>. Later Joachim Nilsson picked up maintenance.
+system by
+.An Shaul Karl Aq shaul@debian.org .
+Later Joachim Nilsson picked up maintenance.
