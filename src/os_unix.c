@@ -84,15 +84,11 @@ static void unix_signal_handler(int signo)
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)global_p_signal_handler_param;
 
 	if (p_self == NULL)
-	{
-		logit(LOG_WARNING, MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo);
 		return;
-	}
 
 	switch (signo)
 	{
 		case SIGHUP:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Restart cmd'.\n", signo);
 			p_self->cmd = CMD_RESTART;
 			break;
 
@@ -100,12 +96,10 @@ static void unix_signal_handler(int signo)
 		case SIGQUIT:
 		case SIGALRM:
 		case SIGTERM:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo);
 			p_self->cmd = CMD_STOP;
 			break;
 
 		default:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo);
 			break;
 	}
 	return;
@@ -113,7 +107,7 @@ static void unix_signal_handler(int signo)
 
 /**
 	install handler for SIGALRM and HUP, INT, QUIT.
-	avoid receiving HIP,INT, QUIT during ALRM and
+	avoid receiving HUP,INT, QUIT during ALRM and
 
 */
 RC_TYPE os_install_signal_handler(void *p_dyndns)
