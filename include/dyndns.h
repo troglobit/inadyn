@@ -312,6 +312,7 @@ typedef struct DYN_DNS_CLIENT
 	int          forced_update_times; /* the same forced update period counted in sleep periods*/
 	int          cmd_check_period; /*time to wait for a command*/
 	int          total_iterations;
+	int          num_iterations;
 	char        *interface;
 	BOOL         initialized;
 	BOOL         run_in_background;

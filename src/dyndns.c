@@ -35,8 +35,11 @@
 
 #define MD5_DIGEST_BYTES (16)
 
-/* DNS systems specific configurations*/
+/* To preserve from being reset at SIGHUP */
+static int cached_times_since_last_update = 0;
+static int cached_num_iterations = 0;
 
+/* DNS systems specific configurations */
 DYNDNS_ORG_SPECIFIC_DATA dyndns_org_dynamic = {"dyndns"};
 DYNDNS_ORG_SPECIFIC_DATA dyndns_org_custom = {"custom"};
 DYNDNS_ORG_SPECIFIC_DATA dyndns_org_static = {"statdns"};
@@ -1044,6 +1047,10 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 		i++;
 	}
 
+	/* Save old value, if restarted by SIGHUP */
+	cached_times_since_last_update = p_self->times_since_last_update;
+	cached_num_iterations = p_self->num_iterations;
+
 	free(p_self);
 	p_self = NULL;
 
@@ -1104,6 +1111,10 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 	{
 		p_self->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
 	}
+
+	/* Reset to old value, if restarted by SIGHUP */
+	p_self->times_since_last_update = cached_times_since_last_update;
+	p_self->num_iterations = cached_num_iterations;
 
 	p_self->initialized = TRUE;
 
@@ -1206,7 +1217,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 {
 	FILE *fp;
 	RC_TYPE rc = RC_OK;
-	int i, iterations = 0;
+	int i;
 	char name[DYNDNS_SERVER_NAME_LENGTH];
 
 	if (p_dyndns == NULL)
@@ -1381,11 +1392,11 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			else
 			{
 				/* count only the successful iterations */
-				++iterations;
+				p_dyndns->num_iterations ++;
 			}
 
 			/* check if the user wants us to stop */
-			if (p_dyndns->total_iterations != 0 && iterations >= p_dyndns->total_iterations)
+			if (p_dyndns->total_iterations != 0 && p_dyndns->num_iterations >= p_dyndns->total_iterations)
 			{
 				break;
 			}
@@ -1413,14 +1424,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				break;
 			}
 
-			if (rc == RC_OK)
+			if (p_dyndns->dbg.level > 0)
 			{
-				if (p_dyndns->dbg.level > 0)
-				{
-					logit(LOG_DEBUG, ".");
-				}
-				p_dyndns->times_since_last_update ++;
+				logit(LOG_DEBUG, ".");
+//				logit(LOG_DEBUG, "Time since last update: (%d) %d", p_dyndns->times_since_last_update, p_dyndns->times_since_last_update * p_dyndns->sleep_sec);
 			}
+			p_dyndns->times_since_last_update ++;
 		}
 	}
 	while (0);

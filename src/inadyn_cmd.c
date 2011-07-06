@@ -1256,9 +1256,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		}
 
 		/* Forced update */
-		p_self->times_since_last_update = 0;
 		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
-
 	}
 	while (0);
 
