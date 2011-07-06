@@ -47,7 +47,7 @@ int inadyn_main(int argc, char* argv[])
 			rc = os_install_signal_handler(p_dyndns);
 			if (rc != RC_OK)
 			{
-				logit(LOG_WARNING, MODULE_TAG  "Failed installing OS signal handler: Error '%s' (0x%x)\n", errorcode_get_name(rc), rc);
+				logit(LOG_WARNING, MODULE_TAG  "Failed installing OS signal handler: %s", errorcode_get_name(rc));
 				break;
 			}
 			os_handler_installed = TRUE;
@@ -62,7 +62,7 @@ int inadyn_main(int argc, char* argv[])
 			rc = dyn_dns_destruct(p_dyndns);
 			if (rc != RC_OK)
 			{
-				logit(LOG_WARNING, MODULE_TAG "Failed cleanup on restart: Error '%s' (0x%x) in dyn_dns_destruct().\n", errorcode_get_name(rc), rc);
+				logit(LOG_WARNING, MODULE_TAG "Failed cleaning up before restart: %s, ignoring...", errorcode_get_name(rc));
 			}
 		}
 		else
@@ -73,13 +73,13 @@ int inadyn_main(int argc, char* argv[])
 	}
 	while (restart);
 
-	/* destroy DYN_DNS_CLIENT object*/
-	rc = dyn_dns_destruct(p_dyndns);
 	if (rc != RC_OK)
 	{
-		logit(LOG_WARNING, MODULE_TAG "Failed cleanup before exit: '%s' (0x%x) in dyn_dns_destruct().\n", errorcode_get_name(rc), rc);
+		logit(LOG_WARNING, MODULE_TAG "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
 	}
 
+	/* Cleanup */
+	dyn_dns_destruct(p_dyndns);
 	os_close_dbg_output();
 
 	return (int)rc;

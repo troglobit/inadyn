@@ -76,23 +76,31 @@ RC_TYPE os_shell_execute(char * p_cmd)
 /* storage for the parameter needed by the handler */
 static void *global_p_signal_handler_param = NULL;
 
-/** The actual handler
-	Stops on almost everything .
-*/
+/**
+ * unix_signal_handler - The actual handler
+ * @signo: Signal number
+ *
+ * Handler for registered/known signals. Most others will terminate the daemon.
+ *
+ * NOTE:
+ * Since printf() is one of the possible back-ends of logit(), and printf() is not one
+ * of the safe syscalls to be used, according to POSIX signal(7). The calls are commented,
+ * since they are most likely also only needed for debugging.
+ */
 static void unix_signal_handler(int signo)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)global_p_signal_handler_param;
 
 	if (p_self == NULL)
 	{
-		logit(LOG_WARNING, MODULE_TAG "Signal '0x%x' received. But handler not correctly installed.\n", signo);
+//		logit(LOG_WARNING, MODULE_TAG "Signal %d received. But handler is not installed correctly.", signo);
 		return;
 	}
 
 	switch (signo)
 	{
 		case SIGHUP:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Restart cmd'.\n", signo);
+//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received. Sending restart command.", signo);
 			p_self->cmd = CMD_RESTART;
 			break;
 
@@ -100,20 +108,20 @@ static void unix_signal_handler(int signo)
 		case SIGQUIT:
 		case SIGALRM:
 		case SIGTERM:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signo);
+//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received. Sending shutdown command.", signo);
 			p_self->cmd = CMD_STOP;
 			break;
 
 		default:
-			logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. Ignored.\n", signo);
+//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received, ignoring.", signo);
 			break;
 	}
 	return;
 }
 
 /**
-	install handler for SIGALRM and HUP, INT, QUIT.
-	avoid receiving HIP,INT, QUIT during ALRM and
+	install handler for SIGALRM and HUP, INT, QUIT, TERM.
+	avoid receiving HUP, INT, QUIT during ALRM and TERM.
 
 */
 RC_TYPE os_install_signal_handler(void *p_dyndns)
@@ -178,7 +186,7 @@ RC_TYPE close_console_window(void)
 	setsid();
 	if (-1 == chdir("/"))
 	{
-		logit(LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s\n", strerror(errno));
+		logit(LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s", strerror(errno));
 	}
 	umask(0);
 
@@ -234,7 +242,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 
 	if (rc != 0)
 	{
-		logit(LOG_WARNING, MODULE_TAG "Error while attempting to drop privileges: %s\n", strerror(errno));
+		logit(LOG_WARNING, MODULE_TAG "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 

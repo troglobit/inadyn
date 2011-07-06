@@ -1,3 +1,6 @@
+Ver.  1.98.1 - Jul  7 2011
+    - Cleanup of inadyn log messages, reformat & clarification.
+
 Ver.  1.98.0 - Feb 28 2011
     - New config file, command line, syntax (still backwards compatible!).
     - New option --drop-privs USER[:GROUP] to support privilege separation.

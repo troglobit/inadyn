@@ -365,7 +365,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv);
 /*
 	printout of version
 */
-void dyn_dns_print_hello(void*p);
+void dyn_dns_print_hello(void);
 
 /*
 	 basic resource allocations for the dyn_dns object

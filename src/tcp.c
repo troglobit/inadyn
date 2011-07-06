@@ -110,7 +110,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 			{
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR, MODULE_TAG "Error %d when creating client socket: %s\n", code, strerror(code));
+				logit(LOG_ERR, MODULE_TAG "Error creating client socket: %s", strerror(code));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
@@ -125,7 +125,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 				{
 					int code = os_get_socket_error();
 
-					logit(LOG_WARNING, MODULE_TAG "Error %d when attempting to bind to client socket: %s\n", code, strerror(code));
+					logit(LOG_WARNING, MODULE_TAG "Failed binding client socket to local address: %s", strerror(code));
 					rc = RC_IP_SOCKET_BIND_ERROR;
 					break;
 				}
@@ -145,14 +145,14 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 
 		if (!getnameinfo(&p_self->super.remote_addr, p_self->super.remote_len, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
 		{
-			logit(LOG_INFO, "%s, connecting to %s(%s)\n", msg, p_self->super.p_remote_host_name, host);
+			logit(LOG_INFO, "%s, connecting to %s(%s)", msg, p_self->super.p_remote_host_name, host);
 		}
 
 		if (0 != connect(p_self->super.socket, &p_self->super.remote_addr, p_self->super.remote_len))
 		{
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, MODULE_TAG "Error %d when connecting to remote server: %s\n", code, strerror(code));
+			logit(LOG_WARNING, MODULE_TAG "Failed connecting to remote server: %s", strerror(code));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}

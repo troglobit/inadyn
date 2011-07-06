@@ -133,14 +133,14 @@ static int dyndns_win32_signal_handler_func(OS_SIGNAL_TYPE signal, void *p_in)
 		case OS_CTRL_CLOSE_SIGNAL :
 		case OS_CTRL_BREAK_SIGNAL :
 		case OS_CTRL_SHUTDOWN_SIGNAL :
-				logit(LOG_INFO, MODULE_TAG "Signal '0x%x' received. Sending 'Shutdown cmd'.\n", signal);
+				logit(LOG_INFO, MODULE_TAG "Signal %d received. Sending shutdown command.", signal);
 				ret_flag = 1;
 				p_self->cmd = CMD_STOP;
 			break;
 
 		case OS_CTRL_LOGOFF_SIGNAL :
 		default:
-				logit(LOG_DEBUG, MODULE_TAG "Signal '0x%x' received. NO ACTION.\n", signal);
+				logit(LOG_DEBUG, MODULE_TAG "Signal %d received. NO ACTION.", signal);
 	}
 	return ret_flag;
 }

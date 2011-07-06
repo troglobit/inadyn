@@ -66,7 +66,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 {
 	{"-a",			1,	{get_alias_handler, NULL},	"" },
 	{"--alias",		1,	{get_alias_handler, NULL},	"<NAME>\n"
-	 "\t\t\tAlias host name. This option can appear multiple times." },
+	 "\t\t\tAlias hostname. This option can appear multiple times." },
 
 	{"-b",			0,	{set_silent_handler, NULL},	""},
 	{"--background",	0,	{set_silent_handler, NULL},	"Run in background."},
@@ -196,7 +196,7 @@ void print_help_page(void)
 	CMD_DESCRIPTION_TYPE *it;
 
 	puts("Inadyn is a dynamic DNS (DDNS) client.  It does periodic and/or on-demand checks\n"
-	     "of your externally visible IP address and updates the host name to IP mapping at\n"
+	     "of your externally visible IP address and updates the hostname to IP mapping at\n"
 	     "your DDNS service provider when necessary.\n");
 	puts("dyndns.org:\n"
 	     "\tinadyn -u username -p password -a my.registrated.name\n"
@@ -684,7 +684,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 			{
 				if (s == 0)
 				{
-					logit(LOG_ERR, MODULE_TAG "Cannot find GROUP %s\n", groupname);
+					logit(LOG_ERR, MODULE_TAG "Cannot find GROUP %s", groupname);
 					result = RC_OS_INVALID_GID;
 				}
 				else
@@ -725,7 +725,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 		{
 			if (s == 0)
 			{
-				logit(LOG_ERR, MODULE_TAG "Cannot find USER %s\n", username);
+				logit(LOG_ERR, MODULE_TAG "Cannot find USER %s", username);
 				result = RC_OS_INVALID_UID;
 			}
 			else
@@ -788,7 +788,7 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 		return RC_INVALID_POINTER;
 	}
 
-	logit(LOG_INFO, "Version: %s\n", DYNDNS_VERSION_STRING);
+	logit(LOG_INFO, "Version: %s", DYNDNS_VERSION_STRING);
 	p_self->abort = TRUE;
 
 	return RC_OK;
@@ -1090,7 +1090,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
-			logit(LOG_ERR, MODULE_TAG "Cannot open conf file %s: %s\n", p_cmd->argv[current_nr], strerror(errno));
+			logit(LOG_ERR, MODULE_TAG "Cannot open config file %s: %s", p_cmd->argv[current_nr], strerror(errno));
 	  		rc = RC_FILE_IO_OPEN_ERROR;
 	  		break;
 	  	}
@@ -1185,7 +1185,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 
 			if (p_self->dbg.level > 0)
 			{
-				logit(LOG_NOTICE, MODULE_TAG "Using default config file %s\n", DYNDNS_DEFAULT_CONFIG_FILE);
+				logit(LOG_NOTICE, MODULE_TAG "Using default config file %s", DYNDNS_DEFAULT_CONFIG_FILE);
 			}
 
 			if (p_self->cfgfile)

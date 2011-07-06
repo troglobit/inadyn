@@ -48,7 +48,7 @@ void set_dbg_dest(DBG_DEST dest)
     global_mod_dbg_dest = dest;
 }
 
-char *print_time(void)
+static char *current_time(void)
 {
     time_t now;
     struct tm *timeptr;
@@ -91,11 +91,9 @@ void os_printf(int prio, char *fmt, ... )
     else
 #endif
     {
-	printf("%s %s", print_time(), message); fflush(stdout);
+	printf("%s %s\n", current_time(), message);
+        fflush(stdout);
     }
-
-    return;
-
 }
 
 
