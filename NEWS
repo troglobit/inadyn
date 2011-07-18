@@ -1,5 +1,11 @@
-Ver.  1.98.1 - Jul  7 2011
+Ver.  1.98.1 - Jul 18 2011
+    - Preserve time since last update (forced update counter) and num interations
+      from being reset by SIGHUP restart command.
+    - Bug fix --drop-privs uid/gid was swapped and a possible buffer overflow.
+    - Extend --drop-privs to support hyphens.
+    - Bug fix segfault at initial DNS lookup.
     - Cleanup of inadyn log messages, reformat & clarification.
+    - Typo fixes and polish to man pages inadyn(8) and inadyn.conf(5)
 
 Ver.  1.98.0 - Feb 28 2011
     - New config file, command line, syntax (still backwards compatible!).

@@ -268,7 +268,12 @@ responds to the following signals:
 .It HUP
 Restarts
 .Nm .
-The configuration file is reread every time this signal is evoked.
+The configuration file is reread every time this signal is evoked. It
+is also useful when a new DHCP/PPPoE lease or new gateway is
+received. Please note that
+.Nm
+does not track such events by itself. You need an external monitor for
+that.
 .It TERM
 Terminates
 .Nm
