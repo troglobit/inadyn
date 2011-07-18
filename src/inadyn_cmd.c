@@ -771,7 +771,7 @@ static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context)
 		return RC_INVALID_POINTER;
 	}
 
-	p_self->pidfile = strdup (p_cmd->argv[current_nr]);
+	p_self->pidfile = strdup(p_cmd->argv[current_nr]);
 
 	return RC_OK;
 }
@@ -788,7 +788,7 @@ RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 		return RC_INVALID_POINTER;
 	}
 
-	logit(LOG_INFO, "Version: %s", DYNDNS_VERSION_STRING);
+	printf("%s\n", DYNDNS_VERSION_STRING);
 	p_self->abort = TRUE;
 
 	return RC_OK;

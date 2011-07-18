@@ -26,8 +26,8 @@
 #include "http_client.h"
 #include "debug_if.h"
 
-#define DYNDNS_VERSION_STRING	VERSION_STRING
-#define DYNDNS_AGENT_NAME	"inadyn/" DYNDNS_VERSION_STRING
+#define DYNDNS_VERSION_STRING	"Inadyn version " VERSION_STRING " -- Dynamic DNS update client."
+#define DYNDNS_AGENT_NAME	"inadyn/" VERSION_STRING
 #define DYNDNS_EMAIL_ADDR	"troglobit@vmlinux.org"
 
 typedef enum

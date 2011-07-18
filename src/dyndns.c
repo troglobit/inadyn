@@ -879,7 +879,7 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 
 void dyn_dns_print_hello(void)
 {
-	logit(LOG_INFO, "Inadyn version %s -- Dynamic DNS update client.", DYNDNS_VERSION_STRING);
+	logit(LOG_INFO, "%s", DYNDNS_VERSION_STRING);
 }
 
 /**
