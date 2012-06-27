@@ -52,6 +52,7 @@ static int get_req_for_zoneedit_http_dns_server(DYN_DNS_CLIENT *p_self, int infc
 static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_sitelutions_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
+static int get_req_for_dnsexit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
 static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
@@ -61,6 +62,7 @@ static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int
 static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
+static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
 static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
@@ -148,6 +150,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
 	  "myip.dnsomatic.com", "/",
 	  "updates.dnsomatic.com", "/nic/update?", NULL}},
+
+	{DNSEXIT_DEFAULT,
+	 {"default@dnsexit.com", NULL,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dnsexit_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dnsexit_http_dns_server,
+	  "update.dnsexit.com", "/",
+	  "update.dnsexit.com", "/RemoteUpdate.sv?", NULL}},
 
 	{HE_IPV6TB,
 	 {"ipv6tb@he.net", NULL,
@@ -375,6 +384,25 @@ static int get_req_for_sitelutions_http_dns_server(DYN_DNS_CLIENT *p_self, int i
 		       p_self->info[infcnt].credentials.my_username,
 		       p_self->info[infcnt].credentials.my_password,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
+static int get_req_for_dnsexit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info)
+{
+	(void)p_sys_info;
+
+	if (p_self == NULL)
+	{
+		/* 0 == "No characters written" */
+		return 0;
+	}
+
+	return sprintf(p_self->p_req_buffer, DNSEXIT_UPDATE_MY_IP_HTTP_REQUEST_FORMAT,
+		       p_self->info[infcnt].dyndns_server_url,
+		       p_self->info[infcnt].credentials.my_username,
+		       p_self->info[infcnt].credentials.my_password,
+		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
 
@@ -681,6 +709,21 @@ static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, 
 
 	if (strstr(p_rsp, "success") != NULL)
 		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
+}
+
+static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+{
+	(void)p_self;
+	(void)infnr;
+	(void)p_ok_string;
+
+	if (strstr(p_rsp, "0=Success") != NULL ||
+		strstr(p_rsp, "1=IP is the same") != NULL)
+		return RC_OK;
+	else if (strstr(p_rsp, "4=Update too often") != NULL)
+		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
