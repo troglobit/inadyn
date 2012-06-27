@@ -515,11 +515,11 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 	do
 	{
 		/* Try to find first decimal number (begin of IP) */
-		p_ip = strpbrk(p_current_str, DYNDNS_ALL_DIGITS);
+		p_ip = strpbrk(p_current_str, "0123456789");
 		if (p_ip != NULL)
 		{
 			/* Maybe I found it? */
-			count = sscanf(p_ip, DYNDNS_IP_ADDR_FORMAT, &ip1, &ip2, &ip3, &ip4);
+			count = sscanf(p_ip, "%d.%d.%d.%d", &ip1, &ip2, &ip3, &ip4);
 			if (count != 4 ||
 			    ip1 <= 0 || ip1 > 255 ||
 			    ip2 < 0  || ip2 > 255 ||
@@ -546,7 +546,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 		{
 			DYNDNS_INFO_TYPE *info = &p_self->info[i];
 
-			sprintf(new_ip_str, DYNDNS_IP_ADDR_FORMAT, ip1, ip2, ip3, ip4);
+			sprintf(new_ip_str, "%d.%d.%d.%d", ip1, ip2, ip3, ip4);
 
 			info->my_ip_has_changed = strcmp(info->my_ip_address.name, new_ip_str) != 0;
 			if (info->my_ip_has_changed)
@@ -602,9 +602,8 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 	return RC_OK;
 }
 
-
 /* DynDNS org.specific response validator.
-   'good' or 'nochange' are the good answers,
+   'good' or 'nochg' are the good answers,
 */
 static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
@@ -612,8 +611,8 @@ static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int i
 	(void)infnr;
 	(void)p_ok_string;
 
-	if (strstr(p_rsp, DYNDNS_OK_RESPONSE) != NULL ||
-		strstr(p_rsp, DYNDNS_OK_NOCHANGE) != NULL)
+	if (strstr(p_rsp, "good") != NULL ||
+		strstr(p_rsp, "nochg") != NULL)
 		return RC_OK;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
