@@ -38,7 +38,7 @@ static int curr_info;
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
-static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE get_wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -133,15 +133,16 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\tSelect DDNS service provider, one of the following.\n"
 	 "\t\t\to For dyndns.org:         dyndns@dyndns.org, or\n"
 	 "\t\t\t                          statdns@dyndns.org, or\n"
-	 "\t\t\t                          customdns@dyndns.org\n"
+	 "\t\t\t                          custom@dyndns.org\n"
 	 "\t\t\to For freedns.afraid.org: default@freedns.afraid.org\n"
-	 "\t\t\to For www.zoneedit.com:   default@zoneedit.com\n"
-	 "\t\t\to For www.no-ip.com:      default@no-ip.com\n"
+	 "\t\t\to For zoneedit.com:   default@zoneedit.com\n"
+	 "\t\t\to For no-ip.com:      default@no-ip.com\n"
 	 "\t\t\to For easydns.com:        default@easydns.com\n"
 	 "\t\t\to For tzo.com:            default@tzo.com\n"
 	 "\t\t\to For 3322.org:           dyndns@3322.org\n"
 	 "\t\t\to For dnsomatic.com:      default@dnsomatic.com\n"
 	 "\t\t\to For tunnelbroker.net:   ipv6tb@he.net\n"
+	 "\t\t\to For dns.he.net:         dyndns@he.net\n"
 	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
 	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
 	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
@@ -175,8 +176,8 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--password",		1,	{get_password_handler, NULL},	"<PASSWORD>\n"
 	 "\t\t\tYour DDNS user password."},
 
-	{"-w",			0,	{wildcard_handler, NULL}, ""},
-	{"--wildcard",		0,	{wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
+	{"-w",			0,	{get_wildcard_handler, NULL}, ""},
+	{"--wildcard",		0,	{get_wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
 
 	{"-h",			0,	{help_handler, NULL},	"" },
 	{"--help",		0,	{help_handler, NULL},	"This online help." },
@@ -240,7 +241,7 @@ static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	return RC_OK;
 }
 
-static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+static RC_TYPE get_wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
 
@@ -252,7 +253,7 @@ static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context
 		return RC_INVALID_POINTER;
 	}
 
-	p_self->wildcard = TRUE;
+	p_self->info[curr_info].wildcard = TRUE;
 
 	return RC_OK;
 }

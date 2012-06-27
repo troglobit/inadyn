@@ -46,6 +46,7 @@ typedef enum
 	SITELUTIONS_DOMAIN,
 	DNSOMATIC_DEFAULT,
 	HE_IPV6TB,
+	HE_DYNDNS,
 	DYNSIP_DEFAULT,
 	LAST_DNS_SYSTEM = -1
 } DYNDNS_SYSTEM_ID;
@@ -176,10 +177,10 @@ typedef enum
 /* HE tunnelbroker.com specific update request format */
 #define HE_IPV6TB_UPDATE_MY_IP_REQUEST_FORMAT				\
 	"GET %s"							\
-	"ipv4b=%s&"							\
-	"user_id=%s&"							\
+	"ip=%s&"							\
+	"apikey=%s&"							\
 	"pass=%s&"							\
-	"tunnel_id=%s "							\
+	"tid=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
@@ -291,6 +292,7 @@ typedef struct
 	DYNDNS_SERVER_NAME  proxy_server_name;
 	DYNDNS_ALIAS_INFO   alias_info[DYNDNS_MAX_ALIAS_NUMBER];
 	int                 alias_count;
+	BOOL wildcard;
 } DYNDNS_INFO_TYPE;
 
 typedef struct
@@ -335,7 +337,6 @@ typedef struct DYN_DNS_CLIENT
 	BOOL force_addr_update;
 	BOOL use_proxy;
 	BOOL abort;
-	BOOL wildcard;
 
 	DBG_TYPE dbg;
 } DYN_DNS_CLIENT;
