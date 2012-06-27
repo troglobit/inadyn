@@ -196,6 +196,7 @@ typedef enum
 #define DYNDNS_DEFAULT_SLEEP			(120) /* sec */
 #define DYNDNS_MIN_SLEEP			(30)  /* sec */
 #define DYNDNS_MAX_SLEEP			(10 * 24 * 3600) /* 10 days in sec */
+#define DYNDNS_ERROR_UPDATE_PERIOD		(600) /* 10 min */
 #define DYNDNS_MY_FORCED_UPDATE_PERIOD_S	(30 * 24 * 3600) /* 30 days in sec */
 #define DYNDNS_DEFAULT_CMD_CHECK_PERIOD		(1)    /* sec */
 #define DYNDNS_DEFAULT_ITERATIONS		0      /* Forever */
@@ -221,7 +222,7 @@ struct DYNDNS_SYSTEM;
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
 typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr, struct DYNDNS_SYSTEM *p_sys_info);
-typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, char *p_rsp, int infnr, const char*p_ok_str);
+typedef RC_TYPE (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, char *p_rsp, int infnr, const char *p_ok_str);
 typedef struct
 {
 	const char* p_key;
@@ -312,9 +313,10 @@ typedef struct DYN_DNS_CLIENT
 
 	DYN_DNS_CMD  cmd;
 	int          sleep_sec; /* time between 2 updates*/
+	int          normal_update_period_sec;
+	int          error_update_period_sec;
 	int          forced_update_period_sec;
-	int          times_since_last_update;
-	int          forced_update_times; /* the same forced update period counted in sleep periods*/
+	int          time_since_last_update;
 	int          cmd_check_period; /*time to wait for a command*/
 	int          total_iterations;
 	int          num_iterations;

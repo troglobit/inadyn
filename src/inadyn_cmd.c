@@ -1280,9 +1280,6 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			break;
 		}
 
-		/* Forced update */
-		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
-
 		/* Cache filename */
 		if (p_self->interface)
 		{
