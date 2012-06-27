@@ -55,15 +55,15 @@ static int get_req_for_sitelutions_http_dns_server(DYN_DNS_CLIENT *p_self, int i
 static int get_req_for_dnsexit_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
-static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
-static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
-static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
+static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string);
+static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string);
+static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt, char* p_ok_string);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
 {
@@ -483,21 +483,11 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	p_tr->rsp_len = 0;
 
 	rc = http_client_transaction(p_http, &p_self->http_tr);
-	p_self->p_work_buffer[p_tr->rsp_len] = 0;
+	p_tr->p_rsp[p_tr->rsp_len] = 0;
 
 	http_client_shutdown(p_http);
 
 	return rc;
-}
-
-static char *get_rsp_body(char *rsp) {
-	char *body;
-	const char sep[] = "\r\n\r\n";
-	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
-		body += strlen(sep);
-		return body;
-	}
-	return rsp;
 }
 
 /*
@@ -521,7 +511,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 		return RC_INVALID_POINTER;
 	}
 
-	p_current_str = get_rsp_body(p_self->http_tr.p_rsp);
+	p_current_str = p_self->http_tr.p_rsp_body;
 
 	found = FALSE;
 	do
@@ -617,9 +607,10 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 /* DynDNS org.specific response validator.
    'good' or 'nochg' are the good answers,
 */
-static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	(void)p_ok_string;
 
@@ -635,8 +626,9 @@ static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int i
     fail blabla and n.n.n.n
     are the good answers. We search our own IP address in response and that's enough.
 */
-static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
+	char *p_rsp = p_tr->p_rsp_body;
 	(void) p_ok_string;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL)
@@ -649,9 +641,10 @@ static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int 
     parses a given string. If found is ok,
     Example : 'SUCCESS CODE='
 */
-static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
 	if (p_ok_string == NULL)
@@ -668,9 +661,10 @@ static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int 
    CODE=200, 201
    CODE=707, for duplicated updates
 */
-static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	(void)p_ok_string;
 
@@ -685,9 +679,10 @@ static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int
 /**
    NOERROR is the OK code here
 */
-static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	(void)p_ok_string;
 
@@ -700,21 +695,22 @@ static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int 
 /* TZO specific response validator.
    If we have an HTTP 302 the update wasn't good and we're being redirected 
 */
-static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	if (strstr(p_rsp, " HTTP/1.%*c 302") == NULL)
+	if (p_tr->status != 302)
 		return RC_OK;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
 
-static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	(void)p_ok_string;
 
@@ -724,9 +720,10 @@ static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, 
 		return RC_DYNDNS_RSP_NOTOK;
 }
 
-static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
 	(void)p_self;
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	(void)p_ok_string;
 
@@ -742,8 +739,9 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int 
 /* HE ipv6 tunnelbroker specific response validator.
    own IP address and 'already in use' are the good answers.
 */
-static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr, char* p_ok_string)
 {
+	char *p_rsp = p_tr->p_rsp_body;
 	(void)p_ok_string;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL ||
@@ -785,9 +783,9 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			http_tr.p_rsp = (char*) p_self->p_work_buffer;
 			http_tr.max_rsp_len = p_self->work_buffer_size - 1; /* Save place for a \0 at the end */
 			http_tr.rsp_len = 0;
-			p_self->p_work_buffer[http_tr.rsp_len+1] = 0;
 
 			rc = http_client_transaction(&p_self->http_to_dyndns[i], &http_tr);
+			http_tr.p_rsp[http_tr.rsp_len] = 0;
 
 			if (p_self->dbg.level > 2)
 			{
@@ -799,7 +797,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			if (rc == RC_OK)
 			{
 				rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
-										http_tr.p_rsp, i,
+										&http_tr, i,
 										info->p_dns_system->p_success_string);
 				if (rc == RC_OK)
 				{
@@ -812,19 +810,17 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				}
 				else
 				{
-					http_tr.p_rsp[http_tr.rsp_len] = 0;
 					if (rc == RC_DYNDNS_RSP_RETRY_LATER)
 						logit(LOG_WARNING, MODULE_TAG "DDNS server returned a temporary error:");
 					else {
 						logit(LOG_WARNING, MODULE_TAG "Error validating DDNS server reply. Could be bad username/password/hostname.");
 						logit(LOG_WARNING, MODULE_TAG "Also make sure to check the reply for an abuse notice:");
 					}
-					logit(LOG_WARNING, MODULE_TAG "%s", get_rsp_body(http_tr.p_rsp));
+					logit(LOG_WARNING, MODULE_TAG "%s", http_tr.p_rsp_body);
 				}
 
 				if (p_self->dbg.level > 2)
 				{
-					http_tr.p_rsp[http_tr.rsp_len] = 0;
 					logit(LOG_DEBUG, MODULE_TAG "Updating alias table, DDNS server response:");
 					logit(LOG_DEBUG, MODULE_TAG "%s", http_tr.p_rsp);
 				}

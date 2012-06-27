@@ -142,6 +142,19 @@ RC_TYPE http_client_shutdown(HTTP_CLIENT *p_self)
 	return super_shutdown(&p_self->super);
 }
 
+static void http_response_parse (HTTP_TRANSACTION *p_tr) {
+	char *body;
+	char *rsp = p_tr->p_rsp_body = p_tr->p_rsp;
+	int status = p_tr->status = 0;
+	const char sep[] = "\r\n\r\n";
+	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
+		body += strlen(sep);
+		p_tr->p_rsp_body = body;
+	}
+	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d", &status) == 1)
+		p_tr->status = status;
+}
+
 /* Send req and get response */
 RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr)
 {
@@ -167,6 +180,8 @@ RC_TYPE http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr)
 		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len, &p_tr->rsp_len);
 	}
 	while (0);
+	
+	http_response_parse(p_tr);
 
 	return rc;
 }
