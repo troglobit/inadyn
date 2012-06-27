@@ -489,6 +489,17 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 
 	return rc;
 }
+
+static char *get_rsp_body(char *rsp) {
+	char *body;
+	const char sep[] = "\r\n\r\n";
+	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
+		body += strlen(sep);
+		return body;
+	}
+	return rsp;
+}
+
 /*
   Read in 4 integers the ip addr numbers.
   construct then the IP address from those numbers.
@@ -499,8 +510,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 {
 	int ip1 = 0, ip2 = 0, ip3 = 0, ip4 = 0;
 	int count, i;
-	char *p_ip;
-	char *p_current_str = p_self->http_tr.p_rsp;
+	char *p_ip, *p_current_str;
 	BOOL found;
 	char new_ip_str[IP_V4_MAX_LENGTH];
 
@@ -510,6 +520,8 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 	{
 		return RC_INVALID_POINTER;
 	}
+
+	p_current_str = get_rsp_body(p_self->http_tr.p_rsp);
 
 	found = FALSE;
 	do
