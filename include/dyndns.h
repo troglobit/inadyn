@@ -90,7 +90,9 @@ typedef enum
 
 /* Conversation with the IP server */
 #define DYNDNS_GET_MY_IP_HTTP_REQUEST  \
-	"GET http://%s%s HTTP/1.0\r\n\r\n"
+	"GET %s HTTP/1.0\r\n"						\
+	"Host: %s\r\n"							\
+	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
 /* dyndns.org specific update address format
  * 3322.org has the same parameters ... */
