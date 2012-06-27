@@ -146,21 +146,21 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	 {"default@dnsomatic.com", &dyndns_org_dynamic,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "myip.dnsomatic.com", "/",
 	  "updates.dnsomatic.com", "/nic/update?", NULL}},
 
 	{HE_IPV6TB,
 	 {"ipv6tb@he.net", NULL,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_he_ipv6_server_rsp_ok,
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_he_ipv6tb_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "checkip.dns.he.net", "/",
 	  "ipv4.tunnelbroker.net", "/ipv4_end.php?", NULL}},
 
 	{HE_DYNDNS,
 	 {"dyndns@he.net", NULL,
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC) is_dyndns_server_rsp_ok,
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_noip_http_dns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "checkip.dns.he.net", "/",
 	  "dyn.dns.he.net", "/nic/update?hostname=", NULL}},
 
 	/* Support for dynsip.org by milkfish, from DD-WRT */
@@ -774,7 +774,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 		FILE *fp;
 
 		/* Update cache with new IP */
-		fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "w");
+		fp = fopen(DYNDNS_DEFAULT_CACHE_FILE, "w"); 
 		if (fp)
 		{
 			fprintf(fp, "%s", p_self->info[0].my_ip_address.name);
