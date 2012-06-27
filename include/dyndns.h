@@ -32,9 +32,6 @@
 
 typedef enum
 {
-	DYNDNS_DYNAMIC,
-	DYNDNS_STATIC,
-	DYNDNS_CUSTOM,
 	DYNDNS_DEFAULT,
 	FREEDNS_AFRAID_ORG_DEFAULT,
 	ZONE_EDIT_DEFAULT,
@@ -60,55 +57,34 @@ typedef enum
 #define DYNDNS_CACHE_FILE		DYNDNS_RUNTIME_DATA_DIR"/%s.cache"
 #define DYNDNS_DEFAULT_PIDFILE		DYNDNS_RUNTIME_DATA_DIR"/inadyn.pid"
 
-#define DYNDNS_MY_USERNAME		"test"
-#define DYNDNS_MY_PASSWD		"test"
 #define DYNDNS_MY_IP_SERVER		"checkip.dyndns.org"
 #define DYNDNS_MY_IP_SERVER_URL		"/"
-#define DYNDNS_MY_DNS_SERVER		"members.dyndns.org"
-#define DYNDNS_MY_DNS_SERVER_URL	"/nic/update?"
-#define DYNDNS_MY_HOST_NAME_1		"test.homeip.net"
-#define DYNDNS_MY_HOST_NAME_2		"test2.homeip.net"
-
-/* botho 30/07/06 : add www.3322.org */
-#define DYNDNS_3322_MY_IP_SERVER	"bliao.com"
-#define DYNDNS_3322_MY_IP_SERVER_URL	"/ip.phtml"
-#define DYNDNS_3322_MY_DNS_SERVER	"members.3322.org"
-#define DYNDNS_3322_MY_DNS_SERVER_URL	"/dyndns/update?"
 
 /*REQ/RSP definitions*/
 
-#define DYNDNS_SYSTEM_CUSTOM		"custom"
-#define DYNDNS_SYSTEM_DYNAMIC		"dyndns"
-#define DYNDNS_SYSTEM_STATIC		"statdns"
-
-#define GENERIC_DNS_IP_SERVER_NAME	DYNDNS_MY_IP_SERVER
-#define DYNDNS_MY_DNS_SYSTEM		DYNDNS_DEFAULT
+#define DYNDNS_DEFAULT_DNS_SYSTEM	DYNDNS_DEFAULT
 
 /* Conversation with the IP server */
-#define DYNDNS_GET_MY_IP_HTTP_REQUEST  \
+#define DYNDNS_GET_IP_HTTP_REQUEST  \
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
 /* dyndns.org specific update address format
  * 3322.org has the same parameters ... */
-#define DYNDNS_GET_MY_IP_HTTP_REQUEST_FORMAT				\
+#define DYNDNS_UPDATE_IP_HTTP_REQUEST					\
 	"GET %s"							\
-	"system=%s&"							\
 	"hostname=%s&"							\
-	"myip=%s&"							\
-	"wildcard=%s&"							\
-	"mx=%s&"							\
-	"backmx=NO&"							\
-	"offline=NO "							\
+	"myip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
 /* freedns.afraid.org specific update request format */
-#define FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT				\
-	"GET %s%s "							\
+#define FREEDNS_UPDATE_IP_REQUEST					\
+	"GET %s"							\
+	"%s "								\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
@@ -120,41 +96,39 @@ typedef enum
 	and then the normal http stuff and basic base64 encoded auth.
 	The parameter here is the entire request but NOT including the alias.
 */
-#define GENERIC_DNS_BASIC_AUTH_MY_IP_REQUEST_FORMAT			\
-	"GET %s%s "							\
+#define GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST				\
+	"GET %s"							\
+	"%s "								\
 	"HTTP/1.0\r\n"							\
-	"Authorization: Basic %s\r\n"					\
 	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
-#define GENERIC_NOIP_AUTH_MY_IP_REQUEST_FORMAT				\
-	"GET %s%s&myip=%s "						\
+#define ZONEEDIT_UPDATE_IP_REQUEST					\
+	"GET %s"						\
+	"host=%s&"							\
+	"dnsto=%s "							\
 	"HTTP/1.0\r\n"							\
-	"Authorization: Basic %s\r\n"					\
 	"Host: %s\r\n"							\
-	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
-
-#define GENERIC_ZONEEDIT_AUTH_MY_IP_REQUEST_FORMAT			\
-	"GET %s%s&dnsto=%s "						\
-	"HTTP/1.0\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 /* dont ask me why easydns is so picky
  * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
-#define GENERIC_EASYDNS_AUTH_MY_IP_REQUEST_FORMAT			\
-	"GET %s%s&"							\
+#define EASYDNS_UPDATE_IP_REQUEST				\
+	"GET %s"							\
+	"hostname=%s&"							\
 	"myip=%s&"							\
 	"wildcard=%s "							\
 	"HTTP/1.0\r\n"							\
-	"Authorization: Basic %s\r\n"					\
 	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 /* tzo doesnt encode password */
-#define GENERIC_TZO_AUTH_MY_IP_REQUEST_FORMAT				\
-	"GET %s%s&"							\
+#define TZO_UPDATE_IP_REQUEST						\
+	"GET %s"							\
+	"TZOName=%s&"							\
 	"Email=%s&"							\
 	"TZOKey=%s&"							\
 	"IPAddress=%s "							\
@@ -163,17 +137,17 @@ typedef enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 /* sitelutions.com specific update address format */
-#define SITELUTIONS_GET_MY_IP_HTTP_REQUEST_FORMAT			\
+#define SITELUTIONS_UPDATE_IP_HTTP_REQUEST				\
 	"GET %s"							\
 	"user=%s&"							\
 	"pass=%s&"							\
 	"id=%s&"							\
-	"detectip=1&"							\
+	"detectip=1 "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
-#define DNSEXIT_UPDATE_MY_IP_HTTP_REQUEST_FORMAT			\
+#define DNSEXIT_UPDATE_IP_HTTP_REQUEST					\
 	"GET %s"							\
 	"login=%s&"							\
 	"password=%s&"							\
@@ -184,7 +158,7 @@ typedef enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 /* HE tunnelbroker.com specific update request format */
-#define HE_IPV6TB_UPDATE_MY_IP_REQUEST_FORMAT				\
+#define HE_IPV6TB_UPDATE_IP_REQUEST					\
 	"GET %s"							\
 	"ip=%s&"							\
 	"apikey=%s&"							\
@@ -195,12 +169,12 @@ typedef enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 
-/* SOME DEFAULT CONFIGURATIONS */
+/* Some default configurations */
 #define DYNDNS_DEFAULT_SLEEP			(120) /* sec */
 #define DYNDNS_MIN_SLEEP			(30)  /* sec */
 #define DYNDNS_MAX_SLEEP			(10 * 24 * 3600) /* 10 days in sec */
 #define DYNDNS_ERROR_UPDATE_PERIOD		(600) /* 10 min */
-#define DYNDNS_MY_FORCED_UPDATE_PERIOD_S	(30 * 24 * 3600) /* 30 days in sec */
+#define DYNDNS_FORCED_UPDATE_PERIOD		(30 * 24 * 3600) /* 30 days in sec */
 #define DYNDNS_DEFAULT_CMD_CHECK_PERIOD		(1)    /* sec */
 #define DYNDNS_DEFAULT_ITERATIONS		0      /* Forever */
 #define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE	(2500) /* Bytes */
@@ -229,7 +203,6 @@ typedef RC_TYPE (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this,
 typedef struct
 {
 	const char* p_key;
-	void* p_specific_data;
 	DNS_SYSTEM_SRV_RESPONSE_OK_FUNC p_rsp_ok_func;
 	DNS_SYSTEM_REQUEST_FUNC p_dns_update_req_func;
 	const char *p_ip_server_name;
@@ -244,11 +217,6 @@ typedef struct
 	DYNDNS_SYSTEM_ID id;
 	DYNDNS_SYSTEM system;
 } DYNDNS_SYSTEM_INFO;
-
-typedef struct
-{
-	const char *p_system;
-} DYNDNS_ORG_SPECIFIC_DATA;
 
 typedef enum
 {
