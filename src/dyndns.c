@@ -416,7 +416,7 @@ static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt, void *p_spe
 	}
 
 	return sprintf(p_self->p_req_buffer, DYNDNS_GET_MY_IP_HTTP_REQUEST,
-		       p_self->info[infcnt].ip_server_name.name, p_self->info[infcnt].ip_server_url);
+		       p_self->info[infcnt].ip_server_url, p_self->info[infcnt].ip_server_name.name);
 }
 
 /*
