@@ -819,7 +819,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 						logit(LOG_WARNING, MODULE_TAG "Error validating DDNS server reply. Could be bad username/password/hostname.");
 						logit(LOG_WARNING, MODULE_TAG "Also make sure to check the reply for an abuse notice:");
 					}
-					logit(LOG_WARNING, MODULE_TAG "%s", http_tr.p_rsp);
+					logit(LOG_WARNING, MODULE_TAG "%s", get_rsp_body(http_tr.p_rsp));
 				}
 
 				if (p_self->dbg.level > 2)
