@@ -77,11 +77,6 @@ typedef enum
 
 /*REQ/RSP definitions*/
 
-#define DYNDNS_IP_SERVER_RESPONSE_BEGIN "Current IP Address: "
-#define DYNDNS_IP_ADDR_FORMAT		"%d.%d.%d.%d"
-#define DYNDNS_ALL_DIGITS		"0123456789"
-
-
 #define DYNDNS_SYSTEM_CUSTOM		"custom"
 #define DYNDNS_SYSTEM_DYNAMIC		"dyndns"
 #define DYNDNS_SYSTEM_STATIC		"statdns"
@@ -198,9 +193,6 @@ typedef enum
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
-
-#define DYNDNS_OK_RESPONSE	"good"
-#define DYNDNS_OK_NOCHANGE	"nochg"
 
 
 /* SOME DEFAULT CONFIGURATIONS */
