@@ -142,12 +142,12 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
 	  "www.sitelutions.com", "/dnsup?", NULL}},
 
-        {DNSOMATIC_DEFAULT,
-         {"default@dnsomatic.com", &dyndns_org_dynamic,
-          (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
-          (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
-          DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
-          "updates.dnsomatic.com", "/nic/update?", NULL}},
+	{DNSOMATIC_DEFAULT,
+	 {"default@dnsomatic.com", &dyndns_org_dynamic,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "updates.dnsomatic.com", "/nic/update?", NULL}},
 
 	{HE_IPV6TB,
 	 {"ipv6tb@he.net", NULL,
@@ -155,6 +155,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_he_ipv6tb_server,
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
 	  "ipv4.tunnelbroker.net", "/ipv4_end.php?", NULL}},
+
+	{HE_DYNDNS,
+	 {"dyndns@he.net", NULL,
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC) is_dyndns_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_noip_http_dns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "dyn.dns.he.net", "/nic/update?hostname=", NULL}},
 
 	/* Support for dynsip.org by milkfish, from DD-WRT */
 	{DYNSIP_DEFAULT,
@@ -240,7 +247,7 @@ static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alc
 		       ptr->p_system,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].my_ip_address.name,
-		       p_self->wildcard ? "ON" : "OFF",
+		       p_self->info[infcnt].wildcard ? "ON" : "OFF",
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].dyndns_server_name.name,
 		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer);
@@ -329,7 +336,7 @@ static int get_req_for_easydns_http_dns_server(DYN_DNS_CLIENT *p_self, int infcn
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].my_ip_address.name,
-		       p_self->wildcard ? "ON" : "OFF",
+		       p_self->info[infcnt].wildcard ? "ON" : "OFF",
 		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
@@ -797,6 +804,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 {
 	RC_TYPE rc = RC_OK;
+	int i;
 
 	do
 	{
@@ -814,7 +822,8 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 		p_self->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 
 		/* Domain wildcarding disabled by default */
-		p_self->wildcard = FALSE;
+		for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++)
+			p_self->info[i].wildcard = FALSE;
 
 		/* pidfile */
 		p_self->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);
