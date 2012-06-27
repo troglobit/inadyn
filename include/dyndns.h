@@ -197,8 +197,8 @@ struct DYNDNS_SYSTEM;
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
-typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr, struct DYNDNS_SYSTEM *p_sys_info);
-typedef RC_TYPE (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, HTTP_TRANSACTION *p_tr, int infnr, const char *p_ok_str);
+typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr);
+typedef RC_TYPE (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, HTTP_TRANSACTION *p_tr, int infnr);
 typedef struct
 {
 	const char* p_key;
@@ -208,7 +208,6 @@ typedef struct
 	const char *p_ip_server_url;
 	const char *p_dyndns_server_name;
 	const char *p_dyndns_server_url;
-	const char *p_success_string;
 } DYNDNS_SYSTEM;
 
 typedef struct
