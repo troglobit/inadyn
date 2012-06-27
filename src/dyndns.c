@@ -36,7 +36,7 @@
 #define MD5_DIGEST_BYTES (16)
 
 /* To preserve from being reset at SIGHUP */
-static int cached_times_since_last_update = 0;
+static int cached_time_since_last_update = 0;
 static int cached_num_iterations = 0;
 
 /* DNS systems specific configurations */
@@ -54,14 +54,14 @@ static int get_req_for_tzo_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, i
 static int get_req_for_sitelutions_http_dns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt, DYNDNS_SYSTEM *p_sys_info);
 
-static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
-static BOOL is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
-static BOOL is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
+static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string);
+static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infcnt, char* p_ok_string);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
 {
@@ -556,7 +556,7 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 	 * That should be OK even if changes dyn_dns_update_ip to
 	 * iterate over servernum, but not if it's fix set to =! 0 */
 	if (p_self->info[0].my_ip_has_changed || p_self->force_addr_update ||
-	    (p_self->times_since_last_update > p_self->forced_update_times))
+	    (p_self->time_since_last_update > p_self->forced_update_period_sec))
 	{
 		for (i = 0; i < p_self->info_count; i++)
 		{
@@ -578,14 +578,17 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 /* DynDNS org.specific response validator.
    'good' or 'nochange' are the good answers,
 */
-static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	return  strstr(p_rsp, DYNDNS_OK_RESPONSE) != NULL ||
-		strstr(p_rsp, DYNDNS_OK_NOCHANGE) != NULL;
+	if (strstr(p_rsp, DYNDNS_OK_RESPONSE) != NULL ||
+		strstr(p_rsp, DYNDNS_OK_NOCHANGE) != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* Freedns afraid.org.specific response validator.
@@ -593,28 +596,32 @@ static BOOL is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infn
     fail blabla and n.n.n.n
     are the good answers. We search our own IP address in response and that's enough.
 */
-static BOOL is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void) p_ok_string;
 
-	return strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL;
+	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /** generic http dns server ok parser
     parses a given string. If found is ok,
     Example : 'SUCCESS CODE='
 */
-static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 
 	if (p_ok_string == NULL)
-	{
-		return FALSE;
-	}
+		return RC_DYNDNS_RSP_NOTOK;
 
-	return (strstr(p_rsp, p_ok_string) != NULL);
+	if (strstr(p_rsp, p_ok_string) != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /**
@@ -622,59 +629,74 @@ static BOOL is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int inf
    CODE=200, 201
    CODE=707, for duplicated updates
 */
-static BOOL is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	return  strstr(p_rsp, "CODE=\"200\"") != NULL ||
+	if (strstr(p_rsp, "CODE=\"200\"") != NULL ||
 		strstr(p_rsp, "CODE=\"201\"") != NULL ||
-		strstr(p_rsp, "CODE=\"707\"") != NULL;
+		strstr(p_rsp, "CODE=\"707\"") != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /**
    NOERROR is the OK code here
 */
-static BOOL is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	return strstr(p_rsp, "NOERROR") != NULL;
+	if (strstr(p_rsp, "NOERROR") != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* TZO specific response validator.
    If we have an HTTP 302 the update wasn't good and we're being redirected 
 */
-static BOOL is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	return strstr(p_rsp, " HTTP/1.%*c 302") == NULL;
+	if (strstr(p_rsp, " HTTP/1.%*c 302") == NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
-static BOOL is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_self;
 	(void)infnr;
 	(void)p_ok_string;
 
-	return strstr(p_rsp, "success") != NULL;
+	if (strstr(p_rsp, "success") != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* HE ipv6 tunnelbroker specific response validator.
    own IP address and 'already in use' are the good answers.
 */
-static BOOL is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
+static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, char*p_rsp, int infnr, char* p_ok_string)
 {
 	(void)p_ok_string;
 
-	return ((strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL) ||
-		(strstr(p_rsp, "already in use") != NULL));
+	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL ||
+		strstr(p_rsp, "already in use") != NULL)
+		return RC_OK;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
 }
 
 static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
@@ -722,35 +744,36 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 
 			if (rc == RC_OK)
 			{
-				BOOL update_ok =
-					info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
-										    http_tr.p_rsp, i,
-										    info->p_dns_system->p_success_string);
-				if (update_ok)
+				rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
+										http_tr.p_rsp, i,
+										info->p_dns_system->p_success_string);
+				if (rc == RC_OK)
 				{
 					info->alias_info[j].update_required = FALSE;
 
 					logit(LOG_INFO, MODULE_TAG "Successful alias table update for %s => new IP# %s",
 					      info->alias_info[j].names.name, info->my_ip_address.name);
-					p_self->times_since_last_update = 0;
+					p_self->time_since_last_update = 0;
+					anychange++; /* Adjust forced update period on success */
 				}
 				else
 				{
 					http_tr.p_rsp[http_tr.rsp_len] = 0;
-					logit(LOG_WARNING, MODULE_TAG "Error validating DDNS server reply. Could be bad username/password/hostname.");
-					logit(LOG_WARNING, MODULE_TAG "Also make sure to check the reply for an abuse notice:");
+					if (rc == RC_DYNDNS_RSP_RETRY_LATER)
+						logit(LOG_WARNING, MODULE_TAG "DDNS server returned a temporary error:");
+					else {
+						logit(LOG_WARNING, MODULE_TAG "Error validating DDNS server reply. Could be bad username/password/hostname.");
+						logit(LOG_WARNING, MODULE_TAG "Also make sure to check the reply for an abuse notice:");
+					}
 					logit(LOG_WARNING, MODULE_TAG "%s", http_tr.p_rsp);
-					rc = RC_DYNDNS_RSP_NOTOK;
 				}
 
-				if (p_self->dbg.level > 2 || !update_ok)
+				if (p_self->dbg.level > 2)
 				{
 					http_tr.p_rsp[http_tr.rsp_len] = 0;
 					logit(LOG_DEBUG, MODULE_TAG "Updating alias table, DDNS server response:");
 					logit(LOG_DEBUG, MODULE_TAG "%s", http_tr.p_rsp);
 				}
-
-				anychange += update_ok; /* Adjust forced update period on success */
 			}
 
 			rc2 = http_client_shutdown(&p_self->http_to_dyndns[i]);
@@ -781,16 +804,10 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			fclose(fp);
 		}
 
-		if (anychange)
+		if (anychange && p_self->external_command)
 		{
-			/* Recalculate forced update period */
-			p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
-
 			/* Run external command hook on update. */
-			if (p_self->external_command)
-			{
-				os_shell_execute(p_self->external_command);
-			}
+			os_shell_execute(p_self->external_command);
 		}
 	}
 
@@ -815,7 +832,11 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 		/* forced update period */
 		p_self->forced_update_period_sec = DYNDNS_MY_FORCED_UPDATE_PERIOD_S;
 
-		/* update period */
+		/* non-fatal error update period */
+		p_self->error_update_period_sec = DYNDNS_ERROR_UPDATE_PERIOD;
+
+		/* normal update period */
+		p_self->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
 		p_self->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 
 		/* Domain wildcarding disabled by default */
@@ -961,6 +982,7 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 		http_to_dyndns_constructed = TRUE;
 
 		(p_self)->cmd = NO_CMD;
+		(p_self)->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
 		(p_self)->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 		(p_self)->total_iterations = DYNDNS_DEFAULT_ITERATIONS;
 		(p_self)->initialized = FALSE;
@@ -1057,7 +1079,7 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 	}
 
 	/* Save old value, if restarted by SIGHUP */
-	cached_times_since_last_update = p_self->times_since_last_update;
+	cached_time_since_last_update = p_self->time_since_last_update;
 	cached_num_iterations = p_self->num_iterations;
 
 	free(p_self);
@@ -1122,7 +1144,7 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 	}
 
 	/* Reset to old value, if restarted by SIGHUP */
-	p_self->times_since_last_update = cached_times_since_last_update;
+	p_self->time_since_last_update = cached_time_since_last_update;
 	p_self->num_iterations = cached_num_iterations;
 
 	p_self->initialized = TRUE;
@@ -1410,6 +1432,8 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				break;
 			}
 
+			p_dyndns->sleep_sec = rc == RC_DYNDNS_RSP_RETRY_LATER ? p_dyndns->error_update_period_sec : p_dyndns->normal_update_period_sec;
+
 			if (rc != RC_OK)
 			{
 				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 
@@ -1436,9 +1460,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			if (p_dyndns->dbg.level > 0)
 			{
 				logit(LOG_DEBUG, ".");
-//				logit(LOG_DEBUG, "Time since last update: (%d) %d", p_dyndns->times_since_last_update, p_dyndns->times_since_last_update * p_dyndns->sleep_sec);
+//				logit(LOG_DEBUG, "Time since last update: %d", p_dyndns->time_since_last_update);
 			}
-			p_dyndns->times_since_last_update ++;
+			p_dyndns->time_since_last_update += p_dyndns->sleep_sec;
 		}
 	}
 	while (0);
