@@ -45,6 +45,7 @@ typedef enum
 	DYNDNS_3322_DYNAMIC,
 	SITELUTIONS_DOMAIN,
 	DNSOMATIC_DEFAULT,
+	DNSEXIT_DEFAULT,
 	HE_IPV6TB,
 	HE_DYNDNS,
 	DYNSIP_DEFAULT,
@@ -173,6 +174,16 @@ typedef enum
 	"pass=%s&"							\
 	"id=%s&"							\
 	"detectip=1&"							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+
+#define DNSEXIT_UPDATE_MY_IP_HTTP_REQUEST_FORMAT			\
+	"GET %s"							\
+	"login=%s&"							\
+	"password=%s&"							\
+	"host=%s&"							\
+	"myip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
