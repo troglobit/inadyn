@@ -131,9 +131,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"-S",			1,	{get_dyndns_system_handler, NULL}, ""},
 	{"--system",		1,	{get_dyndns_system_handler, NULL}, "<PROVIDER>\n"
 	 "\t\t\tSelect DDNS service provider, one of the following.\n"
-	 "\t\t\to For dyndns.org:         dyndns@dyndns.org, or\n"
-	 "\t\t\t                          statdns@dyndns.org, or\n"
-	 "\t\t\t                          custom@dyndns.org\n"
+	 "\t\t\to For dyndns.org:         default@dyndns.org\n"
 	 "\t\t\to For freedns.afraid.org: default@freedns.afraid.org\n"
 	 "\t\t\to For zoneedit.com:       default@zoneedit.com\n"
 	 "\t\t\to For no-ip.com:          default@no-ip.com\n"
@@ -145,8 +143,9 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\to For dns.he.net:         dyndns@he.net\n"
 	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
 	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
+	 "\t\t\to For dnsexit.com:   	  default@dnsexit.com\n"
 	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
-	 "\t\t\tDefault value:            dyndns@dyndns.org"},
+	 "\t\t\tDefault value:            default@dyndns.org"},
 	{"--dyndns_system",	1,	{get_dyndns_system_handler, NULL}, NULL},
 
 	{"-x",			1,	{get_proxy_server_handler, NULL}, ""},
@@ -177,7 +176,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	 "\t\t\tYour DDNS user password."},
 
 	{"-w",			0,	{get_wildcard_handler, NULL}, ""},
-	{"--wildcard",		0,	{get_wildcard_handler, NULL}, "Enable domain wildcarding for dyndns.org, 3322.org, or easydns.com."},
+	{"--wildcard",		0,	{get_wildcard_handler, NULL}, "Enable domain wildcarding for easydns.com."},
 
 	{"-h",			0,	{help_handler, NULL},	"" },
 	{"--help",		0,	{help_handler, NULL},	"This online help." },
