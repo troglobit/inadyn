@@ -1248,7 +1248,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 {
 	FILE *fp;
 	RC_TYPE rc = RC_OK;
-	int i;
+	int i, s;
 	char name[DYNDNS_SERVER_NAME_LENGTH];
 
 	if (p_dyndns == NULL)
@@ -1357,7 +1357,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				hints.ai_flags = 0;
 				hints.ai_protocol = 0;          /* Any protocol */
 
-				if (!getaddrinfo(p_dyndns->info[i].alias_info[0].names.name, NULL, &hints, &result))
+				if (!(s = getaddrinfo(p_dyndns->info[i].alias_info[0].names.name, NULL, &hints, &result)))
 				{
 					/* DNS reply for alias found, convert to IP# */
 					if (!getnameinfo(result->ai_addr, result->ai_addrlen, name, sizeof(name), NULL, 0, NI_NUMERICHOST))
@@ -1368,6 +1368,8 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 					}
 					freeaddrinfo(result);
 				}
+				else
+					logit(LOG_WARNING, MODULE_TAG "Failed resolving hostname %s: %s", p_dyndns->info[i].alias_info[0].names.name, gai_strerror(s));
 			}
 		}
 	}
