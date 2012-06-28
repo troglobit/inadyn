@@ -128,10 +128,12 @@ typedef enum
 /* tzo doesnt encode password */
 #define TZO_UPDATE_IP_REQUEST						\
 	"GET %s"							\
-	"TZOName=%s&"							\
-	"Email=%s&"							\
-	"TZOKey=%s&"							\
-	"IPAddress=%s "							\
+	"tzoname=%s&"							\
+	"email=%s&"							\
+	"tzokey=%s&"							\
+	"ipaddress=%s&"							\
+	"system=tzodns&"							\
+	"info=1 "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
