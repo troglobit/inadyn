@@ -416,6 +416,9 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 
 	rc = http_client_transaction(p_http, &p_self->http_tr);
 	p_tr->p_rsp[p_tr->rsp_len] = 0;
+	
+	if (p_tr->status != 200)
+		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
 	http_client_shutdown(p_http);
 
@@ -731,8 +734,14 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 
 			if (rc == RC_OK)
 			{
-				rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
+				if (http_tr.status == 200)
+					rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
 										&http_tr, i);
+				else if (http_tr.status >= 500 && http_tr.status < 600)
+					rc = RC_DYNDNS_RSP_RETRY_LATER;
+				else
+					rc = RC_DYNDNS_RSP_NOTOK;
+				
 				if (rc == RC_OK)
 				{
 					info->alias_info[j].update_required = FALSE;
