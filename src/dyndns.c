@@ -100,8 +100,8 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	 {"default@tzo.com",
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_tzo_server_rsp_ok,
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_tzo_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
-	  "cgi.tzo.com", "/webclient/signedon.html?"}},
+	  "echo.tzo.com", "/",
+	  "rh.tzo.com", "/webclient/tzoperl.html?"}},
 
 	{DYNDNS_3322_DYNAMIC,
 	 {"dyndns@3322.org",
@@ -622,18 +622,25 @@ static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 		return RC_DYNDNS_RSP_NOTOK;
 }
 
-/* TZO specific response validator.
-   If we have an HTTP 302 the update wasn't good and we're being redirected 
-*/
+/* TZO specific response validator. */
 static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	(void)infnr;
 
-	if (p_tr->status != 302)
-		return RC_OK;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+	int code = 0;
+	sscanf(p_tr->p_rsp_body, "%d ", &code);
+
+	switch (code) {
+		case 200:
+		case 304:
+			return RC_OK;
+		case 414:
+		case 500:
+			return RC_DYNDNS_RSP_RETRY_LATER;
+		default:
+			return RC_DYNDNS_RSP_NOTOK;
+	}
 }
 
 static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
