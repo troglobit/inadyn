@@ -149,9 +149,9 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	{DYNSIP_DEFAULT,
 	 {"default@dynsip.org",
 	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)is_dyndns_server_rsp_ok,
-	  (DNS_SYSTEM_REQUEST_FUNC)get_req_for_generic_server,
+	  (DNS_SYSTEM_REQUEST_FUNC)get_req_for_dyndns_server,
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
-	  "dynsip.org", "/nic/update?hostname="}},
+	  "dynsip.org", "/nic/update?"}},
 
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_srv_basic_auth",
@@ -322,6 +322,7 @@ static int get_req_for_sitelutions_server(DYN_DNS_CLIENT *p_self, int infcnt, in
 		       p_self->info[infcnt].credentials.my_username,
 		       p_self->info[infcnt].credentials.my_password,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
 
@@ -547,6 +548,9 @@ static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION 
 	if (strstr(p_rsp, "good") != NULL ||
 		strstr(p_rsp, "nochg") != NULL)
 		return RC_OK;
+	else if (strstr(p_rsp, "dnserr") != NULL ||
+		strstr(p_rsp, "911") != NULL)
+		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
@@ -612,6 +616,8 @@ static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 
 	if (strstr(p_rsp, "NOERROR") != NULL)
 		return RC_OK;
+	else if (strstr(p_rsp, "TOOSOON") != NULL)
+		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
@@ -638,6 +644,8 @@ static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSAC
 
 	if (strstr(p_rsp, "success") != NULL)
 		return RC_OK;
+	else if (strstr(p_rsp, "dberror") != NULL)
+		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
@@ -651,7 +659,8 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 	if (strstr(p_rsp, "0=Success") != NULL ||
 		strstr(p_rsp, "1=IP is the same") != NULL)
 		return RC_OK;
-	else if (strstr(p_rsp, "4=Update too often") != NULL)
+	else if (strstr(p_rsp, "4=Update too often") != NULL ||
+		strstr(p_rsp, "11=") != NULL)
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;

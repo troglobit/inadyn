@@ -141,7 +141,7 @@ typedef enum
 	"user=%s&"							\
 	"pass=%s&"							\
 	"id=%s&"							\
-	"detectip=1 "							\
+	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
