@@ -597,15 +597,20 @@ static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
-	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
-	if (strstr(p_rsp, "CODE=\"200\"") != NULL ||
-		strstr(p_rsp, "CODE=\"201\"") != NULL ||
-		strstr(p_rsp, "CODE=\"707\"") != NULL)
-		return RC_OK;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+	int code = -1;
+	sscanf(p_tr->p_rsp_body, "%*s CODE=\"%d\" ", &code);
+	
+	switch (code) {
+		case 200:
+		case 201:
+		case 707:
+			// is 707 really ok??
+			return RC_OK;
+		default:
+			return RC_DYNDNS_RSP_NOTOK;
+	}
 }
 
 /**
@@ -631,7 +636,7 @@ static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_
 	(void)p_self;
 	(void)infnr;
 
-	int code = 0;
+	int code = -1;
 	sscanf(p_tr->p_rsp_body, "%d ", &code);
 
 	switch (code) {
@@ -663,17 +668,23 @@ static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSAC
 static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
-	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
-	if (strstr(p_rsp, "0=Success") != NULL ||
-		strstr(p_rsp, "1=IP is the same") != NULL)
-		return RC_OK;
-	else if (strstr(p_rsp, "4=Update too often") != NULL ||
-		strstr(p_rsp, "11=") != NULL)
-		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+	int code = -1;
+	char *tmp;
+	if ((tmp = strstr(p_tr->p_rsp_body, "\n")) != NULL)
+		sscanf(++tmp, "%d=", &code);
+	
+	switch (code) {
+		case 0:
+		case 1:
+			return RC_OK;
+		case 4:
+		case 11:
+			return RC_DYNDNS_RSP_RETRY_LATER;
+		default:
+			return RC_DYNDNS_RSP_NOTOK;
+	}
 }
 
 /* HE ipv6 tunnelbroker specific response validator.
@@ -753,13 +764,9 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				}
 				else
 				{
-					if (rc == RC_DYNDNS_RSP_RETRY_LATER)
-						logit(LOG_WARNING, MODULE_TAG "DDNS server returned a temporary error:");
-					else {
-						logit(LOG_WARNING, MODULE_TAG "Error validating DDNS server reply. Could be bad username/password/hostname.");
-						logit(LOG_WARNING, MODULE_TAG "Also make sure to check the reply for an abuse notice:");
-					}
-					logit(LOG_WARNING, MODULE_TAG "%s", http_tr.p_rsp_body);
+					logit(LOG_WARNING, MODULE_TAG "Checking DDNS server response: %s error.",
+						  rc == RC_DYNDNS_RSP_RETRY_LATER ? "temporary" : "permanent");
+					logit(LOG_WARNING, MODULE_TAG "(%d) %s", http_tr.status, http_tr.p_rsp_body);
 				}
 
 				if (p_self->dbg.level > 2)
