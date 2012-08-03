@@ -73,7 +73,7 @@ typedef enum
 /* dyndns.org specific update address format
  * 3322.org has the same parameters ... */
 #define DYNDNS_UPDATE_IP_HTTP_REQUEST					\
-	"GET %s"							\
+	"GET %s?"							\
 	"hostname=%s&"							\
 	"myip=%s "							\
 	"HTTP/1.0\r\n"							\
@@ -83,7 +83,7 @@ typedef enum
 
 /* freedns.afraid.org specific update request format */
 #define FREEDNS_UPDATE_IP_REQUEST					\
-	"GET %s"							\
+	"GET %s?"							\
 	"%s "								\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -105,7 +105,7 @@ typedef enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 #define ZONEEDIT_UPDATE_IP_REQUEST					\
-	"GET %s"						\
+	"GET %s?"						\
 	"host=%s&"							\
 	"dnsto=%s "							\
 	"HTTP/1.0\r\n"							\
@@ -116,7 +116,7 @@ typedef enum
 /* dont ask me why easydns is so picky
  * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
 #define EASYDNS_UPDATE_IP_REQUEST				\
-	"GET %s"							\
+	"GET %s?"							\
 	"hostname=%s&"							\
 	"myip=%s&"							\
 	"wildcard=%s "							\
@@ -127,7 +127,7 @@ typedef enum
 
 /* tzo doesnt encode password */
 #define TZO_UPDATE_IP_REQUEST						\
-	"GET %s"							\
+	"GET %s?"							\
 	"tzoname=%s&"							\
 	"email=%s&"							\
 	"tzokey=%s&"							\
@@ -140,7 +140,7 @@ typedef enum
 
 /* sitelutions.com specific update address format */
 #define SITELUTIONS_UPDATE_IP_HTTP_REQUEST				\
-	"GET %s"							\
+	"GET %s?"							\
 	"user=%s&"							\
 	"pass=%s&"							\
 	"id=%s&"							\
@@ -150,7 +150,7 @@ typedef enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 #define DNSEXIT_UPDATE_IP_HTTP_REQUEST					\
-	"GET %s"							\
+	"GET %s?"							\
 	"login=%s&"							\
 	"password=%s&"							\
 	"host=%s&"							\
@@ -161,7 +161,7 @@ typedef enum
 
 /* HE tunnelbroker.com specific update request format */
 #define HE_IPV6TB_UPDATE_IP_REQUEST					\
-	"GET %s"							\
+	"GET %s?"							\
 	"ip=%s&"							\
 	"apikey=%s&"							\
 	"pass=%s&"							\
