@@ -28,7 +28,7 @@
 
 #define DYNDNS_VERSION_STRING	"Inadyn version " VERSION_STRING " -- Dynamic DNS update client."
 #define DYNDNS_AGENT_NAME	"inadyn/" VERSION_STRING
-#define DYNDNS_EMAIL_ADDR	"troglobit@vmlinux.org"
+#define DYNDNS_EMAIL_ADDR	"admin@vampik.ru"
 
 typedef enum
 {
