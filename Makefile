@@ -2,7 +2,7 @@
 # Use "make V=1" to see full GCC output
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.99.0
+VERSION      ?= 1.99.1
 NAME          = inadyn
 EXEC          = src/$(NAME)
 PKG           = $(NAME)-$(VERSION)
