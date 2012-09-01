@@ -539,6 +539,16 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 	return RC_OK;
 }
 
+static RC_TYPE is_http_status_code_ok(int status)
+{
+	if (status == 200)
+		return RC_OK;
+	else if (status >= 500 && status < 600)
+		return RC_DYNDNS_RSP_RETRY_LATER;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
+}
+
 /* DynDNS org.specific response validator.
    'good' or 'nochg' are the good answers,
 */
@@ -547,6 +557,10 @@ static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION 
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
+
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	if (strstr(p_rsp, "good") != NULL ||
 		strstr(p_rsp, "nochg") != NULL)
@@ -567,6 +581,10 @@ static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 {
 	char *p_rsp = p_tr->p_rsp_body;
 
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
+
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL)
 		return RC_OK;
 	else
@@ -583,6 +601,10 @@ static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
+
 	if (strstr(p_rsp, "OK") != NULL)
 		return RC_OK;
 	else
@@ -598,6 +620,10 @@ static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTIO
 {
 	(void)p_self;
 	(void)infnr;
+
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	int code = -1;
 	sscanf(p_tr->p_rsp_body, "%*s CODE=\"%d\" ", &code);
@@ -622,6 +648,10 @@ static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
+
 	if (strstr(p_rsp, "NOERROR") != NULL)
 		return RC_OK;
 	else if (strstr(p_rsp, "TOOSOON") != NULL)
@@ -635,6 +665,10 @@ static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_
 {
 	(void)p_self;
 	(void)infnr;
+
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	int code = -1;
 	sscanf(p_tr->p_rsp_body, "%d ", &code);
@@ -656,6 +690,10 @@ static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSAC
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
+	
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	if (strstr(p_rsp, "success") != NULL)
 		return RC_OK;
@@ -669,6 +707,10 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 {
 	(void)p_self;
 	(void)infnr;
+
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	int code = -1;
 	char *tmp;
@@ -693,6 +735,10 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	char *p_rsp = p_tr->p_rsp_body;
+
+	RC_TYPE rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+		return rc;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL ||
 		strstr(p_rsp, "already in use") != NULL)
@@ -745,14 +791,8 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 
 			if (rc == RC_OK)
 			{
-				if (http_tr.status == 200)
-					rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
+				rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
 										&http_tr, i);
-				else if (http_tr.status >= 500 && http_tr.status < 600)
-					rc = RC_DYNDNS_RSP_RETRY_LATER;
-				else
-					rc = RC_DYNDNS_RSP_NOTOK;
-				
 				if (rc == RC_OK)
 				{
 					info->alias_info[j].update_required = FALSE;
