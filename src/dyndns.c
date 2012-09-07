@@ -805,7 +805,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				else
 				{
 					logit(LOG_WARNING, MODULE_TAG "Checking DDNS server response: %s error",
-						  rc == RC_DYNDNS_RSP_RETRY_LATER ? "temporary" : "permanent");
+						  rc == RC_DYNDNS_RSP_RETRY_LATER ? "temporary" : "fatal");
 					logit(LOG_WARNING, MODULE_TAG "(%d) %s", http_tr.status, http_tr.p_rsp_body);
 				}
 
