@@ -49,6 +49,7 @@ typedef struct
 	char *p_rsp_body;
 
 	int status;
+	char status_desc[256];
 } HTTP_TRANSACTION;
 
 
