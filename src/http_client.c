@@ -146,12 +146,13 @@ static void http_response_parse (HTTP_TRANSACTION *p_tr) {
 	char *body;
 	char *rsp = p_tr->p_rsp_body = p_tr->p_rsp;
 	int status = p_tr->status = 0;
+	memset(p_tr->status_desc, 0, sizeof(p_tr->status_desc));
 	const char sep[] = "\r\n\r\n";
 	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
 		body += strlen(sep);
 		p_tr->p_rsp_body = body;
 	}
-	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d", &status) == 1)
+	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, p_tr->status_desc) == 2)
 		p_tr->status = status;
 }
 
