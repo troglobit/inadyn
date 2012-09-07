@@ -155,7 +155,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"-T",			1,	{get_update_period_sec_handler, NULL},	""},
 	{"--period",		1,	{get_update_period_sec_handler, NULL},	"<SEC>\n"
-	 "\t\t\tIP change check interval.  Default: 1 min. Max: 10 days"},
+	 "\t\t\tIP change check interval.  Default: 2 min. Max: 10 days"},
 	{"--update_period_sec",	1,	{get_update_period_sec_handler, NULL},	NULL},
 	{"--update_period",	1,	{get_update_period_handler, NULL},      NULL},
 
@@ -562,13 +562,13 @@ static RC_TYPE get_update_period_sec_handler(CMD_DATA *p_cmd, int current_nr, vo
 		return RC_INVALID_POINTER;
 	}
 
-	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->sleep_sec) != 1)
+	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->normal_update_period_sec) != 1)
 	{
 		return RC_DYNDNS_INVALID_OPTION;
 	}
 
-	p_self->sleep_sec = (p_self->sleep_sec < DYNDNS_MIN_SLEEP) ?  DYNDNS_MIN_SLEEP: p_self->sleep_sec;
-	(p_self->sleep_sec > DYNDNS_MAX_SLEEP) ?  p_self->sleep_sec = DYNDNS_MAX_SLEEP: 1;
+	p_self->normal_update_period_sec = (p_self->normal_update_period_sec < DYNDNS_MIN_SLEEP) ?  DYNDNS_MIN_SLEEP: p_self->normal_update_period_sec;
+	(p_self->normal_update_period_sec > DYNDNS_MAX_SLEEP) ?  p_self->normal_update_period_sec = DYNDNS_MAX_SLEEP: 1;
 
 	return RC_OK;
 }
