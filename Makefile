@@ -1,7 +1,7 @@
 # Makefile for INADYN, a simple and small ddns client.          -*-Makefile-*-
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.99.1
+VERSION      ?= 1.99.2
 NAME          = inadyn
 EXEC          = src/$(NAME)
 PKG           = $(NAME)-$(VERSION)
