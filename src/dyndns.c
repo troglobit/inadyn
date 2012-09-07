@@ -813,7 +813,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 
 				if (p_self->dbg.level > 2)
 				{
-					logit(LOG_DEBUG, MODULE_TAG "Updating alias table, DDNS server response:");
+					logit(LOG_DEBUG, MODULE_TAG "DDNS server response:");
 					logit(LOG_DEBUG, MODULE_TAG "%s", http_tr.p_rsp);
 				}
 			}
@@ -1243,7 +1243,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		}
 		if (p_self->dbg.level > 1)
 		{
-			logit(LOG_DEBUG, MODULE_TAG "DDNS server response:");
+			logit(LOG_DEBUG, MODULE_TAG "IP server response:");
 			logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_work_buffer);
 		}
 
