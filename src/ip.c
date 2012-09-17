@@ -117,7 +117,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
 				p_self->bound = TRUE;
 
-				logit(LOG_INFO, MODULE_TAG "Interface %s has IP# %s", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
+				logit(LOG_INFO, MODULE_TAG "Bound to interface %s (IP# %s)", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
 			}
 			else
 			{
@@ -129,7 +129,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			close(sd);
 		}
 
-		/* remote addres */
+		/* remote address */
 		if (p_self->p_remote_host_name != NULL)
 		{
 			int s;

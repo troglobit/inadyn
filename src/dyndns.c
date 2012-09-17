@@ -22,6 +22,9 @@
 #include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <net/if.h>
+#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -366,6 +369,91 @@ static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int 
 		       digeststr,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
+/*
+	Get the IP address from interface
+*/
+static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
+{
+	struct ifreq ifr;
+	struct in_addr new_ip;
+	char *new_ip_str;
+	int i;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	if (p_self->check_interface)
+	{
+		int sd = socket(PF_INET, SOCK_DGRAM, 0);
+
+		if (sd < 0)
+		{
+			int code = os_get_socket_error();
+
+			logit(LOG_WARNING, MODULE_TAG "Failed opening network socket: %s", strerror(code));
+			return RC_IP_OS_SOCKET_INIT_FAILED;
+		}
+
+		memset(&ifr, 0, sizeof(struct ifreq));
+		ifr.ifr_addr.sa_family = AF_INET;
+		snprintf(ifr.ifr_name, IFNAMSIZ, p_self->check_interface);
+		if (ioctl(sd, SIOCGIFADDR, &ifr) != -1)
+		{	
+			new_ip = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
+			new_ip_str = inet_ntoa(new_ip);
+		}
+		else
+		{
+			int code = os_get_socket_error();
+
+			logit(LOG_ERR, MODULE_TAG "Failed reading IP address of interface %s: %s",
+			      p_self->check_interface, strerror(code));
+			return RC_ERROR;
+		}
+		close(sd);
+	}
+	else
+	{
+		return RC_ERROR;
+	}
+
+	if (new_ip.s_addr == INADDR_ANY ||
+	    new_ip.s_addr == INADDR_BROADCAST ||
+	   (new_ip.s_addr & inet_addr("255.0.0.0")) == (inet_addr("127.0.0.0") & inet_addr("255.0.0.0")) ||
+	   (new_ip.s_addr & inet_addr("255.255.0.0")) == (inet_addr("169.254.0.0") & inet_addr("255.255.0.0")))
+	{
+		logit(LOG_WARNING, MODULE_TAG "Interface %s has invalid IP# %s",
+		      p_self->check_interface, new_ip_str);
+		return RC_ERROR;
+	}
+
+	logit(LOG_INFO, MODULE_TAG "Checking for IP# change. Interface %s has IP# %s",
+	      p_self->check_interface, new_ip_str);
+
+	int anychange = 0;
+
+	for (i = 0; i < p_self->info_count; i++)
+	{
+		DYNDNS_INFO_TYPE *info = &p_self->info[i];
+
+		info->my_ip_has_changed = strcmp(info->my_ip_address.name, new_ip_str) != 0;
+		if (info->my_ip_has_changed)
+		{
+			anychange++;
+			strcpy(info->my_ip_address.name, new_ip_str);
+		}
+	}
+
+	if (!anychange)
+	{
+		logit(LOG_INFO, MODULE_TAG "No IP# change detected, still at %s", new_ip_str);
+	}
+
+	return RC_OK;
 }
 
 static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt)
@@ -1207,8 +1295,8 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 			http_client_set_remote_name(&p_self->http_to_dyndns[i], info->dyndns_server_name.name);
 		}
 
-		http_client_set_bind_iface(&p_self->http_to_dyndns[i], p_self->interface);
-		http_client_set_bind_iface(&p_self->http_to_ip_server[i], p_self->interface);
+		http_client_set_bind_iface(&p_self->http_to_dyndns[i], p_self->bind_interface);
+		http_client_set_bind_iface(&p_self->http_to_ip_server[i], p_self->bind_interface);
 	}
 	while (++i < p_self->info_count);
 
@@ -1268,30 +1356,40 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 
 	do
 	{
-		/* Ask IP server something so he will respond and give me my IP */
-		rc = do_ip_server_transaction(p_self, servernum);
-		if (rc != RC_OK)
+		if (p_self->check_interface)
 		{
-			break;
+			rc = do_ip_check_interface(p_self);
+			if (rc != RC_OK)
+			{
+				break;
+			}
 		}
-		if (p_self->dbg.level > 1)
+		else
 		{
-			logit(LOG_DEBUG, MODULE_TAG "IP server response:");
-			logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_work_buffer);
+			/* Ask IP server something so he will respond and give me my IP */
+			rc = do_ip_server_transaction(p_self, servernum);
+			if (rc != RC_OK)
+			{
+				break;
+			}
+			if (p_self->dbg.level > 1)
+			{
+				logit(LOG_DEBUG, MODULE_TAG "IP server response:");
+				logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_work_buffer);
+			}
+	
+			/* Extract our IP, check if different than previous one */
+			rc = do_parse_my_ip_address(p_self, servernum);
+			if (rc != RC_OK)
+			{
+				break;
+			}
+	
+			if (p_self->dbg.level > 1)
+			{
+				logit(LOG_INFO, MODULE_TAG "Current public IP# %s", p_self->info[servernum].my_ip_address.name);
+			}
 		}
-
-		/* Extract our IP, check if different than previous one */
-		rc = do_parse_my_ip_address(p_self, servernum);
-		if (rc != RC_OK)
-		{
-			break;
-		}
-
-		if (p_self->dbg.level > 1)
-		{
-			logit(LOG_INFO, MODULE_TAG "Current public IP# %s", p_self->info[servernum].my_ip_address.name);
-		}
-
 		/* Step through aliases list, resolve them and check if they point to my IP */
 		rc = do_check_alias_update_table(p_self);
 		if (rc != RC_OK)

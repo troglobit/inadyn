@@ -20,6 +20,7 @@
 .Bk
 .Op Fl a, -alias Ar ALIAS Ns Op , Ns Ar HASH
 .Op Fl b, -background
+.Op Fl B, -bind Ar IFNAME
 .Op Fl d, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 .Op Fl e, -exec Ar SCRIPT
 .Op Fl f, -forced-update Ar SEC
@@ -179,8 +180,11 @@ Use the system
 mechanism for log messages, warnings and error conditions.
 .It Fl d, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 Drop privileges after initial setup to the given user and group.
-.It Fl i, -iface Ar IFNAME
+.It Fl B, -bind Ar IFNAME
 Set interface to bind to. Only on UNIX systems.
+.It Fl i, -iface Ar IFNAME
+Set interface to check for IP. Only on UNIX systems.
+External IP check is not performed.
 .It Fl P, -pidfile Ar FILE
 Set pidfile, defaults to
 .Pa /var/run/inadyn/inadyn.pid .

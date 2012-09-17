@@ -59,6 +59,7 @@ static RC_TYPE set_iterations_handler(CMD_DATA *p_cmd, int current_nr, void *p_c
 static RC_TYPE set_syslog_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE set_check_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -71,6 +72,10 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"-b",			0,	{set_silent_handler, NULL},	""},
 	{"--background",	0,	{set_silent_handler, NULL},	"Run in background."},
+
+	{"-B",			1,	{set_bind_interface, NULL}, ""},
+	{"--bind",		1,	{set_bind_interface, NULL}, "<IFNAME>\n"
+	 "\t\t\tSet interface to bind to, only on UNIX systems."},
 
 	{"-d",			1,	{set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 	1,	{set_change_persona_handler, NULL}, "<USER[:GROUP]>\n"
@@ -105,10 +110,10 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--iterations",	1,	{set_iterations_handler, NULL},	"<NUM>\n"
 	 "\t\t\tSet the number of DNS updates. Default: 0 (forever)"},
 
-	{"-i",			1,	{set_bind_interface, NULL}, ""},
-	{"--iface",		1,	{set_bind_interface, NULL}, "<IFNAME>\n"
-	 "\t\t\tSet interface to bind to, only on UNIX systems."},
-	{"--bind_interface",	1,	{set_bind_interface, NULL}, NULL},
+	{"-i",			1,	{set_check_interface, NULL}, ""},
+	{"--iface",		1,	{set_check_interface, NULL}, "<IFNAME>\n"
+	 "\t\t\tSet interface to check for IP, only on UNIX systems.\n"
+	 "\t\t\tExternal IP check is not performed."},
 
 	{"-L",			1,	{get_logfile_name, NULL}, ""},
 	{"--logfile",		1,	{get_logfile_name, NULL}, "<FILE>\n"
@@ -780,7 +785,21 @@ static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_conte
 		return RC_INVALID_POINTER;
 	}
 
-	p_self->interface = strdup(p_cmd->argv[current_nr]);
+	p_self->bind_interface = strdup(p_cmd->argv[current_nr]);
+
+	return RC_OK;
+}
+
+static RC_TYPE set_check_interface(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->check_interface = strdup(p_cmd->argv[current_nr]);
 
 	return RC_OK;
 }
