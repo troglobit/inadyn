@@ -389,6 +389,9 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 
 	if (p_self->check_interface)
 	{
+		logit(LOG_INFO, MODULE_TAG "Checking for IP# change, querying interface %s",
+		      p_self->check_interface);
+
 		int sd = socket(PF_INET, SOCK_DGRAM, 0);
 
 		if (sd < 0)
@@ -424,17 +427,14 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 
 	if (IN_ZERONET(new_ip) ||
 	    IN_LOOPBACK(new_ip) ||
-	   	IN_LINKLOCAL(new_ip) ||
-	   	IN_MULTICAST(new_ip) ||
-	   	IN_EXPERIMENTAL(new_ip))
+	    IN_LINKLOCAL(new_ip) ||
+	    IN_MULTICAST(new_ip) ||
+	    IN_EXPERIMENTAL(new_ip))
 	{
 		logit(LOG_WARNING, MODULE_TAG "Interface %s has invalid IP# %s",
 		      p_self->check_interface, new_ip_str);
 		return RC_ERROR;
 	}
-
-	logit(LOG_INFO, MODULE_TAG "Checking for IP# change. Interface %s has IP# %s",
-	      p_self->check_interface, new_ip_str);
 
 	int anychange = 0;
 
