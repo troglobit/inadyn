@@ -74,6 +74,25 @@
     #define FAR
 #endif
 
+#ifndef IN_PRIVATE
+#define IN_PRIVATE(addr) (((addr & IN_CLASSA_NET) == 0x0a000000) ||  \
+                          ((addr & 0xfff00000)    == 0xac100000) ||  \
+                          ((addr & IN_CLASSB_NET) == 0xc0a80000))
+#endif
+
+#ifndef IN_LINKLOCAL
+#define IN_LINKLOCALNETNUM	0xa9fe0000
+#define IN_LINKLOCAL(addr) ((addr & IN_CLASSB_NET) == IN_LINKLOCALNETNUM)
+#endif
+
+#ifndef IN_LOOPBACK
+#define IN_LOOPBACK(addr) ((addr & IN_CLASSA_NET) == 0x7f000000)
+#endif
+
+#ifndef IN_ZERONET
+#define IN_ZERONET(addr) ((addr & IN_CLASSA_NET) == 0)
+#endif
+
 #ifndef __TIMESTAMP__
     #define __TIMESTAMP__   "0"
 #endif

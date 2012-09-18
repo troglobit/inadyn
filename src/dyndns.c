@@ -377,7 +377,7 @@ static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int 
 static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 {
 	struct ifreq ifr;
-	struct in_addr new_ip;
+	in_addr_t new_ip;
 	char *new_ip_str;
 	int i;
 
@@ -403,8 +403,8 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 		snprintf(ifr.ifr_name, IFNAMSIZ, p_self->check_interface);
 		if (ioctl(sd, SIOCGIFADDR, &ifr) != -1)
 		{	
-			new_ip = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
-			new_ip_str = inet_ntoa(new_ip);
+			new_ip = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
+			new_ip_str = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 		}
 		else
 		{
@@ -421,10 +421,11 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 		return RC_ERROR;
 	}
 
-	if (new_ip.s_addr == INADDR_ANY ||
-	    new_ip.s_addr == INADDR_BROADCAST ||
-	   (new_ip.s_addr & inet_addr("255.0.0.0")) == (inet_addr("127.0.0.0") & inet_addr("255.0.0.0")) ||
-	   (new_ip.s_addr & inet_addr("255.255.0.0")) == (inet_addr("169.254.0.0") & inet_addr("255.255.0.0")))
+	if (IN_ZERONET(new_ip) ||
+	    IN_LOOPBACK(new_ip) ||
+	   	IN_LINKLOCAL(new_ip) ||
+	   	IN_MULTICAST(new_ip) ||
+	   	IN_EXPERIMENTAL(new_ip))
 	{
 		logit(LOG_WARNING, MODULE_TAG "Interface %s has invalid IP# %s",
 		      p_self->check_interface, new_ip_str);
