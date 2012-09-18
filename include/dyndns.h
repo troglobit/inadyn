@@ -55,6 +55,7 @@ typedef enum
 #define DYNDNS_DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DYNDNS_RUNTIME_DATA_DIR		"/var/run/inadyn"
 #define DYNDNS_DEFAULT_CACHE_FILE	DYNDNS_RUNTIME_DATA_DIR"/inadyn.cache"
+#define DYNDNS_CACHE_FILE		DYNDNS_RUNTIME_DATA_DIR"/%s.cache"
 #define DYNDNS_DEFAULT_PIDFILE		DYNDNS_RUNTIME_DATA_DIR"/inadyn.pid"
 
 #define DYNDNS_MY_USERNAME		"test"
@@ -314,6 +315,7 @@ typedef struct DYN_DNS_CLIENT
 	int          total_iterations;
 	int          num_iterations;
 	char        *interface;
+	char        *cache_file;
 	BOOL         initialized;
 	BOOL         run_in_background;
 	BOOL         debug_to_syslog;

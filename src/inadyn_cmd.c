@@ -1158,6 +1158,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 {
 	int i;
 	RC_TYPE rc = RC_OK;
+	int cache_file_len;
 
 	do
 	{
@@ -1257,6 +1258,27 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 
 		/* Forced update */
 		p_self->forced_update_times = p_self->forced_update_period_sec / p_self->sleep_sec;
+
+		/* Cache filename */
+		if (p_self->interface)
+		{
+			cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) +
+				strlen(p_self->interface);
+			if ((p_self->cache_file = malloc(cache_file_len + 1)) == NULL)
+			{
+				rc = RC_OUT_OF_MEMORY;
+				break;
+			}
+			if (snprintf(p_self->cache_file, cache_file_len + 1,
+				     DYNDNS_CACHE_FILE,
+				     p_self->interface) != cache_file_len)
+			{
+				rc = RC_ERROR;
+				break;
+			}
+		}
+		else
+			p_self->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
 	}
 	while (0);
 
