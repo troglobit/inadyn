@@ -243,6 +243,7 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 	return sprintf(p_self->p_req_buffer, FREEDNS_UPDATE_IP_REQUEST,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].hashes.str,
+		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
 
