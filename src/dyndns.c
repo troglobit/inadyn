@@ -1047,6 +1047,30 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 		i++;
 	}
 
+	if (p_self->cfgfile != NULL)
+	{
+		free(p_self->cfgfile);
+		p_self->cfgfile = NULL;
+	}
+
+	if (p_self->pidfile != NULL)
+	{
+		free(p_self->pidfile);
+		p_self->pidfile = NULL;
+	}
+
+	if (p_self->external_command != NULL)
+	{
+		free(p_self->external_command);
+		p_self->external_command = NULL;
+	}
+
+	if (p_self->interface != NULL)
+	{
+		free(p_self->interface);
+		p_self->interface = NULL;
+	}
+
 	if (p_self->cache_file != NULL)
 	{
 		free(p_self->cache_file);
