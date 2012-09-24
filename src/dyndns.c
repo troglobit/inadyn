@@ -51,6 +51,7 @@ static int get_req_for_tzo_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt)
 static int get_req_for_sitelutions_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt);
 static int get_req_for_dnsexit_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt);
 static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt);
+static int get_req_for_changeip_server(DYN_DNS_CLIENT *this, int infcnt, int alcnt);
 
 static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
 static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
@@ -147,6 +148,13 @@ DYNDNS_SYSTEM_INFO dns_system_table[] =
 	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_dyndns_server,
 	  "checkip.dns.he.net", "/",
 	  "dyn.dns.he.net", "/nic/update"}},
+
+	{CHANGEIP_DEFAULT,
+	 {"default@changeip.com",
+	  (DNS_SYSTEM_SRV_RESPONSE_OK_FUNC) is_dyndns_server_rsp_ok,
+	  (DNS_SYSTEM_REQUEST_FUNC) get_req_for_changeip_server,
+	  "ip.changeip.com", "/",
+	  "nic.changeip.com", "/nic/update"}},
 
 	/* Support for dynsip.org by milkfish, from DD-WRT */
 	{DYNSIP_DEFAULT,
@@ -370,6 +378,22 @@ static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int 
 		       digeststr,
 		       p_self->info[infcnt].alias_info[alcnt].names.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
+}
+
+static int get_req_for_changeip_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt)
+{
+	if (p_self == NULL)
+	{
+		/* 0 == "No characters written" */
+		return 0;
+	}
+	
+	return sprintf(p_self->p_req_buffer, CHANGEIP_UPDATE_IP_HTTP_REQUEST,
+		       p_self->info[infcnt].dyndns_server_url,
+		       p_self->info[infcnt].alias_info[alcnt].names.name,
+		       p_self->info[infcnt].my_ip_address.name,
+		       p_self->info[infcnt].dyndns_server_name.name,
+		       p_self->info[infcnt].credentials.p_enc_usr_passwd_buffer);
 }
 
 /*

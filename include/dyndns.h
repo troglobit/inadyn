@@ -45,6 +45,7 @@ typedef enum
 	DNSEXIT_DEFAULT,
 	HE_IPV6TB,
 	HE_DYNDNS,
+	CHANGEIP_DEFAULT,
 	DYNSIP_DEFAULT,
 	LAST_DNS_SYSTEM = -1
 } DYNDNS_SYSTEM_ID;
@@ -170,6 +171,16 @@ typedef enum
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
+
+#define CHANGEIP_UPDATE_IP_HTTP_REQUEST					\
+	"GET %s?"							\
+	"system=dyndns&"						\
+	"hostname=%s&"							\
+	"myip=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
+	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
 
 /* Some default configurations */
