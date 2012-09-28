@@ -1,3 +1,43 @@
+Ver.  current
+    - Add ability to check IP of interface (unix only).
+    If interface is specified, no external IP check permormed.
+    Old --iface option renamed to --bind.
+    - Specify IP address in freedns.afraid.org update request (only autodetect
+    was used).
+    - Add changeip.com support.
+
+Ver.  1.99.2 - Sep 7 2012
+    - Fix inability to change update period (broken in 1.99.0).
+    - Get http status description.
+    - Fix debug output description.
+
+Ver.  1.99.1 - Sep 1 2012
+    - Make HTTP status code check server-specific.
+    - Change e-mail address.
+
+Ver.  1.99.0 - Aug 17 2012
+    - Merge wl500g patches from http://code.google.com/p/wl500g:
+      - 120-heipv6tb.patch adds support for tunnelbroker.
+      - 121-hedyndns.patch adds support for HE dyndns.
+      - 210-wildcard.patch makes wildcard option account specific.
+    - For ddns services that have their own checkip service, use it instead of
+    dyndns.org checkip service.
+    - Add ability to handle non-fatal temporary errors ("update too often",
+    system error etc.).
+    - Fix malformed HTTP request.
+    - Warn if initial DNS request failed.
+    - Add dnsexit.com support.
+    - Modify http client to parse response for http status code and response
+    body.
+    - Remove DynDNS ignored and deprecated parameters (wildcard, mx, backmx,
+    system). Wildcard kept for easydns.com.
+    - Report detected IP to sitelutions and dynsip servers (only autodetect was
+    used).
+    - Update TZO support.
+    - Check HTTP status code before validating response.
+    - Remake zoneedit response validation.
+    - Little code cleanup.    
+
 Ver.  1.98.1 - Jul 18 2011
     - Preserve time since last update (forced update counter) and num interations
       from being reset by SIGHUP restart command.
