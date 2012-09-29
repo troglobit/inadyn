@@ -188,7 +188,14 @@ Set interface to bind to. Only on UNIX systems.
 Set pidfile, defaults to
 .Pa /var/run/inadyn/inadyn.pid .
 .It Fl e, -exec Ar SCRIPT
-Full path to external command, or script, to run after a successful DDNS update.
+Full path to external command, or script, to run after a successful
+DDNS update.
+.Ar SCRIPT
+can use following environment variables: INADYN_IP,
+INADYN_HOSTNAME. First environment variable contains new IP address,
+second one - host name alias. INADYN_IFACE is available, if
+.Fl -iface
+option used.
 .It Fl w, -wildcard
 Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default
 disabled. For
