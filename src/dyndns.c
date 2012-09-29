@@ -782,7 +782,10 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			/* Run external command hook on update. */
 			if (p_self->external_command)
 			{
-				os_shell_execute(p_self->external_command);
+				os_shell_execute(p_self->external_command,
+						 p_self->info[0].my_ip_address.name,
+						 p_self->info[0].alias_info[0].names.name,
+						 p_self->interface);
 			}
 		}
 	}

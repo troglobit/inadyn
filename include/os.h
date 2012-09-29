@@ -214,7 +214,7 @@ RC_TYPE os_syslog_close(void);
 /**
  * Execute command on successful update.
  */
-RC_TYPE os_shell_execute(char *p_cmd);
+RC_TYPE os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface);
 
 #ifdef __cplusplus
 }
