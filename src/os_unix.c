@@ -24,6 +24,7 @@
 #include "dyndns.h"
 
 #ifdef UNIX_OS
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -49,7 +50,7 @@ RC_TYPE os_ip_support_cleanup(void)
     return RC_OK;
 }
 
-RC_TYPE os_shell_execute(char * p_cmd)
+RC_TYPE os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
 {
 	RC_TYPE rc = RC_OK;
 	int child;
@@ -58,6 +59,10 @@ RC_TYPE os_shell_execute(char * p_cmd)
 	switch (child)
 	{
 		case 0: /* child */
+			setenv("INADYN_IP", ip, 1);
+			setenv("INADYN_HOSTNAME", hostname, 1);
+			if (iface)
+				setenv("INADYN_IFACE", iface, 1);
 			execl("/bin/sh", "sh", "-c", p_cmd, (char *) 0);
 			exit(1);
 			break;
