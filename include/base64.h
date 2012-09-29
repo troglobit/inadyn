@@ -1,52 +1,72 @@
-/*---------------------------------------------------------------------------*/
-/* base64                                                                    */
-/* ======                                                                    */
-/*                                                                           */
-/* Base64 encoding is sometimes used for simple HTTP authentication. That is */
-/* when strong encryption isn't necessary, Base64 encryption is used to      */
-/* authenticate User-ID's and Passwords.                                     */
-/*                                                                           */
-/* Base64 processes a string by octets (3 Byte blocks).  For every octet in  */
-/* the decoded string, four byte blocks are generated in the encoded string. */
-/* If the decoded string length is not a multiple of 3, the Base64 algorithm */
-/* pads the end of the encoded string with equal signs '='.                  */
-/*                                                                           */
-/* An example taken from RFC 2617 (HTTP Authentication):                     */
-/*                                                                           */
-/* Resource (URL) requires basic authentication (Authorization: Basic) for   */
-/* access, otherwise a HTTP 401 Unauthorized response is returned.           */
-/*                                                                           */
-/* User-ID:Password string  = "Aladdin:open sesame"                          */
-/* Base64 encoded   string  = "QWxhZGRpbjpvcGVuIHNlc2FtZQ=="                 */
-/* Note:    For EBCDIC and other collating sequences, the STRING must first  */
-/*          be converted to 7-Bit ASCII before passing it to this module and */
-/*          the return string must be converted back to the appropriate      */
-/*          collating sequence.                                              */
-/*                                                                           */
-/* Copyright (c) 1994 - 2003                                        */
-/* Marc Niegowski                                                            */
-/* Connectivity, Inc.                                                        */
-/* All rights reserved.                                                      */
+/**
+ * \file base64.h
+ *
+ * \brief RFC 1521 base64 encoding/decoding
+ *
+ *  Copyright (C) 2006-2010, Brainspark B.V.
+ *
+ *  This file is part of PolarSSL (http://www.polarssl.org)
+ *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
+ *
+ *  All rights reserved.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+#ifndef BASE64_H
+#define BASE64_H
 
-/* Licensing: this file is basically free to use in any way as long the above */
-/* copyright notice is kept.                                                  */
-/*---------------------------------------------------------------------------*/
-#ifndef BASE_64_H_INCLUDED
-#define BASE_64_H_INCLUDED
+#include <string.h>
 
-
-#ifndef __cplusplus
-	typedef int bool;
-	#define false (1 == 0)
-	#define true  !false
-#endif
+#define ERR_BASE64_BUFFER_TOO_SMALL               -0x002A  /**< Output buffer too small. */
+#define ERR_BASE64_INVALID_CHARACTER              -0x002C  /**< Invalid character in input. */
 
 /**
- b64encode - Encode a 7-Bit ASCII string to a Base64 string                                                                                          
- @param char *  - The 7-Bit ASCII string to encode                                     
- @return char* - array that contains the new decoded string     
- Note: the caller needs to free() the resultant pointer!             
-*/
-char*    b64encode(char *);
+ * \brief          Encode a buffer into base64 format
+ *
+ * \param dst      destination buffer
+ * \param dlen     size of the buffer
+ * \param src      source buffer
+ * \param slen     amount of data to be encoded
+ *
+ * \return         0 if successful, or POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL.
+ *                 *dlen is always updated to reflect the amount
+ *                 of data that has (or would have) been written.
+ *
+ * \note           Call this function with *dlen = 0 to obtain the
+ *                 required buffer size in *dlen
+ */
+int base64_encode( unsigned char *dst, size_t *dlen,
+                   const unsigned char *src, size_t slen );
 
-#endif 
+/**
+ * \brief          Decode a base64-formatted buffer
+ *
+ * \param dst      destination buffer
+ * \param dlen     size of the buffer
+ * \param src      source buffer
+ * \param slen     amount of data to be decoded
+ *
+ * \return         0 if successful, POLARSSL_ERR_BASE64_BUFFER_TOO_SMALL, or
+ *                 POLARSSL_ERR_BASE64_INVALID_DATA if the input data is not
+ *                 correct. *dlen is always updated to reflect the amount
+ *                 of data that has (or would have) been written.
+ *
+ * \note           Call this function with *dlen = 0 to obtain the
+ *                 required buffer size in *dlen
+ */
+int base64_decode( unsigned char *dst, size_t *dlen,
+                   const unsigned char *src, size_t slen );
+
+#endif /* base64.h */

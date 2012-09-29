@@ -1299,18 +1299,16 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		}
 
 		/* Cache filename */
-		if (p_self->interface)
+		if (p_self->bind_interface)
 		{
-			cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) +
-				strlen(p_self->interface);
+			cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) + strlen(p_self->bind_interface);
 			if ((p_self->cache_file = malloc(cache_file_len + 1)) == NULL)
 			{
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
-			if (snprintf(p_self->cache_file, cache_file_len + 1,
-				     DYNDNS_CACHE_FILE,
-				     p_self->interface) != cache_file_len)
+			if (snprintf(p_self->cache_file, cache_file_len + 1, DYNDNS_CACHE_FILE,
+				     p_self->bind_interface) != cache_file_len)
 			{
 				rc = RC_ERROR;
 				break;

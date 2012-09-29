@@ -367,8 +367,8 @@ static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int 
 		return 0;
 	}
 
-	md5_buffer(p_self->info[infcnt].credentials.my_password,
-		   strlen(p_self->info[infcnt].credentials.my_password), digestbuf);
+	md5((unsigned char *)p_self->info[infcnt].credentials.my_password,
+	    strlen(p_self->info[infcnt].credentials.my_password), digestbuf);
 	for (i = 0; i < MD5_DIGEST_BYTES; i++)
 		sprintf(&digeststr[i*2], "%02x", digestbuf[i]);
 	return sprintf(p_self->p_req_buffer, HE_IPV6TB_UPDATE_IP_REQUEST,
@@ -428,7 +428,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 
 		memset(&ifr, 0, sizeof(struct ifreq));
 		ifr.ifr_addr.sa_family = AF_INET;
-		snprintf(ifr.ifr_name, IFNAMSIZ, p_self->check_interface);
+		snprintf(ifr.ifr_name, IFNAMSIZ, "%s", p_self->check_interface);
 		if (ioctl(sd, SIOCGIFADDR, &ifr) != -1)
 		{	
 			new_ip = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
@@ -966,7 +966,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			os_shell_execute(p_self->external_command,
 					 p_self->info[0].my_ip_address.name,
 					 p_self->info[0].alias_info[0].names.name,
-					 p_self->interface);
+					 p_self->bind_interface);
 		}
 	}
 
@@ -1018,6 +1018,8 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 	char *p_tmp_buff = NULL;
 	int size, actual_len;
 	int i = 0;
+	char *p_b64_buff = NULL;
+	size_t dlen = 0;
 
 	do
 	{
@@ -1044,9 +1046,20 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 		}
 
 		/*encode*/
-		info->credentials.p_enc_usr_passwd_buffer = b64encode(p_tmp_buff);
-		info->credentials.encoded =
-			(info->credentials.p_enc_usr_passwd_buffer != NULL);
+
+		base64_encode(NULL, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
+		p_b64_buff = (char *) malloc(dlen);
+		if (p_b64_buff == NULL)
+		{
+			info->credentials.encoded = 0;
+			rc = RC_OUT_OF_MEMORY;
+			break;
+		}
+
+		base64_encode((unsigned char *)p_b64_buff, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
+
+		info->credentials.p_enc_usr_passwd_buffer = p_b64_buff;
+		info->credentials.encoded = 1;
 		info->credentials.size = strlen(info->credentials.p_enc_usr_passwd_buffer);
 
 		if (p_tmp_buff != NULL)
@@ -1255,10 +1268,16 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 		p_self->external_command = NULL;
 	}
 
-	if (p_self->interface != NULL)
+	if (p_self->bind_interface != NULL)
 	{
-		free(p_self->interface);
-		p_self->interface = NULL;
+		free(p_self->bind_interface);
+		p_self->bind_interface = NULL;
+	}
+
+	if (p_self->check_interface != NULL)
+	{
+		free(p_self->check_interface);
+		p_self->check_interface = NULL;
 	}
 
 	if (p_self->cache_file != NULL)

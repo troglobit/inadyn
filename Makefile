@@ -23,9 +23,9 @@ mandir        = $(prefix)/share/man
 #include <config.mk>
 include config.mk
 
-BASE_OBJS     = src/base64utils.o src/md5.o src/dyndns.o src/errorcode.o src/get_cmd.o \
-		src/http_client.o src/ip.o src/main.o src/os_unix.o src/os_windows.o   \
-		src/os.o src/os_psos.o src/tcp.o src/inadyn_cmd.o
+BASE_OBJS     = src/base64.o src/md5.o src/dyndns.o src/errorcode.o src/get_cmd.o    \
+		src/http_client.o src/ip.o src/main.o src/os_unix.o src/os_windows.o \
+		src/os.o src/os_psos.o src/tcp.o src/inadyn_cmd.o src/sha1.o
 OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
 CFLAGS       ?= -O2 -W -Wall -Werror
 CFLAGS       += $(CFG_INC) $(EXTRA_CFLAGS)
