@@ -34,9 +34,11 @@
 #include "debug_if.h"
 #include "base64.h"
 #include "md5.h"
+#include "sha1.h"
 #include "get_cmd.h"
 
 #define MD5_DIGEST_BYTES (16)
+#define SHA1_DIGEST_BYTES (20)
 
 /* To preserve from being reset at SIGHUP */
 static int cached_time_since_last_update = 0;
@@ -224,6 +226,16 @@ static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 	return RC_OK;
 }
 
+static RC_TYPE is_http_status_code_ok(int status)
+{
+	if (status == 200)
+		return RC_OK;
+	else if (status >= 500 && status < 600)
+		return RC_DYNDNS_RSP_RETRY_LATER;
+	else
+		return RC_DYNDNS_RSP_NOTOK;
+}
+
 static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt)
 {
 	if (p_self == NULL)
@@ -242,15 +254,97 @@ static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alc
 
 static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt)
 {
+	RC_TYPE rc = RC_OK, rc2;
+	HTTP_CLIENT http_to_dyndns;
+	HTTP_TRANSACTION http_tr;
+	
+	char buffer[256];
+
+	unsigned char digestbuf[SHA1_DIGEST_BYTES];
+	char digeststr[SHA1_DIGEST_BYTES*2+1];
+	int i;
+	
+	char *buf, *tmp, *line;
+	char host[256], updateurl[256];
+	char *hash = NULL;
+
 	if (p_self == NULL)
 	{
 		/* 0 == "No characters written" */
 		return 0;
 	}
 
+	// I know it's ugly, http client needs redesign.
+
+	do
+	{
+		if ((rc = http_client_construct(&http_to_dyndns)) != RC_OK)
+			break;
+		
+		http_client_set_port(&http_to_dyndns, p_self->info[infcnt].dyndns_server_name.port);
+		http_client_set_remote_name(&http_to_dyndns, p_self->info[infcnt].dyndns_server_name.name);
+		http_client_set_bind_iface(&http_to_dyndns, p_self->bind_interface);
+	
+		if ((rc = http_client_init(&http_to_dyndns, "Sending update URL query")) != RC_OK)
+			break;
+	
+		snprintf(buffer, sizeof(buffer), "%s|%s",
+		         p_self->info[infcnt].credentials.my_username,
+		         p_self->info[infcnt].credentials.my_password);
+		sha1((unsigned char *)buffer, strlen(buffer), digestbuf);
+		for (i = 0; i < SHA1_DIGEST_BYTES; i++)
+			sprintf(&digeststr[i*2], "%02x", digestbuf[i]);
+	
+		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&sha=%s", digeststr);
+	
+		http_tr.req_len = sprintf(p_self->p_req_buffer, GENERIC_HTTP_REQUEST,
+			buffer, p_self->info[infcnt].dyndns_server_name.name);
+		http_tr.p_req = (char*) p_self->p_req_buffer;
+		http_tr.p_rsp = (char*) p_self->p_work_buffer;
+		http_tr.max_rsp_len = p_self->work_buffer_size - 1; /* Save place for a \0 at the end */
+		http_tr.rsp_len = 0;
+	
+		rc = http_client_transaction(&http_to_dyndns, &http_tr);
+		http_tr.p_rsp[http_tr.rsp_len] = 0;
+		
+		rc2 = http_client_shutdown(&http_to_dyndns);
+		
+		http_client_destruct(&http_to_dyndns, 1);
+		
+		if (rc != RC_OK || rc2 != RC_OK)
+			break;
+		
+		if ((rc = is_http_status_code_ok(http_tr.status)) != RC_OK)
+			break;
+		
+		tmp = buf = strdup(http_tr.p_rsp_body);
+		
+		for (line = strsep(&tmp, "\n"); line; line = strsep(&tmp, "\n")) {
+			if (*line &&
+			    sscanf(line, "%255[^|\r\n]|%*[^|\r\n]|%255[^|\r\n]", host, updateurl) == 2 &&
+			    !strcmp(host, p_self->info[infcnt].alias_info[alcnt].names.name)) {
+				hash = strstr(updateurl, "?");
+				break;
+			}
+		}
+		
+		if (buf)
+			free(buf);
+		
+		if (!hash)
+			rc = RC_DYNDNS_RSP_NOTOK;
+	}
+	while (0);
+	
+	if (rc != RC_OK)
+	{
+		logit(LOG_INFO, MODULE_TAG "Update URL query failed");
+		return 0;
+	}
+
 	return sprintf(p_self->p_req_buffer, FREEDNS_UPDATE_IP_REQUEST,
 		       p_self->info[infcnt].dyndns_server_url,
-		       p_self->info[infcnt].alias_info[alcnt].hashes.str,
+		       hash,
 		       p_self->info[infcnt].my_ip_address.name,
 		       p_self->info[infcnt].dyndns_server_name.name);
 }
@@ -651,16 +745,6 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 	}
 
 	return RC_OK;
-}
-
-static RC_TYPE is_http_status_code_ok(int status)
-{
-	if (status == 200)
-		return RC_OK;
-	else if (status >= 500 && status < 600)
-		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* DynDNS org.specific response validator.

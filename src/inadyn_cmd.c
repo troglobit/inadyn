@@ -385,17 +385,9 @@ static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_con
 	return RC_OK;
 }
 
-/**
-   Parses alias,hash.
-   Example: blabla.domain.com,hashahashshahah
-   Action:
-   -search by ',' and replace the ',' with 0
-   -read hash and alias
-*/
 static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
-	char *p_hash = NULL;
 
 	if (p_self == NULL)
 	{
@@ -407,20 +399,6 @@ static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_contex
 		return RC_DYNDNS_TOO_MANY_ALIASES;
 	}
 
-	/*hash*/
-	p_hash = strstr(p_cmd->argv[current_nr],",");
-	if (p_hash && (*(1+p_hash) != '\0'))
-	{
-		if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes) < strlen(1+p_hash))
-		{
-			return RC_DYNDNS_BUFFER_TOO_SMALL;
-		}
-		strcpy(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes.str, 1+p_hash);
-		*p_hash = '\0';
-	}
-
-
-	/*user*/
 	if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].names) < strlen(p_cmd->argv[current_nr]))
 	{
 		return  RC_DYNDNS_BUFFER_TOO_SMALL;
