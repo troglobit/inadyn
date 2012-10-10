@@ -26,7 +26,8 @@
 .Op Fl f, -forced-update Ar SEC
 .Op Fl F, -config Ar FILE
 .Op Fl L, -logfile Ar FILE
-.Op Fl P, -pifdile Ar FILE
+.Op Fl P, -pidfile Ar FILE
+.Op Fl c, -cachefile Ar FILE
 .Op Fl s, -syslog
 .Op Fl h, -help
 .Op Fl i, -iface Ar IFNAME
@@ -99,7 +100,7 @@ Print a summary of the options and exit.
 The username, if applicable. This might be referred to as hash.
 .It Fl p, -password Ar PASSWORD
 The password, if applicable.
-.It Fl a, -alias Ar ALIAS Ns Op , Ns Ar HASH
+.It Fl a, -alias Ar ALIAS
 A host name alias. This option can appear multiple times, for each
 domain that has the same IP.
 .It Fl F, -config Ar FILE
@@ -200,6 +201,9 @@ External IP check is not performed.
 .It Fl P, -pidfile Ar FILE
 Set pidfile, defaults to
 .Pa /var/run/inadyn/inadyn.pid .
+.It Fl c, -cachefile Ar FILE
+Set cachefile, defaults to
+.Pa /var/run/inadyn/inadyn.cache .
 .It Fl e, -exec Ar SCRIPT
 Full path to external command, or script, to run after a successful
 DDNS update.
@@ -223,45 +227,28 @@ Force one update and quit.
 .No -u username -p password -a my.registered.name
 .Pp
 .Nm inadyn
-.No --username test --password test --period 60
+.No --username username --password password --period 60
 .No --alias test.homeip.net --alias my.second.domain
 .Pp
 .Nm inadyn
 .No --background -u test -p test --period 60
-.No --alias inarcis.homeip.net --alias my.second.domain
+.No --alias test.homeip.net --alias my.second.domain
 .No --logfile inadyn_srv.log
 .Ss http://freedns.afraid.org
 .Nm inadyn
-.No --system default@freedns.afraid.org -a my.registrated.name,hash_from_freedns
+.No --system default@freedns.afraid.org
+.No -u username -p password -a my.registrated.name
 .Pp
 .Nm inadyn
-.No --period 60 --alias test.homeip.net,hash_for_host1
-.No -a my.second.domain,hash2 --system default@freedns.afraid.org
+.No -u username -p password
+.No --period 60 --alias test.homeip.net
+.No -a my.second.domain --system default@freedns.afraid.org
 .Pp
 The
 .Dq hash
-should be extracted from the grab url batch file that can be
-downloaded from the site. A single hashed (base64 encoded) string is
-preferred upon a username and password pair, apparently to reduce the
-computational resources that is required on their side. Unfortunately
-the hash can not be computed by
+is automatically retrieved by
 .Nm inadyn
-because it requires the index to
-the username record in the freedns database, which is not known. The
-simplest solution seems to be a copy&paste action from the grab url batch
-file offered on their website. When the batch file looks is like
-.Pp
-.No graburl http://freedns.afraid.org/dynamic/update.php?YUGIUGSEIUFGOUIHEOIFEOIHJFEIO=
-.Pp
-the hash string, which is what the user should copy and paste, is the
-string that begins right after the
-.Dq ?\&
-character and ends with the end
-of line. This string shell be used as the username in
-.Nm inadyn
-command.
-When the user has several names then each name should be followed with
-that name hash string.
+using freedns API.
 .Sh OUTPUT
 .Nm inadyn
 prints a message when the IP is updated. If no update is needed then by

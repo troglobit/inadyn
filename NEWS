@@ -1,10 +1,12 @@
 Ver.  current
+    - Add ability to specify cache file.
     - Add ability to check IP of interface (unix only).
     If interface is specified, no external IP check permormed.
     Old --iface option renamed to --bind.
     - Specify IP address in freedns.afraid.org update request (only autodetect
     was used).
     - Add changeip.com support.
+    - Minor bugfixes and code optimization
 
 Ver.  1.99.2 - Sep 7 2012
     - Fix inability to change update period (broken in 1.99.0).
@@ -185,15 +187,6 @@ Ver. 1.81  - 23 November  2004
      No new features. Just a better integration with Linux OS:
      Reviewed usage of syslog and fork to background in 'daemon mode',
      thanks to Shaul Karl. 
- 
-Ver. 1.80  - 16 October   2004
-    - New feature:
-        - syslog: output to syslog for Linux (should work for all **nix
-          systems)
-        - run in background for Linux (should work for all **nix
-          systems)
- 
-    - Minor compile warnings removed.
  
 Ver. 1.80  - 16 October   2004
     - New feature:
