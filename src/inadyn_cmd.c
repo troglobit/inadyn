@@ -213,14 +213,7 @@ void print_help_page(void)
 	     "of your externally visible IP address and updates the hostname to IP mapping at\n"
 	     "your DDNS service provider when necessary.\n");
 	puts("dyndns.org:\n"
-	     "\tinadyn -u username -p password -a my.registrated.name\n"
-	     "\n"
-	     "freedns.afraid.org:\n"
-	     "\t inadyn --dyndns_system default@freedns.afraid.org \\\n"
-	     "\t        -a my.registrated.name,hash -a anothername,hash2\n"
-	     "\n"
-	     "The 'hash' is extracted from the grab URL batch file that is downloaded from\n"
-	     "freedns.afraid.org\n");
+	     "\tinadyn -u username -p password -a my.registrated.name\n");
 
 	it = cmd_options_table;
 	while (it->p_option != NULL)
