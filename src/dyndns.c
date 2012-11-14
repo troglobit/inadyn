@@ -938,7 +938,7 @@ static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 		return rc;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL ||
-		strstr(p_rsp, "already in use") != NULL)
+		strstr(p_rsp, "-ERROR: This tunnel is already associated with this IP address.") != NULL)
 		return RC_OK;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
