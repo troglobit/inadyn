@@ -256,6 +256,12 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 		return 0;
 	}
 
+	if (p_self->info[infcnt].alias_info[alcnt].hashes.str == NULL ||
+		strlen(p_self->info[infcnt].alias_info[alcnt].hashes.str) == 0)
+	{
+		return -RC_NO_HASH_SPECIFIED;
+	}
+
 	return sprintf(p_self->p_req_buffer, FREEDNS_UPDATE_MY_IP_REQUEST_FORMAT,
 		       p_self->info[infcnt].dyndns_server_url,
 		       p_self->info[infcnt].alias_info[alcnt].hashes.str,
@@ -698,6 +704,11 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			http_tr.req_len = info->p_dns_system->p_dns_update_req_func(
 				(struct _DYN_DNS_CLIENT*) p_self, i, j,
 				(struct DYNDNS_SYSTEM*) info->p_dns_system);
+			if (http_tr.req_len < 0)
+			{ 	/* error */
+				rc = -http_tr.req_len;
+				break;
+			}
 			http_tr.p_req = (char*) p_self->p_req_buffer;
 			http_tr.p_rsp = (char*) p_self->p_work_buffer;
 			http_tr.max_rsp_len = p_self->work_buffer_size - 1; /* Save place for a \0 at the end */
@@ -1419,6 +1430,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				if (rc == RC_DYNDNS_RSP_NOTOK)
 				{
 					logit(LOG_ERR, MODULE_TAG "Error response from DDNS server, exiting!");
+					break;
+				}
+
+				if (rc == RC_NO_HASH_SPECIFIED)
+				{
+					logit(LOG_ERR, MODULE_TAG "No hash specified for DDNS server, exiting!");
 					break;
 				}
 			}

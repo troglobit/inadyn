@@ -67,6 +67,8 @@ typedef enum
 	RC_FILE_IO_READ_ERROR = 0x71,
 	RC_FILE_IO_OUT_OF_BUFFER = 0x72,
 
+	RC_NO_HASH_SPECIFIED = 0x73,
+
 	RC_RESTART = 0xff,
 } RC_TYPE;
 

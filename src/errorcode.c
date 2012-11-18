@@ -69,6 +69,8 @@ static const ERROR_NAME global_error_table[]  =
 	{RC_FILE_IO_READ_ERROR,			"RC_FILE_IO_READ_ERROR"},
 	{RC_FILE_IO_OUT_OF_BUFFER,		"RC_FILE_IO_OUT_OF_BUFFER"},
 
+	{RC_NO_HASH_SPECIFIED,		"RC_NO_HASH_SPECIFIED"},
+
 	{RC_OK,					 NULL}
 };
 
