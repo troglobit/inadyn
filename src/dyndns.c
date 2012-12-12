@@ -1614,7 +1614,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		/* Try a DNS lookup of our last known IP#. */
 		for (i = 0; i < p_dyndns->info_count; i++)
 		{
-			if (p_dyndns->info[i].alias_count)
+			if (p_dyndns->info[i].alias_count &&
+			    /* exception for tunnelbroker.net - no name to lookup */
+			    strcmp(p_dyndns->info[i].p_dns_system->p_key, "ipv6tb@he.net"))
 			{
 				/* DNS Lookup */
 				memset(&hints, 0, sizeof(struct addrinfo));
