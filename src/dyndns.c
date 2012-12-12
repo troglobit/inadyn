@@ -1618,7 +1618,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			{
 				/* DNS Lookup */
 				memset(&hints, 0, sizeof(struct addrinfo));
-				hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+				hints.ai_family = AF_INET;    /* IPv4 */
 				hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
 				hints.ai_flags = 0;
 				hints.ai_protocol = 0;          /* Any protocol */
