@@ -1403,6 +1403,9 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			break;
 		}
 
+		if (p_dyndns->test_update == TRUE)
+			p_dyndns->force_addr_update = TRUE;
+
 		/* DDNS client main loop */
 		while (1)
 		{

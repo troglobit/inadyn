@@ -34,6 +34,7 @@
 .Op Fl N, -server-name Ar SERVER Ns Op : Ns Ar PORT
 .Op Fl U, -server-url Ar PATH
 .Op Fl S, -system Ar PROVIDER
+.Op Fl t, -test
 .Op Fl T, -period Ar SEC
 .Op Fl u, -username Ar USERNAME
 .Op Fl p, -password Ar PASSWORD
@@ -201,6 +202,8 @@ Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com. Default
 disabled. For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
+.It Fl t, -test
+Force one update and quit.
 .El
 .Sh "TYPICAL USAGE"
 .Ss http://www.dyndns.org
