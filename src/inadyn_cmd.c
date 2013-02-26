@@ -38,6 +38,7 @@ static int curr_info;
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE test_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -167,6 +168,9 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--syslog",		0,	{set_syslog_handler, NULL},
 	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
 
+	{"-t",			0,	{test_handler, NULL}, ""},
+	{"--test",		0,	{test_handler, NULL}, "Force one update and quit."},
+
 	{"-u",			1,	{get_username_handler, NULL},	""},
 	{"--username",		1,	{get_username_handler, NULL},	"<USERNAME>\n"
 	 "\t\t\tYour DDNS user name, or hash"},
@@ -236,6 +240,25 @@ static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 
 	p_self->abort = TRUE;
 	print_help_page();
+
+	return RC_OK;
+}
+
+static RC_TYPE test_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	(void)p_cmd;
+	(void)current_nr;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->test_update = TRUE;
+	p_self->total_iterations = 1;
+	p_self->dbg.level = 5;
 
 	return RC_OK;
 }
@@ -381,13 +404,13 @@ static RC_TYPE get_alias_handler(CMD_DATA *p_cmd, int current_nr, void *p_contex
 
 	/*hash*/
 	p_hash = strstr(p_cmd->argv[current_nr],",");
-	if (p_hash)
+	if (p_hash && (*(1+p_hash) != '\0'))
 	{
-		if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes) < strlen(p_hash))
+		if (sizeof(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes) < strlen(1+p_hash))
 		{
 			return RC_DYNDNS_BUFFER_TOO_SMALL;
 		}
-		strcpy(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes.str, p_hash);
+		strcpy(p_self->info[curr_info].alias_info[p_self->info[curr_info].alias_count].hashes.str, 1+p_hash);
 		*p_hash = '\0';
 	}
 
