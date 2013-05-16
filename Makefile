@@ -30,7 +30,7 @@ CFLAGS       ?= -g -O2
 CFLAGS       := -W -Wall -Iinclude -DVERSION_STRING=\"$(VERSION)\" $(CFG_INC) $(CFLAGS) $(EXTRA_CFLAGS)
 CPPFLAGS     ?=
 LDFLAGS      ?=
-LDLIBS       += -lresolv $(EXTRA_LIBS)
+LDLIBS       += $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE
 
 # Pattern rules
