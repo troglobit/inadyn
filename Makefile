@@ -33,15 +33,13 @@ DISTFILES     = README COPYING LICENSE
 
 # Pattern rules
 .c.o:
-	@printf "  CC      $@\n"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 # Build rules
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	@printf "  LINK    $@\n"
-	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
 install: $(EXEC)
 	@install -d $(DESTDIR)$(prefix)/sbin
