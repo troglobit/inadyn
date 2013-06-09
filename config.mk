@@ -4,6 +4,7 @@ ifndef TARGET_ARCH
 TARGET_ARCH   = linux
 endif
 
+# Some targets, or older systems, may need -lresolv in EXTRA_LIBS
 ifeq ($(TARGET_ARCH),solaris)
 EXTRA_CFLAGS  =
 EXTRA_OBJS    =
