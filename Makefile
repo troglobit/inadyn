@@ -26,22 +26,22 @@ BASE_OBJS     = src/base64utils.o src/md5.o src/dyndns.o src/errorcode.o src/get
 		src/http_client.o src/ip.o src/main.o src/os_unix.o src/os_windows.o   \
 		src/os.o src/os_psos.o src/tcp.o src/inadyn_cmd.o
 OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
-CFLAGS        = -Iinclude -DVERSION_STRING=\"$(VERSION)\" $(CFG_INC) $(EXTRA_CFLAGS)
-CFLAGS       += -O2 -W -Wall
-LDLIBS       += -lresolv $(EXTRA_LIBS)
+CFLAGS       ?= -g -O2
+CFLAGS       := -W -Wall -Iinclude -DVERSION_STRING=\"$(VERSION)\" $(CFG_INC) $(CFLAGS) $(EXTRA_CFLAGS)
+CPPFLAGS     ?=
+LDFLAGS      ?=
+LDLIBS       += $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE
 
 # Pattern rules
 .c.o:
-	@printf "  CC      $@\n"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 # Build rules
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	@printf "  LINK    $@\n"
-	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
 install: $(EXEC)
 	@install -d $(DESTDIR)$(prefix)/sbin
