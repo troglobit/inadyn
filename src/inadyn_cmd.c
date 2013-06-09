@@ -61,6 +61,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 static RC_TYPE set_bind_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_check_interface(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE set_cachefile(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 
@@ -76,6 +77,10 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"-B",			1,	{set_bind_interface, NULL}, ""},
 	{"--bind",		1,	{set_bind_interface, NULL}, "<IFNAME>\n"
 	 "\t\t\tSet interface to bind to, only on UNIX systems."},
+
+	{"-c",                  1,      {set_cachefile, NULL}, ""},
+	{"--cachefile",         1,      {set_cachefile, NULL}, "<FILE>\n"
+	 "\t\t\tSet cachefile, default " DYNDNS_DEFAULT_CACHE_FILE},
 
 	{"-d",			1,	{set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 	1,	{set_change_persona_handler, NULL}, "<USER[:GROUP]>\n"
@@ -167,7 +172,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"-P",			1,	{set_pidfile, NULL}, ""},
 	{"--pidfile",		1,	{set_pidfile, NULL}, "<FILE>\n"
-	 "\t\t\tSet pidfile, default /var/run/inadyn/inadyn.pid."},
+	 "\t\t\tSet pidfile, default " DYNDNS_DEFAULT_PIDFILE},
 
 	{"-s",			0,	{set_syslog_handler, NULL}, ""},
 	{"--syslog",		0,	{set_syslog_handler, NULL},
@@ -796,6 +801,20 @@ static RC_TYPE set_pidfile(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	return RC_OK;
 }
 
+static RC_TYPE set_cachefile(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	if (p_self == NULL)
+	{
+		return RC_INVALID_POINTER;
+	}
+
+	p_self->cache_file = strdup(p_cmd->argv[current_nr]);
+
+	return RC_OK;
+}
+
 RC_TYPE print_version_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
@@ -1276,8 +1295,8 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			break;
 		}
 
-		/* Cache filename */
-		if (p_self->bind_interface)
+		/* Setup a default cache file, unless the user provided one for us. */
+		if (p_self->bind_interface && !p_self->cache_file)
 		{
 			cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) + strlen(p_self->bind_interface);
 			if ((p_self->cache_file = malloc(cache_file_len + 1)) == NULL)
@@ -1294,6 +1313,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		}
 		else
 			p_self->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
+
 	}
 	while (0);
 

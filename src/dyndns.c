@@ -1088,6 +1088,8 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 
 		/* pidfile */
 		p_self->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);
+
+		/* Default cache_file is setup in get_config_data() */
 	}
 	while (0);
 
