@@ -1,7 +1,8 @@
 # Makefile for INADYN, a simple and small ddns client.          -*-Makefile-*-
+# Use "make V=1" to see full GCC output
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.98.1
+VERSION      ?= 1.98.2-pre
 NAME          = inadyn
 EXEC          = src/$(NAME)
 PKG           = $(NAME)-$(VERSION)
@@ -33,15 +34,15 @@ DISTFILES     = README COPYING LICENSE
 
 # Pattern rules
 .c.o:
-	@printf "  CC      $@\n"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(PRINTF) "  CC      $@\n"
+	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 # Build rules
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	@printf "  LINK    $@\n"
-	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+	$(PRINTF) "  LINK    $@\n"
+	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
 install: $(EXEC)
 	@install -d $(DESTDIR)$(prefix)/sbin
