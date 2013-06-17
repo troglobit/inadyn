@@ -69,7 +69,8 @@ RC_TYPE http_client_destruct(HTTP_CLIENT *p_self, int num)
 /* Set default TCP specififc params */
 static RC_TYPE local_set_params(HTTP_CLIENT *p_self)
 {
-	int timeout, port;
+	int timeout = 0;
+	int port;
 
 	http_client_get_remote_timeout(p_self, &timeout);
 	if (timeout == 0)
