@@ -1114,9 +1114,10 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 			strlen(info->credentials.my_username) +
 			strlen(format) + 1;
 
-		p_tmp_buff = (char *) malloc(size);
+		p_tmp_buff = (char *)malloc(size);
 		if (p_tmp_buff == NULL)
 		{
+			info->credentials.encoded = 0;
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
@@ -1126,14 +1127,13 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 				     info->credentials.my_password);
 		if (actual_len >= size)
 		{
+			info->credentials.encoded = 0;
 			rc = RC_OUT_BUFFER_OVERFLOW;
 			break;
 		}
 
 		/*encode*/
-
-		base64_encode(NULL, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
-		p_b64_buff = (char *) malloc(dlen);
+		p_b64_buff = (char *)malloc(dlen);
 		if (p_b64_buff == NULL)
 		{
 			info->credentials.encoded = 0;
@@ -1152,7 +1152,8 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 	}
 	while (++i < p_self->info_count);
 
-	free(p_tmp_buff);
+	if (p_tmp_buff)
+		free(p_tmp_buff);
 	p_tmp_buff = NULL;
 
 	return rc;
@@ -1661,15 +1662,11 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	{
 		rc = dyn_dns_init(p_dyndns);
 		if (rc != RC_OK)
-		{
 			break;
-		}
 
 		rc = get_encoded_user_passwd(p_dyndns);
 		if (rc != RC_OK)
-		{
 			break;
-		}
 
 		if (p_dyndns->test_update == TRUE)
 			p_dyndns->force_addr_update = TRUE;
@@ -1701,9 +1698,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 			/* check if the user wants us to stop */
 			if (p_dyndns->total_iterations != 0 && p_dyndns->num_iterations >= p_dyndns->total_iterations)
-			{
 				break;
-			}
 
 			p_dyndns->sleep_sec = rc == RC_DYNDNS_RSP_RETRY_LATER ? p_dyndns->error_update_period_sec : p_dyndns->normal_update_period_sec;
 
