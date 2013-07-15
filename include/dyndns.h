@@ -276,9 +276,9 @@ typedef struct
 	DYNDNS_SERVER_NAME  my_ip_address;
 	DYNDNS_CREDENTIALS  credentials;
 	DYNDNS_SYSTEM      *p_dns_system;
-	DYNDNS_SERVER_NAME  dyndns_server_name;
+	DYNDNS_SERVER_NAME  dyndns_server_name; /* Address of DDNS update service */
 	char                dyndns_server_url[DYNDNS_SERVER_URL_LENGTH];
-	DYNDNS_SERVER_NAME  ip_server_name;
+	DYNDNS_SERVER_NAME  ip_server_name;     /* Address of "What's my IP" checker */
 	char                ip_server_url[DYNDNS_SERVER_URL_LENGTH];
 	DYNDNS_SERVER_NAME  proxy_server_name;
 	DYNDNS_ALIAS_INFO   alias_info[DYNDNS_MAX_ALIAS_NUMBER];
