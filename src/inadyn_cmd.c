@@ -853,34 +853,33 @@ static RC_TYPE get_exec_handler(CMD_DATA *p_cmd, int current_nr, void *p_context
 static RC_TYPE get_dyndns_system_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYNDNS_SYSTEM *p_dns_system = NULL;
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *) p_context;
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+	DYNDNS_SYSTEM_INFO *it;
 
 	if (p_self == NULL)
-	{
 		return RC_INVALID_POINTER;
-	}
 
+	it = get_dyndns_system_table();
+	for (; it != NULL && it->id != LAST_DNS_SYSTEM; ++it)
 	{
-		DYNDNS_SYSTEM_INFO *it = get_dyndns_system_table();
-		for (; it != NULL && it->id != LAST_DNS_SYSTEM; ++it)
+		if (strcmp(it->system.p_key, p_cmd->argv[current_nr]) == 0)
 		{
-			if (strcmp(it->system.p_key, p_cmd->argv[current_nr]) == 0)
-			{
-				p_dns_system = &it->system;
-			}
+			p_dns_system = &it->system;
+			break;
 		}
 	}
 
 	if (p_dns_system == NULL)
 	{
-		return RC_DYNDNS_INVALID_OPTION;
+		logit(LOG_ERR, MODULE_TAG "Cannot find DDNS provider %s, check your spelling.", p_cmd->argv[current_nr]);
+		return RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
 	}
 
 	for (curr_info = 0; curr_info < p_self->info_count &&
 		     curr_info < DYNDNS_MAX_SERVER_NUMBER &&
 		     p_self->info[curr_info].p_dns_system != p_dns_system; curr_info++)
-	{
-	}
+		;
+
 	if (curr_info >= p_self->info_count)
 	{
 		if (curr_info < DYNDNS_MAX_SERVER_NUMBER)
@@ -889,11 +888,14 @@ static RC_TYPE get_dyndns_system_handler(CMD_DATA *p_cmd, int current_nr, void *
 			p_self->info[curr_info].p_dns_system = p_dns_system;
 		}
 	   	else
+		{
 			return RC_DYNDNS_BUFFER_TOO_SMALL;
+		}
 	}
 
 	return RC_OK;
 }
+
 static RC_TYPE push_in_buffer(char* p_src, int src_len, char *p_buffer, int* p_act_len, int max_len)
 {
 	if (*p_act_len + src_len > max_len)
@@ -925,6 +927,7 @@ static RC_TYPE parser_init(OPTION_FILE_PARSER *p_cfg, FILE *p_file)
 	memset(p_cfg, 0, sizeof(*p_cfg));
 	p_cfg->state = NEW_LINE;
 	p_cfg->p_file = p_file;
+
 	return RC_OK;
 }
 
@@ -1107,9 +1110,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	OPTION_FILE_PARSER parser;
 
 	if (!p_self || !p_cmd)
-	{
 		return RC_INVALID_POINTER;
-	}
 
 	do
 	{
@@ -1119,6 +1120,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	 		rc = RC_OUT_OF_MEMORY;
 	 		break;
 	  	}
+
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
@@ -1133,43 +1135,80 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 		p_self->cfgfile = strdup(p_cmd->argv[current_nr]);
 
 		if ((rc = parser_init(&parser, p_file)) != RC_OK)
-		{
 			break;
-		}
 
 		while (!feof(p_file))
 		{
 			rc = parser_read_option(&parser,p_tmp_buffer, buffer_size);
 			if (rc != RC_OK)
-			{
 				break;
-			}
 
 			if (!strlen(p_tmp_buffer))
-			{
 				break;
-			}
 
 			rc = cmd_add_val(p_cmd, p_tmp_buffer);
 			if (rc != RC_OK)
-			{
 				break;
-			}
    		}
 	}
 	while (0);
 
 	if (p_file)
-	{
 		fclose(p_file);
-	}
+
 	if (p_tmp_buffer)
-	{
 		free(p_tmp_buffer);
-	}
 
 	return rc;
 }
+
+static void check_setting(int cond, int no, char *msg, int *ok)
+{
+	if (!cond)
+	{
+		logit(LOG_WARNING, MODULE_TAG "%s in account %d", msg, no + 1);
+		*ok = 0;
+	}
+}
+
+/* Returns POSIX OK(0) on success, non-zero on validation failure. */
+static int validate_configuration(DYN_DNS_CLIENT *p_self)
+{
+	int i, num = 0;
+
+	if (!p_self->info_count)
+	{
+		logit(LOG_ERR, MODULE_TAG "No DDNS provider setup in configuration.");
+		return 1;
+	}
+
+	for (i = 0; i < p_self->info_count; i++)
+	{
+		int ok = 1;
+		DYNDNS_INFO_TYPE *account = &p_self->info[i];
+
+		check_setting(strlen(account->credentials.my_username), i, "Missing username", &ok);
+		check_setting(strlen(account->credentials.my_password), i, "Missing password", &ok);
+		check_setting(account->alias_count, i, "Missing your alias/hostname", &ok);
+		check_setting(strlen(account->dyndns_server_name.name), i, "Missing DDNS server address, check DDNS provider", &ok);
+		check_setting(strlen(account->ip_server_name.name), i, "Missing check IP address, check DDNS provider", &ok);
+
+		if (ok)
+			num++;
+	}
+
+	if (!num)
+	{
+		logit(LOG_ERR, MODULE_TAG "No valid DDNS setup exists.");
+		return 1;
+	}
+
+	if (num != p_self->info_count)
+		logit(LOG_WARNING, MODULE_TAG "Not all account setups are valid, please check configuration.");
+
+	return 0;
+}
+
 
 /*
   Set up all details:
@@ -1191,23 +1230,21 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 	int i;
 	RC_TYPE rc = RC_OK;
 	int cache_file_len;
+	CMD_DESCRIPTION_TYPE *it;
 
 	do
 	{
 		/*load default data */
 		rc = get_default_config_data(p_self);
 		if (rc != RC_OK)
-		{
 			break;
-		}
+
 		/*set up the context pointers */
+		it = cmd_options_table;
+		while (it->p_option != NULL)
 		{
-			CMD_DESCRIPTION_TYPE *it = cmd_options_table;
-			while (it->p_option != NULL)
-			{
-				it->p_handler.p_context = (void*) p_self;
-				++it;
-			}
+			it->p_handler.p_context = (void*) p_self;
+			++it;
 		}
 
 		/* in case of no options, assume the default cfg file may be present */
@@ -1216,10 +1253,8 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			char *custom_argv[] = {"", DYNDNS_INPUT_FILE_OPT_STRING, DYNDNS_DEFAULT_CONFIG_FILE};
 			int custom_argc = sizeof(custom_argv) / sizeof(char*);
 
-			if (p_self->dbg.level > 0)
-			{
+			if (p_self->dbg.level)
 				logit(LOG_NOTICE, MODULE_TAG "Using default config file %s", DYNDNS_DEFAULT_CONFIG_FILE);
-			}
 
 			if (p_self->cfgfile)
 				free(p_self->cfgfile);
@@ -1232,9 +1267,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		}
 
 		if (rc != RC_OK || p_self->abort)
-		{
 			break;
-		}
 
 		/* settings that may change due to cmd line options */
 		i = 0;
@@ -1279,10 +1312,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 		while(++i < p_self->info_count);
 
 		/* Check if the neccessary params have been provided */
-		if ((p_self->info_count == 0) ||
-		    (p_self->info[0].alias_count == 0) ||
-		    (strlen(p_self->info[0].dyndns_server_name.name) == 0)  ||
-		    (strlen(p_self->info[0].ip_server_name.name) == 0))
+		if (validate_configuration(p_self))
 		{
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
@@ -1297,6 +1327,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
+
 			if (snprintf(p_self->cache_file, cache_file_len + 1, DYNDNS_CACHE_FILE,
 				     p_self->bind_interface) != cache_file_len)
 			{
@@ -1305,7 +1336,9 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			}
 		}
 		else
+		{
 			p_self->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
+		}
 
 	}
 	while (0);
