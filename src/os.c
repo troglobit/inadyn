@@ -128,7 +128,7 @@ RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_
 	    break;
 	}
 	{
-	    FILE *pF = freopen(p_logfile_name, "wb", stdout);
+	    FILE *pF = freopen(p_logfile_name, "ab", stdout);
 	    if (pF == NULL)
 	    {
 		rc = RC_FILE_IO_OPEN_ERROR;
