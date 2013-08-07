@@ -223,7 +223,7 @@ void print_help_page(void)
 			if (strlen(it->p_option) == 2)
 				printf("  %s, ", it->p_option);
 			else
-				printf("%-16s  %s\n\r", it->p_option, it->p_description);
+				printf("%-16s  %s\n", it->p_option, it->p_description);
 		}
 		++it;
 	}
