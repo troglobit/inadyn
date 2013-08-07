@@ -1104,11 +1104,11 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 	int size, actual_len;
 	int i = 0;
 	char *p_b64_buff = NULL;
-	size_t dlen = 0;
 	int rc2;
 
 	do
 	{
+		size_t dlen = 0;
 		DYNDNS_INFO_TYPE *info = &p_self->info[i];
 
 		size = strlen(info->credentials.my_password) +
