@@ -1105,6 +1105,7 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 	int i = 0;
 	char *p_b64_buff = NULL;
 	size_t dlen = 0;
+	int rc2;
 
 	do
 	{
@@ -1132,7 +1133,8 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 			break;
 		}
 
-		/*encode*/
+		/* query required buffer size for base64 encoded data */
+		base64_encode(NULL, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
 		p_b64_buff = (char *)malloc(dlen);
 		if (p_b64_buff == NULL)
 		{
@@ -1141,7 +1143,14 @@ static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 			break;
 		}
 
-		base64_encode((unsigned char *)p_b64_buff, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
+		/* encode */
+		rc2 = base64_encode((unsigned char *)p_b64_buff, &dlen, (unsigned char *)p_tmp_buff, strlen(p_tmp_buff));
+		if (rc2 != 0)
+		{
+			info->credentials.encoded = 0;
+			rc = RC_OUT_BUFFER_OVERFLOW;
+			break;
+		}
 
 		info->credentials.p_enc_usr_passwd_buffer = p_b64_buff;
 		info->credentials.encoded = 1;
