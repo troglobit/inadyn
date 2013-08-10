@@ -1601,7 +1601,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		logit(LOG_ERR, "Failed opening pidfile %s for writing: %s", p_dyndns->pidfile, strerror(errno));
 		return RC_ERROR;
 	}
-	fprintf(fp, "%u", getpid());
+	fprintf(fp, "%u\n", getpid());
 	fclose(fp);
 
 	dyn_dns_print_hello();
