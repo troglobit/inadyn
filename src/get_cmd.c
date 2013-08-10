@@ -24,7 +24,6 @@
   Basic, table driven option line parsing.
 */
 
-#define MODULE_TAG ""
 #include <string.h>
 #include <stdlib.h>
 #include "get_cmd.h"
@@ -198,12 +197,12 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			if (p_curr_opt == NULL)
 			{
 				rc = RC_CMD_PARSER_INVALID_OPTION;
-				logit(LOG_WARNING, MODULE_TAG "Invalid option name at position %d: %s",
+				logit(LOG_WARNING, "Invalid option name at position %d: %s",
 				      curr_arg_nr + 1, cmd.argv[curr_arg_nr]);
 				break;
 			}
 
-//			logit(LOG_NOTICE, MODULE_TAG "Found opt %d: %s", curr_arg_nr, cmd.argv[curr_arg_nr]);
+//			logit(LOG_NOTICE, "Found opt %d: %s", curr_arg_nr, cmd.argv[curr_arg_nr]);
 
 			++curr_arg_nr;
 
@@ -211,7 +210,7 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			if (curr_arg_nr + p_curr_opt->arg_nr > cmd.argc)
 			{
 				rc = RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
-				logit(LOG_WARNING, MODULE_TAG "Missing option value at position %d: %s",
+				logit(LOG_WARNING, "Missing option value at position %d: %s",
 				      curr_arg_nr + 1, p_curr_opt->p_option);
 				break;
 			}
@@ -219,7 +218,7 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			rc = p_curr_opt->p_handler.p_func(&cmd, curr_arg_nr, p_curr_opt->p_handler.p_context);
 			if (rc != RC_OK)
 			{
-				logit(LOG_WARNING, MODULE_TAG "Error parsing option %s", cmd.argv[curr_arg_nr - 1]);
+				logit(LOG_WARNING, "Error parsing option %s", cmd.argv[curr_arg_nr - 1]);
 				break;
 			}
 

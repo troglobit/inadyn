@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include <stdlib.h>
 #include <string.h>
 
@@ -110,7 +109,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 			{
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR, MODULE_TAG "Error creating client socket: %s", strerror(code));
+				logit(LOG_ERR, "Error creating client socket: %s", strerror(code));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
@@ -125,7 +124,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 				{
 					int code = os_get_socket_error();
 
-					logit(LOG_WARNING, MODULE_TAG "Failed binding client socket to local address: %s", strerror(code));
+					logit(LOG_WARNING, "Failed binding client socket to local address: %s", strerror(code));
 					rc = RC_IP_SOCKET_BIND_ERROR;
 					break;
 				}
@@ -152,7 +151,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 		{
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, MODULE_TAG "Failed connecting to remote server: %s", strerror(code));
+			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(code));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}

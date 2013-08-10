@@ -17,7 +17,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include "debug_if.h"
 
 #include "os.h"
@@ -98,14 +97,14 @@ static void unix_signal_handler(int signo)
 
 	if (p_self == NULL)
 	{
-//		logit(LOG_WARNING, MODULE_TAG "Signal %d received. But handler is not installed correctly.", signo);
+//		logit(LOG_WARNING, "Signal %d received. But handler is not installed correctly.", signo);
 		return;
 	}
 
 	switch (signo)
 	{
 		case SIGHUP:
-//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received. Sending restart command.", signo);
+//			logit(LOG_DEBUG, "Signal %d received. Sending restart command.", signo);
 			p_self->cmd = CMD_RESTART;
 			break;
 
@@ -113,12 +112,12 @@ static void unix_signal_handler(int signo)
 		case SIGQUIT:
 		case SIGALRM:
 		case SIGTERM:
-//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received. Sending shutdown command.", signo);
+//			logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
 			p_self->cmd = CMD_STOP;
 			break;
 
 		default:
-//			logit(LOG_DEBUG, MODULE_TAG "Signal %d received, ignoring.", signo);
+//			logit(LOG_DEBUG, "Signal %d received, ignoring.", signo);
 			break;
 	}
 	return;
@@ -191,7 +190,7 @@ RC_TYPE close_console_window(void)
 	setsid();
 	if (-1 == chdir("/"))
 	{
-		logit(LOG_WARNING, MODULE_TAG "Failed changing cwd to /: %s", strerror(errno));
+		logit(LOG_WARNING, "Failed changing cwd to /: %s", strerror(errno));
 	}
 	umask(0);
 
@@ -247,7 +246,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 
 	if (rc != 0)
 	{
-		logit(LOG_WARNING, MODULE_TAG "Failed dropping privileges: %s", strerror(errno));
+		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 
