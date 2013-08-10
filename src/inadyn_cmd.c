@@ -93,7 +93,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"-f",			   1,   {get_forced_update_period_handler, NULL}, ""},
 	{"--forced-update",        1,   {get_forced_update_period_handler, NULL}, "<SEC>\n"
-	 "\t\t\tForced DDNS server update interval. Default: 1 week"},
+	 "\t\t\tForced DDNS server update interval. Default: 30 days"},
 	{"--forced_update_period", 1,   {get_forced_update_period_handler, NULL}, NULL}, /* COMPAT */
 
 	{"-F",				1, {get_options_from_file_handler, NULL}, ""},
