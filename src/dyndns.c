@@ -996,7 +996,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 					logit(LOG_INFO, "Successful alias table update for %s => new IP# %s",
 					      info->alias_info[j].names.name, info->my_ip_address.name);
 					p_self->time_since_last_update = 0;
-					anychange++; /* Adjust forced update period on success */
+					anychange++;
 				}
 				else
 				{
