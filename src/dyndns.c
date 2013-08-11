@@ -28,6 +28,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #include "dyndns.h"
 #include "debug_if.h"
@@ -39,7 +41,7 @@
 #define MD5_DIGEST_BYTES (16)
 #define SHA1_DIGEST_BYTES (20)
 
-/* To preserve from being reset at SIGHUP */
+/* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_time_since_last_update = 0;
 static int cached_num_iterations = 0;
 
@@ -1408,7 +1410,7 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 		p_self->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
 	}
 
-	/* Reset to old value, if restarted by SIGHUP */
+	/* Restore values, if reset by SIGHUP.  Initialize time from cache file at startup. */
 	p_self->time_since_last_update = cached_time_since_last_update;
 	p_self->num_iterations = cached_num_iterations;
 
@@ -1652,6 +1654,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	}
 	else
 	{
+		struct stat statbuf;
 		/* Read cached IP# from inadyn cache file. */
 		if (fgets(name, sizeof(name), fp))
 		{
@@ -1661,6 +1664,17 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			for (i = 0; i < p_dyndns->info_count; i++)
 			{
 				strncpy(p_dyndns->info[i].my_ip_address.name, name, sizeof(p_dyndns->info[i].my_ip_address.name));
+			}
+		}
+		/* Initialize time since last update from modification time of cache file. */
+		if (fstat(fileno(fp), &statbuf) == 0)
+		{
+			time_t now = time(NULL);
+			if (now != -1 && now > statbuf.st_mtime)
+			{
+				cached_time_since_last_update = (int)(now - statbuf.st_mtime);
+				logit(LOG_INFO, "Cached time since last update %d (seconds) from previous invocation.",
+					cached_time_since_last_update);
 			}
 		}
 		fclose(fp);
