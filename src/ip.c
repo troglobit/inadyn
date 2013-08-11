@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
@@ -102,7 +101,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			{
 				int code = os_get_socket_error();
 
-				logit(LOG_WARNING, MODULE_TAG "Failed opening network socket: %s", strerror(code));
+				logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -117,13 +116,13 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
 				p_self->bound = TRUE;
 
-				logit(LOG_INFO, MODULE_TAG "Bound to interface %s (IP# %s)", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
+				logit(LOG_INFO, "Bound to interface %s (IP# %s)", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
 			}
 			else
 			{
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR, MODULE_TAG "Failed reading IP address of interface %s: %s", p_self->ifname, strerror(code));
+				logit(LOG_ERR, "Failed reading IP address of interface %s: %s", p_self->ifname, strerror(code));
 				p_self->bound = FALSE;
 			}
 			close(sd);
@@ -148,7 +147,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 			s = getaddrinfo(p_self->p_remote_host_name, port, &hints, &result);
 			if (s != 0 || !result)
 			{
-				logit(LOG_WARNING, MODULE_TAG "Failed resolving hostname %s: %s", p_self->p_remote_host_name, gai_strerror(s));
+				logit(LOG_WARNING, "Failed resolving hostname %s: %s", p_self->p_remote_host_name, gai_strerror(s));
 				rc = RC_IP_INVALID_REMOTE_ADDR;
 				break;
 			}
@@ -219,7 +218,7 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 	{
 		int code = os_get_socket_error();
 
-		logit(LOG_WARNING, MODULE_TAG "Network error while sending query/update: %s", strerror(code));
+		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(code));
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -262,7 +261,7 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 		{
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, MODULE_TAG "Network error while waiting for reply: %s", strerror(code));
+			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(code));
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}

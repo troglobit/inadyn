@@ -17,7 +17,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include "debug_if.h"
 
 #include "os.h"
@@ -133,14 +132,14 @@ static int dyndns_win32_signal_handler_func(OS_SIGNAL_TYPE signal, void *p_in)
 		case OS_CTRL_CLOSE_SIGNAL :
 		case OS_CTRL_BREAK_SIGNAL :
 		case OS_CTRL_SHUTDOWN_SIGNAL :
-				logit(LOG_INFO, MODULE_TAG "Signal %d received. Sending shutdown command.", signal);
+				logit(LOG_INFO, "Signal %d received. Sending shutdown command.", signal);
 				ret_flag = 1;
 				p_self->cmd = CMD_STOP;
 			break;
 
 		case OS_CTRL_LOGOFF_SIGNAL :
 		default:
-				logit(LOG_DEBUG, MODULE_TAG "Signal %d received. NO ACTION.", signal);
+				logit(LOG_DEBUG, "Signal %d received. NO ACTION.", signal);
 	}
 	return ret_flag;
 }

@@ -17,8 +17,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -93,7 +91,7 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 
 	{"-f",			   1,   {get_forced_update_period_handler, NULL}, ""},
 	{"--forced-update",        1,   {get_forced_update_period_handler, NULL}, "<SEC>\n"
-	 "\t\t\tForced DDNS server update interval. Default: 1 week"},
+	 "\t\t\tForced DDNS server update interval. Default: 30 days"},
 	{"--forced_update_period", 1,   {get_forced_update_period_handler, NULL}, NULL}, /* COMPAT */
 
 	{"-F",				1, {get_options_from_file_handler, NULL}, ""},
@@ -627,7 +625,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 			{
 				if (s == 0)
 				{
-					logit(LOG_ERR, MODULE_TAG "Cannot find GROUP %s", groupname);
+					logit(LOG_ERR, "Cannot find GROUP %s", groupname);
 					result = RC_OS_INVALID_GID;
 				}
 				else
@@ -660,7 +658,7 @@ static RC_TYPE set_change_persona_handler(CMD_DATA *p_cmd, int current_nr, void 
 		{
 			if (s == 0)
 			{
-				logit(LOG_ERR, MODULE_TAG "Cannot find USER %s", username);
+				logit(LOG_ERR, "Cannot find USER %s", username);
 				result = RC_OS_INVALID_UID;
 			}
 			else
@@ -788,7 +786,7 @@ static RC_TYPE get_dyndns_system_handler(CMD_DATA *p_cmd, int current_nr, void *
 
 	if (p_dns_system == NULL)
 	{
-		logit(LOG_ERR, MODULE_TAG "Cannot find DDNS provider %s, check your spelling.", p_cmd->argv[current_nr]);
+		logit(LOG_ERR, "Cannot find DDNS provider %s, check your spelling.", p_cmd->argv[current_nr]);
 		return RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
 	}
 
@@ -1044,7 +1042,7 @@ static RC_TYPE get_options_from_file_handler(CMD_DATA *p_cmd, int current_nr, vo
 	  	p_file = fopen(p_cmd->argv[current_nr], "r");
 	  	if (!p_file)
 	  	{
-			logit(LOG_ERR, MODULE_TAG "Cannot open config file %s: %s", p_cmd->argv[current_nr], strerror(errno));
+			logit(LOG_ERR, "Cannot open config file %s: %s", p_cmd->argv[current_nr], strerror(errno));
 	  		rc = RC_FILE_IO_OPEN_ERROR;
 	  		break;
 	  	}
@@ -1086,7 +1084,7 @@ static void check_setting(int cond, int no, char *msg, int *ok)
 {
 	if (!cond)
 	{
-		logit(LOG_WARNING, MODULE_TAG "%s in account %d", msg, no + 1);
+		logit(LOG_WARNING, "%s in account %d", msg, no + 1);
 		*ok = 0;
 	}
 }
@@ -1098,7 +1096,7 @@ static int validate_configuration(DYN_DNS_CLIENT *p_self)
 
 	if (!p_self->info_count)
 	{
-		logit(LOG_ERR, MODULE_TAG "No DDNS provider setup in configuration.");
+		logit(LOG_ERR, "No DDNS provider setup in configuration.");
 		return 1;
 	}
 
@@ -1119,12 +1117,12 @@ static int validate_configuration(DYN_DNS_CLIENT *p_self)
 
 	if (!num)
 	{
-		logit(LOG_ERR, MODULE_TAG "No valid DDNS setup exists.");
+		logit(LOG_ERR, "No valid DDNS setup exists.");
 		return 1;
 	}
 
 	if (num != p_self->info_count)
-		logit(LOG_WARNING, MODULE_TAG "Not all account setups are valid, please check configuration.");
+		logit(LOG_WARNING, "Not all account setups are valid, please check configuration.");
 
 	return 0;
 }
@@ -1174,7 +1172,7 @@ RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv)
 			int custom_argc = sizeof(custom_argv) / sizeof(char*);
 
 			if (p_self->dbg.level)
-				logit(LOG_NOTICE, MODULE_TAG "Using default config file %s", DYNDNS_DEFAULT_CONFIG_FILE);
+				logit(LOG_NOTICE, "Using default config file %s", DYNDNS_DEFAULT_CONFIG_FILE);
 
 			if (p_self->cfgfile)
 				free(p_self->cfgfile);

@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
@@ -337,7 +336,7 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 	
 	if (rc != RC_OK)
 	{
-		logit(LOG_INFO, MODULE_TAG "Update URL query failed");
+		logit(LOG_INFO, "Update URL query failed");
 		return 0;
 	}
 
@@ -506,7 +505,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 
 	if (p_self->check_interface)
 	{
-		logit(LOG_INFO, MODULE_TAG "Checking for IP# change, querying interface %s",
+		logit(LOG_INFO, "Checking for IP# change, querying interface %s",
 		      p_self->check_interface);
 
 		int sd = socket(PF_INET, SOCK_DGRAM, 0);
@@ -515,7 +514,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 		{
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, MODULE_TAG "Failed opening network socket: %s", strerror(code));
+			logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
 			return RC_IP_OS_SOCKET_INIT_FAILED;
 		}
 
@@ -531,7 +530,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 		{
 			int code = os_get_socket_error();
 
-			logit(LOG_ERR, MODULE_TAG "Failed reading IP address of interface %s: %s",
+			logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
 			      p_self->check_interface, strerror(code));
 			return RC_ERROR;
 		}
@@ -548,7 +547,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 	    IN_MULTICAST(new_ip) ||
 	    IN_EXPERIMENTAL(new_ip))
 	{
-		logit(LOG_WARNING, MODULE_TAG "Interface %s has invalid IP# %s",
+		logit(LOG_WARNING, "Interface %s has invalid IP# %s",
 		      p_self->check_interface, new_ip_str);
 		return RC_ERROR;
 	}
@@ -569,7 +568,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 
 	if (!anychange)
 	{
-		logit(LOG_INFO, MODULE_TAG "No IP# change detected, still at %s", new_ip_str);
+		logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
 	}
 
 	return RC_OK;
@@ -613,8 +612,8 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	p_tr->req_len = get_req_for_ip_server(p_self, servernum);
 	if (p_self->dbg.level > 2)
 	{
-		logit(LOG_DEBUG, MODULE_TAG "Querying DDNS server for my public IP#:");
-		logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_req_buffer);
+		logit(LOG_DEBUG, "Querying DDNS server for my public IP#:");
+		logit(LOG_DEBUG, "%s", p_self->p_req_buffer);
 	}
 	p_tr->p_req = (char*) p_self->p_req_buffer;
 	p_tr->p_rsp = (char*) p_self->p_work_buffer;
@@ -702,7 +701,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 
 		if (!anychange)
 		{
-			logit(LOG_INFO, MODULE_TAG "No IP# change detected, still at %s", new_ip_str);
+			logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
 		}
 
 		return RC_OK;
@@ -737,7 +736,7 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 			for (j = 0; j < info->alias_count; j++)
 			{
 				info->alias_info[j].update_required = TRUE;
-				logit(LOG_WARNING, MODULE_TAG "Update needed for alias %s, new IP# %s",
+				logit(LOG_WARNING, "Update needed for alias %s, new IP# %s",
 				      info->alias_info[j].names.name, info->my_ip_address.name);
 			}
 		}
@@ -982,8 +981,8 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			if (p_self->dbg.level > 2)
 			{
 				p_self->p_req_buffer[http_tr.req_len] = 0;
-				logit(LOG_DEBUG, MODULE_TAG "Sending alias table update to DDNS server:");
-				logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_req_buffer);
+				logit(LOG_DEBUG, "Sending alias table update to DDNS server:");
+				logit(LOG_DEBUG, "%s", p_self->p_req_buffer);
 			}
 
 			if (rc == RC_OK)
@@ -994,24 +993,24 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				{
 					info->alias_info[j].update_required = FALSE;
 
-					logit(LOG_INFO, MODULE_TAG "Successful alias table update for %s => new IP# %s",
+					logit(LOG_INFO, "Successful alias table update for %s => new IP# %s",
 					      info->alias_info[j].names.name, info->my_ip_address.name);
 					p_self->time_since_last_update = 0;
-					anychange++; /* Adjust forced update period on success */
+					anychange++;
 				}
 				else
 				{
-					logit(LOG_WARNING, MODULE_TAG "%s error in DDNS server response:",
+					logit(LOG_WARNING, "%s error in DDNS server response:",
 						  rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
-					logit(LOG_WARNING, MODULE_TAG "[%d %s] %s",
+					logit(LOG_WARNING, "[%d %s] %s",
 					      http_tr.status, http_tr.status_desc,
 					      http_tr.p_rsp_body != http_tr.p_rsp ? http_tr.p_rsp_body : "");
 				}
 
 				if (p_self->dbg.level > 2)
 				{
-					logit(LOG_DEBUG, MODULE_TAG "DDNS server response:");
-					logit(LOG_DEBUG, MODULE_TAG "%s", http_tr.p_rsp);
+					logit(LOG_DEBUG, "DDNS server response:");
+					logit(LOG_DEBUG, "%s", http_tr.p_rsp);
 				}
 			}
 
@@ -1477,8 +1476,8 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 			}
 			if (p_self->dbg.level > 1)
 			{
-				logit(LOG_DEBUG, MODULE_TAG "IP server response:");
-				logit(LOG_DEBUG, MODULE_TAG "%s", p_self->p_work_buffer);
+				logit(LOG_DEBUG, "IP server response:");
+				logit(LOG_DEBUG, "%s", p_self->p_work_buffer);
 			}
 	
 			/* Extract our IP, check if different than previous one */
@@ -1490,7 +1489,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 	
 			if (p_self->dbg.level > 1)
 			{
-				logit(LOG_INFO, MODULE_TAG "Current public IP# %s", p_self->info[servernum].my_ip_address.name);
+				logit(LOG_INFO, "Current public IP# %s", p_self->info[servernum].my_ip_address.name);
 			}
 		}
 		/* Step through aliases list, resolve them and check if they point to my IP */
@@ -1599,10 +1598,10 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	fp = fopen(p_dyndns->pidfile, "w");
 	if (!fp)
 	{
-		logit(LOG_ERR, MODULE_TAG "Failed opening pidfile %s for writing: %s", p_dyndns->pidfile, strerror(errno));
+		logit(LOG_ERR, "Failed opening pidfile %s for writing: %s", p_dyndns->pidfile, strerror(errno));
 		return RC_ERROR;
 	}
-	fprintf(fp, "%u", getpid());
+	fprintf(fp, "%u\n", getpid());
 	fclose(fp);
 
 	dyn_dns_print_hello();
@@ -1642,12 +1641,12 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 					{
 						/* Update local record for next checkip call. */
 						strncpy(p_dyndns->info[i].my_ip_address.name, name, sizeof(p_dyndns->info[i].my_ip_address.name));
-						logit(LOG_INFO, MODULE_TAG "Resolving hostname %s => IP# %s", p_dyndns->info[i].alias_info[0].names.name, name);
+						logit(LOG_INFO, "Resolving hostname %s => IP# %s", p_dyndns->info[i].alias_info[0].names.name, name);
 					}
 					freeaddrinfo(result);
 				}
 				else
-					logit(LOG_WARNING, MODULE_TAG "Failed resolving hostname %s: %s", p_dyndns->info[i].alias_info[0].names.name, gai_strerror(s));
+					logit(LOG_WARNING, "Failed resolving hostname %s: %s", p_dyndns->info[i].alias_info[0].names.name, gai_strerror(s));
 			}
 		}
 	}
@@ -1656,7 +1655,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		/* Read cached IP# from inadyn cache file. */
 		if (fgets(name, sizeof(name), fp))
 		{
-			logit(LOG_INFO, MODULE_TAG "Cached IP# %s from previous invocation.", name);
+			logit(LOG_INFO, "Cached IP# %s from previous invocation.", name);
 
 			/* Update local record for next checkip call. */
 			for (i = 0; i < p_dyndns->info_count; i++)
@@ -1695,7 +1694,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 				if (rc == RC_DYNDNS_RSP_NOTOK)
 				{
-					logit(LOG_ERR, MODULE_TAG "Error response from DDNS server, exiting!");
+					logit(LOG_ERR, "Error response from DDNS server, exiting!");
 					break;
 				}
 			}
@@ -1716,14 +1715,14 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 
 				 * Time to inform the user the (network) error is not fatal and that we
 				 * will try again in a short while. */
-				logit(LOG_WARNING, MODULE_TAG "Will retry again in %d sec...", p_dyndns->sleep_sec);
+				logit(LOG_WARNING, "Will retry again in %d sec...", p_dyndns->sleep_sec);
 			}
 
 			/* Now sleep a while. Using the time set in sleep_sec data member */
 			dyn_dns_wait_for_cmd(p_dyndns);
 			if (p_dyndns->cmd == CMD_STOP)
 			{
-				logit(LOG_DEBUG, MODULE_TAG "STOP command received, exiting.");
+				logit(LOG_DEBUG, "STOP command received, exiting.");
 				rc = RC_OK;
 				break;
 			}

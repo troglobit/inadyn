@@ -17,7 +17,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#define MODULE_TAG ""
 #include <stdlib.h>
 
 #include "debug_if.h"
@@ -47,7 +46,7 @@ int inadyn_main(int argc, char* argv[])
 			rc = os_install_signal_handler(p_dyndns);
 			if (rc != RC_OK)
 			{
-				logit(LOG_WARNING, MODULE_TAG  "Failed installing OS signal handler: %s", errorcode_get_name(rc));
+				logit(LOG_WARNING, "Failed installing OS signal handler: %s", errorcode_get_name(rc));
 				break;
 			}
 			os_handler_installed = TRUE;
@@ -62,7 +61,7 @@ int inadyn_main(int argc, char* argv[])
 			rc = dyn_dns_destruct(p_dyndns);
 			if (rc != RC_OK)
 			{
-				logit(LOG_WARNING, MODULE_TAG "Failed cleaning up before restart: %s, ignoring...", errorcode_get_name(rc));
+				logit(LOG_WARNING, "Failed cleaning up before restart: %s, ignoring...", errorcode_get_name(rc));
 			}
 		}
 		else
@@ -75,7 +74,7 @@ int inadyn_main(int argc, char* argv[])
 
 	if (rc != RC_OK)
 	{
-		logit(LOG_WARNING, MODULE_TAG "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
+		logit(LOG_WARNING, "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
 	}
 
 	/* Cleanup */
