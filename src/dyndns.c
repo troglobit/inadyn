@@ -1722,6 +1722,13 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 				p_dyndns->num_iterations ++;
 			}
 
+			/* SIGUSR1 has been handled now, reset cmd */
+			if (p_dyndns->cmd == CMD_FORCED_UPDATE)
+			{
+				p_dyndns->cmd = NO_CMD;
+				p_dyndns->force_addr_update = FALSE;
+			}
+
 			/* check if the user wants us to stop */
 			if (p_dyndns->total_iterations != 0 && p_dyndns->num_iterations >= p_dyndns->total_iterations)
 				break;
@@ -1738,17 +1745,23 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 			/* Now sleep a while. Using the time set in sleep_sec data member */
 			dyn_dns_wait_for_cmd(p_dyndns);
+
 			if (p_dyndns->cmd == CMD_STOP)
 			{
 				logit(LOG_DEBUG, "STOP command received, exiting.");
 				rc = RC_OK;
 				break;
 			}
-			else if (p_dyndns->cmd == CMD_RESTART)
+			if (p_dyndns->cmd == CMD_RESTART)
 			{
 				logit(LOG_DEBUG, "RESTART command received, restarting.");
 				rc = RC_RESTART;
 				break;
+			}
+			if (p_dyndns->cmd == CMD_FORCED_UPDATE)
+			{
+				p_dyndns->force_addr_update = TRUE;
+				continue;
 			}
 
 			if (p_dyndns->dbg.level > 0)

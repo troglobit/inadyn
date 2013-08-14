@@ -116,6 +116,11 @@ static void unix_signal_handler(int signo)
 			p_self->cmd = CMD_STOP;
 			break;
 
+		case SIGUSR1:
+//			logit(LOG_DEBUG, "Signal %d received. Sending forced update command.", signo);
+			p_self->cmd = CMD_FORCED_UPDATE;
+			break;
+
 		default:
 //			logit(LOG_DEBUG, "Signal %d received, ignoring.", signo);
 			break;
@@ -139,6 +144,7 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 		sigaddset(&newact.sa_mask, SIGHUP)   ||
 		sigaddset(&newact.sa_mask, SIGINT)   ||
 		sigaddset(&newact.sa_mask, SIGQUIT)  ||
+		sigaddset(&newact.sa_mask, SIGUSR1)  ||
 		sigaddset(&newact.sa_mask, SIGTERM)  ||
 		sigaction(SIGALRM, &newact, NULL)    ||
 		sigemptyset(&newact.sa_mask)         ||
@@ -146,7 +152,9 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 		sigaction(SIGHUP, &newact, NULL)     ||
 		sigaction(SIGINT, &newact, NULL)     ||
 		sigaction(SIGQUIT, &newact, NULL)    ||
+		sigaction(SIGUSR1, &newact, NULL)    ||
 		sigaction(SIGTERM, &newact, NULL);
+
  	if (rc == RC_OK)
  	{
 		global_p_signal_handler_param = p_dyndns;
