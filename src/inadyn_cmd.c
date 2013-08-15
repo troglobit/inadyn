@@ -36,7 +36,7 @@ static int curr_info;
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
-static RC_TYPE test_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE update_once_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_password_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -176,8 +176,8 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--syslog",		0,	{set_syslog_handler, NULL},
 	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
 
-	{"-t",			0,	{test_handler, NULL}, ""},
-	{"--test",		0,	{test_handler, NULL}, "Force one update and quit."},
+	{"-o",			0,	{update_once_handler, NULL}, ""},
+	{"--once",		0,	{update_once_handler, NULL}, "Force one update and quit."},
 
 	{"-u",			1,	{get_username_handler, NULL},	""},
 	{"--username",		1,	{get_username_handler, NULL},	"<USERNAME>\n"
@@ -243,7 +243,7 @@ static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	return RC_OK;
 }
 
-static RC_TYPE test_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+static RC_TYPE update_once_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
 

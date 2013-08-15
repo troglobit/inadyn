@@ -1694,7 +1694,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		if (rc != RC_OK)
 			break;
 
-		if (p_dyndns->test_update == TRUE)
+		if (p_dyndns->update_once == TRUE)
 			p_dyndns->force_addr_update = TRUE;
 
 		/* DDNS client main loop */

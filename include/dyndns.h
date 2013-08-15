@@ -315,7 +315,7 @@ typedef struct DYN_DNS_CLIENT
 	BOOL         run_in_background;
 	BOOL         debug_to_syslog;
 	BOOL         change_persona;
-	BOOL         test_update;
+	BOOL         update_once;
 
 	HTTP_CLIENT       http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
 	HTTP_CLIENT       http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
