@@ -1608,6 +1608,14 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 	dyn_dns_print_hello();
 
+	/* Wait for network and any NTP daemon to set system time correctly.
+	 * Will wake up on any signal, but it is recommended to use SIGUSR1 */
+	if (p_dyndns->startup_delay_sec)
+	{
+		logit(LOG_NOTICE, "Startup delay: %d sec ...", p_dyndns->startup_delay_sec);
+		os_sleep_ms(1000 * p_dyndns->startup_delay_sec);
+	}
+
 	/* At boot, or when restarting inadyn at runtime, the memory struct holding
 	 * our current IP# is empty.  We want to avoid unnecessary updates of our
 	 * DDNS server record, since we might get locked out for abuse, so we "seed"

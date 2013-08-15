@@ -36,6 +36,7 @@ static int curr_info;
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
 
 static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
+static RC_TYPE startup_delay_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE update_once_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_wildcard_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
 static RC_TYPE get_username_handler(CMD_DATA *p_cmd, int current_nr, void *p_context);
@@ -176,6 +177,10 @@ static CMD_DESCRIPTION_TYPE cmd_options_table[] =
 	{"--syslog",		0,	{set_syslog_handler, NULL},
 	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
 
+	{"-t",                  1,      {startup_delay_handler, NULL}, ""},
+	{"--startup-delay",     1,      {startup_delay_handler, NULL}, "<SEC>\n"
+	 "\t\t\tWait for network/NTP to come up at boot.  Default: 0 sec"},
+
 	{"-o",			0,	{update_once_handler, NULL}, ""},
 	{"--once",		0,	{update_once_handler, NULL}, "Force one update and quit."},
 
@@ -243,6 +248,19 @@ static RC_TYPE help_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 	return RC_OK;
 }
 
+static RC_TYPE startup_delay_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
+{
+	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
+
+	if (p_self == NULL)
+		return RC_INVALID_POINTER;
+
+	if (sscanf(p_cmd->argv[current_nr], "%d", &p_self->startup_delay_sec) != 1)
+		return RC_DYNDNS_INVALID_OPTION;
+
+	return RC_OK;
+}
+
 static RC_TYPE update_once_handler(CMD_DATA *p_cmd, int current_nr, void *p_context)
 {
 	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)p_context;
@@ -253,7 +271,7 @@ static RC_TYPE update_once_handler(CMD_DATA *p_cmd, int current_nr, void *p_cont
 	if (p_self == NULL)
 		return RC_INVALID_POINTER;
 
-	p_self->test_update = TRUE;
+	p_self->update_once = TRUE;
 	p_self->total_iterations = 1;
 	p_self->dbg.level = 5;
 

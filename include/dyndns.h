@@ -300,6 +300,7 @@ typedef struct DYN_DNS_CLIENT
 	char *external_command;
 
 	DYN_DNS_CMD  cmd;
+	int          startup_delay_sec;
 	int          sleep_sec; /* time between 2 updates*/
 	int          normal_update_period_sec;
 	int          error_update_period_sec;

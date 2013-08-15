@@ -36,7 +36,8 @@
 .Op Fl N, -server-name Ar SERVER Ns Op : Ns Ar PORT
 .Op Fl U, -server-url Ar PATH
 .Op Fl S, -system Ar PROVIDER
-.Op Fl t, -once
+.Op Fl o, -once
+.Op Fl t, -startup-delay Ar SEC
 .Op Fl T, -period Ar SEC
 .Op Fl u, -username Ar USERNAME
 .Op Fl p, -password Ar PASSWORD
@@ -218,7 +219,12 @@ Enable domain name wildcarding for easydns.com. Default
 disabled. For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
-.It Fl t, -once
+.It Fl t, -startup-delay Ar SEC
+Wait for network to come up and system clock to be set correctly at
+boot.  Any signal received during this sleep will wake up
+.Nm
+but SIGUSR1 is recommended to use.
+.It Fl o, -once
 Force one update and quit.
 .El
 .Sh "TYPICAL USAGE"
