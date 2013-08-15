@@ -16,7 +16,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-/* 
+/*
 	Interface functions for CMD options parsing system
 	Author: Narcis Ilisei
 	Date: May 2003
@@ -37,7 +37,7 @@ typedef struct
 } CMD_DATA;
 
 typedef RC_TYPE (*CMD_OPTION_HANDLER_FUNC)(CMD_DATA *p_cmd, int current_nr, void *p_context);
-typedef struct 
+typedef struct
 {
 	CMD_OPTION_HANDLER_FUNC p_func;
 	void *p_context;
@@ -48,7 +48,7 @@ typedef struct
 {
 	char *p_option;
 	int arg_nr;
-	CMD_OPTION_HANDLER_TYPE p_handler;	
+	CMD_OPTION_HANDLER_TYPE p_handler;
 	char *p_description;
 } CMD_DESCRIPTION_TYPE;
 
@@ -59,7 +59,7 @@ typedef struct
 	Parses the incoming argv list data.
 	Arguments:
 		argv, argc,
-		cmd description 
+		cmd description
 
 	Action:
 		performs a match for every p_option string in the CMD description.
@@ -68,7 +68,7 @@ typedef struct
 */
 RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr);
 
-/** Adds a new option (string) to the command line 
+/** Adds a new option (string) to the command line
 */
 RC_TYPE cmd_add_val(CMD_DATA *p_cmd, char *p_val);
 

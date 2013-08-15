@@ -20,59 +20,23 @@
 #ifndef _OS_H_INCLUDED
 #define _OS_H_INCLUDED
 
-/* Include the correct headers for each OS.
-   TODO Note: This is a very thin and hacked way of supporting multiple OSes.
-   Must be another way of doing it.
-*/
-#define OS_DEF_OK 0
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <syslog.h>
 
-#ifdef _WIN32
-	#include <Windows.h>
-    #undef OS_DEF_OK
-    #define OS_DEF_OK  1
-    #ifndef BOOL
-	#define BOOL WINBOOL
-	#define HAVE_OS_BOOL 1
-    #endif
-#endif
-
-#ifdef RMC_DEBUG_VERSION
-    #undef OS_DEF_OK
-    #define OS_DEF_OK 1
-    #define PSOS_OS 1
-    #include <rmctypes.h>
-    #include <rmcmacros.h>
-
-    #define HAVE_OS_BOOL 1
-    #include <psos.h>
-    #include "psos_net.h"
-#endif
-
-#if OS_DEF_OK == 0
-  /*default to Unix*/
-    #define UNIX_OS  1
-    #define HAVE_OS_SYSLOG 1
-
-    #include <unistd.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <errno.h>
-    #include <string.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
-    #include <sys/wait.h>
-    #include <signal.h>
-    #include <sys/socket.h>
-    #include <netdb.h>
-    #include <syslog.h>
-
-    typedef int SOCKET;
-    #define closesocket close
-
-    #define FAR
-#endif
+typedef int SOCKET;
+#define closesocket close
 
 #ifndef IN_PRIVATE
 #define IN_PRIVATE(addr) (((addr & IN_CLASSA_NET) == 0x0a000000) ||  \
@@ -113,38 +77,20 @@ extern "C" {
     typedef int BOOL;
 #endif
 
-#ifndef UNIX_OS
-    typedef unsigned int uid_t;
-    typedef unsigned int gid_t;
-#endif
-
-
 /* general defines */
 #ifndef SOCKET_ERROR
     #define SOCKET_ERROR    (-1)
 #endif
 #define IP_V4_IP_ADDR_FORMAT "%u.%u.%u.%u"
 
-/** Syslog support */
-#ifndef HAVE_OS_SYSLOG
-    #define LOG_EMERG       0       /* system is unusable */
-    #define LOG_ALERT       1       /* action must be taken immediately */
-    #define LOG_CRIT        2       /* critical conditions */
-    #define LOG_ERR         3       /* error conditions */
-    #define LOG_WARNING     4       /* warning conditions */
-    #define LOG_NOTICE      5       /* normal but significant condition */
-    #define LOG_INFO        6       /* informational */
-    #define LOG_DEBUG       7       /* debug-level messages */
-#endif
-
 typedef enum
 {
-		OS_CTRL_C_SIGNAL = 0,
-		OS_CTRL_CLOSE_SIGNAL = 1,
-		OS_CTRL_BREAK_SIGNAL = 2,
-		OS_CTRL_LOGOFF_SIGNAL = 3,
-		OS_CTRL_SHUTDOWN_SIGNAL = 4,
-		LAST_SIGNAL = -1
+        OS_CTRL_C_SIGNAL = 0,
+        OS_CTRL_CLOSE_SIGNAL = 1,
+        OS_CTRL_BREAK_SIGNAL = 2,
+        OS_CTRL_LOGOFF_SIGNAL = 3,
+        OS_CTRL_SHUTDOWN_SIGNAL = 4,
+        LAST_SIGNAL = -1
 } OS_SIGNALS;
 
 typedef struct
@@ -240,3 +186,4 @@ RC_TYPE os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface);
 #endif
 
 #endif /* _OS_H_INCLUDED */
+

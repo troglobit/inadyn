@@ -22,7 +22,6 @@
 #include "os.h"
 #include "dyndns.h"
 
-#ifdef UNIX_OS
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -260,7 +259,6 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 
 	return RC_OK;
 }
-#endif
 
 /**
  * Local Variables:

@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TCP_DEFAULT_TIMEOUT	20000 /*ms*/
 
 
-typedef struct 
+typedef struct
 {
 	IP_SOCKET super;
 	BOOL initialized;
@@ -51,17 +51,17 @@ RC_TYPE tcp_construct(TCP_SOCKET *p_self);
 
 /*
 	Resource free.
-*/	
+*/
 RC_TYPE tcp_destruct(TCP_SOCKET *p_self);
 
-/* 
+/*
 	Sets up the object.
 
 	- ...
 */
 RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg);
 
-/* 
+/*
 	Disconnect and some other clean up.
 */
 RC_TYPE tcp_shutdown(TCP_SOCKET *p_self);
