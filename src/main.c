@@ -28,14 +28,14 @@ int inadyn_main(int argc, char* argv[])
 {
 	int restart = 0;
 	BOOL os_handler_installed = FALSE;
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	DYN_DNS_CLIENT *p_dyndns = NULL;
 
 	do
 	{
 		/* create DYN_DNS_CLIENT object	*/
 		rc = dyn_dns_construct(&p_dyndns);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
@@ -44,7 +44,7 @@ int inadyn_main(int argc, char* argv[])
 		if (!os_handler_installed)
 		{
 			rc = os_install_signal_handler(p_dyndns);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				logit(LOG_WARNING, "Failed installing OS signal handler: %s", errorcode_get_name(rc));
 				break;
@@ -59,7 +59,7 @@ int inadyn_main(int argc, char* argv[])
 
 			/* do some cleanup if restart requested */
 			rc = dyn_dns_destruct(p_dyndns);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				logit(LOG_WARNING, "Failed cleaning up before restart: %s, ignoring...", errorcode_get_name(rc));
 			}
@@ -72,7 +72,7 @@ int inadyn_main(int argc, char* argv[])
 	}
 	while (restart);
 
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		logit(LOG_WARNING, "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
 	}

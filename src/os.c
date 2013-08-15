@@ -103,9 +103,9 @@ void os_printf(int prio, char *fmt, ... )
  * TODO:
  *  some simple solution that involves storing the dbg output device name (and filename)
  */
-RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name)
+int os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name)
 {
-    RC_TYPE rc = RC_OK;
+    int rc = 0;
     set_dbg_dest(dest);
 
     switch (get_dbg_dest())
@@ -135,7 +135,7 @@ RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_
 	}
     case DBG_STD_LOG:
     default:
-	rc = RC_OK;
+	rc = 0;
     }
     return rc;
 }
@@ -143,9 +143,9 @@ RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_
 /**
  * Closes the dbg output device.
  */
-RC_TYPE os_close_dbg_output(void)
+int os_close_dbg_output(void)
 {
-    RC_TYPE rc = RC_OK;
+    int rc = 0;
     switch (get_dbg_dest())
     {
     case DBG_SYS_LOG:
@@ -154,12 +154,12 @@ RC_TYPE os_close_dbg_output(void)
 
     case DBG_FILE_LOG:
 	fclose(stdout);
-	rc = RC_OK;
+	rc = 0;
 	break;
 
     case DBG_STD_LOG:
     default:
-	rc = RC_OK;
+	rc = 0;
     }
     return rc;
 }

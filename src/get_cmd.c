@@ -49,7 +49,7 @@ static CMD_DESCRIPTION_TYPE * opt_search(CMD_DESCRIPTION_TYPE *p_table, char *p_
 /**
    Init the CMD_DATA
 */
-RC_TYPE cmd_init(CMD_DATA *p_cmd)
+int cmd_init(CMD_DATA *p_cmd)
 {
 	if (!p_cmd)
 	{
@@ -58,10 +58,10 @@ RC_TYPE cmd_init(CMD_DATA *p_cmd)
 
 	memset(p_cmd, 0, sizeof(*p_cmd));
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE cmd_destruct(CMD_DATA *p_cmd)
+int cmd_destruct(CMD_DATA *p_cmd)
 {
 	if (!p_cmd)
 	{
@@ -82,14 +82,14 @@ RC_TYPE cmd_destruct(CMD_DATA *p_cmd)
 		free(p_cmd->argv);
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /** Adds a new option (string) to the command line
  */
-RC_TYPE cmd_add_val(CMD_DATA *p_cmd, char *p_val)
+int cmd_add_val(CMD_DATA *p_cmd, char *p_val)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 
 	if (!p_cmd || !p_val)
 	{
@@ -127,10 +127,10 @@ RC_TYPE cmd_add_val(CMD_DATA *p_cmd, char *p_val)
     copy the argv from the command line to the given CMD_DATA struct
     set the data val of the list element to the current argv
 */
-RC_TYPE cmd_add_vals_from_argv(CMD_DATA *p_cmd, char **argv, int argc)
+int cmd_add_vals_from_argv(CMD_DATA *p_cmd, char **argv, int argc)
 {
 	int i;
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 
 	if (!p_cmd || !argv || !argc)
 	{
@@ -140,7 +140,7 @@ RC_TYPE cmd_add_vals_from_argv(CMD_DATA *p_cmd, char **argv, int argc)
 	for (i = 0; i < argc; ++i)
 	{
 		rc = cmd_add_val(p_cmd, argv[i]);
-		if (rc != RC_OK)
+		if (rc != 0)
 			break;
 	}
 
@@ -165,9 +165,9 @@ RC_TYPE cmd_add_vals_from_argv(CMD_DATA *p_cmd, char **argv, int argc)
   - check the required number of arguments
   - call the handler
 */
-RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr)
+int get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	CMD_DATA cmd;
 	int curr_arg_nr = 1; /* without the prg name*/
 
@@ -179,13 +179,13 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 	do
 	{
 		rc = cmd_init(&cmd);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
 
 		rc = cmd_add_vals_from_argv(&cmd, argv, argc);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
@@ -216,7 +216,7 @@ RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_de
 			}
 
 			rc = p_curr_opt->p_handler.p_func(&cmd, curr_arg_nr, p_curr_opt->p_handler.p_context);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				logit(LOG_WARNING, "Error parsing option %s", cmd.argv[curr_arg_nr - 1]);
 				break;

@@ -223,7 +223,7 @@ struct DYNDNS_SYSTEM;
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
 typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr);
-typedef RC_TYPE (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, HTTP_TRANSACTION *p_tr, int infnr);
+typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, HTTP_TRANSACTION *p_tr, int infnr);
 typedef struct
 {
 	const char* p_key;
@@ -345,7 +345,7 @@ DYNDNS_SYSTEM_INFO* get_dyndns_system_table(void);
 /**
  *  Returns the default DYNDNS client config data.
 */
-RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self);
+int get_default_config_data(DYN_DNS_CLIENT *p_self);
 
 /*
 	Set up all details:
@@ -359,7 +359,7 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self);
 	- assign settings that may change due to cmd line options
 		- check data
 */
-RC_TYPE get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv);
+int get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv);
 
 /*
 	printout of version
@@ -369,24 +369,24 @@ void dyn_dns_print_hello(void);
 /*
 	 basic resource allocations for the dyn_dns object
 */
-RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self);
+int dyn_dns_construct(DYN_DNS_CLIENT **pp_self);
 
 /*
 	Resource free.
 */
-RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self);
+int dyn_dns_destruct(DYN_DNS_CLIENT *p_self);
 
 /*
 	Sets up the object.
 	- sets the IPs of the DYN DNS server
 	- ...
 */
-RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self);
+int dyn_dns_init(DYN_DNS_CLIENT *p_self);
 
 /*
 	Disconnect and some other clean up.
 */
-RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
+int dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
 
 
 
@@ -399,7 +399,7 @@ RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
 		- get the current DYN DNS address from DYN DNS server
 		- compare and update if neccessary
 */
-RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self);
+int dyn_dns_update_ip(DYN_DNS_CLIENT *p_self);
 
 /* MAIN - Dyn DNS update entry point.*/
 

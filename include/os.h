@@ -113,7 +113,7 @@ typedef struct
 	gid_t gid;
 } OS_USER_INFO;
 
-RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info);
+int os_change_persona(OS_USER_INFO *p_usr_info);
 
 /* Blocks a thread the specified number of milliseconds*/
 void os_sleep_ms(int ms);
@@ -124,13 +124,13 @@ int  os_get_socket_error (void);
 /* NETWORK SUPPORT*/
 
 /* Socket system start */
-RC_TYPE os_ip_support_startup(void);
+int os_ip_support_startup(void);
 
 /* Socket system stop*/
-RC_TYPE os_ip_support_cleanup(void);
+int os_ip_support_cleanup(void);
 
 /* OS SIGNALS */
-RC_TYPE os_install_signal_handler(void*);
+int os_install_signal_handler(void*);
 
 /* MAIN - Dyn DNS update entry point.*/
 int inadyn_main(int argc, char* argv[]);
@@ -149,7 +149,7 @@ typedef struct
 int thread_start(OS_THREAD_TYPE *p_thread);
 
 /* console */
-RC_TYPE close_console_window(void);
+int close_console_window(void);
 
 typedef enum
 {
@@ -162,24 +162,24 @@ typedef enum
  * Opens the dbg output for the required destination.
  *
  */
-RC_TYPE os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name);
+int os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name);
 
 /**
  * Closes the dbg output device.
  */
-RC_TYPE os_close_dbg_output(void);
+int os_close_dbg_output(void);
 
 
 /**
  * Opens the system's syslog. The prg name is what will be printed before every message.
  */
-RC_TYPE os_syslog_open(const char *p_prg_name);
-RC_TYPE os_syslog_close(void);
+int os_syslog_open(const char *p_prg_name);
+int os_syslog_close(void);
 
 /**
  * Execute command on successful update.
  */
-RC_TYPE os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface);
+int os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface);
 
 #ifdef __cplusplus
 }

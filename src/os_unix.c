@@ -38,19 +38,19 @@ int  os_get_socket_error (void)
     return errno;
 }
 
-RC_TYPE os_ip_support_startup(void)
+int os_ip_support_startup(void)
 {
-    return RC_OK;
+    return 0;
 }
 
-RC_TYPE os_ip_support_cleanup(void)
+int os_ip_support_cleanup(void)
 {
-    return RC_OK;
+    return 0;
 }
 
-RC_TYPE os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
+int os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	int child;
 
 	child = vfork();
@@ -132,9 +132,9 @@ static void unix_signal_handler(int signo)
 	avoid receiving HUP, INT, QUIT during ALRM and TERM.
 
 */
-RC_TYPE os_install_signal_handler(void *p_dyndns)
+int os_install_signal_handler(void *p_dyndns)
 {
-	RC_TYPE rc;
+	int rc;
 	struct sigaction    newact;
 	newact.sa_handler = unix_signal_handler;
 	newact.sa_flags   = 0;
@@ -154,7 +154,7 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
 		sigaction(SIGUSR1, &newact, NULL)    ||
 		sigaction(SIGTERM, &newact, NULL);
 
- 	if (rc == RC_OK)
+ 	if (rc == 0)
  	{
 		global_p_signal_handler_param = p_dyndns;
 	}
@@ -181,7 +181,7 @@ RC_TYPE os_install_signal_handler(void *p_dyndns)
     - for parent
 	just exit
 */
-RC_TYPE close_console_window(void)
+int close_console_window(void)
 {
     pid_t pid = fork();
 
@@ -201,12 +201,12 @@ RC_TYPE close_console_window(void)
 	}
 	umask(0);
 
-	return RC_OK;
+	return 0;
     }
 
     exit(0);
 
-    return RC_OK;		/* Never reached. */
+    return 0;		/* Never reached. */
 }
 
 /* MAIN - Dyn DNS update entry point.*/
@@ -215,19 +215,19 @@ int main(int argc, char* argv[])
     return inadyn_main(argc, argv);
 }
 
-RC_TYPE os_syslog_open(const char *p_prg_name)
+int os_syslog_open(const char *p_prg_name)
 {
     openlog(p_prg_name, LOG_PID, LOG_USER);
-    return RC_OK;
+    return 0;
 }
 
-RC_TYPE os_syslog_close(void)
+int os_syslog_close(void)
 {
     closelog();
-    return RC_OK;
+    return 0;
 }
 
-RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
+int os_change_persona(OS_USER_INFO *p_usr_info)
 {
 	int rc;
 
@@ -257,7 +257,7 @@ RC_TYPE os_change_persona(OS_USER_INFO *p_usr_info)
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /**

@@ -29,7 +29,7 @@
 #include "ip.h"
 
 /* basic resource allocations for the ip object */
-RC_TYPE ip_construct(IP_SOCKET *p_self)
+int ip_construct(IP_SOCKET *p_self)
 {
 	if (p_self == NULL)
 	{
@@ -45,17 +45,17 @@ RC_TYPE ip_construct(IP_SOCKET *p_self)
 	memset(&p_self->remote_addr, 0, sizeof(p_self->remote_addr));
 	p_self->timeout = IP_DEFAULT_TIMEOUT;
 
-	return RC_OK;
+	return 0;
 }
 
 /*
   Resource free.
 */
-RC_TYPE ip_destruct(IP_SOCKET *p_self)
+int ip_destruct(IP_SOCKET *p_self)
 {
 	if (p_self == NULL)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	if (p_self->initialized == TRUE)
@@ -63,7 +63,7 @@ RC_TYPE ip_destruct(IP_SOCKET *p_self)
 		ip_shutdown(p_self);
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 
@@ -73,21 +73,21 @@ RC_TYPE ip_destruct(IP_SOCKET *p_self)
 
   - ...
 */
-RC_TYPE ip_initialize(IP_SOCKET *p_self)
+int ip_initialize(IP_SOCKET *p_self)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	struct ifreq ifr;
 	struct sockaddr_in *addrp = NULL;
 
 	if (p_self->initialized == TRUE)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	do
 	{
 		rc = os_ip_support_startup();
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
@@ -163,7 +163,7 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 	}
 	while (0);
 
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		ip_shutdown(p_self);
 		return rc;
@@ -171,13 +171,13 @@ RC_TYPE ip_initialize(IP_SOCKET *p_self)
 
 	p_self->initialized = TRUE;
 
-	return RC_OK;
+	return 0;
 }
 
 /*
   Disconnect and some other clean up.
 */
-RC_TYPE ip_shutdown(IP_SOCKET *p_self)
+int ip_shutdown(IP_SOCKET *p_self)
 {
 	if (p_self == NULL)
 	{
@@ -186,7 +186,7 @@ RC_TYPE ip_shutdown(IP_SOCKET *p_self)
 
 	if (!p_self->initialized)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	if (p_self->socket > -1)
@@ -199,10 +199,10 @@ RC_TYPE ip_shutdown(IP_SOCKET *p_self)
 
 	p_self->initialized = FALSE;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
+int ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 {
 	if (p_self == NULL)
 	{
@@ -222,7 +222,7 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
 		return RC_IP_SEND_ERROR;
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /*
@@ -234,9 +234,9 @@ RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len)
   Note:
   if the recv_len is bigger than 0, no error is returned.
 */
-RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
+int ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	int remaining_buf_len = max_recv_len;
 	int total_recv_len = 0;
 	int recv_len = 0;
@@ -287,7 +287,7 @@ RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_le
 
 /*Accessors */
 
-RC_TYPE ip_set_port(IP_SOCKET *p_self, int p)
+int ip_set_port(IP_SOCKET *p_self, int p)
 {
 	if (p_self == NULL)
 	{
@@ -301,10 +301,10 @@ RC_TYPE ip_set_port(IP_SOCKET *p_self, int p)
 
 	p_self->port = p;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p)
+int ip_set_remote_name(IP_SOCKET *p_self, const char *p)
 {
 	if (p_self == NULL)
 	{
@@ -313,10 +313,10 @@ RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p)
 
 	p_self->p_remote_host_name = p;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t)
+int ip_set_remote_timeout(IP_SOCKET *p_self, int t)
 {
 	if (p_self == NULL)
 	{
@@ -325,10 +325,10 @@ RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t)
 
 	p_self->timeout = t;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_set_bind_iface(IP_SOCKET *p_self, char *ifname)
+int ip_set_bind_iface(IP_SOCKET *p_self, char *ifname)
 {
 	if (p_self == NULL)
 	{
@@ -337,10 +337,10 @@ RC_TYPE ip_set_bind_iface(IP_SOCKET *p_self, char *ifname)
 
 	p_self->ifname = ifname;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port)
+int ip_get_port(IP_SOCKET *p_self, int *p_port)
 {
 	if (p_self == NULL || p_port == NULL)
 	{
@@ -349,10 +349,10 @@ RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port)
 
 	*p_port = p_self->port;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p)
+int ip_get_remote_name(IP_SOCKET *p_self, const char **p)
 {
 	if (p_self == NULL || p == NULL)
 	{
@@ -361,10 +361,10 @@ RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p)
 
 	*p = p_self->p_remote_host_name;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p)
+int ip_get_remote_timeout(IP_SOCKET *p_self, int *p)
 {
 	if (p_self == NULL || p == NULL)
 	{
@@ -373,10 +373,10 @@ RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p)
 
 	*p = p_self->timeout;
 
-	return RC_OK;
+	return 0;
 }
 
-RC_TYPE ip_get_bind_iface(IP_SOCKET *p_self, char **ifname)
+int ip_get_bind_iface(IP_SOCKET *p_self, char **ifname)
 {
 	if (p_self == NULL || ifname == NULL)
 	{
@@ -385,7 +385,7 @@ RC_TYPE ip_get_bind_iface(IP_SOCKET *p_self, char **ifname)
 
 	*ifname = p_self->ifname;
 
-	return RC_OK;
+	return 0;
 }
 
 /**

@@ -23,9 +23,9 @@
 #include "tcp.h"
 
 /* basic resource allocations for the tcp object */
-RC_TYPE tcp_construct(TCP_SOCKET *p_self)
+int tcp_construct(TCP_SOCKET *p_self)
 {
-	RC_TYPE rc;
+	int rc;
 
 	if (p_self == NULL)
 	{
@@ -33,7 +33,7 @@ RC_TYPE tcp_construct(TCP_SOCKET *p_self)
 	}
 
 	rc = ip_construct(&p_self->super);
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		return rc;
 	}
@@ -42,17 +42,17 @@ RC_TYPE tcp_construct(TCP_SOCKET *p_self)
 	memset(((char*)p_self + sizeof(p_self->super)) , 0, sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = FALSE;
 
-	return RC_OK;
+	return 0;
 }
 
 /*
   Resource free.
 */
-RC_TYPE tcp_destruct(TCP_SOCKET *p_self)
+int tcp_destruct(TCP_SOCKET *p_self)
 {
 	if (p_self == NULL)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	if (p_self->initialized == TRUE)
@@ -63,7 +63,7 @@ RC_TYPE tcp_destruct(TCP_SOCKET *p_self)
 	return ip_destruct(&p_self->super);
 }
 
-static RC_TYPE local_set_params(TCP_SOCKET *p_self)
+static int local_set_params(TCP_SOCKET *p_self)
 {
 	int timeout;
 
@@ -75,7 +75,7 @@ static RC_TYPE local_set_params(TCP_SOCKET *p_self)
 		tcp_set_remote_timeout(p_self, TCP_DEFAULT_TIMEOUT);
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /*
@@ -83,9 +83,9 @@ static RC_TYPE local_set_params(TCP_SOCKET *p_self)
 
   - ...
 */
-RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
+int tcp_initialize(TCP_SOCKET *p_self, char *msg)
 {
-	RC_TYPE rc;
+	int rc;
 	struct timeval sv;
 	int svlen = sizeof(sv);
 	char host[NI_MAXHOST];
@@ -96,7 +96,7 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 
 		/*call the super*/
 		rc = ip_initialize(&p_self->super);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
@@ -158,18 +158,18 @@ RC_TYPE tcp_initialize(TCP_SOCKET *p_self, char *msg)
 	}
 	while (0);
 
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		tcp_shutdown(p_self);
 		return rc;
 	}
 
-	return RC_OK;
+	return 0;
 }
 /*
   Disconnect and some other clean up.
 */
-RC_TYPE tcp_shutdown(TCP_SOCKET *p_self)
+int tcp_shutdown(TCP_SOCKET *p_self)
 {
 	if (p_self == NULL)
 	{
@@ -178,7 +178,7 @@ RC_TYPE tcp_shutdown(TCP_SOCKET *p_self)
 
 	if (!p_self->initialized)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	p_self->initialized = FALSE;
@@ -188,7 +188,7 @@ RC_TYPE tcp_shutdown(TCP_SOCKET *p_self)
 
 
 /* send data*/
-RC_TYPE tcp_send(TCP_SOCKET *p_self, const char *p_buf, int len)
+int tcp_send(TCP_SOCKET *p_self, const char *p_buf, int len)
 {
 	if (p_self == NULL)
 	{
@@ -204,7 +204,7 @@ RC_TYPE tcp_send(TCP_SOCKET *p_self, const char *p_buf, int len)
 }
 
 /* receive data*/
-RC_TYPE tcp_recv(TCP_SOCKET *p_self,char *p_buf, int max_recv_len, int *p_recv_len)
+int tcp_recv(TCP_SOCKET *p_self,char *p_buf, int max_recv_len, int *p_recv_len)
 {
 	if (p_self == NULL)
 	{
@@ -220,7 +220,7 @@ RC_TYPE tcp_recv(TCP_SOCKET *p_self,char *p_buf, int max_recv_len, int *p_recv_l
 
 
 /* Accessors*/
-RC_TYPE tcp_set_port(TCP_SOCKET *p_self, int p)
+int tcp_set_port(TCP_SOCKET *p_self, int p)
 {
 	if (p_self == NULL)
 	{
@@ -230,7 +230,7 @@ RC_TYPE tcp_set_port(TCP_SOCKET *p_self, int p)
 	return ip_set_port(&p_self->super, p);
 }
 
-RC_TYPE tcp_set_remote_name(TCP_SOCKET *p_self, const char* p)
+int tcp_set_remote_name(TCP_SOCKET *p_self, const char* p)
 {
 	if (p_self == NULL)
 	{
@@ -240,7 +240,7 @@ RC_TYPE tcp_set_remote_name(TCP_SOCKET *p_self, const char* p)
 	return ip_set_remote_name(&p_self->super, p);
 }
 
-RC_TYPE tcp_set_remote_timeout(TCP_SOCKET *p_self, int p)
+int tcp_set_remote_timeout(TCP_SOCKET *p_self, int p)
 {
 	if (p_self == NULL)
 	{
@@ -250,7 +250,7 @@ RC_TYPE tcp_set_remote_timeout(TCP_SOCKET *p_self, int p)
 	return ip_set_remote_timeout(&p_self->super, p);
 }
 
-RC_TYPE tcp_set_bind_iface(TCP_SOCKET *p_self, char *ifname)
+int tcp_set_bind_iface(TCP_SOCKET *p_self, char *ifname)
 {
 	if (p_self == NULL)
 	{
@@ -260,7 +260,7 @@ RC_TYPE tcp_set_bind_iface(TCP_SOCKET *p_self, char *ifname)
 	return ip_set_bind_iface(&p_self->super, ifname);
 }
 
-RC_TYPE tcp_get_port(TCP_SOCKET *p_self, int *p)
+int tcp_get_port(TCP_SOCKET *p_self, int *p)
 {
 	if (p_self == NULL)
 	{
@@ -270,7 +270,7 @@ RC_TYPE tcp_get_port(TCP_SOCKET *p_self, int *p)
 	return ip_get_port(&p_self->super, p);
 }
 
-RC_TYPE tcp_get_remote_name(TCP_SOCKET *p_self, const char **p)
+int tcp_get_remote_name(TCP_SOCKET *p_self, const char **p)
 {
 	if (p_self == NULL)
 	{
@@ -280,7 +280,7 @@ RC_TYPE tcp_get_remote_name(TCP_SOCKET *p_self, const char **p)
 	return ip_get_remote_name(&p_self->super, p);
 }
 
-RC_TYPE tcp_get_remote_timeout(TCP_SOCKET *p_self, int *p)
+int tcp_get_remote_timeout(TCP_SOCKET *p_self, int *p)
 {
 	if (p_self == NULL)
 	{
@@ -290,7 +290,7 @@ RC_TYPE tcp_get_remote_timeout(TCP_SOCKET *p_self, int *p)
 	return ip_get_remote_timeout(&p_self->super, p);
 }
 
-RC_TYPE tcp_get_bind_iface(TCP_SOCKET *p_self, char **ifname)
+int tcp_get_bind_iface(TCP_SOCKET *p_self, char **ifname)
 {
 	if (p_self == NULL || ifname == NULL)
 	{

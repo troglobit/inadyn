@@ -56,15 +56,15 @@ static int get_req_for_dnsexit_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 static int get_req_for_he_ipv6tb_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt);
 static int get_req_for_changeip_server(DYN_DNS_CLIENT *this, int infcnt, int alcnt);
 
-static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
-static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
+static int is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infcnt);
 
 DYNDNS_SYSTEM_INFO dns_system_table[] =
 {
@@ -198,7 +198,7 @@ DYNDNS_SYSTEM_INFO* get_dyndns_system_table(void)
 }
 
 /*************PRIVATE FUNCTIONS ******************/
-static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
+static int dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 {
 	int counter;
 	DYN_DNS_CMD old_cmd;
@@ -211,7 +211,7 @@ static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 	old_cmd = p_self->cmd;
 	if (old_cmd != NO_CMD)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	counter = p_self->sleep_sec / p_self->cmd_check_period;
@@ -224,13 +224,13 @@ static RC_TYPE dyn_dns_wait_for_cmd(DYN_DNS_CLIENT *p_self)
 		os_sleep_ms(p_self->cmd_check_period * 1000);
 	}
 
-	return RC_OK;
+	return 0;
 }
 
-static RC_TYPE is_http_status_code_ok(int status)
+static int is_http_status_code_ok(int status)
 {
 	if (status == 200)
-		return RC_OK;
+		return 0;
 	else if (status >= 500 && status < 600)
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
@@ -255,7 +255,7 @@ static int get_req_for_dyndns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alc
 
 static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int alcnt)
 {
-	RC_TYPE rc = RC_OK, rc2;
+	int rc = 0, rc2;
 	HTTP_CLIENT http_to_dyndns;
 	HTTP_TRANSACTION http_tr;
 	
@@ -279,14 +279,14 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 
 	do
 	{
-		if ((rc = http_client_construct(&http_to_dyndns)) != RC_OK)
+		if ((rc = http_client_construct(&http_to_dyndns)) != 0)
 			break;
 		
 		http_client_set_port(&http_to_dyndns, p_self->info[infcnt].dyndns_server_name.port);
 		http_client_set_remote_name(&http_to_dyndns, p_self->info[infcnt].dyndns_server_name.name);
 		http_client_set_bind_iface(&http_to_dyndns, p_self->bind_interface);
 	
-		if ((rc = http_client_init(&http_to_dyndns, "Sending update URL query")) != RC_OK)
+		if ((rc = http_client_init(&http_to_dyndns, "Sending update URL query")) != 0)
 			break;
 	
 		snprintf(buffer, sizeof(buffer), "%s|%s",
@@ -312,10 +312,10 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 		
 		http_client_destruct(&http_to_dyndns, 1);
 		
-		if (rc != RC_OK || rc2 != RC_OK)
+		if (rc != 0 || rc2 != 0)
 			break;
 		
-		if ((rc = is_http_status_code_ok(http_tr.status)) != RC_OK)
+		if ((rc = is_http_status_code_ok(http_tr.status)) != 0)
 			break;
 		
 		tmp = buf = strdup(http_tr.p_rsp_body);
@@ -336,7 +336,7 @@ static int get_req_for_freedns_server(DYN_DNS_CLIENT *p_self, int infcnt, int al
 	}
 	while (0);
 	
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		logit(LOG_INFO, "Update URL query failed");
 		return 0;
@@ -493,7 +493,7 @@ static int get_req_for_changeip_server(DYN_DNS_CLIENT *p_self, int infcnt, int a
 /*
 	Get the IP address from interface
 */
-static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
+static int do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 {
 	struct ifreq ifr;
 	in_addr_t new_ip;
@@ -573,7 +573,7 @@ static RC_TYPE do_ip_check_interface(DYN_DNS_CLIENT *p_self)
 		logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt)
@@ -591,9 +591,9 @@ static int get_req_for_ip_server(DYN_DNS_CLIENT *p_self, int infcnt)
 /*
 	Send req to IP server and get the response
 */
-static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
+static int do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	HTTP_CLIENT *p_http;
 	HTTP_TRANSACTION *p_tr;
 
@@ -604,7 +604,7 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
 	p_http = &p_self->http_to_ip_server[servernum];
 
 	rc = http_client_init(p_http, "Checking for IP# change");
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		return rc;
 	}
@@ -639,7 +639,7 @@ static RC_TYPE do_ip_server_transaction(DYN_DNS_CLIENT *p_self, int servernum)
   Note:
   it updates the flag: info->'my_ip_has_changed' if the old address was different
 */
-static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
+static int do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 {
 	int ip1 = 0, ip2 = 0, ip3 = 0, ip4 = 0;
 	int count, i;
@@ -706,7 +706,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
 			logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
 		}
 
-		return RC_OK;
+		return 0;
 	}
 
 	return RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
@@ -721,7 +721,7 @@ static RC_TYPE do_parse_my_ip_address(DYN_DNS_CLIENT *p_self, int servernum)
   Nothing else.
   Note: In the update function the property will set to false if update was successful.
 */
-static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
+static int do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 {
 	int i, j;
 
@@ -744,25 +744,25 @@ static RC_TYPE do_check_alias_update_table(DYN_DNS_CLIENT *p_self)
 		}
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /* DynDNS org.specific response validator.
    'good' or 'nochg' are the good answers,
 */
-static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, "good") != NULL ||
 		strstr(p_rsp, "nochg") != NULL)
-		return RC_OK;
+		return 0;
 	else if (strstr(p_rsp, "dnserr") != NULL ||
 		strstr(p_rsp, "911") != NULL)
 		return RC_DYNDNS_RSP_RETRY_LATER;
@@ -775,16 +775,16 @@ static RC_TYPE is_dyndns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION 
     fail blabla and n.n.n.n
     are the good answers. We search our own IP address in response and that's enough.
 */
-static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	char *p_rsp = p_tr->p_rsp_body;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL)
-		return RC_OK;
+		return 0;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
@@ -793,18 +793,18 @@ static RC_TYPE is_freedns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
     parses a given string. If found is ok,
     Example : 'SUCCESS CODE='
 */
-static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, "OK") != NULL)
-		return RC_OK;
+		return 0;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
@@ -814,13 +814,13 @@ static RC_TYPE is_generic_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
    CODE=200, 201
    CODE=707, for duplicated updates
 */
-static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	int code = -1;
@@ -831,7 +831,7 @@ static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTIO
 		case 201:
 		case 707:
 			// is 707 really ok??
-			return RC_OK;
+			return 0;
 		default:
 			return RC_DYNDNS_RSP_NOTOK;
 	}
@@ -840,18 +840,18 @@ static RC_TYPE is_zoneedit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTIO
 /**
    NOERROR is the OK code here
 */
-static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, "NOERROR") != NULL)
-		return RC_OK;
+		return 0;
 	else if (strstr(p_rsp, "TOOSOON") != NULL)
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
@@ -859,13 +859,13 @@ static RC_TYPE is_easydns_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 }
 
 /* TZO specific response validator. */
-static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	int code = -1;
@@ -874,7 +874,7 @@ static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_
 	switch (code) {
 		case 200:
 		case 304:
-			return RC_OK;
+			return 0;
 		case 414:
 		case 500:
 			return RC_DYNDNS_RSP_RETRY_LATER;
@@ -883,31 +883,31 @@ static RC_TYPE is_tzo_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_
 	}
 }
 
-static RC_TYPE is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_sitelutions_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	char *p_rsp = p_tr->p_rsp_body;
 	(void)infnr;
 	
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, "success") != NULL)
-		return RC_OK;
+		return 0;
 	else if (strstr(p_rsp, "dberror") != NULL)
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
 
-static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	(void)p_self;
 	(void)infnr;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	int code = -1;
@@ -918,7 +918,7 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 	switch (code) {
 		case 0:
 		case 1:
-			return RC_OK;
+			return 0;
 		case 4:
 		case 11:
 			return RC_DYNDNS_RSP_RETRY_LATER;
@@ -930,25 +930,25 @@ static RC_TYPE is_dnsexit_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION
 /* HE ipv6 tunnelbroker specific response validator.
    own IP address and 'already in use' are the good answers.
 */
-static RC_TYPE is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
+static int is_he_ipv6_server_rsp_ok(DYN_DNS_CLIENT *p_self, HTTP_TRANSACTION *p_tr, int infnr)
 {
 	char *p_rsp = p_tr->p_rsp_body;
 
-	RC_TYPE rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != RC_OK)
+	int rc;
+	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
 		return rc;
 
 	if (strstr(p_rsp, p_self->info[infnr].my_ip_address.name) != NULL ||
 		strstr(p_rsp, "-ERROR: This tunnel is already associated with this IP address.") != NULL)
-		return RC_OK;
+		return 0;
 	else
 		return RC_DYNDNS_RSP_NOTOK;
 }
 
-static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
+static int do_update_alias_table(DYN_DNS_CLIENT *p_self)
 {
 	int i, j;
-	RC_TYPE rc = RC_OK, rc2;
+	int rc = 0, rc2;
 	HTTP_TRANSACTION http_tr;
 	int anychange = 0;
 
@@ -964,7 +964,7 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			}
 
 			rc = http_client_init(&p_self->http_to_dyndns[i], "Sending IP# update to DDNS server");
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				break;
 			}
@@ -987,11 +987,11 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 				logit(LOG_DEBUG, "%s", p_self->p_req_buffer);
 			}
 
-			if (rc == RC_OK)
+			if (rc == 0)
 			{
 				rc = info->p_dns_system->p_rsp_ok_func((struct _DYN_DNS_CLIENT*)p_self,
 										&http_tr, i);
-				if (rc == RC_OK)
+				if (rc == 0)
 				{
 					info->alias_info[j].update_required = FALSE;
 
@@ -1017,13 +1017,13 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 			}
 
 			rc2 = http_client_shutdown(&p_self->http_to_dyndns[i]);
-			if (rc == RC_OK)
+			if (rc == 0)
 			{
 				/* Only overwrite rc with of http_client_shutdown() rc if previous call, in
 				 * e.g., http_client_transaction() or the p_rsp_ok_func() callback was OK. */
 				rc = rc2;
 			}
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				break;
 			}
@@ -1058,9 +1058,9 @@ static RC_TYPE do_update_alias_table(DYN_DNS_CLIENT *p_self)
 }
 
 
-RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
+int get_default_config_data(DYN_DNS_CLIENT *p_self)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	int i;
 
 	do
@@ -1097,9 +1097,9 @@ RC_TYPE get_default_config_data(DYN_DNS_CLIENT *p_self)
 }
 
 
-static RC_TYPE get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
+static int get_encoded_user_passwd(DYN_DNS_CLIENT *p_self)
 {
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	const char* format = "%s:%s";
 	char *p_tmp_buff = NULL;
 	int size, actual_len;
@@ -1177,9 +1177,9 @@ void dyn_dns_print_hello(void)
 /**
    basic resource allocations for the dyn_dns object
 */
-RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
+int dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 {
-	RC_TYPE rc;
+	int rc;
 	DYN_DNS_CLIENT *p_self;
 	BOOL http_to_dyndns_constructed = FALSE;
 	BOOL http_to_ip_constructed = FALSE;
@@ -1223,7 +1223,7 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 		while (i < DYNDNS_MAX_SERVER_NUMBER)
 		{
 			rc = http_client_construct(&p_self->http_to_ip_server[i++]);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				rc = RC_OUT_OF_MEMORY;
 				break;
@@ -1235,7 +1235,7 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 		while (i < DYNDNS_MAX_SERVER_NUMBER)
 		{
 			rc = http_client_construct(&p_self->http_to_dyndns[i++]);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				rc = RC_OUT_OF_MEMORY;
 				break;
@@ -1257,7 +1257,7 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 	}
 	while (0);
 
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 
 		free(*pp_self);
@@ -1276,21 +1276,21 @@ RC_TYPE dyn_dns_construct(DYN_DNS_CLIENT **pp_self)
 		}
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 
 /**
    Resource free.
 */
-RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
+int dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 {
 	int i;
-	RC_TYPE rc;
+	int rc;
 
 	if (p_self == NULL)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	if (p_self->initialized == TRUE)
@@ -1299,13 +1299,13 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 	}
 
 	rc = http_client_destruct(p_self->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		/* XXX */
 	}
 
 	rc = http_client_destruct(p_self->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
-	if (rc != RC_OK)
+	if (rc != 0)
 	{
 		/* XXX */
 	}
@@ -1352,7 +1352,7 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
 	free(p_self);
 	p_self = NULL;
 
-	return RC_OK;
+	return 0;
 }
 
 /**
@@ -1361,7 +1361,7 @@ RC_TYPE dyn_dns_destruct(DYN_DNS_CLIENT *p_self)
    - if proxy server is set use it!
    - ...
 */
-RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
+int dyn_dns_init(DYN_DNS_CLIENT *p_self)
 {
 	int i = 0;
 
@@ -1372,7 +1372,7 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 
 	if (p_self->initialized == TRUE)
 	{
-		return RC_OK;
+		return 0;
 	}
 
 	p_self->abort_on_network_errors = FALSE;
@@ -1416,13 +1416,13 @@ RC_TYPE dyn_dns_init(DYN_DNS_CLIENT *p_self)
 
 	p_self->initialized = TRUE;
 
-	return RC_OK;
+	return 0;
 }
 
 /**
    Disconnect and some other clean up.
 */
-RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self)
+int dyn_dns_shutdown(DYN_DNS_CLIENT *p_self)
 {
 	if (p_self == NULL)
 	{
@@ -1431,10 +1431,10 @@ RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self)
 
 	if (p_self->initialized == FALSE)
 	{
-		return RC_OK;
+		return 0;
 	}
 
-	return RC_OK;
+	return 0;
 }
 
 /** the real action:
@@ -1447,11 +1447,11 @@ RC_TYPE dyn_dns_shutdown(DYN_DNS_CLIENT *p_self)
     - get the current DYN DNS address from DYN DNS server
     - compare and update if neccessary
 */
-RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
+int dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 {
 	int servernum = 0; /* server to use for requesting IP */
 		     /*use server 0 by default, should be always exist */
-	RC_TYPE rc;
+	int rc;
 
 	if (p_self == NULL)
 	{
@@ -1463,7 +1463,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		if (p_self->check_interface)
 		{
 			rc = do_ip_check_interface(p_self);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				break;
 			}
@@ -1472,7 +1472,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		{
 			/* Ask IP server something so he will respond and give me my IP */
 			rc = do_ip_server_transaction(p_self, servernum);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				break;
 			}
@@ -1484,7 +1484,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 	
 			/* Extract our IP, check if different than previous one */
 			rc = do_parse_my_ip_address(p_self, servernum);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				break;
 			}
@@ -1496,14 +1496,14 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 		}
 		/* Step through aliases list, resolve them and check if they point to my IP */
 		rc = do_check_alias_update_table(p_self);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
 
 		/* Update IPs marked as not identical with my IP */
 		rc = do_update_alias_table(p_self);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			break;
 		}
@@ -1524,7 +1524,7 @@ RC_TYPE dyn_dns_update_ip(DYN_DNS_CLIENT *p_self)
 int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 {
 	FILE *fp;
-	RC_TYPE rc = RC_OK;
+	int rc = 0;
 	int i, s;
 	char name[DYNDNS_SERVER_NAME_LENGTH];
 
@@ -1538,7 +1538,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 	/* read cmd line options and set object properties */
 	rc = get_config_data(p_dyndns, argc, argv);
-	if (rc != RC_OK || p_dyndns->abort)
+	if (rc != 0 || p_dyndns->abort)
 	{
 		return rc;
 	}
@@ -1551,7 +1551,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		os_usr_info.gid = p_dyndns->sys_usr_info.gid;
 		os_usr_info.uid = p_dyndns->sys_usr_info.uid;
 		rc = os_change_persona(&os_usr_info);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			return rc;
 		}
@@ -1561,7 +1561,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	if (strlen(p_dyndns->dbg.p_logfilename) != 0)
 	{
 		rc = os_open_dbg_output(DBG_FILE_LOG, "", p_dyndns->dbg.p_logfilename);
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			return rc;
 		}
@@ -1572,7 +1572,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
 		{
 			rc = os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				return rc;
 			}
@@ -1583,7 +1583,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	if (p_dyndns->run_in_background == TRUE)
 	{
 		rc = close_console_window();
-		if (rc != RC_OK)
+		if (rc != 0)
 		{
 			return rc;
 		}
@@ -1695,11 +1695,11 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	do
 	{
 		rc = dyn_dns_init(p_dyndns);
-		if (rc != RC_OK)
+		if (rc != 0)
 			break;
 
 		rc = get_encoded_user_passwd(p_dyndns);
-		if (rc != RC_OK)
+		if (rc != 0)
 			break;
 
 		if (p_dyndns->update_once == TRUE)
@@ -1709,7 +1709,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 		while (1)
 		{
 			rc = dyn_dns_update_ip(p_dyndns);
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				if (p_dyndns->cmd == CMD_RESTART)
 				{
@@ -1743,7 +1743,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 
 			p_dyndns->sleep_sec = rc == RC_DYNDNS_RSP_RETRY_LATER ? p_dyndns->error_update_period_sec : p_dyndns->normal_update_period_sec;
 
-			if (rc != RC_OK)
+			if (rc != 0)
 			{
 				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 
 				 * Time to inform the user the (network) error is not fatal and that we
@@ -1757,7 +1757,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 			if (p_dyndns->cmd == CMD_STOP)
 			{
 				logit(LOG_DEBUG, "STOP command received, exiting.");
-				rc = RC_OK;
+				rc = 0;
 				break;
 			}
 			if (p_dyndns->cmd == CMD_RESTART)
@@ -1783,7 +1783,7 @@ int dyn_dns_main(DYN_DNS_CLIENT *p_dyndns, int argc, char* argv[])
 	while (0);
 
 	/* if everything ok here we should exit. End of program */
-	if (rc == RC_OK)
+	if (rc == 0)
 	{
 	    rc = dyn_dns_shutdown(p_dyndns);
 	}

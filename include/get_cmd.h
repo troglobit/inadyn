@@ -36,7 +36,7 @@ typedef struct
     char **argv;
 } CMD_DATA;
 
-typedef RC_TYPE (*CMD_OPTION_HANDLER_FUNC)(CMD_DATA *p_cmd, int current_nr, void *p_context);
+typedef int (*CMD_OPTION_HANDLER_FUNC)(CMD_DATA *p_cmd, int current_nr, void *p_context);
 typedef struct
 {
 	CMD_OPTION_HANDLER_FUNC p_func;
@@ -66,10 +66,10 @@ typedef struct
 		checks the number of arguments left
 		calls the user handler with the pointer to the correct arguments
 */
-RC_TYPE get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr);
+int get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr);
 
 /** Adds a new option (string) to the command line
 */
-RC_TYPE cmd_add_val(CMD_DATA *p_cmd, char *p_val);
+int cmd_add_val(CMD_DATA *p_cmd, char *p_val);
 
 #endif /*_GET_CMD_IF_INCLUDED*/

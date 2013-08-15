@@ -60,42 +60,42 @@ typedef struct
 /*
 	 basic resource allocations for the  object
 */
-RC_TYPE ip_construct(IP_SOCKET *p_self);
+int ip_construct(IP_SOCKET *p_self);
 
 /*
 	Resource free .
 */
-RC_TYPE ip_destruct(IP_SOCKET *p_self);
+int ip_destruct(IP_SOCKET *p_self);
 
 /*
 	Sets up the object.
 
 	- ...
 */
-RC_TYPE ip_initialize(IP_SOCKET *p_self);
+int ip_initialize(IP_SOCKET *p_self);
 
 /*
 	Disconnect and some other clean up.
 */
-RC_TYPE ip_shutdown(IP_SOCKET *p_self);
+int ip_shutdown(IP_SOCKET *p_self);
 
 /* send data*/
-RC_TYPE ip_send(IP_SOCKET *p_self, const char *p_buf, int len);
+int ip_send(IP_SOCKET *p_self, const char *p_buf, int len);
 
 /* receive data*/
-RC_TYPE ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
+int ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
 
 
 /*Accessors */
-RC_TYPE ip_set_port(IP_SOCKET *p_self, int p);
-RC_TYPE ip_set_remote_name(IP_SOCKET *p_self, const char *p);
-RC_TYPE ip_set_remote_timeout(IP_SOCKET *p_self, int t);
-RC_TYPE ip_set_bind_iface(IP_SOCKET *p_self, char *ifname);
+int ip_set_port(IP_SOCKET *p_self, int p);
+int ip_set_remote_name(IP_SOCKET *p_self, const char *p);
+int ip_set_remote_timeout(IP_SOCKET *p_self, int t);
+int ip_set_bind_iface(IP_SOCKET *p_self, char *ifname);
 
-RC_TYPE ip_get_port(IP_SOCKET *p_self, int *p_port);
-RC_TYPE ip_get_remote_name(IP_SOCKET *p_self, const char **p);
-RC_TYPE ip_get_remote_timeout(IP_SOCKET *p_self, int *p);
-RC_TYPE ip_get_bind_iface(IP_SOCKET *p_self, char **ifname);
+int ip_get_port(IP_SOCKET *p_self, int *p_port);
+int ip_get_remote_name(IP_SOCKET *p_self, const char **p);
+int ip_get_remote_timeout(IP_SOCKET *p_self, int *p);
+int ip_get_bind_iface(IP_SOCKET *p_self, char **ifname);
 
 #endif /*_IP_H_INCLUDED*/
 

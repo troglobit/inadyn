@@ -21,7 +21,7 @@
 
 typedef struct
 {
-	RC_TYPE rc;
+	int rc;
 	const char *p_name;
 } ERROR_NAME;
 
@@ -75,17 +75,15 @@ static const ERROR_NAME global_error_table[]  =
 
 static const char *unknown_error = "Unknown error";
 
-const char *errorcode_get_name(RC_TYPE rc)
+const char *errorcode_get_name(int rc)
 {
 	const ERROR_NAME *it = global_error_table;
 
-	while (it->p_name != NULL)
+	while (it->p_name)
 	{
 		if (it->rc == rc)
-		{
 			return it->p_name;
-		}
-		++it;
+		it++;
 	}
 
 	return unknown_error;
