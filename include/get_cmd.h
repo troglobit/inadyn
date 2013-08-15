@@ -32,44 +32,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errorcode.h"
 typedef struct
 {
-    int argc;
-    char **argv;
-} CMD_DATA;
+        int            argc;
+        char         **argv;
+} cmd_data_t;
 
-typedef int (*CMD_OPTION_HANDLER_FUNC)(CMD_DATA *p_cmd, int current_nr, void *p_context);
-typedef struct
-{
-	CMD_OPTION_HANDLER_FUNC p_func;
-	void *p_context;
-} CMD_OPTION_HANDLER_TYPE;
-
+typedef int (*cmd_func_t)(cmd_data_t *cmd, int no, void *context);
 
 typedef struct
 {
-	char *p_option;
-	int arg_nr;
-	CMD_OPTION_HANDLER_TYPE p_handler;
-	char *p_description;
-} CMD_DESCRIPTION_TYPE;
+	cmd_func_t     func;
+	void          *context;
+} cmd_handler_t;
 
+typedef struct
+{
+	char          *option;
+	int            argno;
+	cmd_handler_t  handler;
+	char          *description;
+} cmd_desc_t;
 
-
-
-/*
-	Parses the incoming argv list data.
-	Arguments:
-		argv, argc,
-		cmd description
-
-	Action:
-		performs a match for every p_option string in the CMD description.
-		checks the number of arguments left
-		calls the user handler with the pointer to the correct arguments
-*/
-int get_cmd_parse_data(char **argv, int argc, CMD_DESCRIPTION_TYPE *p_cmd_descr);
-
-/** Adds a new option (string) to the command line
-*/
-int cmd_add_val(CMD_DATA *p_cmd, char *p_val);
+int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc);
+int cmd_add_val(cmd_data_t *cmd, char *val);
 
 #endif /*_GET_CMD_IF_INCLUDED*/
+

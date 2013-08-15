@@ -1,4 +1,4 @@
-/* Interface for main ddns functions
+/* Interface for main DDNS functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006  Steve Horbachuk
@@ -30,9 +30,10 @@
 #define DYNDNS_AGENT_NAME	"inadyn/" VERSION_STRING
 #define DYNDNS_EMAIL_ADDR	"troglobit@gmail.com"
 
-typedef enum
+/* DDNS system ID's */
+enum
 {
-	DYNDNS_DEFAULT,
+	DYNDNS_DEFAULT = 0,
 	FREEDNS_AFRAID_ORG_DEFAULT,
 	ZONE_EDIT_DEFAULT,
 	CUSTOM_HTTP_BASIC_AUTH,
@@ -48,9 +49,9 @@ typedef enum
 	CHANGEIP_DEFAULT,
 	DYNSIP_DEFAULT,
 	LAST_DNS_SYSTEM = -1
-} DYNDNS_SYSTEM_ID;
+};
 
-/*test values*/
+/* Test values */
 #define DYNDNS_DEFAULT_DEBUG_LEVEL	1
 #define DYNDNS_DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DYNDNS_RUNTIME_DATA_DIR		"/var/run/inadyn"
@@ -61,7 +62,7 @@ typedef enum
 #define DYNDNS_MY_IP_SERVER		"checkip.dyndns.org"
 #define DYNDNS_MY_IP_SERVER_URL		"/"
 
-/*REQ/RSP definitions*/
+/* REQ/RSP definitions */
 
 #define DYNDNS_DEFAULT_DNS_SYSTEM	DYNDNS_DEFAULT
 
@@ -105,7 +106,7 @@ typedef enum
 /** generic update format for sites that perform the update
 	with:
 	http://some.address.domain/somesubdir
-	?some_param_name=MY_ALIAS
+	?some_param_name=ALIAS
 	and then the normal http stuff and basic base64 encoded auth.
 	The parameter here is the entire request but NOT including the alias.
 */
@@ -208,38 +209,35 @@ typedef enum
 #define DYNDNS_MAX_SERVER_NUMBER		5  /* maximum number of servers that can be maintained */
 
 /* local configs */
-#define DYNDNS_MY_IP_ADDRESS_LENGTH		20  /* chars */
-#define DYNDNS_MY_USERNAME_LENGTH		50  /* chars */
-#define DYNDNS_MY_PASSWORD_LENGTH		50  /* chars */
-#define DYNDNS_SERVER_NAME_LENGTH		256 /* chars */
-#define DYNDNS_SERVER_URL_LENGTH		256 /* chars */
-#define IP_V4_MAX_LENGTH			16  /* chars: nnn.nnn.nnn.nnn\0 */
+#define DYNDNS_IP_ADDRESS_LEN		20  /* chars */
+#define DYNDNS_USERNAME_LEN		50  /* chars */
+#define DYNDNS_PASSWORD_LEN		50  /* chars */
+#define DYNDNS_SERVER_NAME_LEN		256 /* chars */
+#define DYNDNS_SERVER_URL_LEN		256 /* chars */
+#define IP_V4_MAX_LEN			16  /* chars: nnn.nnn.nnn.nnn\0 */
 
-
-/* typedefs */
-struct _DYN_DNS_CLIENT;
-struct DYNDNS_SYSTEM;
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
-typedef int (*DNS_SYSTEM_REQUEST_FUNC)(struct _DYN_DNS_CLIENT *this, int infnr, int alnr);
-typedef int (*DNS_SYSTEM_SRV_RESPONSE_OK_FUNC)(struct _DYN_DNS_CLIENT *this, HTTP_TRANSACTION *p_tr, int infnr);
-typedef struct
-{
-	const char* p_key;
-	DNS_SYSTEM_SRV_RESPONSE_OK_FUNC p_rsp_ok_func;
-	DNS_SYSTEM_REQUEST_FUNC p_dns_update_req_func;
-	const char *p_ip_server_name;
-	const char *p_ip_server_url;
-	const char *p_dyndns_server_name;
-	const char *p_dyndns_server_url;
-} DYNDNS_SYSTEM;
+typedef int (*ddns_request_func_t)(void *this, int infnr, int alnr);
+typedef int (*ddns_response_ok_func_t)(void *this, http_trans_t *p_tr, int infnr);
 
 typedef struct
 {
-	DYNDNS_SYSTEM_ID id;
-	DYNDNS_SYSTEM system;
-} DYNDNS_SYSTEM_INFO;
+	const char              *key;
+	ddns_response_ok_func_t  response_ok_func;
+	ddns_request_func_t      update_request_func;
+	const char              *ip_server_name;
+	const char              *ip_server_url;
+	const char              *ddns_server_name;
+	const char              *ddns_server_url;
+} ddns_system_t;
+
+typedef struct
+{
+	int            id;
+	ddns_system_t system;
+} ddns_sysinfo_t;
 
 typedef enum
 {
@@ -247,180 +245,115 @@ typedef enum
 	CMD_STOP,
 	CMD_RESTART,
 	CMD_FORCED_UPDATE
-} DYN_DNS_CMD;
+} ddns_cmd_t;
 
 typedef struct
 {
-	char my_username[DYNDNS_MY_USERNAME_LENGTH];
-	char my_password[DYNDNS_MY_PASSWORD_LENGTH];
-	char *p_enc_usr_passwd_buffer;
+	char username[DYNDNS_USERNAME_LEN];
+	char password[DYNDNS_PASSWORD_LEN];
+	char *encoded_password;
 	int size;
-	BOOL encoded;
-} DYNDNS_CREDENTIALS;
+	int encoded;
+} ddns_creds_t;
 
 typedef struct
 {
-	char name[DYNDNS_SERVER_NAME_LENGTH];
+	char name[DYNDNS_SERVER_NAME_LEN];
 	int port;
-} DYNDNS_SERVER_NAME;
+} ddns_server_name_t;
 
 
 typedef struct
 {
-	DYNDNS_SERVER_NAME names;
+	ddns_server_name_t names;
 	int update_required;
-} DYNDNS_ALIAS_INFO;
+} ddns_alias_t;
 
 typedef struct
 {
-	BOOL                my_ip_has_changed;
-	DYNDNS_SERVER_NAME  my_ip_address;
-	DYNDNS_CREDENTIALS  credentials;
-	DYNDNS_SYSTEM      *p_dns_system;
-	DYNDNS_SERVER_NAME  dyndns_server_name; /* Address of DDNS update service */
-	char                dyndns_server_url[DYNDNS_SERVER_URL_LENGTH];
-	DYNDNS_SERVER_NAME  ip_server_name;     /* Address of "What's my IP" checker */
-	char                ip_server_url[DYNDNS_SERVER_URL_LENGTH];
-	DYNDNS_SERVER_NAME  proxy_server_name;
-	DYNDNS_ALIAS_INFO   alias_info[DYNDNS_MAX_ALIAS_NUMBER];
+	int                 ip_has_changed;
+	ddns_server_name_t  my_ip_address;
+
+	ddns_creds_t        creds;
+	ddns_system_t      *system;
+
+	ddns_server_name_t  dyndns_server_name; /* Address of DDNS update service */
+	char                dyndns_server_url[DYNDNS_SERVER_URL_LEN];
+
+	ddns_server_name_t  ip_server_name;     /* Address of "What's my IP" checker */
+	char                ip_server_url[DYNDNS_SERVER_URL_LEN];
+
+	ddns_server_name_t  proxy_server_name;
+
+	ddns_alias_t        alias[DYNDNS_MAX_ALIAS_NUMBER];
 	int                 alias_count;
-	BOOL wildcard;
-} DYNDNS_INFO_TYPE;
+
+	int                 wildcard;
+} ddns_info_t;
 
 typedef struct
 {
 	uid_t uid;
 	gid_t gid;
-} USER_INFO;
+} ddns_user_t;
 
-typedef struct DYN_DNS_CLIENT
+/* Client context */
+typedef struct
 {
-	char *cfgfile;
-	char *pidfile;
-	char *external_command;
+	char          *cfgfile;
+	char          *pidfile;
+	char          *external_command;
 
-	DYN_DNS_CMD  cmd;
-	int          startup_delay_sec;
-	int          sleep_sec; /* time between 2 updates*/
-	int          normal_update_period_sec;
-	int          error_update_period_sec;
-	int          forced_update_period_sec;
-	int          time_since_last_update;
-	int          cmd_check_period; /*time to wait for a command*/
-	int          total_iterations;
-	int          num_iterations;
-	char        *cache_file;
-	char        *bind_interface;
-	char        *check_interface;
-	BOOL         initialized;
-	BOOL         run_in_background;
-	BOOL         debug_to_syslog;
-	BOOL         change_persona;
-	BOOL         update_once;
+	ddns_dbg_t     dbg;
 
-	HTTP_CLIENT       http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
-	HTTP_CLIENT       http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
-	HTTP_TRANSACTION  http_tr;
-	char             *p_work_buffer; /* for HTTP responses*/
-	int               work_buffer_size;
-	char             *p_req_buffer; /* for HTTP requests*/
-	int               req_buffer_size;
+	ddns_cmd_t     cmd;
+	int            startup_delay_sec;
+	int            sleep_sec; /* time between 2 updates*/
+	int            normal_update_period_sec;
+	int            error_update_period_sec;
+	int            forced_update_period_sec;
+	int            time_since_last_update;
+	int            cmd_check_period; /*time to wait for a command*/
+	int            total_iterations;
+	int            num_iterations;
+	char          *cache_file;
+	char          *bind_interface;
+	char          *check_interface;
+	int            initialized;
+	int            run_in_background;
+	int            debug_to_syslog;
+	int            change_persona;
+	int            update_once;
+	int            force_addr_update;
+	int            use_proxy;
+	int            abort;
 
-	USER_INFO         sys_usr_info; /* info about the current account running inadyn */
-	DYNDNS_INFO_TYPE  info[DYNDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
-	int               info_count;
+	http_client_t  http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
+	http_client_t  http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
+	http_trans_t   http_transaction;
+	char          *work_buf; /* for HTTP responses*/
+	int            work_buflen;
+	char          *request_buf; /* for HTTP requests*/
+	int            request_buflen;
 
-	BOOL abort_on_network_errors;
-	BOOL force_addr_update;
-	BOOL use_proxy;
-	BOOL abort;
+	ddns_user_t    sys_usr_info; /* info about the current account running inadyn */
+	ddns_info_t    info[DYNDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
+	int            info_count;
+} ddns_t;
 
-	DBG_TYPE dbg;
-} DYN_DNS_CLIENT;
-/*public functions*/
-/** Returns the table of supported dyndns systems
-*/
-DYNDNS_SYSTEM_INFO* get_dyndns_system_table(void);
+ddns_sysinfo_t *ddns_system_table (void);
+int ddns_default_config_data(ddns_t *ctx);
 
-/**
- *  Returns the default DYNDNS client config data.
-*/
-int get_default_config_data(DYN_DNS_CLIENT *p_self);
+int  dyn_dns_init(ddns_t *p_self);
+int  dyn_dns_shutdown(ddns_t *p_self);
+int  dyn_dns_update_ip(ddns_t *p_self);
+int  dyn_dns_main(ddns_t *p_self, int argc, char* argv[]);
 
-/*
-	Set up all details:
-		- ip server name
-		- dns server name
-		- username, passwd
-		- ...
-	Implementation:
-		- load defaults
-		- parse cmd line
-	- assign settings that may change due to cmd line options
-		- check data
-*/
-int get_config_data(DYN_DNS_CLIENT *p_self, int argc, char** argv);
+int   get_config_data(ddns_t *p_self, int argc, char** argv);
 
-/*
-	printout of version
-*/
-void dyn_dns_print_hello(void);
-
-/*
-	 basic resource allocations for the dyn_dns object
-*/
-int dyn_dns_construct(DYN_DNS_CLIENT **pp_self);
-
-/*
-	Resource free.
-*/
-int dyn_dns_destruct(DYN_DNS_CLIENT *p_self);
-
-/*
-	Sets up the object.
-	- sets the IPs of the DYN DNS server
-	- ...
-*/
-int dyn_dns_init(DYN_DNS_CLIENT *p_self);
-
-/*
-	Disconnect and some other clean up.
-*/
-int dyn_dns_shutdown(DYN_DNS_CLIENT *p_self);
-
-
-
-/* the real action:
-	- detect current IP
-		- connect to an HTTP server
-		- parse the response for IP addr
-
-	- for all the names that have to be maintained
-		- get the current DYN DNS address from DYN DNS server
-		- compare and update if neccessary
-*/
-int dyn_dns_update_ip(DYN_DNS_CLIENT *p_self);
-
-/* MAIN - Dyn DNS update entry point.*/
-
-/*
-	Actions:
-		- read the configuration options
-		- create and init dyn_dns object.
-		- launch the IP update action
-*/
-int dyn_dns_main(DYN_DNS_CLIENT *p_self, int argc, char* argv[]);
-
-
-/*
-	help.
-*/
 void print_help_page(void);
-
-/*
-    main entry point
-*/
 int inadyn_main(int argc, char* argv[]);
+int os_change_persona(ddns_user_t *user);
 
 #endif /*_DYNDNS_INCLUDED*/
 

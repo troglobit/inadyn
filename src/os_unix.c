@@ -28,6 +28,9 @@
 
 #include "debug_if.h"
 
+/* storage for the parameter needed by the handler */
+static void *param = NULL;
+
 void os_sleep_ms(int ms)
 {
     usleep(ms*1000);
@@ -48,7 +51,7 @@ int os_ip_support_cleanup(void)
     return 0;
 }
 
-int os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
+int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 {
 	int rc = 0;
 	int child;
@@ -61,7 +64,7 @@ int os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
 			setenv("INADYN_HOSTNAME", hostname, 1);
 			if (iface)
 				setenv("INADYN_IFACE", iface, 1);
-			execl("/bin/sh", "sh", "-c", p_cmd, (char *) 0);
+			execl("/bin/sh", "sh", "-c", cmd, (char *) 0);
 			exit(1);
 			break;
 
@@ -76,9 +79,6 @@ int os_shell_execute(char *p_cmd, char *ip, char *hostname, char *iface)
 	return rc;
 }
 
-/* storage for the parameter needed by the handler */
-static void *global_p_signal_handler_param = NULL;
-
 /**
  * unix_signal_handler - The actual handler
  * @signo: Signal number
@@ -92,9 +92,9 @@ static void *global_p_signal_handler_param = NULL;
  */
 static void unix_signal_handler(int signo)
 {
-	DYN_DNS_CLIENT *p_self = (DYN_DNS_CLIENT *)global_p_signal_handler_param;
+	ddns_t *ctx = (ddns_t *)param;
 
-	if (p_self == NULL)
+	if (ctx == NULL)
 	{
 //		logit(LOG_WARNING, "Signal %d received. But handler is not installed correctly.", signo);
 		return;
@@ -104,7 +104,7 @@ static void unix_signal_handler(int signo)
 	{
 		case SIGHUP:
 //			logit(LOG_DEBUG, "Signal %d received. Sending restart command.", signo);
-			p_self->cmd = CMD_RESTART;
+			ctx->cmd = CMD_RESTART;
 			break;
 
 		case SIGINT:
@@ -112,12 +112,12 @@ static void unix_signal_handler(int signo)
 		case SIGALRM:
 		case SIGTERM:
 //			logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
-			p_self->cmd = CMD_STOP;
+			ctx->cmd = CMD_STOP;
 			break;
 
 		case SIGUSR1:
 //			logit(LOG_DEBUG, "Signal %d received. Sending forced update command.", signo);
-			p_self->cmd = CMD_FORCED_UPDATE;
+			ctx->cmd = CMD_FORCED_UPDATE;
 			break;
 
 		default:
@@ -132,7 +132,7 @@ static void unix_signal_handler(int signo)
 	avoid receiving HUP, INT, QUIT during ALRM and TERM.
 
 */
-int os_install_signal_handler(void *p_dyndns)
+int os_install_signal_handler(void *context)
 {
 	int rc;
 	struct sigaction    newact;
@@ -155,9 +155,7 @@ int os_install_signal_handler(void *p_dyndns)
 		sigaction(SIGTERM, &newact, NULL);
 
  	if (rc == 0)
- 	{
-		global_p_signal_handler_param = p_dyndns;
-	}
+		param = context;
 
 	return rc;
 }
@@ -195,10 +193,10 @@ int close_console_window(void)
 	fclose(stdin);
 	fclose(stderr);
 	setsid();
+
 	if (-1 == chdir("/"))
-	{
 		logit(LOG_WARNING, "Failed changing cwd to /: %s", strerror(errno));
-	}
+
 	umask(0);
 
 	return 0;
@@ -209,15 +207,9 @@ int close_console_window(void)
     return 0;		/* Never reached. */
 }
 
-/* MAIN - Dyn DNS update entry point.*/
-int main(int argc, char* argv[])
+int os_syslog_open(const char *name)
 {
-    return inadyn_main(argc, argv);
-}
-
-int os_syslog_open(const char *p_prg_name)
-{
-    openlog(p_prg_name, LOG_PID, LOG_USER);
+    openlog(name, LOG_PID, LOG_USER);
     return 0;
 }
 
@@ -227,26 +219,22 @@ int os_syslog_close(void)
     return 0;
 }
 
-int os_change_persona(OS_USER_INFO *p_usr_info)
+int os_change_persona(ddns_user_t *user)
 {
 	int rc;
 
 	do
 	{
-		if (p_usr_info->gid != getgid())
+		if (user->gid != getgid())
 		{
-			if ((rc = setgid(p_usr_info->gid)) != 0)
-			{
+			if ((rc = setgid(user->gid)) != 0)
 				break;
-			}
 		}
 
-		if (p_usr_info->uid != getuid())
+		if (user->uid != getuid())
 		{
-			if ((rc = setuid(p_usr_info->uid)) != 0)
-			{
+			if ((rc = setuid(user->uid)) != 0)
 				break;
-			}
 		}
 	}
 	while(0);

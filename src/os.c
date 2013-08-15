@@ -32,18 +32,18 @@
     DBG_SYS_LOG for SysLog
     DBG_STD_LOG for standard console
 */
-static DBG_DEST global_mod_dbg_dest = DBG_STD_LOG;
+static int global_mod_dbg_dest = DBG_STD_LOG;
 /**
     Returns the dbg destination.
     DBG_SYS_LOG for SysLog
     DBG_STD_LOG for standard console
 */
-DBG_DEST get_dbg_dest(void)
+int get_dbg_dest(void)
 {
     return global_mod_dbg_dest;
 }
 
-void set_dbg_dest(DBG_DEST dest)
+void set_dbg_dest(int dest)
 {
     global_mod_dbg_dest = dest;
 }
@@ -103,36 +103,36 @@ void os_printf(int prio, char *fmt, ... )
  * TODO:
  *  some simple solution that involves storing the dbg output device name (and filename)
  */
-int os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logfile_name)
+int os_open_dbg_output(int dest, const char *name, const char *logfile)
 {
     int rc = 0;
+    FILE *pF;
+
     set_dbg_dest(dest);
 
     switch (get_dbg_dest())
     {
     case DBG_SYS_LOG:
-	if (p_prg_name == NULL)
+	if (name == NULL)
 	{
 	    rc = RC_INVALID_POINTER;
 	    break;
 	}
-	rc = os_syslog_open(p_prg_name);
+	rc = os_syslog_open(name);
 	break;
 
     case DBG_FILE_LOG:
-	if (p_logfile_name == NULL)
+	if (logfile == NULL)
 	{
 	    rc = RC_INVALID_POINTER;
 	    break;
 	}
-	{
-	    FILE *pF = freopen(p_logfile_name, "ab", stdout);
-	    if (pF == NULL)
-	    {
+
+        pF = freopen(logfile, "ab", stdout);
+        if (pF == NULL)
 		rc = RC_FILE_IO_OPEN_ERROR;
-	    }
-	    break;
-	}
+        break;
+
     case DBG_STD_LOG:
     default:
 	rc = 0;
@@ -146,6 +146,7 @@ int os_open_dbg_output(DBG_DEST dest, const char *p_prg_name, const char *p_logf
 int os_close_dbg_output(void)
 {
     int rc = 0;
+
     switch (get_dbg_dest())
     {
     case DBG_SYS_LOG:
@@ -161,5 +162,6 @@ int os_close_dbg_output(void)
     default:
 	rc = 0;
     }
+
     return rc;
 }

@@ -30,20 +30,11 @@ typedef struct
 	int verbose;
 	char p_logfilename[1024];
 	FILE *p_file;
-} DBG_TYPE;
+} ddns_dbg_t;
 
 
-/**
-    Returns the dbg destination.
-    DBG_SYS_LOG for SysLog
-    DBG_STD_LOG for standard console
-*/
-DBG_DEST get_dbg_dest(void);
-void set_dbg_dest(DBG_DEST dest);
-
-/**
-    A printf function that may print to syslog if that is activated.
-*/
+int  get_dbg_dest(void);
+void set_dbg_dest(int dest);
 void os_printf(int prio, char *fmt, ... );
 
 #ifndef DBG_PRINT_DISABLED

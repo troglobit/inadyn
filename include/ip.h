@@ -30,21 +30,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define IP_DEFAULT_READ_CHUNK_SIZE	100
 
 /* typedefs */
-typedef enum
+enum
 {
 	TYPE_TCP = 0,
 	TYPE_UDP
-} IP_TYPES;
+};
 
 typedef struct
 {
-	BOOL initialized;
+	int initialized;
 
 	char *ifname;
-	BOOL bound;             /* When bound to an interface */
+	int bound;             /* When bound to an interface */
 
 	int type;
-	SOCKET socket;
+	int socket;
 	struct sockaddr_in local_addr;
 	struct sockaddr remote_addr;
 	socklen_t remote_len;
@@ -52,7 +52,7 @@ typedef struct
 
 	unsigned short port;
 	int timeout;
-} IP_SOCKET;
+} ip_sock_t;
 
 
 /*public functions*/
@@ -60,42 +60,42 @@ typedef struct
 /*
 	 basic resource allocations for the  object
 */
-int ip_construct(IP_SOCKET *p_self);
+int ip_construct(ip_sock_t *p_self);
 
 /*
 	Resource free .
 */
-int ip_destruct(IP_SOCKET *p_self);
+int ip_destruct(ip_sock_t *p_self);
 
 /*
 	Sets up the object.
 
 	- ...
 */
-int ip_initialize(IP_SOCKET *p_self);
+int ip_initialize(ip_sock_t *p_self);
 
 /*
 	Disconnect and some other clean up.
 */
-int ip_shutdown(IP_SOCKET *p_self);
+int ip_shutdown(ip_sock_t *p_self);
 
 /* send data*/
-int ip_send(IP_SOCKET *p_self, const char *p_buf, int len);
+int ip_send(ip_sock_t *p_self, const char *p_buf, int len);
 
 /* receive data*/
-int ip_recv(IP_SOCKET *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
+int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
 
 
 /*Accessors */
-int ip_set_port(IP_SOCKET *p_self, int p);
-int ip_set_remote_name(IP_SOCKET *p_self, const char *p);
-int ip_set_remote_timeout(IP_SOCKET *p_self, int t);
-int ip_set_bind_iface(IP_SOCKET *p_self, char *ifname);
+int ip_set_port(ip_sock_t *p_self, int p);
+int ip_set_remote_name(ip_sock_t *p_self, const char *p);
+int ip_set_remote_timeout(ip_sock_t *p_self, int t);
+int ip_set_bind_iface(ip_sock_t *p_self, char *ifname);
 
-int ip_get_port(IP_SOCKET *p_self, int *p_port);
-int ip_get_remote_name(IP_SOCKET *p_self, const char **p);
-int ip_get_remote_timeout(IP_SOCKET *p_self, int *p);
-int ip_get_bind_iface(IP_SOCKET *p_self, char **ifname);
+int ip_get_port(ip_sock_t *p_self, int *p_port);
+int ip_get_remote_name(ip_sock_t *p_self, const char **p);
+int ip_get_remote_timeout(ip_sock_t *p_self, int *p);
+int ip_get_bind_iface(ip_sock_t *p_self, char **ifname);
 
 #endif /*_IP_H_INCLUDED*/
 

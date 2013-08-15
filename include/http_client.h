@@ -33,9 +33,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct
 {
-	TCP_SOCKET super;
-	BOOL initialized;
-} HTTP_CLIENT;
+	tcp_sock_t super;
+	int initialized;
+} http_client_t;
 
 typedef struct
 {
@@ -50,7 +50,7 @@ typedef struct
 
 	int status;
 	char status_desc[256];
-} HTTP_TRANSACTION;
+} http_trans_t;
 
 
 /*public functions*/
@@ -58,38 +58,38 @@ typedef struct
 /*
 	basic resource allocations for the tcp object
 */
-int http_client_construct(HTTP_CLIENT *p_self);
+int http_client_construct(http_client_t *p_self);
 
 /*
 	Resource free.
 */
-int http_client_destruct(HTTP_CLIENT *p_self, int num);
+int http_client_destruct(http_client_t *p_self, int num);
 
 /*
 	Sets up the object.
 
 	- ...
 */
-int http_client_init(HTTP_CLIENT *p_self, char *msg);
+int http_client_init(http_client_t *p_self, char *msg);
 
 /*
 	Disconnect and some other clean up.
 */
-int http_client_shutdown(HTTP_CLIENT *p_self);
+int http_client_shutdown(http_client_t *p_self);
 
 /* Send req and get response */
-int http_client_transaction(HTTP_CLIENT *p_self, HTTP_TRANSACTION *p_tr );
+int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr);
 
 /* Accessors */
-int http_client_set_port(HTTP_CLIENT *p_self, int p);
-int http_client_set_remote_name(HTTP_CLIENT *p_self, const char* p);
-int http_client_set_remote_addr(HTTP_CLIENT *p_self, const char* p);
-int http_client_set_remote_timeout(HTTP_CLIENT *p_self, int t);
-int http_client_set_bind_iface(HTTP_CLIENT *p_self, char *ifname);
+int http_client_set_port(http_client_t *p_self, int p);
+int http_client_set_remote_name(http_client_t *p_self, const char* p);
+int http_client_set_remote_addr(http_client_t *p_self, const char* p);
+int http_client_set_remote_timeout(http_client_t *p_self, int t);
+int http_client_set_bind_iface(http_client_t *p_self, char *ifname);
 
-int http_client_get_port(HTTP_CLIENT *p_self, int *p_port);
-int http_client_get_remote_name(HTTP_CLIENT *p_self, const char* *p);
-int http_client_get_remote_timeout(HTTP_CLIENT *p_self, int *p);
-int http_client_get_bind_iface(HTTP_CLIENT *p_self, char **ifname);
+int http_client_get_port(http_client_t *p_self, int *p_port);
+int http_client_get_remote_name(http_client_t *p_self, const char* *p);
+int http_client_get_remote_timeout(http_client_t *p_self, int *p);
+int http_client_get_bind_iface(http_client_t *p_self, char **ifname);
 
 #endif /*_HTTP_CLIENT_H_INCLUDED*/
