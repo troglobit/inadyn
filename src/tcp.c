@@ -27,19 +27,18 @@ int tcp_construct(tcp_sock_t *p_self)
 {
 	int rc;
 
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
 	rc = ip_construct(&p_self->super);
-	if (rc != 0)
-	{
+	if (rc != 0) {
 		return rc;
 	}
 
-	/*reset its part of the struct (skip IP part)*/
-	memset(((char*)p_self + sizeof(p_self->super)) , 0, sizeof(*p_self) - sizeof(p_self->super));
+	/*reset its part of the struct (skip IP part) */
+	memset(((char *)p_self + sizeof(p_self->super)), 0,
+	       sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = 0;
 
 	return 0;
@@ -50,13 +49,11 @@ int tcp_construct(tcp_sock_t *p_self)
 */
 int tcp_destruct(tcp_sock_t *p_self)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return 0;
 	}
 
-	if (p_self->initialized == 1)
-	{
+	if (p_self->initialized == 1) {
 		tcp_shutdown(p_self);
 	}
 
@@ -70,8 +67,7 @@ static int local_set_params(tcp_sock_t *p_self)
 	/* Set default TCP specififc params */
 	tcp_get_remote_timeout(p_self, &timeout);
 
-	if (timeout == 0)
-	{
+	if (timeout == 0) {
 		tcp_set_remote_timeout(p_self, TCP_DEFAULT_TIMEOUT);
 	}
 
@@ -90,26 +86,24 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 	int svlen = sizeof(sv);
 	char host[NI_MAXHOST];
 
-	do
-	{
+	do {
 		local_set_params(p_self);
 
-		/*call the super*/
+		/*call the super */
 		rc = ip_initialize(&p_self->super);
-		if (rc != 0)
-		{
+		if (rc != 0) {
 			break;
 		}
 
 		/* local object initalizations */
-		if (p_self->super.type == TYPE_TCP)
-		{
+		if (p_self->super.type == TYPE_TCP) {
 			p_self->super.socket = socket(AF_INET, SOCK_STREAM, 0);
-			if (p_self->super.socket == -1)
-			{
+			if (p_self->super.socket == -1) {
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR, "Error creating client socket: %s", strerror(code));
+				logit(LOG_ERR,
+				      "Error creating client socket: %s",
+				      strerror(code));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
@@ -118,66 +112,73 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 			 * prevent socket leak if any of the below calls fail. */
 			p_self->initialized = 1;
 
-			if (p_self->super.bound == 1)
-			{
-				if (bind(p_self->super.socket, (struct sockaddr *)&p_self->super.local_addr, sizeof(struct sockaddr_in)) < 0)
-				{
+			if (p_self->super.bound == 1) {
+				if (bind
+				    (p_self->super.socket,
+				     (struct sockaddr *)&p_self->super.
+				     local_addr,
+				     sizeof(struct sockaddr_in)) < 0) {
 					int code = os_get_socket_error();
 
-					logit(LOG_WARNING, "Failed binding client socket to local address: %s", strerror(code));
+					logit(LOG_WARNING,
+					      "Failed binding client socket to local address: %s",
+					      strerror(code));
 					rc = RC_IP_SOCKET_BIND_ERROR;
 					break;
 				}
 			}
-		}
-		else
-		{
-			p_self->initialized = 1; /* Allow tcp_shutdown() to run. */
+		} else {
+			p_self->initialized = 1;	/* Allow tcp_shutdown() to run. */
 			rc = RC_IP_BAD_PARAMETER;
 		}
 
 		/* set timeouts */
-		sv.tv_sec  = p_self->super.timeout / 1000;	    /* msec to sec */
-		sv.tv_usec = (p_self->super.timeout % 1000) * 1000; /* reminder to usec */
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, svlen);
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, svlen);
+		sv.tv_sec = p_self->super.timeout / 1000;	/* msec to sec */
+		sv.tv_usec = (p_self->super.timeout % 1000) * 1000;	/* reminder to usec */
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv,
+			   svlen);
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv,
+			   svlen);
 
-		if (!getnameinfo(&p_self->super.remote_addr, p_self->super.remote_len, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
-		{
-			logit(LOG_INFO, "%s, connecting to %s(%s)", msg, p_self->super.p_remote_host_name, host);
+		if (!getnameinfo
+		    (&p_self->super.remote_addr, p_self->super.remote_len, host,
+		     NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+			logit(LOG_INFO, "%s, connecting to %s(%s)", msg,
+			      p_self->super.p_remote_host_name, host);
 		}
 
-		if (0 != connect(p_self->super.socket, &p_self->super.remote_addr, p_self->super.remote_len))
-		{
+		if (0 !=
+		    connect(p_self->super.socket, &p_self->super.remote_addr,
+			    p_self->super.remote_len)) {
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(code));
+			logit(LOG_WARNING,
+			      "Failed connecting to remote server: %s",
+			      strerror(code));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}
 	}
 	while (0);
 
-	if (rc != 0)
-	{
+	if (rc != 0) {
 		tcp_shutdown(p_self);
 		return rc;
 	}
 
 	return 0;
 }
+
 /*
   Disconnect and some other clean up.
 */
 int tcp_shutdown(tcp_sock_t *p_self)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return 0;
 	}
 
@@ -186,17 +187,14 @@ int tcp_shutdown(tcp_sock_t *p_self)
 	return ip_shutdown(&p_self->super);
 }
 
-
 /* send data*/
 int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return RC_TCP_OBJECT_NOT_INITIALIZED;
 	}
 
@@ -204,36 +202,31 @@ int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len)
 }
 
 /* receive data*/
-int tcp_recv(tcp_sock_t *p_self,char *p_buf, int max_recv_len, int *p_recv_len)
+int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return RC_TCP_OBJECT_NOT_INITIALIZED;
 	}
 	return ip_recv(&p_self->super, p_buf, max_recv_len, p_recv_len);
 }
 
-
 /* Accessors*/
 int tcp_set_port(tcp_sock_t *p_self, int p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
 	return ip_set_port(&p_self->super, p);
 }
 
-int tcp_set_remote_name(tcp_sock_t *p_self, const char* p)
+int tcp_set_remote_name(tcp_sock_t *p_self, const char *p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -242,8 +235,7 @@ int tcp_set_remote_name(tcp_sock_t *p_self, const char* p)
 
 int tcp_set_remote_timeout(tcp_sock_t *p_self, int p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -252,8 +244,7 @@ int tcp_set_remote_timeout(tcp_sock_t *p_self, int p)
 
 int tcp_set_bind_iface(tcp_sock_t *p_self, char *ifname)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -262,8 +253,7 @@ int tcp_set_bind_iface(tcp_sock_t *p_self, char *ifname)
 
 int tcp_get_port(tcp_sock_t *p_self, int *p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -272,8 +262,7 @@ int tcp_get_port(tcp_sock_t *p_self, int *p)
 
 int tcp_get_remote_name(tcp_sock_t *p_self, const char **p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -282,8 +271,7 @@ int tcp_get_remote_name(tcp_sock_t *p_self, const char **p)
 
 int tcp_get_remote_timeout(tcp_sock_t *p_self, int *p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -292,8 +280,7 @@ int tcp_get_remote_timeout(tcp_sock_t *p_self, int *p)
 
 int tcp_get_bind_iface(tcp_sock_t *p_self, char **ifname)
 {
-	if (p_self == NULL || ifname == NULL)
-	{
+	if (p_self == NULL || ifname == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -304,7 +291,6 @@ int tcp_get_bind_iface(tcp_sock_t *p_self, char **ifname)
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

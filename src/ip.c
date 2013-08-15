@@ -31,8 +31,7 @@
 /* basic resource allocations for the ip object */
 int ip_construct(ip_sock_t *p_self)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -53,20 +52,16 @@ int ip_construct(ip_sock_t *p_self)
 */
 int ip_destruct(ip_sock_t *p_self)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return 0;
 	}
 
-	if (p_self->initialized == 1)
-	{
+	if (p_self->initialized == 1) {
 		ip_shutdown(p_self);
 	}
 
 	return 0;
 }
-
-
 
 /*
   Sets up the object.
@@ -79,58 +74,57 @@ int ip_initialize(ip_sock_t *p_self)
 	struct ifreq ifr;
 	struct sockaddr_in *addrp = NULL;
 
-	if (p_self->initialized == 1)
-	{
+	if (p_self->initialized == 1) {
 		return 0;
 	}
 
-	do
-	{
+	do {
 		rc = os_ip_support_startup();
-		if (rc != 0)
-		{
+		if (rc != 0) {
 			break;
 		}
 
 		/* local bind, to interface */
-		if (p_self->ifname)
-		{
+		if (p_self->ifname) {
 			int sd = socket(PF_INET, SOCK_DGRAM, 0);
 
-			if (sd < 0)
-			{
+			if (sd < 0) {
 				int code = os_get_socket_error();
 
-				logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
+				logit(LOG_WARNING,
+				      "Failed opening network socket: %s",
+				      strerror(code));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
 
 			memset(&ifr, 0, sizeof(struct ifreq));
 			strncpy(ifr.ifr_name, p_self->ifname, IFNAMSIZ);
-			if (ioctl(sd, SIOCGIFADDR, &ifr) != -1)
-			{
+			if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
 				p_self->local_addr.sin_family = AF_INET;
 				p_self->local_addr.sin_port = htons(0);
 				addrp = (struct sockaddr_in *)&(ifr.ifr_addr);
-				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
+				p_self->local_addr.sin_addr.s_addr =
+				    addrp->sin_addr.s_addr;
 				p_self->bound = 1;
 
-				logit(LOG_INFO, "Bound to interface %s (IP# %s)", p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
-			}
-			else
-			{
+				logit(LOG_INFO,
+				      "Bound to interface %s (IP# %s)",
+				      p_self->ifname,
+				      inet_ntoa(p_self->local_addr.sin_addr));
+			} else {
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR, "Failed reading IP address of interface %s: %s", p_self->ifname, strerror(code));
+				logit(LOG_ERR,
+				      "Failed reading IP address of interface %s: %s",
+				      p_self->ifname, strerror(code));
 				p_self->bound = 0;
 			}
 			close(sd);
 		}
 
 		/* remote address */
-		if (p_self->p_remote_host_name != NULL)
-		{
+		if (p_self->p_remote_host_name != NULL) {
 			int s;
 			char port[10];
 			struct addrinfo hints, *result;
@@ -140,14 +134,17 @@ int ip_initialize(ip_sock_t *p_self)
 
 			/* Obtain address(es) matching host/port */
 			memset(&hints, 0, sizeof(struct addrinfo));
-			hints.ai_family = AF_INET; /* Use AF_UNSPEC to allow IPv4 or IPv6 */
-			hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+			hints.ai_family = AF_INET;	/* Use AF_UNSPEC to allow IPv4 or IPv6 */
+			hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
 			snprintf(port, sizeof(port), "%d", p_self->port);
 
-			s = getaddrinfo(p_self->p_remote_host_name, port, &hints, &result);
-			if (s != 0 || !result)
-			{
-				logit(LOG_WARNING, "Failed resolving hostname %s: %s", p_self->p_remote_host_name, gai_strerror(s));
+			s = getaddrinfo(p_self->p_remote_host_name, port,
+					&hints, &result);
+			if (s != 0 || !result) {
+				logit(LOG_WARNING,
+				      "Failed resolving hostname %s: %s",
+				      p_self->p_remote_host_name,
+				      gai_strerror(s));
 				rc = RC_IP_INVALID_REMOTE_ADDR;
 				break;
 			}
@@ -158,13 +155,12 @@ int ip_initialize(ip_sock_t *p_self)
 			p_self->remote_addr = *result->ai_addr;
 			p_self->remote_len = result->ai_addrlen;
 
-			freeaddrinfo(result);           /* No longer needed */
+			freeaddrinfo(result);	/* No longer needed */
 		}
 	}
 	while (0);
 
-	if (rc != 0)
-	{
+	if (rc != 0) {
 		ip_shutdown(p_self);
 		return rc;
 	}
@@ -179,18 +175,15 @@ int ip_initialize(ip_sock_t *p_self)
 */
 int ip_shutdown(ip_sock_t *p_self)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return 0;
 	}
 
-	if (p_self->socket > -1)
-	{
+	if (p_self->socket > -1) {
 		close(p_self->socket);
 		p_self->socket = -1;
 	}
@@ -204,21 +197,20 @@ int ip_shutdown(ip_sock_t *p_self)
 
 int ip_send(ip_sock_t *p_self, const char *p_buf, int len)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 	}
 
-	if (send(p_self->socket, (char*) p_buf, len, 0) == -1)
-	{
+	if (send(p_self->socket, (char *)p_buf, len, 0) == -1) {
 		int code = os_get_socket_error();
 
-		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(code));
+		logit(LOG_WARNING,
+		      "Network error while sending query/update: %s",
+		      strerror(code));
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -241,35 +233,34 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	int total_recv_len = 0;
 	int recv_len = 0;
 
-	if (p_self == NULL || p_buf == NULL || p_recv_len == NULL)
-	{
+	if (p_self == NULL || p_buf == NULL || p_recv_len == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (!p_self->initialized)
-	{
+	if (!p_self->initialized) {
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 	}
 
-	while (remaining_buf_len > 0)
-	{
-		int chunk_size = remaining_buf_len > IP_DEFAULT_READ_CHUNK_SIZE ?
-			IP_DEFAULT_READ_CHUNK_SIZE : remaining_buf_len;
+	while (remaining_buf_len > 0) {
+		int chunk_size =
+		    remaining_buf_len >
+		    IP_DEFAULT_READ_CHUNK_SIZE ? IP_DEFAULT_READ_CHUNK_SIZE :
+		    remaining_buf_len;
 
-		recv_len = recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
-		if (recv_len < 0)
-		{
+		recv_len =
+		    recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
+		if (recv_len < 0) {
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(code));
+			logit(LOG_WARNING,
+			      "Network error while waiting for reply: %s",
+			      strerror(code));
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}
 
-		if (recv_len == 0)
-		{
-			if (total_recv_len == 0)
-			{
+		if (recv_len == 0) {
+			if (total_recv_len == 0) {
 				rc = RC_IP_RECV_ERROR;
 			}
 			break;
@@ -284,18 +275,15 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	return rc;
 }
 
-
 /*Accessors */
 
 int ip_set_port(ip_sock_t *p_self, int p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (p < 0 || p > IP_SOCKET_MAX_PORT)
-	{
+	if (p < 0 || p > IP_SOCKET_MAX_PORT) {
 		return RC_IP_BAD_PARAMETER;
 	}
 
@@ -306,8 +294,7 @@ int ip_set_port(ip_sock_t *p_self, int p)
 
 int ip_set_remote_name(ip_sock_t *p_self, const char *p)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -318,8 +305,7 @@ int ip_set_remote_name(ip_sock_t *p_self, const char *p)
 
 int ip_set_remote_timeout(ip_sock_t *p_self, int t)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -330,8 +316,7 @@ int ip_set_remote_timeout(ip_sock_t *p_self, int t)
 
 int ip_set_bind_iface(ip_sock_t *p_self, char *ifname)
 {
-	if (p_self == NULL)
-	{
+	if (p_self == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -342,8 +327,7 @@ int ip_set_bind_iface(ip_sock_t *p_self, char *ifname)
 
 int ip_get_port(ip_sock_t *p_self, int *p_port)
 {
-	if (p_self == NULL || p_port == NULL)
-	{
+	if (p_self == NULL || p_port == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -354,8 +338,7 @@ int ip_get_port(ip_sock_t *p_self, int *p_port)
 
 int ip_get_remote_name(ip_sock_t *p_self, const char **p)
 {
-	if (p_self == NULL || p == NULL)
-	{
+	if (p_self == NULL || p == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -366,8 +349,7 @@ int ip_get_remote_name(ip_sock_t *p_self, const char **p)
 
 int ip_get_remote_timeout(ip_sock_t *p_self, int *p)
 {
-	if (p_self == NULL || p == NULL)
-	{
+	if (p_self == NULL || p == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -378,8 +360,7 @@ int ip_get_remote_timeout(ip_sock_t *p_self, int *p)
 
 int ip_get_bind_iface(ip_sock_t *p_self, char **ifname)
 {
-	if (p_self == NULL || ifname == NULL)
-	{
+	if (p_self == NULL || ifname == NULL) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -392,7 +373,6 @@ int ip_get_bind_iface(ip_sock_t *p_self, char **ifname)
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

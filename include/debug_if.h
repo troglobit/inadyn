@@ -24,25 +24,31 @@
 #include <stdio.h>
 #include "os.h"
 
-typedef struct
-{
+typedef struct {
 	int level;
 	int verbose;
 	char p_logfilename[1024];
 	FILE *p_file;
 } ddns_dbg_t;
 
-
-int  get_dbg_dest(void);
+int get_dbg_dest(void);
 void set_dbg_dest(int dest);
-void os_printf(int prio, char *fmt, ... );
+void os_printf(int prio, char *fmt, ...);
 
 #ifndef DBG_PRINT_DISABLED
-#  ifndef logit
-#    define logit(prio, fmt, args...) os_printf(prio, fmt, ##args)
-#  endif
+#ifndef logit
+#define logit(prio, fmt, args...) os_printf(prio, fmt, ##args)
+#endif
 #else
-#  define logit(fmt, args...)
+#define logit(fmt, args...)
 #endif
 
-#endif /* _DEBUG_IF_INCLUDED */
+#endif				/* _DEBUG_IF_INCLUDED */
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ * End:
+ */

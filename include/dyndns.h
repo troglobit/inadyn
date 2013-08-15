@@ -31,8 +31,7 @@
 #define DYNDNS_EMAIL_ADDR	"troglobit@gmail.com"
 
 /* DDNS system ID's */
-enum
-{
+enum {
 	DYNDNS_DEFAULT = 0,
 	FREEDNS_AFRAID_ORG_DEFAULT,
 	ZONE_EDIT_DEFAULT,
@@ -67,12 +66,12 @@ enum
 #define DYNDNS_DEFAULT_DNS_SYSTEM	DYNDNS_DEFAULT
 
 /* Conversation with the IP server */
-#define DYNDNS_GET_IP_HTTP_REQUEST  \
+#define DYNDNS_GET_IP_HTTP_REQUEST  					\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
-#define GENERIC_HTTP_REQUEST                                      \
+#define GENERIC_HTTP_REQUEST                                      	\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
@@ -119,7 +118,7 @@ enum
 	"User-Agent: "DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR"\r\n\r\n"
 
 #define ZONEEDIT_UPDATE_IP_REQUEST					\
-	"GET %s?"						\
+	"GET %s?"							\
 	"host=%s&"							\
 	"dnsto=%s "							\
 	"HTTP/1.0\r\n"							\
@@ -129,7 +128,7 @@ enum
 
 /* dont ask me why easydns is so picky
  * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
-#define EASYDNS_UPDATE_IP_REQUEST				\
+#define EASYDNS_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
 	"hostname=%s&"							\
 	"myip=%s&"							\
@@ -146,7 +145,7 @@ enum
 	"email=%s&"							\
 	"tzokey=%s&"							\
 	"ipaddress=%s&"							\
-	"system=tzodns&"							\
+	"system=tzodns&"						\
 	"info=1 "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -194,61 +193,55 @@ enum
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
-
 /* Some default configurations */
-#define DYNDNS_DEFAULT_SLEEP			(120) /* sec */
-#define DYNDNS_MIN_SLEEP			(30)  /* sec */
-#define DYNDNS_MAX_SLEEP			(10 * 24 * 3600) /* 10 days in sec */
-#define DYNDNS_ERROR_UPDATE_PERIOD		(600) /* 10 min */
-#define DYNDNS_FORCED_UPDATE_PERIOD		(30 * 24 * 3600) /* 30 days in sec */
-#define DYNDNS_DEFAULT_CMD_CHECK_PERIOD		(1)    /* sec */
-#define DYNDNS_DEFAULT_ITERATIONS		0      /* Forever */
-#define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE	(2500) /* Bytes */
-#define DYNDNS_HTTP_REQUEST_BUFFER_SIZE		(2500) /* Bytes */
-#define DYNDNS_MAX_ALIAS_NUMBER			10 /* maximum number of aliases per server that can be maintained */
-#define DYNDNS_MAX_SERVER_NUMBER		5  /* maximum number of servers that can be maintained */
+#define DYNDNS_DEFAULT_SLEEP              120     /* sec */
+#define DYNDNS_MIN_SLEEP                  30      /* sec */
+#define DYNDNS_MAX_SLEEP                  (10 * 24 * 3600)        /* 10 days in sec */
+#define DYNDNS_ERROR_UPDATE_PERIOD        600     /* 10 min */
+#define DYNDNS_FORCED_UPDATE_PERIOD       (30 * 24 * 3600)        /* 30 days in sec */
+#define DYNDNS_DEFAULT_CMD_CHECK_PERIOD   1       /* sec */
+#define DYNDNS_DEFAULT_ITERATIONS         0       /* Forever */
+#define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE  2500    /* Bytes */
+#define DYNDNS_HTTP_REQUEST_BUFFER_SIZE   2500    /* Bytes */
+#define DYNDNS_MAX_ALIAS_NUMBER           10      /* maximum number of aliases per server that can be maintained */
+#define DYNDNS_MAX_SERVER_NUMBER          5       /* maximum number of servers that can be maintained */
 
 /* local configs */
-#define DYNDNS_IP_ADDRESS_LEN		20  /* chars */
-#define DYNDNS_USERNAME_LEN		50  /* chars */
-#define DYNDNS_PASSWORD_LEN		50  /* chars */
-#define DYNDNS_SERVER_NAME_LEN		256 /* chars */
-#define DYNDNS_SERVER_URL_LEN		256 /* chars */
-#define IP_V4_MAX_LEN			16  /* chars: nnn.nnn.nnn.nnn\0 */
-
+#define DYNDNS_IP_ADDRESS_LEN             20      /* chars */
+#define DYNDNS_USERNAME_LEN               50      /* chars */
+#define DYNDNS_PASSWORD_LEN               50      /* chars */
+#define DYNDNS_SERVER_NAME_LEN            256     /* chars */
+#define DYNDNS_SERVER_URL_LEN             256     /* chars */
+#define IP_V4_MAX_LEN                     16      /* chars: nnn.nnn.nnn.nnn\0 */
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
-typedef int (*ddns_request_func_t)(void *this, int infnr, int alnr);
-typedef int (*ddns_response_ok_func_t)(void *this, http_trans_t *p_tr, int infnr);
+typedef int (*ddns_request_func_t) (void *this, int infnr, int alnr);
+typedef int (*ddns_response_ok_func_t) (void *this, http_trans_t *p_tr, int infnr);
 
-typedef struct
-{
-	const char              *key;
-	ddns_response_ok_func_t  response_ok_func;
-	ddns_request_func_t      update_request_func;
-	const char              *ip_server_name;
-	const char              *ip_server_url;
-	const char              *ddns_server_name;
-	const char              *ddns_server_url;
+typedef struct {
+	const char *key;
+	ddns_response_ok_func_t response_ok_func;
+	ddns_request_func_t update_request_func;
+	const char *ip_server_name;
+	const char *ip_server_url;
+	const char *ddns_server_name;
+	const char *ddns_server_url;
 } ddns_system_t;
 
-typedef struct
-{
-	int            id;
+typedef struct {
+	int id;
 	ddns_system_t system;
 } ddns_sysinfo_t;
 
-typedef enum
-{
+typedef enum {
 	NO_CMD = 0,
 	CMD_STOP,
 	CMD_RESTART,
 	CMD_FORCED_UPDATE
 } ddns_cmd_t;
 
-typedef struct
-{
+typedef struct {
 	char username[DYNDNS_USERNAME_LEN];
 	char password[DYNDNS_PASSWORD_LEN];
 	char *encoded_password;
@@ -256,103 +249,96 @@ typedef struct
 	int encoded;
 } ddns_creds_t;
 
-typedef struct
-{
+typedef struct {
 	char name[DYNDNS_SERVER_NAME_LEN];
 	int port;
 } ddns_server_name_t;
 
-
-typedef struct
-{
+typedef struct {
 	ddns_server_name_t names;
 	int update_required;
 } ddns_alias_t;
 
-typedef struct
-{
-	int                 ip_has_changed;
-	ddns_server_name_t  my_ip_address;
+typedef struct {
+	int ip_has_changed;
+	ddns_server_name_t my_ip_address;
 
-	ddns_creds_t        creds;
-	ddns_system_t      *system;
+	ddns_creds_t creds;
+	ddns_system_t *system;
 
-	ddns_server_name_t  dyndns_server_name; /* Address of DDNS update service */
-	char                dyndns_server_url[DYNDNS_SERVER_URL_LEN];
+	ddns_server_name_t dyndns_server_name;	/* Address of DDNS update service */
+	char dyndns_server_url[DYNDNS_SERVER_URL_LEN];
 
-	ddns_server_name_t  ip_server_name;     /* Address of "What's my IP" checker */
-	char                ip_server_url[DYNDNS_SERVER_URL_LEN];
+	ddns_server_name_t ip_server_name;	/* Address of "What's my IP" checker */
+	char ip_server_url[DYNDNS_SERVER_URL_LEN];
 
-	ddns_server_name_t  proxy_server_name;
+	ddns_server_name_t proxy_server_name;
 
-	ddns_alias_t        alias[DYNDNS_MAX_ALIAS_NUMBER];
-	int                 alias_count;
+	ddns_alias_t alias[DYNDNS_MAX_ALIAS_NUMBER];
+	int alias_count;
 
-	int                 wildcard;
+	int wildcard;
 } ddns_info_t;
 
-typedef struct
-{
+typedef struct {
 	uid_t uid;
 	gid_t gid;
 } ddns_user_t;
 
 /* Client context */
-typedef struct
-{
-	char          *cfgfile;
-	char          *pidfile;
-	char          *external_command;
+typedef struct {
+	char *cfgfile;
+	char *pidfile;
+	char *external_command;
 
-	ddns_dbg_t     dbg;
+	ddns_dbg_t dbg;
 
-	ddns_cmd_t     cmd;
-	int            startup_delay_sec;
-	int            sleep_sec; /* time between 2 updates*/
-	int            normal_update_period_sec;
-	int            error_update_period_sec;
-	int            forced_update_period_sec;
-	int            time_since_last_update;
-	int            cmd_check_period; /*time to wait for a command*/
-	int            total_iterations;
-	int            num_iterations;
-	char          *cache_file;
-	char          *bind_interface;
-	char          *check_interface;
-	int            initialized;
-	int            run_in_background;
-	int            debug_to_syslog;
-	int            change_persona;
-	int            update_once;
-	int            force_addr_update;
-	int            use_proxy;
-	int            abort;
+	ddns_cmd_t cmd;
+	int startup_delay_sec;
+	int sleep_sec;		/* time between 2 updates */
+	int normal_update_period_sec;
+	int error_update_period_sec;
+	int forced_update_period_sec;
+	int time_since_last_update;
+	int cmd_check_period;	/*time to wait for a command */
+	int total_iterations;
+	int num_iterations;
+	char *cache_file;
+	char *bind_interface;
+	char *check_interface;
+	int initialized;
+	int run_in_background;
+	int debug_to_syslog;
+	int change_persona;
+	int update_once;
+	int force_addr_update;
+	int use_proxy;
+	int abort;
 
-	http_client_t  http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
-	http_client_t  http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
-	http_trans_t   http_transaction;
-	char          *work_buf; /* for HTTP responses*/
-	int            work_buflen;
-	char          *request_buf; /* for HTTP requests*/
-	int            request_buflen;
+	http_client_t http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
+	http_client_t http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
+	http_trans_t http_transaction;
+	char *work_buf;		/* for HTTP responses */
+	int work_buflen;
+	char *request_buf;	/* for HTTP requests */
+	int request_buflen;
 
-	ddns_user_t    sys_usr_info; /* info about the current account running inadyn */
-	ddns_info_t    info[DYNDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
-	int            info_count;
+	ddns_user_t sys_usr_info;	/* info about the current account running inadyn */
+	ddns_info_t info[DYNDNS_MAX_SERVER_NUMBER];	/* servers, names, passwd */
+	int info_count;
 } ddns_t;
 
-ddns_sysinfo_t *ddns_system_table (void);
+ddns_sysinfo_t *ddns_system_table(void);
 int ddns_default_config_data(ddns_t *ctx);
 
-int  dyn_dns_init(ddns_t *p_self);
-int  dyn_dns_shutdown(ddns_t *p_self);
-int  dyn_dns_update_ip(ddns_t *p_self);
-int  dyn_dns_main(ddns_t *p_self, int argc, char* argv[]);
+int dyn_dns_init(ddns_t *p_self);
+int dyn_dns_shutdown(ddns_t *p_self);
+int dyn_dns_update_ip(ddns_t *p_self);
+int dyn_dns_main(ddns_t *p_self, int argc, char *argv[]);
 
-int   get_config_data(ddns_t *p_self, int argc, char** argv);
+int get_config_data(ddns_t *p_self, int argc, char **argv);
 
 void print_help_page(void);
-int inadyn_main(int argc, char* argv[]);
 int os_change_persona(ddns_user_t *user);
 
 #endif /*_DYNDNS_INCLUDED*/
@@ -361,7 +347,6 @@ int os_change_persona(ddns_user_t *user);
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

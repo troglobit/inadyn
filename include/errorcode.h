@@ -68,15 +68,14 @@
 
 #define RC_RESTART                                  255
 
-const char* errorcode_get_name(int rc);
+const char *errorcode_get_name(int rc);
 
-#endif /* ERRORCODE_INCLUDED */
+#endif				/* ERRORCODE_INCLUDED */
 
 /**
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

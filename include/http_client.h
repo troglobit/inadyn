@@ -25,20 +25,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errorcode.h"
 #include "tcp.h"
 
-
 /* SOME DEFAULT CONFIGURATIONS */
-#define HTTP_DEFAULT_TIMEOUT	10000 /*ms*/
+#define HTTP_DEFAULT_TIMEOUT	10000	/*ms */
 #define	HTTP_DEFAULT_PORT	80
 
-
-typedef struct
-{
+typedef struct {
 	tcp_sock_t super;
 	int initialized;
 } http_client_t;
 
-typedef struct
-{
+typedef struct {
 	char *p_req;
 	int req_len;
 
@@ -51,7 +47,6 @@ typedef struct
 	int status;
 	char status_desc[256];
 } http_trans_t;
-
 
 /*public functions*/
 
@@ -82,14 +77,22 @@ int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr);
 
 /* Accessors */
 int http_client_set_port(http_client_t *p_self, int p);
-int http_client_set_remote_name(http_client_t *p_self, const char* p);
-int http_client_set_remote_addr(http_client_t *p_self, const char* p);
+int http_client_set_remote_name(http_client_t *p_self, const char *p);
+int http_client_set_remote_addr(http_client_t *p_self, const char *p);
 int http_client_set_remote_timeout(http_client_t *p_self, int t);
 int http_client_set_bind_iface(http_client_t *p_self, char *ifname);
 
 int http_client_get_port(http_client_t *p_self, int *p_port);
-int http_client_get_remote_name(http_client_t *p_self, const char* *p);
+int http_client_get_remote_name(http_client_t *p_self, const char * *p);
 int http_client_get_remote_timeout(http_client_t *p_self, int *p);
 int http_client_get_bind_iface(http_client_t *p_self, char **ifname);
 
 #endif /*_HTTP_CLIENT_H_INCLUDED*/
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ * End:
+ */

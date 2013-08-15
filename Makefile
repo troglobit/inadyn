@@ -70,7 +70,7 @@ clean:
 	-@$(RM) $(OBJS) $(EXEC)
 
 distclean:
-	-@$(RM) $(OBJS) core $(EXEC) *.o *.map .*.d *.out tags TAGS
+	-@$(RM) $(OBJS) core $(EXEC) src/*~ include/*~ *~ src/*.o *.map src/.*.d *.out tags TAGS
 
 dist:
 	@echo "Building bzip2 tarball of $(PKG) in parent dir..."

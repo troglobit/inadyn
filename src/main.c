@@ -41,34 +41,29 @@ static int init_context(ddns_t **pctx)
 	if (!*pctx)
 		return RC_OUT_OF_MEMORY;
 
-	do
-	{
+	do {
 		ctx = *pctx;
 		memset(ctx, 0, sizeof(ddns_t));
 
 		/* Alloc space for http_to_ip_server data */
 		ctx->work_buflen = DYNDNS_HTTP_RESPONSE_BUFFER_SIZE;
-		ctx->work_buf    = (char *)malloc(ctx->work_buflen);
-		if (!ctx->work_buf)
-		{
+		ctx->work_buf = (char *)malloc(ctx->work_buflen);
+		if (!ctx->work_buf) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
-   		}
+		}
 
 		/* Alloc space for request data */
 		ctx->request_buflen = DYNDNS_HTTP_REQUEST_BUFFER_SIZE;
-		ctx->request_buf    = (char*)malloc(ctx->request_buflen);
-		if (!ctx->request_buf)
-		{
+		ctx->request_buf = (char *)malloc(ctx->request_buflen);
+		if (!ctx->request_buf) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
 
 		i = 0;
-		while (i < DYNDNS_MAX_SERVER_NUMBER)
-		{
-			if (http_client_construct(&ctx->http_to_ip_server[i++]))
-			{
+		while (i < DYNDNS_MAX_SERVER_NUMBER) {
+			if (http_client_construct(&ctx->http_to_ip_server[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
@@ -76,10 +71,8 @@ static int init_context(ddns_t **pctx)
 		http_to_ip_constructed = 1;
 
 		i = 0;
-		while (i < DYNDNS_MAX_SERVER_NUMBER)
-		{
-			if (http_client_construct(&ctx->http_to_dyndns[i++]))
-			{
+		while (i < DYNDNS_MAX_SERVER_NUMBER) {
+			if (http_client_construct(&ctx->http_to_dyndns[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
@@ -99,8 +92,7 @@ static int init_context(ddns_t **pctx)
 	}
 	while (0);
 
-	if (rc)
-	{
+	if (rc) {
 
 		if (ctx->work_buf)
 			free(ctx->work_buf);
@@ -109,10 +101,12 @@ static int init_context(ddns_t **pctx)
 			free(ctx->work_buf);
 
 		if (http_to_dyndns_constructed)
-			http_client_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
+			http_client_destruct(ctx->http_to_dyndns,
+					     DYNDNS_MAX_SERVER_NUMBER);
 
 		if (http_to_ip_constructed)
-			http_client_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
+			http_client_destruct(ctx->http_to_ip_server,
+					     DYNDNS_MAX_SERVER_NUMBER);
 
 		free(ctx);
 		*pctx = NULL;
@@ -120,7 +114,6 @@ static int init_context(ddns_t **pctx)
 
 	return 0;
 }
-
 
 /**
    Resource free.
@@ -144,8 +137,7 @@ static int free_context(ddns_t *ctx)
 	free(ctx->request_buf);
 	ctx->request_buf = NULL;
 
-	for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++)
-	{
+	for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++) {
 		ddns_info_t *info = &ctx->info[i];
 
 		free(info->creds.encoded_password);
@@ -175,42 +167,40 @@ static int free_context(ddns_t *ctx)
 	return 0;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	int restart = 0;
 	int os_handler_installed = 0;
 	int rc = 0;
 	ddns_t *ctx = NULL;
 
-	do
-	{
+	do {
 		rc = init_context(&ctx);
 		if (rc != 0)
 			break;
 
-		if (!os_handler_installed)
-		{
+		if (!os_handler_installed) {
 			rc = os_install_signal_handler(ctx);
-			if (rc != 0)
-			{
-				logit(LOG_WARNING, "Failed installing OS signal handler: %s", errorcode_get_name(rc));
+			if (rc != 0) {
+				logit(LOG_WARNING,
+				      "Failed installing OS signal handler: %s",
+				      errorcode_get_name(rc));
 				break;
 			}
 			os_handler_installed = 1;
 		}
 
 		rc = dyn_dns_main(ctx, argc, argv);
-		if (rc == RC_RESTART)
-		{
+		if (rc == RC_RESTART) {
 			restart = 1;
 
 			/* do some cleanup if restart requested */
 			rc = free_context(ctx);
 			if (rc != 0)
-				logit(LOG_WARNING, "Failed cleaning up before restart: %s, ignoring...", errorcode_get_name(rc));
-		}
-		else
-		{
+				logit(LOG_WARNING,
+				      "Failed cleaning up before restart: %s, ignoring...",
+				      errorcode_get_name(rc));
+		} else {
 			/* Error, or OK.  In either case exit outer loop. */
 			restart = 0;
 		}
@@ -218,7 +208,8 @@ int main(int argc, char* argv[])
 	while (restart);
 
 	if (rc != 0)
-		logit(LOG_WARNING, "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
+		logit(LOG_WARNING, "Failed %sstarting daemon: %s",
+		      restart ? "re" : "", errorcode_get_name(rc));
 
 	/* Cleanup */
 	free_context(ctx);
@@ -231,7 +222,6 @@ int main(int argc, char* argv[])
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

@@ -29,15 +29,12 @@
 #include "get_cmd.h"
 #include "debug_if.h"
 
-
-static cmd_desc_t * opt_search(cmd_desc_t *p_table, char *p_opt)
+static cmd_desc_t *opt_search(cmd_desc_t *p_table, char *p_opt)
 {
 	cmd_desc_t *it = p_table;
 
-	while( it->option != NULL)
-	{
-		if (strcmp(p_opt, it->option) == 0)
-		{
+	while (it->option != NULL) {
+		if (strcmp(p_opt, it->option) == 0) {
 			return it;
 		}
 		++it;
@@ -51,8 +48,7 @@ static cmd_desc_t * opt_search(cmd_desc_t *p_table, char *p_opt)
 */
 int cmd_init(cmd_data_t *cmd)
 {
-	if (!cmd)
-	{
+	if (!cmd) {
 		return RC_INVALID_POINTER;
 	}
 
@@ -63,19 +59,15 @@ int cmd_init(cmd_data_t *cmd)
 
 int cmd_destruct(cmd_data_t *cmd)
 {
-	if (!cmd)
-	{
+	if (!cmd) {
 		return RC_INVALID_POINTER;
 	}
 
-	if (cmd->argv)
-	{
+	if (cmd->argv) {
 		int i;
 
-		for (i = 0; i < cmd->argc; ++i)
-		{
-			if (cmd->argv[i])
-			{
+		for (i = 0; i < cmd->argc; ++i) {
+			if (cmd->argv[i]) {
 				free(cmd->argv[i]);
 			}
 		}
@@ -91,37 +83,36 @@ int cmd_add_val(cmd_data_t *cmd, char *p_val)
 {
 	int rc = 0;
 
-	if (!cmd || !p_val)
-	{
+	if (!cmd || !p_val) {
 		return RC_INVALID_POINTER;
 	}
 
-	do
-	{
+	do {
 		char *p;
-		char **pp = (char **)realloc(cmd->argv, (cmd->argc + 1) * sizeof(char *));
-		if (!pp)
-		{
+		char **pp =
+		    (char **)realloc(cmd->argv,
+				     (cmd->argc + 1) * sizeof(char *));
+		if (!pp) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
 		cmd->argv = pp;
 
 		p = (char *)malloc(strlen(p_val) + 1);
-		if (!p)
-		{
+		if (!p) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
 
 		strcpy(p, p_val);
 		cmd->argv[cmd->argc] = p;
-		cmd->argc ++;
+		cmd->argc++;
 	}
 	while (0);
 
 	return rc;
 }
+
 /** Creates a struct of argvals from the given command line.
     Action:
     copy the argv from the command line to the given cmd_data_t struct
@@ -135,8 +126,7 @@ int cmd_add_vals_from_argv(cmd_data_t *cmd, char **argv, int argc)
 	if (!cmd || !argv || !argc)
 		return RC_INVALID_POINTER;
 
-	for (i = 0; i < argc; ++i)
-	{
+	for (i = 0; i < argc; ++i) {
 		rc = cmd_add_val(cmd, argv[i]);
 		if (rc != 0)
 			break;
@@ -144,7 +134,6 @@ int cmd_add_vals_from_argv(cmd_data_t *cmd, char **argv, int argc)
 
 	return rc;
 }
-
 
 /*
   Parses the incoming argv list.
@@ -167,13 +156,12 @@ int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc)
 {
 	int rc = 0;
 	cmd_data_t cmd;
-	int current = 1; /* Skip daemon name */
+	int current = 1;	/* Skip daemon name */
 
 	if (argv == NULL || desc == NULL)
 		return RC_INVALID_POINTER;
 
-	do
-	{
+	do {
 		rc = cmd_init(&cmd);
 		if (rc != 0)
 			break;
@@ -182,35 +170,34 @@ int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc)
 		if (rc != 0)
 			break;
 
-	 	while (current < cmd.argc)
-		{
+		while (current < cmd.argc) {
 			cmd_desc_t *ptr = opt_search(desc, cmd.argv[current]);
 
-			if (ptr == NULL)
-			{
+			if (ptr == NULL) {
 				rc = RC_CMD_PARSER_INVALID_OPTION;
-				logit(LOG_WARNING, "Invalid option name at position %d: %s",
+				logit(LOG_WARNING,
+				      "Invalid option name at position %d: %s",
 				      current + 1, cmd.argv[current]);
 				break;
 			}
-
-//			logit(LOG_NOTICE, "Found opt %d: %s", current, cmd.argv[current]);
+//                      logit(LOG_NOTICE, "Found opt %d: %s", current, cmd.argv[current]);
 
 			++current;
 
-			/*check arg nr required by the current option*/
-			if (current + ptr->argno > cmd.argc)
-			{
+			/*check arg nr required by the current option */
+			if (current + ptr->argno > cmd.argc) {
 				rc = RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
-				logit(LOG_WARNING, "Missing option value at position %d: %s",
+				logit(LOG_WARNING,
+				      "Missing option value at position %d: %s",
 				      current + 1, ptr->option);
 				break;
 			}
 
-			rc = ptr->handler.func(&cmd, current, ptr->handler.context);
-			if (rc != 0)
-			{
-				logit(LOG_WARNING, "Error parsing option %s", cmd.argv[current - 1]);
+			rc = ptr->handler.func(&cmd, current,
+					       ptr->handler.context);
+			if (rc != 0) {
+				logit(LOG_WARNING, "Error parsing option %s",
+				      cmd.argv[current - 1]);
 				break;
 			}
 
@@ -228,7 +215,6 @@ int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc)
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

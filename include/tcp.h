@@ -16,7 +16,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-
 /* interface for tcp functions */
 
 #ifndef _TCP_H_INCLUDED
@@ -26,13 +25,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errorcode.h"
 #include "ip.h"
 
-
 /* SOME DEFAULT CONFIGURATIONS */
-#define TCP_DEFAULT_TIMEOUT	20000 /*ms*/
+#define TCP_DEFAULT_TIMEOUT	20000	/*ms */
 
-
-typedef struct
-{
+typedef struct {
 	ip_sock_t super;
 	int initialized;
 } tcp_sock_t;
@@ -59,24 +55,31 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg);
 */
 int tcp_shutdown(tcp_sock_t *p_self);
 
-
 /* send data*/
 int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len);
 
 /* receive data*/
-int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
+int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len,
+	     int *p_recv_len);
 
 /* Accessors */
 
 int tcp_set_port(tcp_sock_t *p_self, int p);
-int tcp_set_remote_name(tcp_sock_t *p_self, const char* p);
+int tcp_set_remote_name(tcp_sock_t *p_self, const char *p);
 int tcp_set_remote_timeout(tcp_sock_t *p_self, int t);
 int tcp_set_bind_iface(tcp_sock_t *p_self, char *ifname);
 
 int tcp_get_port(tcp_sock_t *p_self, int *p_port);
-int tcp_get_remote_name(tcp_sock_t *p_self, const char* *p);
+int tcp_get_remote_name(tcp_sock_t *p_self, const char * *p);
 int tcp_get_remote_timeout(tcp_sock_t *p_self, int *p);
 int tcp_get_bind_iface(tcp_sock_t *p_self, char **ifname);
 
-
 #endif /*_TCP_H_INCLUDED*/
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ * End:
+ */

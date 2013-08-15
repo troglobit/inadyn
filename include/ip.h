@@ -25,23 +25,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errorcode.h"
 
 /* SOME DEFAULT CONFIGURATIONS */
-#define IP_DEFAULT_TIMEOUT		20000 /* ms */
+#define IP_DEFAULT_TIMEOUT		20000	/* ms */
 #define IP_SOCKET_MAX_PORT		65535
 #define IP_DEFAULT_READ_CHUNK_SIZE	100
 
 /* typedefs */
-enum
-{
+enum {
 	TYPE_TCP = 0,
 	TYPE_UDP
 };
 
-typedef struct
-{
+typedef struct {
 	int initialized;
 
 	char *ifname;
-	int bound;             /* When bound to an interface */
+	int bound;		/* When bound to an interface */
 
 	int type;
 	int socket;
@@ -53,7 +51,6 @@ typedef struct
 	unsigned short port;
 	int timeout;
 } ip_sock_t;
-
 
 /*public functions*/
 
@@ -85,7 +82,6 @@ int ip_send(ip_sock_t *p_self, const char *p_buf, int len);
 /* receive data*/
 int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
 
-
 /*Accessors */
 int ip_set_port(ip_sock_t *p_self, int p);
 int ip_set_remote_name(ip_sock_t *p_self, const char *p);
@@ -103,7 +99,6 @@ int ip_get_bind_iface(ip_sock_t *p_self, char **ifname);
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

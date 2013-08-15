@@ -33,22 +33,22 @@ static void *param = NULL;
 
 void os_sleep_ms(int ms)
 {
-    usleep(ms*1000);
+	usleep(ms * 1000);
 }
 
-int  os_get_socket_error (void)
+int os_get_socket_error(void)
 {
-    return errno;
+	return errno;
 }
 
 int os_ip_support_startup(void)
 {
-    return 0;
+	return 0;
 }
 
 int os_ip_support_cleanup(void)
 {
-    return 0;
+	return 0;
 }
 
 int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
@@ -57,23 +57,22 @@ int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 	int child;
 
 	child = vfork();
-	switch (child)
-	{
-		case 0: /* child */
-			setenv("INADYN_IP", ip, 1);
-			setenv("INADYN_HOSTNAME", hostname, 1);
-			if (iface)
-				setenv("INADYN_IFACE", iface, 1);
-			execl("/bin/sh", "sh", "-c", cmd, (char *) 0);
-			exit(1);
-			break;
+	switch (child) {
+	case 0:		/* child */
+		setenv("INADYN_IP", ip, 1);
+		setenv("INADYN_HOSTNAME", hostname, 1);
+		if (iface)
+			setenv("INADYN_IFACE", iface, 1);
+		execl("/bin/sh", "sh", "-c", cmd, (char *)0);
+		exit(1);
+		break;
 
-		case -1:
-			rc = RC_OS_FORK_FAILURE;
-			break;
+	case -1:
+		rc = RC_OS_FORK_FAILURE;
+		break;
 
-		default: /* parent */
-			break;
+	default:		/* parent */
+		break;
 	}
 
 	return rc;
@@ -94,35 +93,33 @@ static void unix_signal_handler(int signo)
 {
 	ddns_t *ctx = (ddns_t *)param;
 
-	if (ctx == NULL)
-	{
-//		logit(LOG_WARNING, "Signal %d received. But handler is not installed correctly.", signo);
+	if (ctx == NULL) {
+//              logit(LOG_WARNING, "Signal %d received. But handler is not installed correctly.", signo);
 		return;
 	}
 
-	switch (signo)
-	{
-		case SIGHUP:
-//			logit(LOG_DEBUG, "Signal %d received. Sending restart command.", signo);
-			ctx->cmd = CMD_RESTART;
-			break;
+	switch (signo) {
+	case SIGHUP:
+//                      logit(LOG_DEBUG, "Signal %d received. Sending restart command.", signo);
+		ctx->cmd = CMD_RESTART;
+		break;
 
-		case SIGINT:
-		case SIGQUIT:
-		case SIGALRM:
-		case SIGTERM:
-//			logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
-			ctx->cmd = CMD_STOP;
-			break;
+	case SIGINT:
+	case SIGQUIT:
+	case SIGALRM:
+	case SIGTERM:
+//                      logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
+		ctx->cmd = CMD_STOP;
+		break;
 
-		case SIGUSR1:
-//			logit(LOG_DEBUG, "Signal %d received. Sending forced update command.", signo);
-			ctx->cmd = CMD_FORCED_UPDATE;
-			break;
+	case SIGUSR1:
+//                      logit(LOG_DEBUG, "Signal %d received. Sending forced update command.", signo);
+		ctx->cmd = CMD_FORCED_UPDATE;
+		break;
 
-		default:
-//			logit(LOG_DEBUG, "Signal %d received, ignoring.", signo);
-			break;
+	default:
+//                      logit(LOG_DEBUG, "Signal %d received, ignoring.", signo);
+		break;
 	}
 	return;
 }
@@ -135,26 +132,26 @@ static void unix_signal_handler(int signo)
 int os_install_signal_handler(void *context)
 {
 	int rc;
-	struct sigaction    newact;
+	struct sigaction newact;
 	newact.sa_handler = unix_signal_handler;
-	newact.sa_flags   = 0;
+	newact.sa_flags = 0;
 
-	rc = sigemptyset(&newact.sa_mask)            ||
-		sigaddset(&newact.sa_mask, SIGHUP)   ||
-		sigaddset(&newact.sa_mask, SIGINT)   ||
-		sigaddset(&newact.sa_mask, SIGQUIT)  ||
-		sigaddset(&newact.sa_mask, SIGUSR1)  ||
-		sigaddset(&newact.sa_mask, SIGTERM)  ||
-		sigaction(SIGALRM, &newact, NULL)    ||
-		sigemptyset(&newact.sa_mask)         ||
-		sigaddset(&newact.sa_mask, SIGALRM)  ||
-		sigaction(SIGHUP, &newact, NULL)     ||
-		sigaction(SIGINT, &newact, NULL)     ||
-		sigaction(SIGQUIT, &newact, NULL)    ||
-		sigaction(SIGUSR1, &newact, NULL)    ||
-		sigaction(SIGTERM, &newact, NULL);
+	rc = sigemptyset(&newact.sa_mask) ||
+	    sigaddset(&newact.sa_mask, SIGHUP) ||
+	    sigaddset(&newact.sa_mask, SIGINT) ||
+	    sigaddset(&newact.sa_mask, SIGQUIT) ||
+	    sigaddset(&newact.sa_mask, SIGUSR1) ||
+	    sigaddset(&newact.sa_mask, SIGTERM) ||
+	    sigaction(SIGALRM, &newact, NULL) ||
+	    sigemptyset(&newact.sa_mask) ||
+	    sigaddset(&newact.sa_mask, SIGALRM) ||
+	    sigaction(SIGHUP, &newact, NULL) ||
+	    sigaction(SIGINT, &newact, NULL) ||
+	    sigaction(SIGQUIT, &newact, NULL) ||
+	    sigaction(SIGUSR1, &newact, NULL) ||
+	    sigaction(SIGTERM, &newact, NULL);
 
- 	if (rc == 0)
+	if (rc == 0)
 		param = context;
 
 	return rc;
@@ -181,67 +178,63 @@ int os_install_signal_handler(void *context)
 */
 int close_console_window(void)
 {
-    pid_t pid = fork();
+	pid_t pid = fork();
 
-    if (pid < 0)
-    {
-	return RC_OS_FORK_FAILURE;
-    }
+	if (pid < 0) {
+		return RC_OS_FORK_FAILURE;
+	}
 
-    if (pid == 0)		/* child */
-    {
-	fclose(stdin);
-	fclose(stderr);
-	setsid();
+	if (pid == 0) {		/* child */
+		fclose(stdin);
+		fclose(stderr);
+		setsid();
 
-	if (-1 == chdir("/"))
-		logit(LOG_WARNING, "Failed changing cwd to /: %s", strerror(errno));
+		if (-1 == chdir("/"))
+			logit(LOG_WARNING, "Failed changing cwd to /: %s",
+			      strerror(errno));
 
-	umask(0);
+		umask(0);
 
-	return 0;
-    }
+		return 0;
+	}
 
-    exit(0);
+	exit(0);
 
-    return 0;		/* Never reached. */
+	return 0;		/* Never reached. */
 }
 
 int os_syslog_open(const char *name)
 {
-    openlog(name, LOG_PID, LOG_USER);
-    return 0;
+	openlog(name, LOG_PID, LOG_USER);
+	return 0;
 }
 
 int os_syslog_close(void)
 {
-    closelog();
-    return 0;
+	closelog();
+	return 0;
 }
 
 int os_change_persona(ddns_user_t *user)
 {
 	int rc;
 
-	do
-	{
-		if (user->gid != getgid())
-		{
+	do {
+		if (user->gid != getgid()) {
 			if ((rc = setgid(user->gid)) != 0)
 				break;
 		}
 
-		if (user->uid != getuid())
-		{
+		if (user->uid != getuid()) {
 			if ((rc = setuid(user->uid)) != 0)
 				break;
 		}
 	}
-	while(0);
+	while (0);
 
-	if (rc != 0)
-	{
-		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
+	if (rc != 0) {
+		logit(LOG_WARNING, "Failed dropping privileges: %s",
+		      strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 
@@ -252,7 +245,6 @@ int os_change_persona(ddns_user_t *user)
  * Local Variables:
  *  version-control: t
  *  indent-tabs-mode: t
- *  c-file-style: "ellemtel"
- *  c-basic-offset: 8
+ *  c-file-style: "linux"
  * End:
  */

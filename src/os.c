@@ -40,60 +40,56 @@ static int global_mod_dbg_dest = DBG_STD_LOG;
 */
 int get_dbg_dest(void)
 {
-    return global_mod_dbg_dest;
+	return global_mod_dbg_dest;
 }
 
 void set_dbg_dest(int dest)
 {
-    global_mod_dbg_dest = dest;
+	global_mod_dbg_dest = dest;
 }
 
 static char *current_time(void)
 {
-    time_t now;
-    struct tm *timeptr;
-    static const char wday_name[7][3] = {
-	"Sun", "Mon", "Tue", "Wed",
-	"Thu", "Fri", "Sat"
-    };
-    static const char mon_name[12][3] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-    static char result[26];
+	time_t now;
+	struct tm *timeptr;
+	static const char wday_name[7][3] = {
+		"Sun", "Mon", "Tue", "Wed",
+		"Thu", "Fri", "Sat"
+	};
+	static const char mon_name[12][3] = {
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	};
+	static char result[26];
 
-    time(&now);
-    timeptr = localtime(&now);
+	time(&now);
+	timeptr = localtime(&now);
 
-    sprintf(result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d:",
-	wday_name[timeptr->tm_wday], mon_name[timeptr->tm_mon],
-	timeptr->tm_mday, timeptr->tm_hour, timeptr->tm_min,
-	timeptr->tm_sec, 1900 + timeptr->tm_year);
+	sprintf(result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d:",
+		wday_name[timeptr->tm_wday], mon_name[timeptr->tm_mon],
+		timeptr->tm_mday, timeptr->tm_hour, timeptr->tm_min,
+		timeptr->tm_sec, 1900 + timeptr->tm_year);
 
-    return result;
+	return result;
 }
 
-void os_printf(int prio, char *fmt, ... )
+void os_printf(int prio, char *fmt, ...)
 {
-    va_list args;
-    static char message[MAXSTRING + 1];
+	va_list args;
+	static char message[MAXSTRING + 1];
 
-    message[MAXSTRING] = 0;
-    va_start(args, fmt);
-    vsnprintf(message, sizeof(message), fmt, args);
-    va_end(args);
+	message[MAXSTRING] = 0;
+	va_start(args, fmt);
+	vsnprintf(message, sizeof(message), fmt, args);
+	va_end(args);
 
-    if (get_dbg_dest() == DBG_SYS_LOG)
-    {
-	syslog(prio, "%s",message);
-    }
-    else
-    {
-	printf("%s %s\n", current_time(), message);
-        fflush(stdout);
-    }
+	if (get_dbg_dest() == DBG_SYS_LOG) {
+		syslog(prio, "%s", message);
+	} else {
+		printf("%s %s\n", current_time(), message);
+		fflush(stdout);
+	}
 }
-
 
 /**
  * Opens the dbg output for the required destination.
@@ -105,39 +101,36 @@ void os_printf(int prio, char *fmt, ... )
  */
 int os_open_dbg_output(int dest, const char *name, const char *logfile)
 {
-    int rc = 0;
-    FILE *pF;
+	int rc = 0;
+	FILE *pF;
 
-    set_dbg_dest(dest);
+	set_dbg_dest(dest);
 
-    switch (get_dbg_dest())
-    {
-    case DBG_SYS_LOG:
-	if (name == NULL)
-	{
-	    rc = RC_INVALID_POINTER;
-	    break;
+	switch (get_dbg_dest()) {
+	case DBG_SYS_LOG:
+		if (name == NULL) {
+			rc = RC_INVALID_POINTER;
+			break;
+		}
+		rc = os_syslog_open(name);
+		break;
+
+	case DBG_FILE_LOG:
+		if (logfile == NULL) {
+			rc = RC_INVALID_POINTER;
+			break;
+		}
+
+		pF = freopen(logfile, "ab", stdout);
+		if (pF == NULL)
+			rc = RC_FILE_IO_OPEN_ERROR;
+		break;
+
+	case DBG_STD_LOG:
+	default:
+		rc = 0;
 	}
-	rc = os_syslog_open(name);
-	break;
-
-    case DBG_FILE_LOG:
-	if (logfile == NULL)
-	{
-	    rc = RC_INVALID_POINTER;
-	    break;
-	}
-
-        pF = freopen(logfile, "ab", stdout);
-        if (pF == NULL)
-		rc = RC_FILE_IO_OPEN_ERROR;
-        break;
-
-    case DBG_STD_LOG:
-    default:
-	rc = 0;
-    }
-    return rc;
+	return rc;
 }
 
 /**
@@ -145,23 +138,30 @@ int os_open_dbg_output(int dest, const char *name, const char *logfile)
  */
 int os_close_dbg_output(void)
 {
-    int rc = 0;
+	int rc = 0;
 
-    switch (get_dbg_dest())
-    {
-    case DBG_SYS_LOG:
-	rc = os_syslog_close();
-	break;
+	switch (get_dbg_dest()) {
+	case DBG_SYS_LOG:
+		rc = os_syslog_close();
+		break;
 
-    case DBG_FILE_LOG:
-	fclose(stdout);
-	rc = 0;
-	break;
+	case DBG_FILE_LOG:
+		fclose(stdout);
+		rc = 0;
+		break;
 
-    case DBG_STD_LOG:
-    default:
-	rc = 0;
-    }
+	case DBG_STD_LOG:
+	default:
+		rc = 0;
+	}
 
-    return rc;
+	return rc;
 }
+
+/**
+ * Local Variables:
+ *  version-control: t
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
+ * End:
+ */
