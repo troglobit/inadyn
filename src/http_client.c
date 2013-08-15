@@ -42,8 +42,7 @@ int http_client_construct(http_client_t *p_self)
 	}
 
 	/*init */
-	memset((char *)p_self + sizeof(p_self->super), 0,
-	       sizeof(*p_self) - sizeof(p_self->super));
+	memset((char *)p_self + sizeof(p_self->super), 0, sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = 0;
 
 	return 0;
@@ -143,9 +142,7 @@ static void http_response_parse(http_trans_t *p_tr)
 		body += strlen(sep);
 		p_tr->p_rsp_body = body;
 	}
-	if (sscanf
-	    (p_tr->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status,
-	     p_tr->status_desc) == 2)
+	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, p_tr->status_desc) == 2)
 		p_tr->status = status;
 }
 
@@ -167,8 +164,7 @@ int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr)
 			break;
 		}
 
-		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len,
-			      &p_tr->rsp_len);
+		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len, &p_tr->rsp_len);
 	}
 	while (0);
 

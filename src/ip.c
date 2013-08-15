@@ -91,9 +91,7 @@ int ip_initialize(ip_sock_t *p_self)
 			if (sd < 0) {
 				int code = os_get_socket_error();
 
-				logit(LOG_WARNING,
-				      "Failed opening network socket: %s",
-				      strerror(code));
+				logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -104,14 +102,12 @@ int ip_initialize(ip_sock_t *p_self)
 				p_self->local_addr.sin_family = AF_INET;
 				p_self->local_addr.sin_port = htons(0);
 				addrp = (struct sockaddr_in *)&(ifr.ifr_addr);
-				p_self->local_addr.sin_addr.s_addr =
-				    addrp->sin_addr.s_addr;
+				p_self->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
 				p_self->bound = 1;
 
 				logit(LOG_INFO,
 				      "Bound to interface %s (IP# %s)",
-				      p_self->ifname,
-				      inet_ntoa(p_self->local_addr.sin_addr));
+				      p_self->ifname, inet_ntoa(p_self->local_addr.sin_addr));
 			} else {
 				int code = os_get_socket_error();
 
@@ -138,13 +134,11 @@ int ip_initialize(ip_sock_t *p_self)
 			hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
 			snprintf(port, sizeof(port), "%d", p_self->port);
 
-			s = getaddrinfo(p_self->p_remote_host_name, port,
-					&hints, &result);
+			s = getaddrinfo(p_self->p_remote_host_name, port, &hints, &result);
 			if (s != 0 || !result) {
 				logit(LOG_WARNING,
 				      "Failed resolving hostname %s: %s",
-				      p_self->p_remote_host_name,
-				      gai_strerror(s));
+				      p_self->p_remote_host_name, gai_strerror(s));
 				rc = RC_IP_INVALID_REMOTE_ADDR;
 				break;
 			}
@@ -208,9 +202,7 @@ int ip_send(ip_sock_t *p_self, const char *p_buf, int len)
 	if (send(p_self->socket, (char *)p_buf, len, 0) == -1) {
 		int code = os_get_socket_error();
 
-		logit(LOG_WARNING,
-		      "Network error while sending query/update: %s",
-		      strerror(code));
+		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(code));
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -244,17 +236,13 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	while (remaining_buf_len > 0) {
 		int chunk_size =
 		    remaining_buf_len >
-		    IP_DEFAULT_READ_CHUNK_SIZE ? IP_DEFAULT_READ_CHUNK_SIZE :
-		    remaining_buf_len;
+		    IP_DEFAULT_READ_CHUNK_SIZE ? IP_DEFAULT_READ_CHUNK_SIZE : remaining_buf_len;
 
-		recv_len =
-		    recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
+		recv_len = recv(p_self->socket, p_buf + total_recv_len, chunk_size, 0);
 		if (recv_len < 0) {
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING,
-			      "Network error while waiting for reply: %s",
-			      strerror(code));
+			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(code));
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}

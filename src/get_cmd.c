@@ -89,9 +89,8 @@ int cmd_add_val(cmd_data_t *cmd, char *p_val)
 
 	do {
 		char *p;
-		char **pp =
-		    (char **)realloc(cmd->argv,
-				     (cmd->argc + 1) * sizeof(char *));
+		char **pp = (char **)realloc(cmd->argv,
+					     (cmd->argc + 1) * sizeof(char *));
 		if (!pp) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
@@ -176,8 +175,7 @@ int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc)
 			if (ptr == NULL) {
 				rc = RC_CMD_PARSER_INVALID_OPTION;
 				logit(LOG_WARNING,
-				      "Invalid option name at position %d: %s",
-				      current + 1, cmd.argv[current]);
+				      "Invalid option name at position %d: %s", current + 1, cmd.argv[current]);
 				break;
 			}
 //                      logit(LOG_NOTICE, "Found opt %d: %s", current, cmd.argv[current]);
@@ -188,16 +186,13 @@ int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc)
 			if (current + ptr->argno > cmd.argc) {
 				rc = RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
 				logit(LOG_WARNING,
-				      "Missing option value at position %d: %s",
-				      current + 1, ptr->option);
+				      "Missing option value at position %d: %s", current + 1, ptr->option);
 				break;
 			}
 
-			rc = ptr->handler.func(&cmd, current,
-					       ptr->handler.context);
+			rc = ptr->handler.func(&cmd, current, ptr->handler.context);
 			if (rc != 0) {
-				logit(LOG_WARNING, "Error parsing option %s",
-				      cmd.argv[current - 1]);
+				logit(LOG_WARNING, "Error parsing option %s", cmd.argv[current - 1]);
 				break;
 			}
 

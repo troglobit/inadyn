@@ -37,8 +37,7 @@ int tcp_construct(tcp_sock_t *p_self)
 	}
 
 	/*reset its part of the struct (skip IP part) */
-	memset(((char *)p_self + sizeof(p_self->super)), 0,
-	       sizeof(*p_self) - sizeof(p_self->super));
+	memset(((char *)p_self + sizeof(p_self->super)), 0, sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = 0;
 
 	return 0;
@@ -101,9 +100,7 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 			if (p_self->super.socket == -1) {
 				int code = os_get_socket_error();
 
-				logit(LOG_ERR,
-				      "Error creating client socket: %s",
-				      strerror(code));
+				logit(LOG_ERR, "Error creating client socket: %s", strerror(code));
 				rc = RC_IP_SOCKET_CREATE_ERROR;
 				break;
 			}
@@ -115,8 +112,7 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 			if (p_self->super.bound == 1) {
 				if (bind
 				    (p_self->super.socket,
-				     (struct sockaddr *)&p_self->super.
-				     local_addr,
+				     (struct sockaddr *)&p_self->super.local_addr,
 				     sizeof(struct sockaddr_in)) < 0) {
 					int code = os_get_socket_error();
 
@@ -135,10 +131,8 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 		/* set timeouts */
 		sv.tv_sec = p_self->super.timeout / 1000;	/* msec to sec */
 		sv.tv_usec = (p_self->super.timeout % 1000) * 1000;	/* reminder to usec */
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv,
-			   svlen);
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv,
-			   svlen);
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, svlen);
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, svlen);
 
 		if (!getnameinfo
 		    (&p_self->super.remote_addr, p_self->super.remote_len, host,
@@ -147,14 +141,10 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 			      p_self->super.p_remote_host_name, host);
 		}
 
-		if (0 !=
-		    connect(p_self->super.socket, &p_self->super.remote_addr,
-			    p_self->super.remote_len)) {
+		if (0 != connect(p_self->super.socket, &p_self->super.remote_addr, p_self->super.remote_len)) {
 			int code = os_get_socket_error();
 
-			logit(LOG_WARNING,
-			      "Failed connecting to remote server: %s",
-			      strerror(code));
+			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(code));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}

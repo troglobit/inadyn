@@ -148,8 +148,7 @@ int os_install_signal_handler(void *context)
 	    sigaction(SIGHUP, &newact, NULL) ||
 	    sigaction(SIGINT, &newact, NULL) ||
 	    sigaction(SIGQUIT, &newact, NULL) ||
-	    sigaction(SIGUSR1, &newact, NULL) ||
-	    sigaction(SIGTERM, &newact, NULL);
+	    sigaction(SIGUSR1, &newact, NULL) || sigaction(SIGTERM, &newact, NULL);
 
 	if (rc == 0)
 		param = context;
@@ -190,8 +189,7 @@ int close_console_window(void)
 		setsid();
 
 		if (-1 == chdir("/"))
-			logit(LOG_WARNING, "Failed changing cwd to /: %s",
-			      strerror(errno));
+			logit(LOG_WARNING, "Failed changing cwd to /: %s", strerror(errno));
 
 		umask(0);
 
@@ -233,8 +231,7 @@ int os_change_persona(ddns_user_t *user)
 	while (0);
 
 	if (rc != 0) {
-		logit(LOG_WARNING, "Failed dropping privileges: %s",
-		      strerror(errno));
+		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 

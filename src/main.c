@@ -101,12 +101,10 @@ static int init_context(ddns_t **pctx)
 			free(ctx->work_buf);
 
 		if (http_to_dyndns_constructed)
-			http_client_destruct(ctx->http_to_dyndns,
-					     DYNDNS_MAX_SERVER_NUMBER);
+			http_client_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
 
 		if (http_to_ip_constructed)
-			http_client_destruct(ctx->http_to_ip_server,
-					     DYNDNS_MAX_SERVER_NUMBER);
+			http_client_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
 
 		free(ctx);
 		*pctx = NULL;
@@ -183,8 +181,7 @@ int main(int argc, char *argv[])
 			rc = os_install_signal_handler(ctx);
 			if (rc != 0) {
 				logit(LOG_WARNING,
-				      "Failed installing OS signal handler: %s",
-				      errorcode_get_name(rc));
+				      "Failed installing OS signal handler: %s", errorcode_get_name(rc));
 				break;
 			}
 			os_handler_installed = 1;
@@ -208,8 +205,7 @@ int main(int argc, char *argv[])
 	while (restart);
 
 	if (rc != 0)
-		logit(LOG_WARNING, "Failed %sstarting daemon: %s",
-		      restart ? "re" : "", errorcode_get_name(rc));
+		logit(LOG_WARNING, "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
 
 	/* Cleanup */
 	free_context(ctx);

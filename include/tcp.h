@@ -59,8 +59,7 @@ int tcp_shutdown(tcp_sock_t *p_self);
 int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len);
 
 /* receive data*/
-int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len,
-	     int *p_recv_len);
+int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
 
 /* Accessors */
 
