@@ -45,6 +45,9 @@
 static int cached_time_since_last_update = 0;
 static int cached_num_iterations = 0;
 
+/* Cleared to zero if the application is ever SIGHUP'ed */
+static int startup = 1;
+
 static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt);
 static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt);
 static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt);
@@ -1275,10 +1278,9 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 
 	/* Wait for network and any NTP daemon to set system time correctly.
 	 * Will wake up on any signal, but it is recommended to use SIGUSR1 */
-	if (ctx->startup_delay_sec) {
+	if (startup && ctx->startup_delay_sec) {
 		logit(LOG_NOTICE, "Startup delay: %d sec ...", ctx->startup_delay_sec);
 		os_sleep_ms(1000 * ctx->startup_delay_sec);
-		ctx->startup_delay_sec = 0;	/* Don't trigger att SIGHUP */
 	}
 
 	/* At boot, or when restarting inadyn at runtime, the memory struct holding
@@ -1438,6 +1440,9 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 		cached_num_iterations = ctx->num_iterations;
 	}
 	while (0);
+
+	/* In case we return, due to SIGHUP, used by startup-delay above */
+	startup = 0;
 
 	/* if everything ok here we should exit. End of program */
 	if (rc == 0)
