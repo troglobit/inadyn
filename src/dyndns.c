@@ -1376,7 +1376,7 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			rc = dyn_dns_update_ip(ctx);
 			if (rc != 0) {
 				if (ctx->cmd == CMD_RESTART) {
-					logit(LOG_DEBUG, "RESTART command received. Restarting.");
+					logit(LOG_INFO, "RESTART command received. Restarting.");
 					rc = RC_RESTART;
 					break;
 				}
@@ -1416,16 +1416,17 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			dyn_dns_wait_for_cmd(ctx);
 
 			if (ctx->cmd == CMD_STOP) {
-				logit(LOG_DEBUG, "STOP command received, exiting.");
+				logit(LOG_INFO, "STOP command received, exiting.");
 				rc = 0;
 				break;
 			}
 			if (ctx->cmd == CMD_RESTART) {
-				logit(LOG_DEBUG, "RESTART command received, restarting.");
+				logit(LOG_INFO, "RESTART command received, restarting.");
 				rc = RC_RESTART;
 				break;
 			}
 			if (ctx->cmd == CMD_FORCED_UPDATE) {
+				logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
 				ctx->force_addr_update = 1;
 				continue;
 			}
