@@ -220,10 +220,16 @@ disabled. For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
 .It Fl t, -startup-delay Ar SEC
-Wait for network to come up and system clock to be set correctly at
-boot.  Any signal received during this sleep will wake up
+Wait time during program startup.  Default is 0 seconds.  Any signal
+received during this sleep will wake up
 .Nm
-but SIGUSR1 is recommended to use.
+but it is recommended to use SIGUSR1.
+Intended to allow time for embedded devices without a battery backed
+real time clock to set their clock via NTP at bootup.  This is so that
+the time since the last update can be calculated correctly from the
+cachefile and the
+.Fl -forced-update
+option honored across reboots, avoiding unnecessary IP address updates.
 .It Fl o, -once
 Force one update and quit.
 .El
