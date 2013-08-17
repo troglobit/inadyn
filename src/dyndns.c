@@ -917,6 +917,7 @@ static int do_update_alias_table(ddns_t *ctx)
 					      "Successful alias table update for %s => new IP# %s",
 					      info->alias[j].names.name, info->my_ip_address.name);
 					ctx->time_since_last_update = 0;
+					ctx->force_addr_update = 0;
 					anychange++;
 				} else {
 					logit(LOG_WARNING,
@@ -1393,7 +1394,6 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			/* SIGUSR1 has been handled now, reset cmd */
 			if (ctx->cmd == CMD_FORCED_UPDATE) {
 				ctx->cmd = NO_CMD;
-				ctx->force_addr_update = 0;
 			}
 
 			/* check if the user wants us to stop */
