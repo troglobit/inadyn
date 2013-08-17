@@ -80,6 +80,7 @@ static int init_context(ddns_t **pctx)
 		http_to_dyndns_constructed = 1;
 
 		ctx->cmd = NO_CMD;
+		ctx->startup_delay_sec = DYNDNS_DEFAULT_STARTUP_SLEEP;
 		ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
 		ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 		ctx->total_iterations = DYNDNS_DEFAULT_ITERATIONS;
