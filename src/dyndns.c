@@ -1379,6 +1379,7 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 				if (ctx->cmd == CMD_RESTART) {
 					logit(LOG_INFO, "RESTART command received. Restarting.");
 					rc = RC_RESTART;
+					ctx->cmd = NO_CMD;
 					break;
 				}
 
@@ -1413,11 +1414,13 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			if (ctx->cmd == CMD_STOP) {
 				logit(LOG_INFO, "STOP command received, exiting.");
 				rc = 0;
+				ctx->cmd = NO_CMD;
 				break;
 			}
 			if (ctx->cmd == CMD_RESTART) {
 				logit(LOG_INFO, "RESTART command received, restarting.");
 				rc = RC_RESTART;
+				ctx->cmd = NO_CMD;
 				break;
 			}
 			if (ctx->cmd == CMD_FORCED_UPDATE) {
