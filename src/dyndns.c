@@ -45,9 +45,6 @@
 static int cached_time_since_last_update = 0;
 static int cached_num_iterations = 0;
 
-/* Cleared to zero if the application is ever SIGHUP'ed */
-static int startup = 1;
-
 static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt);
 static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt);
 static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt);
@@ -920,6 +917,7 @@ static int do_update_alias_table(ddns_t *ctx)
 					      "Successful alias table update for %s => new IP# %s",
 					      info->alias[j].names.name, info->my_ip_address.name);
 					ctx->time_since_last_update = 0;
+					ctx->force_addr_update = 0;
 					anychange++;
 				} else {
 					logit(LOG_WARNING,
@@ -1210,6 +1208,7 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 	int rc = 0;
 	int i, s;
 	char name[DYNDNS_SERVER_NAME_LEN];
+	static int first_startup = 1;
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
@@ -1276,11 +1275,15 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 	/* "Hello!" Let user know we've started up OK */
 	logit(LOG_INFO, "%s", DYNDNS_VERSION_STRING);
 
-	/* Wait for network and any NTP daemon to set system time correctly.
-	 * Will wake up on any signal, but it is recommended to use SIGUSR1 */
-	if (startup && ctx->startup_delay_sec) {
+	/* On first startup only, optionally wait for network and any NTP daemon
+	 * to set system time correctly.  Intended for devices without battery
+	 * backed real time clocks as initialization of time since last update
+	 * requires the correct time.  Sleep can be cancelled with any signal,
+	 * but it is recommended to use SIGUSR1. */
+	if (first_startup && ctx->startup_delay_sec) {
 		logit(LOG_NOTICE, "Startup delay: %d sec ...", ctx->startup_delay_sec);
 		os_sleep_ms(1000 * ctx->startup_delay_sec);
+		first_startup = 0;
 	}
 
 	/* At boot, or when restarting inadyn at runtime, the memory struct holding
@@ -1374,8 +1377,9 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			rc = dyn_dns_update_ip(ctx);
 			if (rc != 0) {
 				if (ctx->cmd == CMD_RESTART) {
-					logit(LOG_DEBUG, "RESTART command received. Restarting.");
+					logit(LOG_INFO, "RESTART command received. Restarting.");
 					rc = RC_RESTART;
+					ctx->cmd = NO_CMD;
 					break;
 				}
 
@@ -1386,12 +1390,6 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			} else {
 				/* count only the successful iterations */
 				ctx->num_iterations++;
-			}
-
-			/* SIGUSR1 has been handled now, reset cmd */
-			if (ctx->cmd == CMD_FORCED_UPDATE) {
-				ctx->cmd = NO_CMD;
-				ctx->force_addr_update = 0;
 			}
 
 			/* check if the user wants us to stop */
@@ -1414,17 +1412,21 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			dyn_dns_wait_for_cmd(ctx);
 
 			if (ctx->cmd == CMD_STOP) {
-				logit(LOG_DEBUG, "STOP command received, exiting.");
+				logit(LOG_INFO, "STOP command received, exiting.");
 				rc = 0;
+				ctx->cmd = NO_CMD;
 				break;
 			}
 			if (ctx->cmd == CMD_RESTART) {
-				logit(LOG_DEBUG, "RESTART command received, restarting.");
+				logit(LOG_INFO, "RESTART command received, restarting.");
 				rc = RC_RESTART;
+				ctx->cmd = NO_CMD;
 				break;
 			}
 			if (ctx->cmd == CMD_FORCED_UPDATE) {
+				logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
 				ctx->force_addr_update = 1;
+				ctx->cmd = NO_CMD;
 				continue;
 			}
 
@@ -1440,9 +1442,6 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 		cached_num_iterations = ctx->num_iterations;
 	}
 	while (0);
-
-	/* In case we return, due to SIGHUP, used by startup-delay above */
-	startup = 0;
 
 	/* if everything ok here we should exit. End of program */
 	if (rc == 0)

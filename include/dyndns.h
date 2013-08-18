@@ -194,6 +194,7 @@ enum {
 	"User-Agent: " DYNDNS_AGENT_NAME " " DYNDNS_EMAIL_ADDR "\r\n\r\n"
 
 /* Some default configurations */
+#define DYNDNS_DEFAULT_STARTUP_SLEEP      0       /* sec */
 #define DYNDNS_DEFAULT_SLEEP              120     /* sec */
 #define DYNDNS_MIN_SLEEP                  30      /* sec */
 #define DYNDNS_MAX_SLEEP                  (10 * 24 * 3600)        /* 10 days in sec */
