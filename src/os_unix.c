@@ -105,8 +105,6 @@ static void unix_signal_handler(int signo)
 		break;
 
 	case SIGINT:
-	case SIGQUIT:
-	case SIGALRM:
 	case SIGTERM:
 //                      logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
 		ctx->cmd = CMD_STOP;
@@ -125,10 +123,11 @@ static void unix_signal_handler(int signo)
 }
 
 /**
-	install handler for SIGALRM and HUP, INT, QUIT, TERM.
-	avoid receiving HUP, INT, QUIT during ALRM and TERM.
-
-*/
+ * Install signal handler for signals HUP, INT, TERM and USR1
+ *
+ * Also block exactly the handled signals, only for the duration
+ * of the handler.  All other signals are left alone.
+ */
 int os_install_signal_handler(void *context)
 {
 	int rc;
@@ -136,19 +135,15 @@ int os_install_signal_handler(void *context)
 	newact.sa_handler = unix_signal_handler;
 	newact.sa_flags = 0;
 
-	rc = sigemptyset(&newact.sa_mask) ||
-	    sigaddset(&newact.sa_mask, SIGHUP) ||
-	    sigaddset(&newact.sa_mask, SIGINT) ||
-	    sigaddset(&newact.sa_mask, SIGQUIT) ||
-	    sigaddset(&newact.sa_mask, SIGUSR1) ||
-	    sigaddset(&newact.sa_mask, SIGTERM) ||
-	    sigaction(SIGALRM, &newact, NULL) ||
-	    sigemptyset(&newact.sa_mask) ||
-	    sigaddset(&newact.sa_mask, SIGALRM) ||
-	    sigaction(SIGHUP, &newact, NULL) ||
-	    sigaction(SIGINT, &newact, NULL) ||
-	    sigaction(SIGQUIT, &newact, NULL) ||
-	    sigaction(SIGUSR1, &newact, NULL) || sigaction(SIGTERM, &newact, NULL);
+	rc = sigemptyset(&newact.sa_mask)        ||
+	     sigaddset(&newact.sa_mask, SIGHUP)  ||
+	     sigaddset(&newact.sa_mask, SIGINT)  ||
+	     sigaddset(&newact.sa_mask, SIGTERM) ||
+	     sigaddset(&newact.sa_mask, SIGUSR1) ||
+	     sigaction(SIGHUP, &newact, NULL)    ||
+	     sigaction(SIGINT, &newact, NULL)    ||
+	     sigaction(SIGUSR1, &newact, NULL)   ||
+	     sigaction(SIGTERM, &newact, NULL);
 
 	if (rc == 0)
 		param = context;
