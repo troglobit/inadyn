@@ -1391,11 +1391,6 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 				ctx->num_iterations++;
 			}
 
-			/* SIGUSR1 has been handled now, reset cmd */
-			if (ctx->cmd == CMD_FORCED_UPDATE) {
-				ctx->cmd = NO_CMD;
-			}
-
 			/* check if the user wants us to stop */
 			if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
 				break;
@@ -1428,6 +1423,7 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			if (ctx->cmd == CMD_FORCED_UPDATE) {
 				logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
 				ctx->force_addr_update = 1;
+				ctx->cmd = NO_CMD;
 				continue;
 			}
 
