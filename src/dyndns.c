@@ -1412,10 +1412,8 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
 				break;
 
-			ctx->sleep_sec =
-			    rc ==
-			    RC_DYNDNS_RSP_RETRY_LATER ? ctx->error_update_period_sec :
-			    ctx->normal_update_period_sec;
+			ctx->sleep_sec = (rc == RC_DYNDNS_RSP_RETRY_LATER) ?
+						ctx->error_update_period_sec : ctx->normal_update_period_sec;
 
 			if (rc != 0) {
 				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 
