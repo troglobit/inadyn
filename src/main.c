@@ -84,6 +84,8 @@ static int init_context(ddns_t **pctx)
 		ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
 		ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
 		ctx->total_iterations = DYNDNS_DEFAULT_ITERATIONS;
+		ctx->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
+		ctx->force_addr_update = 0;
 
 		i = 0;
 		while (i < DYNDNS_MAX_SERVER_NUMBER)

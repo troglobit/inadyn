@@ -1084,8 +1084,6 @@ int dyn_dns_init(ddns_t *ctx)
 	if (ctx->initialized == 1)
 		return 0;
 
-	ctx->force_addr_update = 0;
-
 	do {
 		ddns_info_t *info = &ctx->info[i];
 
@@ -1107,11 +1105,6 @@ int dyn_dns_init(ddns_t *ctx)
 		http_client_set_bind_iface(&ctx->http_to_ip_server[i], ctx->bind_interface);
 	}
 	while (++i < ctx->info_count);
-
-	ctx->cmd = NO_CMD;
-	if (ctx->cmd_check_period == 0) {
-		ctx->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
-	}
 
 	/* Restore values, if reset by SIGHUP.  Initialize time from cache file at startup. */
 	ctx->time_since_last_update = cached_time_since_last_update;
@@ -1278,12 +1271,35 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 	/* On first startup only, optionally wait for network and any NTP daemon
 	 * to set system time correctly.  Intended for devices without battery
 	 * backed real time clocks as initialization of time since last update
-	 * requires the correct time.  Sleep can be cancelled with any signal,
-	 * but it is recommended to use SIGUSR1. */
+	 * requires the correct time.  Sleep can be interrupted with the usual
+	 * signals inadyn responds too. */
 	if (first_startup && ctx->startup_delay_sec) {
 		logit(LOG_NOTICE, "Startup delay: %d sec ...", ctx->startup_delay_sec);
-		os_sleep_ms(1000 * ctx->startup_delay_sec);
 		first_startup = 0;
+
+		/* Now sleep a while. Using the time set in sleep_sec data member */
+		ctx->sleep_sec = ctx->startup_delay_sec;
+		dyn_dns_wait_for_cmd(ctx);
+
+		if (ctx->cmd == CMD_STOP) {
+			logit(LOG_INFO, "STOP command received, exiting.");
+			rc = 0;
+			ctx->cmd = NO_CMD;
+			rc = dyn_dns_shutdown(ctx);
+			return rc;
+		}
+		if (ctx->cmd == CMD_RESTART) {
+			logit(LOG_INFO, "RESTART command received, restarting.");
+			rc = RC_RESTART;
+			ctx->cmd = NO_CMD;
+			return rc;
+		}
+		if (ctx->cmd == CMD_FORCED_UPDATE) {
+			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
+			ctx->force_addr_update = 1;
+			ctx->cmd = NO_CMD;
+			/* Continue on to DDNS client main loop and dyn_dns_update_ip() */
+		}
 	}
 
 	/* At boot, or when restarting inadyn at runtime, the memory struct holding
@@ -1396,10 +1412,8 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 			if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
 				break;
 
-			ctx->sleep_sec =
-			    rc ==
-			    RC_DYNDNS_RSP_RETRY_LATER ? ctx->error_update_period_sec :
-			    ctx->normal_update_period_sec;
+			ctx->sleep_sec = (rc == RC_DYNDNS_RSP_RETRY_LATER) ?
+						ctx->error_update_period_sec : ctx->normal_update_period_sec;
 
 			if (rc != 0) {
 				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 

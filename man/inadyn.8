@@ -220,10 +220,14 @@ disabled. For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
 .It Fl t, -startup-delay Ar SEC
-Wait time during program startup.  Default is 0 seconds.  Any signal
-received during this sleep will wake up
-.Nm
-but it is recommended to use SIGUSR1.
+Wait time during program startup.  Default is 0 seconds.  Use HUP signal
+to interrupt early.  (See
+.Sm
+SIGNALS
+below for full details of how
+.Nm inadyn
+responds to signals).
+.Pp
 Intended to allow time for embedded devices without a battery backed
 real time clock to set their clock via NTP at bootup.  This is so that
 the time since the last update can be calculated correctly from the
