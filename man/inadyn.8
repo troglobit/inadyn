@@ -220,26 +220,27 @@ disabled. For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
 .It Fl t, -startup-delay Ar SEC
-Wait time during program startup.  Default is 0 seconds.  Use HUP signal
-to interrupt early.  (See
+Initial delay at program startup.  Default is 0 seconds.  Any signal can
+be used to abort the startup delay early, but SIGUSR2 is the recommended
+to use.  See
 .Sm
 SIGNALS
 below for full details of how
-.Nm inadyn
-responds to signals).
+.Nm
+ responds to signals.
 .Pp
 Intended to allow time for embedded devices without a battery backed
 real time clock to set their clock via NTP at bootup.  This is so that
 the time since the last update can be calculated correctly from the
 cachefile and the
 .Fl -forced-update
-option honored across reboots, avoiding unnecessary IP address updates.
+ option honored across reboots, avoiding unnecessary IP address updates.
 .It Fl o, -once
 Force one update and quit.
 .El
 .Sh "TYPICAL USAGE"
 .Ss http://www.dyndns.org
-.Nm inadyn
+.Nm
 .No -u username -p password -a my.registered.name
 .Pp
 .Nm inadyn
@@ -290,23 +291,26 @@ messages after the connection is back up.
 responds to the following signals:
 .Pp
 .Bl -tag -width TERM -compact
-.It HUP
+.It SIGHUP
 Restarts
 .Nm .
-The configuration file is reread every time this signal is evoked. It
+The configuration file is reloaded every time this signal is evoked. It
 is also useful when a new DHCP/PPPoE lease or new gateway is
 received. Please note that
 .Nm
 does not track such events by itself. You need an external monitor for
 that.
-.It TERM
-Terminates
+.It SIGTERM
+Tell
 .Nm
-gracefully.
-.It INT
-The same as TERM.
+to exit gracefully.
+.It SIGINT
+Same as SIGTERM.
 .It USR1
-Force update now, even if the IP address hasn't changed.
+Force update now, even if the IP address has not changed.
+.It USR2
+Leave initial startup delay, or main loop check update delay, and check
+for any IP address change now.
 .El
 .Pp
 For convenience in sending signals,

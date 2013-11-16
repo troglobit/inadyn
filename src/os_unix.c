@@ -79,47 +79,46 @@ int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 }
 
 /**
- * unix_signal_handler - The actual handler
+ * unix_signal_handler - Signal handler
  * @signo: Signal number
  *
- * Handler for registered/known signals. Most others will terminate the daemon.
+ * Handler for registered/known signals. Most others will terminate the
+ * daemon.
  *
  * NOTE:
- * Since printf() is one of the possible back-ends of logit(), and printf() is not one
- * of the safe syscalls to be used, according to POSIX signal(7). The calls are commented,
- * since they are most likely also only needed for debugging.
+ * Since printf() is one of the possible back-ends of logit(), and
+ * printf() is not one of the safe syscalls to be used, according to
+ * POSIX signal(7). The calls are commented, since they are most likely
+ * also only needed for debugging.
  */
 static void unix_signal_handler(int signo)
 {
 	ddns_t *ctx = (ddns_t *)param;
 
-	if (ctx == NULL) {
-//              logit(LOG_WARNING, "Signal %d received. But handler is not installed correctly.", signo);
+	if (ctx == NULL)
 		return;
-	}
 
 	switch (signo) {
 	case SIGHUP:
-//                      logit(LOG_DEBUG, "Signal %d received. Sending restart command.", signo);
 		ctx->cmd = CMD_RESTART;
 		break;
 
 	case SIGINT:
 	case SIGTERM:
-//                      logit(LOG_DEBUG, "Signal %d received. Sending shutdown command.", signo);
 		ctx->cmd = CMD_STOP;
 		break;
 
 	case SIGUSR1:
-//                      logit(LOG_DEBUG, "Signal %d received. Sending forced update command.", signo);
 		ctx->cmd = CMD_FORCED_UPDATE;
 		break;
 
+	case SIGUSR2:
+		ctx->cmd = CMD_CHECK_NOW;
+		break;
+
 	default:
-//                      logit(LOG_DEBUG, "Signal %d received, ignoring.", signo);
 		break;
 	}
-	return;
 }
 
 /**
@@ -140,9 +139,11 @@ int os_install_signal_handler(void *context)
 	     sigaddset(&newact.sa_mask, SIGINT)  ||
 	     sigaddset(&newact.sa_mask, SIGTERM) ||
 	     sigaddset(&newact.sa_mask, SIGUSR1) ||
+	     sigaddset(&newact.sa_mask, SIGUSR2) ||
 	     sigaction(SIGHUP, &newact, NULL)    ||
 	     sigaction(SIGINT, &newact, NULL)    ||
 	     sigaction(SIGUSR1, &newact, NULL)   ||
+	     sigaction(SIGUSR2, &newact, NULL)   ||
 	     sigaction(SIGTERM, &newact, NULL);
 
 	if (rc == 0)

@@ -1283,20 +1283,21 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 
 		if (ctx->cmd == CMD_STOP) {
 			logit(LOG_INFO, "STOP command received, exiting.");
-			rc = 0;
 			ctx->cmd = NO_CMD;
-			rc = dyn_dns_shutdown(ctx);
-			return rc;
+			return dyn_dns_shutdown(ctx);
 		}
 		if (ctx->cmd == CMD_RESTART) {
 			logit(LOG_INFO, "RESTART command received, restarting.");
-			rc = RC_RESTART;
 			ctx->cmd = NO_CMD;
-			return rc;
+			return RC_RESTART;
 		}
 		if (ctx->cmd == CMD_FORCED_UPDATE) {
 			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
 			ctx->force_addr_update = 1;
+			ctx->cmd = NO_CMD;
+			/* Continue on to DDNS client main loop and dyn_dns_update_ip() */
+		} else if (ctx->cmd == CMD_CHECK_NOW) {
+			logit(LOG_INFO, "CHECK_NOW command received, leaving startup delay.");
 			ctx->cmd = NO_CMD;
 			/* Continue on to DDNS client main loop and dyn_dns_update_ip() */
 		}
@@ -1442,6 +1443,12 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 				ctx->force_addr_update = 1;
 				ctx->cmd = NO_CMD;
 				continue;
+			}
+
+			if (ctx->cmd == CMD_CHECK_NOW) {
+				logit(LOG_INFO, "CHECK_NOW command received, checking ...");
+				ctx->cmd = NO_CMD;
+				break;
 			}
 
 			if (ctx->dbg.level > 0) {

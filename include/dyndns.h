@@ -239,7 +239,8 @@ typedef enum {
 	NO_CMD = 0,
 	CMD_STOP,
 	CMD_RESTART,
-	CMD_FORCED_UPDATE
+	CMD_FORCED_UPDATE,
+	CMD_CHECK_NOW,
 } ddns_cmd_t;
 
 typedef struct {
