@@ -84,10 +84,11 @@ void os_printf(int prio, char *fmt, ...)
 
 	if (get_dbg_dest() == DBG_SYS_LOG) {
 		syslog(prio, "%s", message);
-	} else {
-		printf("%s %s\n", current_time(), message);
-		fflush(stdout);
+		return;
 	}
+
+	printf("%s %s\n", current_time(), message);
+	fflush(stdout);
 }
 
 /**
@@ -129,6 +130,7 @@ int os_open_dbg_output(int dest, const char *name, const char *logfile)
 	default:
 		rc = 0;
 	}
+
 	return rc;
 }
 

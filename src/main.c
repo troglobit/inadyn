@@ -26,7 +26,7 @@
 /**
    basic resource allocations for the dyn_dns object
 */
-static int init_context(ddns_t **pctx)
+static int alloc_context(ddns_t **pctx)
 {
 	int rc = 0;
 	ddns_t *ctx;
@@ -116,18 +116,9 @@ static int init_context(ddns_t **pctx)
 	return 0;
 }
 
-/**
-   Resource free.
-*/
-static int free_context(ddns_t *ctx)
+static void free_context(ddns_t *ctx)
 {
 	int i;
-
-	if (!ctx)
-		return 0;
-
-	if (ctx->initialized == 1)
-		dyn_dns_shutdown(ctx);
 
 	http_client_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
 	http_client_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
@@ -164,57 +155,31 @@ static int free_context(ddns_t *ctx)
 	ctx->cache_file = NULL;
 
 	free(ctx);
-
-	return 0;
 }
 
 int main(int argc, char *argv[])
 {
-	int restart = 0;
-	int os_handler_installed = 0;
-	int rc = 0;
+	int rc = 0, restart;
 	ddns_t *ctx = NULL;
 
 	do {
-		rc = init_context(&ctx);
-		if (rc != 0)
-			break;
+		restart = 0;
 
-		if (!os_handler_installed) {
-			rc = os_install_signal_handler(ctx);
-			if (rc != 0) {
-				logit(LOG_WARNING,
-				      "Failed installing OS signal handler: %s", errorcode_get_name(rc));
-				break;
-			}
-			os_handler_installed = 1;
+		rc = alloc_context(&ctx);
+		if (rc == RC_OK) {
+			DO(os_install_signal_handler(ctx));
+
+			rc = ddns_main_loop(ctx, argc, argv);
+			if (rc == RC_RESTART)
+				restart = 1;
+
+			free_context(ctx);
 		}
+	} while (restart);
 
-		rc = dyn_dns_main(ctx, argc, argv);
-		if (rc == RC_RESTART) {
-			restart = 1;
-
-			/* do some cleanup if restart requested */
-			rc = free_context(ctx);
-			if (rc != 0)
-				logit(LOG_WARNING,
-				      "Failed cleaning up before restart: %s, ignoring...",
-				      errorcode_get_name(rc));
-		} else {
-			/* Error, or OK.  In either case exit outer loop. */
-			restart = 0;
-		}
-	}
-	while (restart);
-
-	if (rc != 0)
-		logit(LOG_WARNING, "Failed %sstarting daemon: %s", restart ? "re" : "", errorcode_get_name(rc));
-
-	/* Cleanup */
-	free_context(ctx);
 	os_close_dbg_output();
 
-	return (int)rc;
+	return rc;
 }
 
 /**

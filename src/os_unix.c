@@ -127,29 +127,38 @@ static void unix_signal_handler(int signo)
  * Also block exactly the handled signals, only for the duration
  * of the handler.  All other signals are left alone.
  */
-int os_install_signal_handler(void *context)
+int os_install_signal_handler(void *ctx)
 {
-	int rc;
-	struct sigaction newact;
-	newact.sa_handler = unix_signal_handler;
-	newact.sa_flags = 0;
+	int rc = 0;
+	static int installed = 0;
+	struct sigaction sa;
 
-	rc = sigemptyset(&newact.sa_mask)        ||
-	     sigaddset(&newact.sa_mask, SIGHUP)  ||
-	     sigaddset(&newact.sa_mask, SIGINT)  ||
-	     sigaddset(&newact.sa_mask, SIGTERM) ||
-	     sigaddset(&newact.sa_mask, SIGUSR1) ||
-	     sigaddset(&newact.sa_mask, SIGUSR2) ||
-	     sigaction(SIGHUP, &newact, NULL)    ||
-	     sigaction(SIGINT, &newact, NULL)    ||
-	     sigaction(SIGUSR1, &newact, NULL)   ||
-	     sigaction(SIGUSR2, &newact, NULL)   ||
-	     sigaction(SIGTERM, &newact, NULL);
+	if (!installed) {
+		sa.sa_flags   = 0;
+		sa.sa_handler = unix_signal_handler;
 
-	if (rc == 0)
-		param = context;
+		rc = sigemptyset(&sa.sa_mask) ||
+			sigaddset(&sa.sa_mask, SIGHUP)  ||
+			sigaddset(&sa.sa_mask, SIGINT)  ||
+			sigaddset(&sa.sa_mask, SIGTERM) ||
+			sigaddset(&sa.sa_mask, SIGUSR1) ||
+			sigaddset(&sa.sa_mask, SIGUSR2) ||
+			sigaction(SIGHUP, &sa, NULL)    ||
+			sigaction(SIGINT, &sa, NULL)    ||
+			sigaction(SIGUSR1, &sa, NULL)   ||
+			sigaction(SIGUSR2, &sa, NULL)   ||
+			sigaction(SIGTERM, &sa, NULL);
 
-	return rc;
+		installed = 1;
+	}
+
+	if (rc) {
+		logit(LOG_WARNING, "Failed installing signal handler: %s", errorcode_get_name(rc));
+		return RC_OS_INSTALL_SIGHANDLER_FAILED;
+	}
+
+	param = ctx;
+	return 0;
 }
 
 /*

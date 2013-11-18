@@ -218,7 +218,7 @@ static cmd_desc_t cmd_options_table[] = {
 	{NULL, 0, {0, NULL}, NULL}
 };
 
-void print_help_page(void)
+static void print_help_page(void)
 {
 	cmd_desc_t *it;
 
@@ -769,6 +769,7 @@ static int get_exec_handler(cmd_data_t *cmd, int num, void *context)
 	return 0;
 }
 
+
 /**
    Searches the DYNDNS system by the argument.
    Input is like: system@server.name
@@ -1091,6 +1092,50 @@ static int validate_configuration(ddns_t *ctx)
 	return 0;
 }
 
+
+static ddns_system_t *get_dns_system_by_id(int id)
+{
+	ddns_sysinfo_t *it;
+
+	it = ddns_system_table();
+	for (; it->id != LAST_DNS_SYSTEM; ++it) {
+		if (it->id == id)
+			return &it->system;
+	}
+
+	return NULL;
+}
+
+static int default_config(ddns_t *ctx)
+{
+	int i;
+
+	ctx->info[0].system = get_dns_system_by_id(DYNDNS_DEFAULT_DNS_SYSTEM);
+	if (ctx->info[0].system == NULL)
+		return RC_DYNDNS_INVALID_DNS_SYSTEM_DEFAULT;
+
+	/* forced update period */
+	ctx->forced_update_period_sec = DYNDNS_FORCED_UPDATE_PERIOD;
+
+	/* non-fatal error update period */
+	ctx->error_update_period_sec = DYNDNS_ERROR_UPDATE_PERIOD;
+
+	/* normal update period */
+	ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
+	ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
+
+	/* Domain wildcarding disabled by default */
+	for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++)
+		ctx->info[i].wildcard = 0;
+
+	/* pidfile */
+	ctx->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);
+
+	/* Default cache_file is setup in get_config_data() */
+
+	return 0;
+}
+
 /*
   Set up all details:
   - ip server name
@@ -1106,7 +1151,7 @@ static int validate_configuration(ddns_t *ctx)
   - if no argument is specified tries to call the cmd line parser
   with the default cfg file path.
 */
-int get_config_data(ddns_t *ctx, int argc, char **argv)
+int get_config_data(ddns_t *ctx, int argc, char *argv[])
 {
 	int i;
 	int rc = 0;
@@ -1114,7 +1159,7 @@ int get_config_data(ddns_t *ctx, int argc, char **argv)
 	cmd_desc_t *it;
 
 	do {
-		rc = ddns_default_config_data(ctx);
+		rc = default_config(ctx);
 		if (rc != 0)
 			break;
 

@@ -30,18 +30,11 @@
 */
 int http_client_construct(http_client_t *p_self)
 {
-	int rc;
-
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	rc = super_construct(&p_self->super);
-	if (rc != 0) {
-		return rc;
-	}
+	DO(super_construct(&p_self->super));
 
-	/*init */
 	memset((char *)p_self + sizeof(p_self->super), 0, sizeof(*p_self) - sizeof(p_self->super));
 	p_self->initialized = 0;
 
@@ -55,9 +48,8 @@ int http_client_destruct(http_client_t *p_self, int num)
 {
 	int i = 0, rv = 0;
 
-	while (i < num) {
+	while (i < num)
 		rv = super_destruct(&p_self[i++].super);
-	}
 
 	return rv;
 }
@@ -69,22 +61,18 @@ static int local_set_params(http_client_t *p_self)
 	int port;
 
 	http_client_get_remote_timeout(p_self, &timeout);
-	if (timeout == 0) {
+	if (timeout == 0)
 		http_client_set_remote_timeout(p_self, HTTP_DEFAULT_TIMEOUT);
-	}
 
 	http_client_get_port(p_self, &port);
-	if (port == 0) {
+	if (port == 0)
 		http_client_set_port(p_self, HTTP_DEFAULT_PORT);
-	}
 
 	return 0;
 }
 
 /*
   Sets up the object.
-
-  - ...
 */
 int http_client_init(http_client_t *p_self, char *msg)
 {
@@ -92,14 +80,12 @@ int http_client_init(http_client_t *p_self, char *msg)
 
 	do {
 		rc = local_set_params(p_self);
-		if (rc != 0) {
+		if (rc != 0)
 			break;
-		}
 
 		rc = super_init(&p_self->super, msg);
-		if (rc != 0) {
+		if (rc != 0)
 			break;
-		}
 	}
 	while (0);
 
@@ -118,13 +104,11 @@ int http_client_init(http_client_t *p_self, char *msg)
 */
 int http_client_shutdown(http_client_t *p_self)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	if (!p_self->initialized) {
+	if (!p_self->initialized)
 		return 0;
-	}
 
 	p_self->initialized = 0;
 
@@ -136,12 +120,15 @@ static void http_response_parse(http_trans_t *p_tr)
 	char *body;
 	char *rsp = p_tr->p_rsp_body = p_tr->p_rsp;
 	int status = p_tr->status = 0;
-	memset(p_tr->status_desc, 0, sizeof(p_tr->status_desc));
 	const char sep[] = "\r\n\r\n";
+
+	memset(p_tr->status_desc, 0, sizeof(p_tr->status_desc));
+
 	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
 		body += strlen(sep);
 		p_tr->p_rsp_body = body;
 	}
+
 	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, p_tr->status_desc) == 2)
 		p_tr->status = status;
 }
@@ -150,19 +137,17 @@ static void http_response_parse(http_trans_t *p_tr)
 int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr)
 {
 	int rc;
-	if (p_self == NULL || p_tr == NULL) {
-		return RC_INVALID_POINTER;
-	}
 
-	if (!p_self->initialized) {
+	if (p_self == NULL || p_tr == NULL)
+		return RC_INVALID_POINTER;
+
+	if (!p_self->initialized)
 		return RC_HTTP_OBJECT_NOT_INITIALIZED;
-	}
 
 	do {
 		rc = tcp_send(&p_self->super, p_tr->p_req, p_tr->req_len);
-		if (rc != 0) {
+		if (rc != 0)
 			break;
-		}
 
 		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len, &p_tr->rsp_len);
 	}
@@ -177,72 +162,64 @@ int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr)
 
 int http_client_set_port(http_client_t *p_self, int p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_set_port(&p_self->super, p);
 }
 
 int http_client_set_remote_name(http_client_t *p_self, const char *p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_set_remote_name(&p_self->super, p);
 }
 
 int http_client_set_remote_timeout(http_client_t *p_self, int p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_set_remote_timeout(&p_self->super, p);
 }
 
 int http_client_set_bind_iface(http_client_t *p_self, char *ifname)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_set_bind_iface(&p_self->super, ifname);
 }
 
 int http_client_get_port(http_client_t *p_self, int *p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_get_port(&p_self->super, p);
 }
 
 int http_client_get_remote_name(http_client_t *p_self, const char * *p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_get_remote_name(&p_self->super, p);
 }
 
 int http_client_get_remote_timeout(http_client_t *p_self, int *p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_get_remote_timeout(&p_self->super, p);
 }
 
 int http_client_get_bind_iface(http_client_t *p_self, char **ifname)
 {
-	if (p_self == NULL || ifname == NULL) {
+	if (p_self == NULL || ifname == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	return tcp_get_bind_iface(&p_self->super, ifname);
 }

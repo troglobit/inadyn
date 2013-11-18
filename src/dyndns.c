@@ -176,25 +176,13 @@ ddns_sysinfo_t dns_system_table[] = {
 	{LAST_DNS_SYSTEM, {NULL, NULL, NULL, NULL, NULL, NULL, NULL}}
 };
 
-static ddns_system_t *get_dns_system_by_id(int id)
-{
-	ddns_sysinfo_t *it;
-
-	for (it = dns_system_table; it->id != LAST_DNS_SYSTEM; ++it) {
-		if (it->id == id)
-			return &it->system;
-	}
-
-	return NULL;
-}
-
 ddns_sysinfo_t *ddns_system_table(void)
 {
 	return dns_system_table;
 }
 
 /*************PRIVATE FUNCTIONS ******************/
-static int dyn_dns_wait_for_cmd(ddns_t *ctx)
+static int wait_for_cmd(ddns_t *ctx)
 {
 	int counter;
 	ddns_cmd_t old_cmd;
@@ -223,8 +211,8 @@ static int is_http_status_code_ok(int status)
 		return 0;
 	else if (status >= 500 && status < 600)
 		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -458,54 +446,43 @@ static int get_req_for_changeip_server(ddns_t *ctx, int infcnt, int alcnt)
 /*
 	Get the IP address from interface
 */
-static int do_ip_check_interface(ddns_t *ctx)
+static int check_interface_address(ddns_t *ctx)
 {
 	struct ifreq ifr;
 	in_addr_t new_ip;
 	char *new_ip_str;
-	int i;
+	int i, sd, anychange = 0;
 
-	if (!ctx)
-		return RC_INVALID_POINTER;
+	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ctx->check_interface);
 
-	if (ctx->check_interface) {
-		logit(LOG_INFO, "Checking for IP# change, querying interface %s", ctx->check_interface);
+	sd = socket(PF_INET, SOCK_DGRAM, 0);
+	if (sd < 0) {
+		int code = os_get_socket_error();
 
-		int sd = socket(PF_INET, SOCK_DGRAM, 0);
+		logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
+		return RC_IP_OS_SOCKET_INIT_FAILED;
+	}
 
-		if (sd < 0) {
-			int code = os_get_socket_error();
-
-			logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
-			return RC_IP_OS_SOCKET_INIT_FAILED;
-		}
-
-		memset(&ifr, 0, sizeof(struct ifreq));
-		ifr.ifr_addr.sa_family = AF_INET;
-		snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ctx->check_interface);
-		if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
-			new_ip = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
-			new_ip_str = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-		} else {
-			int code = os_get_socket_error();
-
-			logit(LOG_ERR,
-			      "Failed reading IP address of interface %s: %s",
-			      ctx->check_interface, strerror(code));
-			return RC_ERROR;
-		}
-		close(sd);
+	memset(&ifr, 0, sizeof(struct ifreq));
+	ifr.ifr_addr.sa_family = AF_INET;
+	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ctx->check_interface);
+	if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
+		new_ip = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
+		new_ip_str = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 	} else {
+		int code = os_get_socket_error();
+
+		logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
+		      ctx->check_interface, strerror(code));
 		return RC_ERROR;
 	}
+	close(sd);
 
 	if (IN_ZERONET(new_ip) ||
 	    IN_LOOPBACK(new_ip) || IN_LINKLOCAL(new_ip) || IN_MULTICAST(new_ip) || IN_EXPERIMENTAL(new_ip)) {
 		logit(LOG_WARNING, "Interface %s has invalid IP# %s", ctx->check_interface, new_ip_str);
 		return RC_ERROR;
 	}
-
-	int anychange = 0;
 
 	for (i = 0; i < ctx->info_count; i++) {
 		ddns_info_t *info = &ctx->info[i];
@@ -517,9 +494,8 @@ static int do_ip_check_interface(ddns_t *ctx)
 		}
 	}
 
-	if (!anychange) {
+	if (!anychange)
 		logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
-	}
 
 	return 0;
 }
@@ -538,7 +514,7 @@ static int get_req_for_ip_server(ddns_t *ctx, int infcnt)
 /*
 	Send req to IP server and get the response
 */
-static int do_ip_server_transaction(ddns_t *ctx, int servernum)
+static int server_transaction(ddns_t *ctx, int servernum)
 {
 	int rc = 0;
 	http_client_t *p_http;
@@ -549,10 +525,7 @@ static int do_ip_server_transaction(ddns_t *ctx, int servernum)
 
 	p_http = &ctx->http_to_ip_server[servernum];
 
-	rc = http_client_init(p_http, "Checking for IP# change");
-	if (rc != 0) {
-		return rc;
-	}
+	DO(http_client_init(p_http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
 	p_tr = &ctx->http_transaction;
@@ -583,7 +556,7 @@ static int do_ip_server_transaction(ddns_t *ctx, int servernum)
   Note:
   it updates the flag: info->'ip_has_changed' if the old address was different
 */
-static int do_parse_my_ip_address(ddns_t *ctx, int servernum)
+static int parse_my_ip_address(ddns_t *ctx, int servernum)
 {
 	int ip1 = 0, ip2 = 0, ip3 = 0, ip4 = 0;
 	int count, i;
@@ -651,12 +624,12 @@ static int do_parse_my_ip_address(ddns_t *ctx, int servernum)
   Nothing else.
   Note: In the update function the property will set to false if update was successful.
 */
-static int do_check_alias_update_table(ddns_t *ctx)
+static int check_alias_update_table(ddns_t *ctx)
 {
 	int i, j;
 
 	/* Uses fix test if ip of server 0 has changed.
-	 * That should be OK even if changes dyn_dns_update_ip to
+	 * That should be OK even if changes check_address() to
 	 * iterate over servernum, but not if it's fix set to =! 0 */
 	if (ctx->info[0].ip_has_changed || ctx->force_addr_update ||
 	    (ctx->time_since_last_update > ctx->forced_update_period_sec)) {
@@ -665,8 +638,7 @@ static int do_check_alias_update_table(ddns_t *ctx)
 
 			for (j = 0; j < info->alias_count; j++) {
 				info->alias[j].update_required = 1;
-				logit(LOG_WARNING,
-				      "Update needed for alias %s, new IP# %s",
+				logit(LOG_WARNING, "Update needed for alias %s, new IP# %s",
 				      info->alias[j].names.name, info->my_ip_address.name);
 			}
 		}
@@ -860,19 +832,137 @@ static int is_he_ipv6_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
 {
 	char *p_rsp = p_tr->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(p_tr->status));
 
 	if (strstr(p_rsp, ctx->info[infnr].my_ip_address.name) != NULL ||
 	    strstr(p_rsp, "-ERROR: This tunnel is already associated with this IP address.")
 	    != NULL)
 		return 0;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
-static int do_update_alias_table(ddns_t *ctx)
+
+/* DNS Lookup */
+static int nslookup(ddns_info_t *entry)
+{
+	int error;
+	char name[DYNDNS_SERVER_NAME_LEN];
+	struct addrinfo hints;
+	struct addrinfo *result;
+
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET;	/* IPv4 */
+	hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;	        /* Any protocol */
+
+	error = getaddrinfo(entry->alias[0].names.name, NULL, &hints, &result);
+	if (!error) {
+		/* DNS reply for alias found, convert to IP# */
+		if (!getnameinfo(result->ai_addr, result->ai_addrlen, name, sizeof(name), NULL, 0, NI_NUMERICHOST)) {
+			/* Update local record for next checkip call. */
+			strncpy(entry->my_ip_address.name, name, sizeof(entry->my_ip_address.name));
+			logit(LOG_INFO, "Resolving hostname %s => IP# %s", entry->alias[0].names.name, name);
+		}
+
+		freeaddrinfo(result);
+		return 0;
+	}
+
+	logit(LOG_WARNING, "Failed resolving hostname %s: %s", entry->alias[0].names.name, gai_strerror(error));
+
+	return 1;
+}
+
+/* At boot, or when restarting inadyn at runtime, the memory struct holding our
+ * current IP# is empty.  We want to avoid unnecessary updates of our DDNS server
+ * record, since we might get locked out for abuse, so we "seed" each of the DDNS
+ * records of our struct with the cached IP# from our cache file, or from a regular
+ * DNS query. */
+static int read_cache_file (ddns_t *ctx)
+{
+	int i;
+	FILE *fp;
+	char name[DYNDNS_SERVER_NAME_LEN];
+
+	if (!ctx)
+		return RC_INVALID_POINTER;
+
+	fp = fopen(ctx->cache_file, "r");
+	if (!fp) {
+		/* Clear DNS cache before querying for the IP below. */
+		res_init();
+
+		/* Try a DNS lookup of our last known IP#. */
+		for (i = 0; i < ctx->info_count; i++) {
+			/* exception for tunnelbroker.net - no name to lookup */
+			if (ctx->info[i].alias_count && strcmp(ctx->info[i].system->key, "ipv6tb@he.net"))
+				nslookup(&ctx->info[i]);
+		}
+	} else {
+		struct stat statbuf;
+
+		/* Read cached IP# from inadyn cache file. */
+		if (fgets(name, sizeof(name), fp)) {
+			logit(LOG_INFO, "Cached IP# %s from previous invocation.", name);
+
+			/* Update local record for next checkip call. */
+			for (i = 0; i < ctx->info_count; i++) {
+				strncpy(ctx->info[i].my_ip_address.name, name,
+					sizeof(ctx->info[i].my_ip_address.name));
+			}
+		}
+
+		/* Initialize time since last update from modification time of cache file. */
+		if (fstat(fileno(fp), &statbuf) == 0) {
+			time_t now = time(NULL);
+
+			if (now != -1 && now > statbuf.st_mtime) {
+				cached_time_since_last_update = (int)(now - statbuf.st_mtime);
+				logit(LOG_INFO, "Cached time since last update %d (seconds) from previous invocation.",
+				      cached_time_since_last_update);
+			}
+		}
+
+		fclose(fp);
+	}
+
+	return 0;
+}
+
+/* Update cache with new IP */
+static int write_cache_file(ddns_t *ctx)
+{
+	FILE *fp;
+
+	fp = fopen(ctx->cache_file, "w");
+	if (fp) {
+		fprintf(fp, "%s", ctx->info[0].my_ip_address.name);
+		fclose(fp);
+
+		return 0;
+	}
+
+	return 1;
+}
+
+static int write_pidfile(ddns_t *ctx)
+{
+	FILE *fp = fopen(ctx->pidfile, "w");
+
+	if (!fp) {
+		logit(LOG_ERR, "Failed creating pidfile %s: %s", ctx->pidfile, strerror(errno));
+		return 1;
+	}
+
+	fprintf(fp, "%u\n", getpid());
+	fclose(fp);
+
+	return 0;
+}
+
+static int update_alias_table(ddns_t *ctx)
 {
 	int i, j;
 	int rc = 0, rc2;
@@ -883,9 +973,8 @@ static int do_update_alias_table(ddns_t *ctx)
 		ddns_info_t *info = &ctx->info[i];
 
 		for (j = 0; j < info->alias_count; j++) {
-			if (info->alias[j].update_required != 1) {
+			if (info->alias[j].update_required != 1)
 				continue;
-			}
 
 			rc = http_client_init(&ctx->http_to_dyndns[i], "Sending IP# update to DDNS server");
 			if (rc != 0) {
@@ -950,58 +1039,14 @@ static int do_update_alias_table(ddns_t *ctx)
 
 	/* Successful change or when cache file does not yet exist! */
 	if (anychange || access(ctx->cache_file, F_OK)) {
-		FILE *fp;
-
-		/* Update cache with new IP */
-		fp = fopen(ctx->cache_file, "w");
-		if (fp) {
-			fprintf(fp, "%s", ctx->info[0].my_ip_address.name);
-			fclose(fp);
-		}
+		write_cache_file(ctx);
 
 		/* Run external command hook on update. */
-		if (anychange && ctx->external_command) {
+		if (anychange && ctx->external_command)
 			os_shell_execute(ctx->external_command,
 					 ctx->info[0].my_ip_address.name,
 					 ctx->info[0].alias[0].names.name, ctx->bind_interface);
-		}
 	}
-
-	return rc;
-}
-
-int ddns_default_config_data(ddns_t *ctx)
-{
-	int rc = 0;
-	int i;
-
-	do {
-		ctx->info[0].system = get_dns_system_by_id(DYNDNS_DEFAULT_DNS_SYSTEM);
-		if (ctx->info[0].system == NULL) {
-			rc = RC_DYNDNS_INVALID_DNS_SYSTEM_DEFAULT;
-			break;
-		}
-
-		/* forced update period */
-		ctx->forced_update_period_sec = DYNDNS_FORCED_UPDATE_PERIOD;
-
-		/* non-fatal error update period */
-		ctx->error_update_period_sec = DYNDNS_ERROR_UPDATE_PERIOD;
-
-		/* normal update period */
-		ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
-		ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
-
-		/* Domain wildcarding disabled by default */
-		for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++)
-			ctx->info[i].wildcard = 0;
-
-		/* pidfile */
-		ctx->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);
-
-		/* Default cache_file is setup in get_config_data() */
-	}
-	while (0);
 
 	return rc;
 }
@@ -1074,9 +1119,9 @@ static int get_encoded_user_passwd(ddns_t *ctx)
    - if proxy server is set use it!
    - ...
 */
-int dyn_dns_init(ddns_t *ctx)
+static int init_context(ddns_t *ctx)
 {
-	int i = 0;
+	int i;
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
@@ -1084,7 +1129,7 @@ int dyn_dns_init(ddns_t *ctx)
 	if (ctx->initialized == 1)
 		return 0;
 
-	do {
+	for (i = 0; i < ctx->info_count; i++) {
 		ddns_info_t *info = &ctx->info[i];
 
 		if (strlen(info->proxy_server_name.name)) {
@@ -1104,27 +1149,12 @@ int dyn_dns_init(ddns_t *ctx)
 		http_client_set_bind_iface(&ctx->http_to_dyndns[i], ctx->bind_interface);
 		http_client_set_bind_iface(&ctx->http_to_ip_server[i], ctx->bind_interface);
 	}
-	while (++i < ctx->info_count);
 
 	/* Restore values, if reset by SIGHUP.  Initialize time from cache file at startup. */
 	ctx->time_since_last_update = cached_time_since_last_update;
 	ctx->num_iterations = cached_num_iterations;
 
 	ctx->initialized = 1;
-
-	return 0;
-}
-
-/**
-   Disconnect and some other clean up.
-*/
-int dyn_dns_shutdown(ddns_t *ctx)
-{
-	if (!ctx)
-		return RC_INVALID_POINTER;
-
-	if (ctx->initialized == 0)
-		return 0;
 
 	return 0;
 }
@@ -1139,68 +1169,49 @@ int dyn_dns_shutdown(ddns_t *ctx)
     - get the current DYN DNS address from DYN DNS server
     - compare and update if neccessary
 */
-int dyn_dns_update_ip(ddns_t *ctx)
+static int check_address(ddns_t *ctx)
 {
-	int servernum = 0;	/* server to use for requesting IP */
-	/*use server 0 by default, should be always exist */
-	int rc;
+	int servernum = 0;  /* server to use for checking IP, index 0 by default */
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	do {
-		if (ctx->check_interface) {
-			rc = do_ip_check_interface(ctx);
-			if (rc != 0)
-				break;
-		} else {
-			/* Ask IP server something so he will respond and give me my IP */
-			rc = do_ip_server_transaction(ctx, servernum);
-			if (rc != 0)
-				break;
-
-			if (ctx->dbg.level > 1) {
-				logit(LOG_DEBUG, "IP server response:");
-				logit(LOG_DEBUG, "%s", ctx->work_buf);
-			}
-
-			/* Extract our IP, check if different than previous one */
-			rc = do_parse_my_ip_address(ctx, servernum);
-			if (rc != 0)
-				break;
-
-			if (ctx->dbg.level > 1)
-				logit(LOG_INFO, "Current public IP# %s",
-				      ctx->info[servernum].my_ip_address.name);
+	if (ctx->check_interface) {
+		DO(check_interface_address(ctx));
+	} else {
+		/* Ask IP server something so he will respond and give me my IP */
+		DO(server_transaction(ctx, servernum));
+		if (ctx->dbg.level > 1) {
+			logit(LOG_DEBUG, "IP server response:");
+			logit(LOG_DEBUG, "%s", ctx->work_buf);
 		}
-		/* Step through aliases list, resolve them and check if they point to my IP */
-		rc = do_check_alias_update_table(ctx);
-		if (rc != 0)
-			break;
 
-		/* Update IPs marked as not identical with my IP */
-		rc = do_update_alias_table(ctx);
-		if (rc != 0)
-			break;
+		/* Extract our IP, check if different than previous one */
+		DO(parse_my_ip_address(ctx, servernum));
+		if (ctx->dbg.level > 1)
+			logit(LOG_INFO, "Current public IP# %s", ctx->info[servernum].my_ip_address.name);
 	}
-	while (0);
 
-	return rc;
+	/* Step through aliases list, resolve them and check if they point to my IP */
+	DO(check_alias_update_table(ctx));
+
+	/* Update IPs marked as not identical with my IP */
+	DO(update_alias_table(ctx));
+
+	return 0;
 }
 
-/** MAIN - Dyn DNS update entry point
-    Actions:
-    - read the configuration options
-    - perform various init actions as specified in the options
-    - create and init dyn_dns object.
-    - launch the IP update action loop
-*/
-int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
+/**
+ * Main DDNS loop
+ * Actions:
+ *  - read the configuration options
+ *  - perform various init actions as specified in the options
+ *  - create and init dyn_dns object.
+ *  - launch the IP update action loop
+ */
+int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 {
-	FILE *fp;
 	int rc = 0;
-	int i, s;
-	char name[DYNDNS_SERVER_NAME_LEN];
 	static int first_startup = 1;
 
 	if (!ctx)
@@ -1220,50 +1231,30 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 		memset(&user, 0, sizeof(user));
 		user.gid = ctx->sys_usr_info.gid;
 		user.uid = ctx->sys_usr_info.uid;
-		rc = os_change_persona(&user);
-		if (rc != 0)
-			return rc;
+
+		DO(os_change_persona(&user));
 	}
 
 	/* if logfile provided, redirect output to log file */
-	if (strlen(ctx->dbg.p_logfilename) != 0) {
-		rc = os_open_dbg_output(DBG_FILE_LOG, "", ctx->dbg.p_logfilename);
-		if (rc != 0) {
-			return rc;
-		}
-	}
+	if (strlen(ctx->dbg.p_logfilename) != 0)
+		DO(os_open_dbg_output(DBG_FILE_LOG, "", ctx->dbg.p_logfilename));
 
 	if (ctx->debug_to_syslog == 1 || (ctx->run_in_background == 1)) {
-		if (get_dbg_dest() == DBG_STD_LOG) {	/* avoid file and syslog output */
-			rc = os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL);
-			if (rc != 0) {
-				return rc;
-			}
-		}
+		if (get_dbg_dest() == DBG_STD_LOG)	/* avoid file and syslog output */
+			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
 	}
 
 	/* if silent required, close console window */
 	if (ctx->run_in_background == 1) {
-		rc = close_console_window();
-		if (rc != 0) {
-			return rc;
-		}
-		if (get_dbg_dest() == DBG_SYS_LOG) {
+		DO(close_console_window());
+
+		if (get_dbg_dest() == DBG_SYS_LOG)
 			fclose(stdout);
-		}
 	}
 
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
-
-	/* write pid file */
-	fp = fopen(ctx->pidfile, "w");
-	if (!fp) {
-		logit(LOG_ERR, "Failed opening pidfile %s for writing: %s", ctx->pidfile, strerror(errno));
-		return RC_ERROR;
-	}
-	fprintf(fp, "%u\n", getpid());
-	fclose(fp);
+	write_pidfile(ctx);
 
 	/* "Hello!" Let user know we've started up OK */
 	logit(LOG_INFO, "%s", DYNDNS_VERSION_STRING);
@@ -1279,194 +1270,104 @@ int dyn_dns_main(ddns_t *ctx, int argc, char *argv[])
 
 		/* Now sleep a while. Using the time set in sleep_sec data member */
 		ctx->sleep_sec = ctx->startup_delay_sec;
-		dyn_dns_wait_for_cmd(ctx);
+		wait_for_cmd(ctx);
 
 		if (ctx->cmd == CMD_STOP) {
 			logit(LOG_INFO, "STOP command received, exiting.");
-			ctx->cmd = NO_CMD;
-			return dyn_dns_shutdown(ctx);
+			return 0;
 		}
 		if (ctx->cmd == CMD_RESTART) {
 			logit(LOG_INFO, "RESTART command received, restarting.");
-			ctx->cmd = NO_CMD;
 			return RC_RESTART;
 		}
 		if (ctx->cmd == CMD_FORCED_UPDATE) {
 			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
 			ctx->force_addr_update = 1;
 			ctx->cmd = NO_CMD;
-			/* Continue on to DDNS client main loop and dyn_dns_update_ip() */
 		} else if (ctx->cmd == CMD_CHECK_NOW) {
 			logit(LOG_INFO, "CHECK_NOW command received, leaving startup delay.");
 			ctx->cmd = NO_CMD;
-			/* Continue on to DDNS client main loop and dyn_dns_update_ip() */
 		}
 	}
 
-	/* At boot, or when restarting inadyn at runtime, the memory struct holding
-	 * our current IP# is empty.  We want to avoid unnecessary updates of our
-	 * DDNS server record, since we might get locked out for abuse, so we "seed"
-	 * each of the DDNS records of our struct with the cached IP# from our cache
-	 * file, or from a regular DNS query. */
-	fp = fopen(ctx->cache_file, "r");
-	if (!fp) {
-		struct addrinfo hints;
-		struct addrinfo *result;
+	DO(init_context(ctx));
+	DO(read_cache_file(ctx));
+	DO(get_encoded_user_passwd(ctx));
 
-		/* Clear DNS cache before querying for the IP below. */
-		res_init();
+	if (ctx->update_once == 1)
+		ctx->force_addr_update = 1;
 
-		/* Try a DNS lookup of our last known IP#. */
-		for (i = 0; i < ctx->info_count; i++) {
-			if (ctx->info[i].alias_count &&
-			    /* exception for tunnelbroker.net - no name to lookup */
-			    strcmp(ctx->info[i].system->key, "ipv6tb@he.net")) {
-				/* DNS Lookup */
-				memset(&hints, 0, sizeof(struct addrinfo));
-				hints.ai_family = AF_INET;	/* IPv4 */
-				hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
-				hints.ai_flags = 0;
-				hints.ai_protocol = 0;	/* Any protocol */
-
-				if (!(s = getaddrinfo(ctx->info[i].alias[0].names.name, NULL, &hints, &result))) {
-					/* DNS reply for alias found, convert to IP# */
-					if (!getnameinfo
-					    (result->ai_addr,
-					     result->ai_addrlen, name, sizeof(name), NULL, 0, NI_NUMERICHOST)) {
-						/* Update local record for next checkip call. */
-						strncpy(ctx->info[i].my_ip_address.name,
-							name, sizeof(ctx->info[i].my_ip_address.name));
-						logit(LOG_INFO,
-						      "Resolving hostname %s => IP# %s",
-						      ctx->info[i].alias[0].names.name, name);
-					}
-					freeaddrinfo(result);
-				} else {
-					logit(LOG_WARNING,
-					      "Failed resolving hostname %s: %s",
-					      ctx->info[i].alias[0].names.name, gai_strerror(s));
-				}
-			}
-		}
-	} else {
-		struct stat statbuf;
-
-		/* Read cached IP# from inadyn cache file. */
-		if (fgets(name, sizeof(name), fp)) {
-			logit(LOG_INFO, "Cached IP# %s from previous invocation.", name);
-
-			/* Update local record for next checkip call. */
-			for (i = 0; i < ctx->info_count; i++) {
-				strncpy(ctx->info[i].my_ip_address.name, name,
-					sizeof(ctx->info[i].my_ip_address.name));
-			}
-		}
-
-		/* Initialize time since last update from modification time of cache file. */
-		if (fstat(fileno(fp), &statbuf) == 0) {
-			time_t now = time(NULL);
-
-			if (now != -1 && now > statbuf.st_mtime) {
-				cached_time_since_last_update = (int)(now - statbuf.st_mtime);
-				logit(LOG_INFO,
-				      "Cached time since last update %d (seconds) from previous invocation.",
-				      cached_time_since_last_update);
-			}
-		}
-
-		fclose(fp);
-	}
-
-	do {
-		rc = dyn_dns_init(ctx);
-		if (rc != 0)
-			break;
-
-		rc = get_encoded_user_passwd(ctx);
-		if (rc != 0)
-			break;
-
-		if (ctx->update_once == 1)
-			ctx->force_addr_update = 1;
-
-		/* DDNS client main loop */
-		while (1) {
-			rc = dyn_dns_update_ip(ctx);
-			if (rc != 0) {
-				if (ctx->cmd == CMD_RESTART) {
-					logit(LOG_INFO, "RESTART command received. Restarting.");
-					rc = RC_RESTART;
-					ctx->cmd = NO_CMD;
-					break;
-				}
-
-				if (rc == RC_DYNDNS_RSP_NOTOK) {
-					logit(LOG_ERR, "Error response from DDNS server, exiting!");
-					break;
-				}
-			} else {
-				/* count only the successful iterations */
-				ctx->num_iterations++;
-			}
-
-			/* check if the user wants us to stop */
-			if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
-				break;
-
-			ctx->sleep_sec = (rc == RC_DYNDNS_RSP_RETRY_LATER) ?
-						ctx->error_update_period_sec : ctx->normal_update_period_sec;
-
-			if (rc != 0) {
-				/* dyn_dns_update_ip() failed above, and we've not reached MAX iterations. 
-				 * Time to inform the user the (network) error is not fatal and that we
-				 * will try again in a short while. */
-				logit(LOG_WARNING, "Will retry again in %d sec...", ctx->sleep_sec);
-			}
-
-			/* Now sleep a while. Using the time set in sleep_sec data member */
-			dyn_dns_wait_for_cmd(ctx);
-
-			if (ctx->cmd == CMD_STOP) {
-				logit(LOG_INFO, "STOP command received, exiting.");
-				rc = 0;
-				ctx->cmd = NO_CMD;
-				break;
-			}
+	/* DDNS client main loop */
+	while (1) {
+		rc = check_address(ctx);
+		if (rc) {
 			if (ctx->cmd == CMD_RESTART) {
-				logit(LOG_INFO, "RESTART command received, restarting.");
+				logit(LOG_INFO, "RESTART command received. Restarting.");
 				rc = RC_RESTART;
 				ctx->cmd = NO_CMD;
 				break;
 			}
-			if (ctx->cmd == CMD_FORCED_UPDATE) {
-				logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
-				ctx->force_addr_update = 1;
-				ctx->cmd = NO_CMD;
-				continue;
-			}
 
-			if (ctx->cmd == CMD_CHECK_NOW) {
-				logit(LOG_INFO, "CHECK_NOW command received, checking ...");
-				ctx->cmd = NO_CMD;
+			if (rc == RC_DYNDNS_RSP_NOTOK) {
+				logit(LOG_ERR, "Error response from DDNS server, exiting!");
 				break;
 			}
-
-			if (ctx->dbg.level > 0) {
-				logit(LOG_DEBUG, ".");
-//                              logit(LOG_DEBUG, "Time since last update: %d", ctx->time_since_last_update);
-			}
-			ctx->time_since_last_update += ctx->sleep_sec;
+		} else {
+			/* count only the successful iterations */
+			ctx->num_iterations++;
 		}
 
-		/* Save old value, if restarted by SIGHUP */
-		cached_time_since_last_update = ctx->time_since_last_update;
-		cached_num_iterations = ctx->num_iterations;
-	}
-	while (0);
+		/* check if the user wants us to stop */
+		if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
+			break;
 
-	/* if everything ok here we should exit. End of program */
-	if (rc == 0)
-		rc = dyn_dns_shutdown(ctx);
+		ctx->sleep_sec = (rc == RC_DYNDNS_RSP_RETRY_LATER) ?
+			ctx->error_update_period_sec : ctx->normal_update_period_sec;
+
+		if (rc != 0) {
+			/* check_address() failed above, and we've not reached MAX iterations.
+			 * Time to inform the user the (network) error is not fatal and that we
+			 * will try again in a short while. */
+			logit(LOG_WARNING, "Will retry again in %d sec ...", ctx->sleep_sec);
+		}
+
+		/* Now sleep a while. Using the time set in sleep_sec data member */
+		wait_for_cmd(ctx);
+
+		if (ctx->cmd == CMD_STOP) {
+			logit(LOG_INFO, "STOP command received, exiting.");
+			rc = 0;
+			break;
+		}
+		if (ctx->cmd == CMD_RESTART) {
+			logit(LOG_INFO, "RESTART command received, restarting.");
+			rc = RC_RESTART;
+			break;
+		}
+		if (ctx->cmd == CMD_FORCED_UPDATE) {
+			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
+			ctx->force_addr_update = 1;
+			ctx->cmd = NO_CMD;
+			continue;
+		}
+
+		if (ctx->cmd == CMD_CHECK_NOW) {
+			logit(LOG_INFO, "CHECK_NOW command received, checking ...");
+			ctx->cmd = NO_CMD;
+			continue;
+		}
+
+		if (ctx->dbg.level > 0) {
+			logit(LOG_DEBUG, ".");
+//                      logit(LOG_DEBUG, "Time since last update: %d", ctx->time_since_last_update);
+		}
+
+		ctx->time_since_last_update += ctx->sleep_sec;
+	}
+
+	/* Save old value, if restarted by SIGHUP */
+	cached_time_since_last_update = ctx->time_since_last_update;
+	cached_num_iterations = ctx->num_iterations;
 
 	return rc;
 }

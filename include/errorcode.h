@@ -61,12 +61,15 @@
 #define RC_OS_CHANGE_PERSONA_FAILURE                63
 #define RC_OS_INVALID_UID                           64
 #define RC_OS_INVALID_GID                           65
+#define RC_OS_INSTALL_SIGHANDLER_FAILED             66
 
 #define RC_FILE_IO_OPEN_ERROR                       70
 #define RC_FILE_IO_READ_ERROR                       71
 #define RC_FILE_IO_OUT_OF_BUFFER                    72
 
 #define RC_RESTART                                  255
+
+#define DO(fn) { int rc = fn; if (rc) return rc; }
 
 const char *errorcode_get_name(int rc);
 

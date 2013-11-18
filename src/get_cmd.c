@@ -34,10 +34,10 @@ static cmd_desc_t *opt_search(cmd_desc_t *p_table, char *p_opt)
 	cmd_desc_t *it = p_table;
 
 	while (it->option != NULL) {
-		if (strcmp(p_opt, it->option) == 0) {
+		if (strcmp(p_opt, it->option) == 0)
 			return it;
-		}
-		++it;
+
+		it++;
 	}
 
 	return NULL;
@@ -48,9 +48,8 @@ static cmd_desc_t *opt_search(cmd_desc_t *p_table, char *p_opt)
 */
 int cmd_init(cmd_data_t *cmd)
 {
-	if (!cmd) {
+	if (!cmd)
 		return RC_INVALID_POINTER;
-	}
 
 	memset(cmd, 0, sizeof(*cmd));
 
@@ -59,17 +58,15 @@ int cmd_init(cmd_data_t *cmd)
 
 int cmd_destruct(cmd_data_t *cmd)
 {
-	if (!cmd) {
+	if (!cmd)
 		return RC_INVALID_POINTER;
-	}
 
 	if (cmd->argv) {
 		int i;
 
 		for (i = 0; i < cmd->argc; ++i) {
-			if (cmd->argv[i]) {
+			if (cmd->argv[i])
 				free(cmd->argv[i]);
-			}
 		}
 		free(cmd->argv);
 	}
@@ -81,35 +78,26 @@ int cmd_destruct(cmd_data_t *cmd)
  */
 int cmd_add_val(cmd_data_t *cmd, char *p_val)
 {
-	int rc = 0;
+	char *p, **pp;
 
-	if (!cmd || !p_val) {
+	if (!cmd || !p_val)
 		return RC_INVALID_POINTER;
-	}
 
-	do {
-		char *p;
-		char **pp = (char **)realloc(cmd->argv,
-					     (cmd->argc + 1) * sizeof(char *));
-		if (!pp) {
-			rc = RC_OUT_OF_MEMORY;
-			break;
-		}
-		cmd->argv = pp;
+	pp = realloc(cmd->argv, (cmd->argc + 1) * sizeof(char *));
+	if (!pp)
+		return RC_OUT_OF_MEMORY;
 
-		p = (char *)malloc(strlen(p_val) + 1);
-		if (!p) {
-			rc = RC_OUT_OF_MEMORY;
-			break;
-		}
+	cmd->argv = pp;
 
-		strcpy(p, p_val);
-		cmd->argv[cmd->argc] = p;
-		cmd->argc++;
-	}
-	while (0);
+	p = malloc(strlen(p_val) + 1);
+	if (!p)
+		return RC_OUT_OF_MEMORY;
 
-	return rc;
+	strcpy(p, p_val);
+	cmd->argv[cmd->argc] = p;
+	cmd->argc++;
+
+	return 0;
 }
 
 /** Creates a struct of argvals from the given command line.

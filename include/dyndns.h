@@ -18,8 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _DYNDNS_INCLUDED
-#define _DYNDNS_INCLUDED
+
+#ifndef DYNDNS_H_
+#define DYNDNS_H_
 
 #include "os.h"
 #include "errorcode.h"
@@ -282,11 +283,6 @@ typedef struct {
 	int wildcard;
 } ddns_info_t;
 
-typedef struct {
-	uid_t uid;
-	gid_t gid;
-} ddns_user_t;
-
 /* Client context */
 typedef struct {
 	char *cfgfile;
@@ -330,20 +326,11 @@ typedef struct {
 	int info_count;
 } ddns_t;
 
-ddns_sysinfo_t *ddns_system_table(void);
-int ddns_default_config_data(ddns_t *ctx);
+ddns_sysinfo_t *ddns_system_table (void);
+int             ddns_main_loop    (ddns_t *ctx, int argc, char *argv[]);
+int             get_config_data   (ddns_t *ctx, int argc, char *argv[]);
 
-int dyn_dns_init(ddns_t *p_self);
-int dyn_dns_shutdown(ddns_t *p_self);
-int dyn_dns_update_ip(ddns_t *p_self);
-int dyn_dns_main(ddns_t *p_self, int argc, char *argv[]);
-
-int get_config_data(ddns_t *p_self, int argc, char **argv);
-
-void print_help_page(void);
-int os_change_persona(ddns_user_t *user);
-
-#endif /*_DYNDNS_INCLUDED*/
+#endif /* DYNDNS_H_ */
 
 /**
  * Local Variables:

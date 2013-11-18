@@ -65,8 +65,6 @@ int ip_destruct(ip_sock_t *p_self)
 
 /*
   Sets up the object.
-
-  - ...
 */
 int ip_initialize(ip_sock_t *p_self)
 {
@@ -74,15 +72,13 @@ int ip_initialize(ip_sock_t *p_self)
 	struct ifreq ifr;
 	struct sockaddr_in *addrp = NULL;
 
-	if (p_self->initialized == 1) {
+	if (p_self->initialized == 1)
 		return 0;
-	}
 
 	do {
 		rc = os_ip_support_startup();
-		if (rc != 0) {
+		if (rc != 0)
 			break;
-		}
 
 		/* local bind, to interface */
 		if (p_self->ifname) {
@@ -169,13 +165,11 @@ int ip_initialize(ip_sock_t *p_self)
 */
 int ip_shutdown(ip_sock_t *p_self)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	if (!p_self->initialized) {
+	if (!p_self->initialized)
 		return 0;
-	}
 
 	if (p_self->socket > -1) {
 		close(p_self->socket);
@@ -191,13 +185,11 @@ int ip_shutdown(ip_sock_t *p_self)
 
 int ip_send(ip_sock_t *p_self, const char *p_buf, int len)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	if (!p_self->initialized) {
+	if (!p_self->initialized)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
-	}
 
 	if (send(p_self->socket, (char *)p_buf, len, 0) == -1) {
 		int code = os_get_socket_error();
@@ -225,13 +217,11 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	int total_recv_len = 0;
 	int recv_len = 0;
 
-	if (p_self == NULL || p_buf == NULL || p_recv_len == NULL) {
+	if (p_self == NULL || p_buf == NULL || p_recv_len == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	if (!p_self->initialized) {
+	if (!p_self->initialized)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
-	}
 
 	while (remaining_buf_len > 0) {
 		int chunk_size =
@@ -248,9 +238,8 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 		}
 
 		if (recv_len == 0) {
-			if (total_recv_len == 0) {
+			if (total_recv_len == 0)
 				rc = RC_IP_RECV_ERROR;
-			}
 			break;
 		}
 
@@ -263,17 +252,15 @@ int ip_recv(ip_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	return rc;
 }
 
-/*Accessors */
+/* Accessors */
 
 int ip_set_port(ip_sock_t *p_self, int p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
-	if (p < 0 || p > IP_SOCKET_MAX_PORT) {
+	if (p < 0 || p > IP_SOCKET_MAX_PORT)
 		return RC_IP_BAD_PARAMETER;
-	}
 
 	p_self->port = p;
 
@@ -282,9 +269,8 @@ int ip_set_port(ip_sock_t *p_self, int p)
 
 int ip_set_remote_name(ip_sock_t *p_self, const char *p)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	p_self->p_remote_host_name = p;
 
@@ -293,9 +279,8 @@ int ip_set_remote_name(ip_sock_t *p_self, const char *p)
 
 int ip_set_remote_timeout(ip_sock_t *p_self, int t)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	p_self->timeout = t;
 
@@ -304,9 +289,8 @@ int ip_set_remote_timeout(ip_sock_t *p_self, int t)
 
 int ip_set_bind_iface(ip_sock_t *p_self, char *ifname)
 {
-	if (p_self == NULL) {
+	if (p_self == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	p_self->ifname = ifname;
 
@@ -315,9 +299,8 @@ int ip_set_bind_iface(ip_sock_t *p_self, char *ifname)
 
 int ip_get_port(ip_sock_t *p_self, int *p_port)
 {
-	if (p_self == NULL || p_port == NULL) {
+	if (p_self == NULL || p_port == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	*p_port = p_self->port;
 
@@ -326,9 +309,8 @@ int ip_get_port(ip_sock_t *p_self, int *p_port)
 
 int ip_get_remote_name(ip_sock_t *p_self, const char **p)
 {
-	if (p_self == NULL || p == NULL) {
+	if (p_self == NULL || p == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	*p = p_self->p_remote_host_name;
 
@@ -337,9 +319,8 @@ int ip_get_remote_name(ip_sock_t *p_self, const char **p)
 
 int ip_get_remote_timeout(ip_sock_t *p_self, int *p)
 {
-	if (p_self == NULL || p == NULL) {
+	if (p_self == NULL || p == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	*p = p_self->timeout;
 
@@ -348,9 +329,8 @@ int ip_get_remote_timeout(ip_sock_t *p_self, int *p)
 
 int ip_get_bind_iface(ip_sock_t *p_self, char **ifname)
 {
-	if (p_self == NULL || ifname == NULL) {
+	if (p_self == NULL || ifname == NULL)
 		return RC_INVALID_POINTER;
-	}
 
 	*ifname = p_self->ifname;
 
