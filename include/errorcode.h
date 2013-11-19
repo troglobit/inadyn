@@ -17,8 +17,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _ERRORCODE_INCLUDED
-#define _ERRORCODE_INCLUDED
+#ifndef INADYN_ERRORCODE_H_
+#define INADYN_ERRORCODE_H_
 
 #define RC_OK                                       0
 #define RC_ERROR                                    1
@@ -70,11 +70,12 @@
 
 #define RC_RESTART                                  255
 
-#define DO(fn) { int rc = fn; if (rc) return rc; }
+#define DO(fn)  { int rc = fn; if (rc) return rc; }
+#define TRY(fn) { rc = fn; if (rc) break; }
 
 const char *errorcode_get_name(int rc);
 
-#endif				/* ERRORCODE_INCLUDED */
+#endif /* INADYN_ERRORCODE_H_ */
 
 /**
  * Local Variables:

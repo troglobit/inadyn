@@ -1,5 +1,7 @@
-/*
+/* Interface for TCP functions
+ *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ * Copyright (C) 2010-2013  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
+*/
 
+#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "debug_if.h"
 #include "tcp.h"
 
-/* basic resource allocations for the tcp object */
 int tcp_construct(tcp_sock_t *p_self)
 {
 	if (p_self == NULL)
@@ -37,9 +39,6 @@ int tcp_construct(tcp_sock_t *p_self)
 	return 0;
 }
 
-/*
-  Resource free.
-*/
 int tcp_destruct(tcp_sock_t *p_self)
 {
 	if (p_self == NULL)
@@ -63,72 +62,92 @@ static int local_set_params(tcp_sock_t *p_self)
 	return 0;
 }
 
-/*
-  Sets up the object.
-*/
+/* Check for socket error */
+static int soerror(int sd)
+{
+	int code = 0;
+	socklen_t len = sizeof(code);
+
+	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, &code, &len))
+		return 1;
+
+	errno = code;
+
+	return code;
+}
+
+/* In the wonderful world of network programming the manual states that
+ * EINPROGRESS is only a possible error on non-blocking sockets.  Real world
+ * experience, however, suggests otherwise.  Simply poll() for completion and
+ * then continue. --Joachim */
+static int check_error(int sd, int msec)
+{
+	struct pollfd pfd = { sd, POLLOUT, 0 };
+
+	if (EINPROGRESS == errno) {
+		logit(LOG_INFO, "Waiting (%d sec) for three-way handshake to complete ...", msec / 1000);
+		if (poll (&pfd, 1, msec) > 0 && !soerror(sd)) {
+			logit(LOG_INFO, "Connected.");
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+/* On error tcp_shutdown() is called by upper layers. */
 int tcp_initialize(tcp_sock_t *p_self, char *msg)
 {
-	int rc;
-	struct timeval sv;
-	int svlen = sizeof(sv);
+	int sd, rc = 0;
 	char host[NI_MAXHOST];
+	struct timeval sv;
+	struct sockaddr sa;
+	socklen_t salen;
 
 	do {
-		local_set_params(p_self);
+		TRY(local_set_params(p_self));
+		TRY(ip_initialize(&p_self->super));
 
-		/*call the super */
-		rc = ip_initialize(&p_self->super);
-		if (rc != 0) {
+		if (p_self->super.type != TYPE_TCP)
+			return RC_IP_BAD_PARAMETER;
+
+		sd = socket(AF_INET, SOCK_STREAM, 0);
+		if (sd == -1) {
+			logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));
+			rc = RC_IP_SOCKET_CREATE_ERROR;
 			break;
 		}
 
-		/* local object initalizations */
-		if (p_self->super.type == TYPE_TCP) {
-			p_self->super.socket = socket(AF_INET, SOCK_STREAM, 0);
-			if (p_self->super.socket == -1) {
-				int code = os_get_socket_error();
+		/* Call to socket() OK, allow tcp_shutdown() to run to
+		 * prevent socket leak if any of the below calls fail. */
+		p_self->super.socket = sd;
+		p_self->initialized  = 1;
 
-				logit(LOG_ERR, "Error creating client socket: %s", strerror(code));
-				rc = RC_IP_SOCKET_CREATE_ERROR;
+		if (p_self->super.bound == 1) {
+			if (bind (sd, (struct sockaddr *)&p_self->super.local_addr, sizeof(struct sockaddr_in)) < 0) {
+				logit(LOG_WARNING, "Failed binding client socket to local address: %s", strerror(errno));
+				rc = RC_IP_SOCKET_BIND_ERROR;
 				break;
 			}
-
-			/* Call to socket() OK, allow tcp_shutdown() to run to
-			 * prevent socket leak if any of the below calls fail. */
-			p_self->initialized = 1;
-
-			if (p_self->super.bound == 1) {
-				if (bind (p_self->super.socket, (struct sockaddr *)&p_self->super.local_addr,
-					  sizeof(struct sockaddr_in)) < 0) {
-					int code = os_get_socket_error();
-
-					logit(LOG_WARNING, "Failed binding client socket to local address: %s", strerror(code));
-					rc = RC_IP_SOCKET_BIND_ERROR;
-					break;
-				}
-			}
-		} else {
-			p_self->initialized = 1;	/* Allow tcp_shutdown() to run. */
-			rc = RC_IP_BAD_PARAMETER;
 		}
 
-		/* set timeouts */
-		sv.tv_sec = p_self->super.timeout / 1000;	/* msec to sec */
-		sv.tv_usec = (p_self->super.timeout % 1000) * 1000;	/* reminder to usec */
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, svlen);
-		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, svlen);
+		/* Attempt to set TCP timers, silently fall back to OS defaults */
+		sv.tv_sec  =  p_self->super.timeout / 1000;
+		sv.tv_usec = (p_self->super.timeout % 1000) * 1000;
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv));
+		setsockopt(p_self->super.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv));
 
-		if (!getnameinfo
-		    (&p_self->super.remote_addr, p_self->super.remote_len, host,
-		     NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
-			logit(LOG_INFO, "%s, connecting to %s(%s)", msg,
-			      p_self->super.p_remote_host_name, host);
+		sa    = p_self->super.remote_addr;
+		salen = p_self->super.remote_len;
+		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+			logit(LOG_INFO, "%s, connecting to %s(%s)", msg, p_self->super.p_remote_host_name, host);
 		}
 
-		if (0 != connect(p_self->super.socket, &p_self->super.remote_addr, p_self->super.remote_len)) {
-			int code = os_get_socket_error();
+		if (connect(sd, &sa, salen)) {
+			if (!check_error(sd, p_self->super.timeout))
+				break; /* OK */
 
-			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(code));
+			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(errno));
 			rc = RC_IP_CONNECT_FAILED;
 			break;
 		}
@@ -143,9 +162,6 @@ int tcp_initialize(tcp_sock_t *p_self, char *msg)
 	return 0;
 }
 
-/*
-  Disconnect and some other clean up.
-*/
 int tcp_shutdown(tcp_sock_t *p_self)
 {
 	if (p_self == NULL)
@@ -159,7 +175,6 @@ int tcp_shutdown(tcp_sock_t *p_self)
 	return ip_shutdown(&p_self->super);
 }
 
-/* send data*/
 int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len)
 {
 	if (p_self == NULL)
@@ -171,7 +186,6 @@ int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len)
 	return ip_send(&p_self->super, p_buf, len);
 }
 
-/* receive data*/
 int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 {
 	if (p_self == NULL)
@@ -183,7 +197,6 @@ int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len)
 	return ip_recv(&p_self->super, p_buf, max_recv_len, p_recv_len);
 }
 
-/* Accessors*/
 int tcp_set_port(tcp_sock_t *p_self, int p)
 {
 	if (p_self == NULL)
