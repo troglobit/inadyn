@@ -110,6 +110,11 @@ int os_syslog_close(void);
 int os_change_persona (ddns_user_t *user);
 
 /**
+ * Check file system permissions and create pidfile
+ */
+int os_check_perms(void *);
+
+/**
  * Execute command on successful update.
  */
 int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface);

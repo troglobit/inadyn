@@ -66,6 +66,7 @@
 #define RC_FILE_IO_OPEN_ERROR                       70
 #define RC_FILE_IO_READ_ERROR                       71
 #define RC_FILE_IO_OUT_OF_BUFFER                    72
+#define RC_FILE_IO_ACCESS_ERROR                     73
 
 #define RC_RESTART                                  255
 

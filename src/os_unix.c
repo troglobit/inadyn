@@ -22,6 +22,7 @@
 #include "os.h"
 #include "dyndns.h"
 
+#include <libgen.h>		/* dirname() */
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -242,6 +243,81 @@ int os_change_persona(ddns_user_t *user)
 
 	return 0;
 }
+
+static int mkparentdir(char *file)
+{
+	int rc = 0;
+
+	if (access(file, W_OK)) {
+		char *dir;
+		char *ptr = strdup(file);
+
+		if (!ptr)
+			return RC_OUT_OF_MEMORY;
+
+		dir = dirname(ptr);
+		if (mkdir(dir, 0755))
+			rc = 1;
+
+		if (access(file, W_OK)) {
+			rc = 1;
+
+			/* If the file doesn't exist and we can write
+			 * to the parent directory, then it's OK :) */
+			if (ENOENT == errno && !access(dir, W_OK))
+				rc = 0;
+		}
+
+		free(ptr);
+	}
+
+	return rc;
+}
+
+static int pidfile(char *pidfile)
+{
+	FILE *fp;
+
+	/* Ignore any errors, we may not be allowed to create the dir,
+	 * but still be able to create/overwrite the pidfile. */
+	mkparentdir(pidfile);
+
+	fp = fopen(pidfile, "w");
+	if (!fp) {
+		logit(LOG_ERR, "Failed creating pidfile %s: %s", pidfile, strerror(errno));
+		return RC_FILE_IO_ACCESS_ERROR;
+	}
+
+	fprintf(fp, "%u\n", getpid());
+	fclose(fp);
+
+	return 0;
+}
+
+/* Create pid and cache file repository, make sure we can write to it.  If
+ * we are restarted we cannot otherwise make sure we've not already updated
+ * the IP -- and the user will be locked-out of their DDNS server provider
+ * for excessive updates. */
+int os_check_perms(void *arg)
+{
+	ddns_t *ctx = arg;
+
+	/* Create files with permissions 0644 */
+	umask(S_IWGRP | S_IWOTH);
+
+	if (mkparentdir(ctx->cache_file)) {
+		logit(LOG_ERR, "No write permission to %s, aborting.", ctx->cache_file);
+		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
+
+		return RC_FILE_IO_ACCESS_ERROR;
+	}
+
+	/* Not creating a pidfile is OK, the cache file is the critical point. */
+	pidfile(ctx->pidfile);
+
+	return 0;
+}
+
 
 /**
  * Local Variables:

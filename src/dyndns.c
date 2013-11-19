@@ -474,14 +474,14 @@ static int check_interface_address(ddns_t *ctx)
 
 		logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
 		      ctx->check_interface, strerror(code));
-		return RC_ERROR;
+		return RC_OS_INVALID_IP_ADDRESS;
 	}
 	close(sd);
 
 	if (IN_ZERONET(new_ip) ||
 	    IN_LOOPBACK(new_ip) || IN_LINKLOCAL(new_ip) || IN_MULTICAST(new_ip) || IN_EXPERIMENTAL(new_ip)) {
 		logit(LOG_WARNING, "Interface %s has invalid IP# %s", ctx->check_interface, new_ip_str);
-		return RC_ERROR;
+		return RC_OS_INVALID_IP_ADDRESS;
 	}
 
 	for (i = 0; i < ctx->info_count; i++) {
@@ -947,21 +947,6 @@ static int write_cache_file(ddns_t *ctx)
 	return 1;
 }
 
-static int write_pidfile(ddns_t *ctx)
-{
-	FILE *fp = fopen(ctx->pidfile, "w");
-
-	if (!fp) {
-		logit(LOG_ERR, "Failed creating pidfile %s: %s", ctx->pidfile, strerror(errno));
-		return 1;
-	}
-
-	fprintf(fp, "%u\n", getpid());
-	fclose(fp);
-
-	return 0;
-}
-
 static int update_alias_table(ddns_t *ctx)
 {
 	int i, j;
@@ -977,9 +962,8 @@ static int update_alias_table(ddns_t *ctx)
 				continue;
 
 			rc = http_client_init(&ctx->http_to_dyndns[i], "Sending IP# update to DDNS server");
-			if (rc != 0) {
+			if (rc != 0)
 				break;
-			}
 
 			/* Build dyndns transaction */
 			http_tr.req_len = info->system->update_request_func(ctx, i, j);
@@ -1201,6 +1185,42 @@ static int check_address(ddns_t *ctx)
 	return 0;
 }
 
+/* Error filter.  Some errors are to be expected in a network
+ * application, some we can recover from, wait a shorter while and try
+ * again, whereas others are terminal, e.g., some OS errors. */
+static int check_error(ddns_t *ctx, int rc)
+{
+	switch (rc) {
+	case RC_OK:
+		ctx->sleep_sec = ctx->normal_update_period_sec;
+		break;
+
+	/* dyn_dns_update_ip() failed, inform the user the (network) error
+	 * is not fatal and that we will retry again in a short while. */
+	case RC_IP_INVALID_REMOTE_ADDR: /* Probably temporary DNS error. */
+	case RC_IP_CONNECT_FAILED:      /* Cannot connect to DDNS server atm. */
+	case RC_IP_SEND_ERROR:
+	case RC_IP_RECV_ERROR:
+	case RC_OS_INVALID_IP_ADDRESS:
+	case RC_DYNDNS_RSP_RETRY_LATER:
+	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:
+		ctx->sleep_sec = ctx->error_update_period_sec;
+		logit(LOG_WARNING, "Will retry again in %d sec...", ctx->sleep_sec);
+		break;
+
+	case RC_DYNDNS_RSP_NOTOK:
+		logit(LOG_ERR, "Error response from DDNS server, exiting!");
+		return 1;
+
+	/* All other errors, socket creation failures, invalid pointers etc.  */
+	default:
+		logit(LOG_ERR, "Unrecoverable error %d, exiting ...", rc);
+		return 1;
+	}
+
+	return 0;
+}
+
 /**
  * Main DDNS loop
  * Actions:
@@ -1217,9 +1237,6 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	/* Create pid and cache file repository. */
-	mkdir(DYNDNS_RUNTIME_DATA_DIR, 0755);
-
 	/* read cmd line options and set object properties */
 	rc = get_config_data(ctx, argc, argv);
 	if (rc != 0 || ctx->abort)
@@ -1234,6 +1251,9 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 
 		DO(os_change_persona(&user));
 	}
+
+	/* Check file system permissions and create pidfile */
+	DO(os_check_perms(ctx));
 
 	/* if logfile provided, redirect output to log file */
 	if (strlen(ctx->dbg.p_logfilename) != 0)
@@ -1251,10 +1271,6 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 		if (get_dbg_dest() == DBG_SYS_LOG)
 			fclose(stdout);
 	}
-
-	/* Create files with permissions 0644 */
-	umask(S_IWGRP | S_IWOTH);
-	write_pidfile(ctx);
 
 	/* "Hello!" Let user know we've started up OK */
 	logit(LOG_INFO, "%s", DYNDNS_VERSION_STRING);
@@ -1300,36 +1316,22 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	/* DDNS client main loop */
 	while (1) {
 		rc = check_address(ctx);
-		if (rc) {
-			if (ctx->cmd == CMD_RESTART) {
-				logit(LOG_INFO, "RESTART command received. Restarting.");
-				rc = RC_RESTART;
-				ctx->cmd = NO_CMD;
+		if (RC_OK == rc) {
+			if (ctx->total_iterations != 0 &&
+			    ++ctx->num_iterations >= ctx->total_iterations)
 				break;
-			}
-
-			if (rc == RC_DYNDNS_RSP_NOTOK) {
-				logit(LOG_ERR, "Error response from DDNS server, exiting!");
-				break;
-			}
-		} else {
-			/* count only the successful iterations */
-			ctx->num_iterations++;
 		}
 
-		/* check if the user wants us to stop */
-		if (ctx->total_iterations != 0 && ctx->num_iterations >= ctx->total_iterations)
+		if (ctx->cmd == CMD_RESTART) {
+			logit(LOG_INFO, "RESTART command received. Restarting.");
+			ctx->cmd = NO_CMD;
+			rc = RC_RESTART;
 			break;
-
-		ctx->sleep_sec = (rc == RC_DYNDNS_RSP_RETRY_LATER) ?
-			ctx->error_update_period_sec : ctx->normal_update_period_sec;
-
-		if (rc != 0) {
-			/* check_address() failed above, and we've not reached MAX iterations.
-			 * Time to inform the user the (network) error is not fatal and that we
-			 * will try again in a short while. */
-			logit(LOG_WARNING, "Will retry again in %d sec ...", ctx->sleep_sec);
 		}
+
+		/* On error, check why, possibly need to retry sooner ... */
+		if (check_error (ctx, rc))
+			break;
 
 		/* Now sleep a while. Using the time set in sleep_sec data member */
 		wait_for_cmd(ctx);
