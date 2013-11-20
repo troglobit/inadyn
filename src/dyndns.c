@@ -1320,6 +1320,8 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 			if (ctx->total_iterations != 0 &&
 			    ++ctx->num_iterations >= ctx->total_iterations)
 				break;
+
+			ctx->time_since_last_update += ctx->sleep_sec;
 		}
 
 		if (ctx->cmd == CMD_RESTART) {
@@ -1363,8 +1365,6 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 			logit(LOG_DEBUG, ".");
 //                      logit(LOG_DEBUG, "Time since last update: %d", ctx->time_since_last_update);
 		}
-
-		ctx->time_since_last_update += ctx->sleep_sec;
 	}
 
 	/* Save old value, if restarted by SIGHUP */
