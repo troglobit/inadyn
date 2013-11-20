@@ -70,8 +70,9 @@
 
 #define RC_RESTART                                  255
 
-#define DO(fn)  { int rc = fn; if (rc) return rc; }
-#define TRY(fn) { rc = fn; if (rc) break; }
+#define DO(fn)       { int rc = fn; if (rc) return rc; }
+#define TRY(fn)      {     rc = fn; if (rc) break; }
+#define ASSERT(cond) { if (!cond) return RC_INVALID_POINTER; }
 
 const char *errorcode_get_name(int rc);
 

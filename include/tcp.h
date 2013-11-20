@@ -29,27 +29,29 @@
 
 typedef struct {
 	ip_sock_t super;
-	int initialized;
+	int       initialized;
 } tcp_sock_t;
 
-int tcp_construct(tcp_sock_t *p_self);
-int tcp_destruct(tcp_sock_t *p_self);
+int tcp_construct          (tcp_sock_t *tcp);
+int tcp_destruct           (tcp_sock_t *tcp);
 
-int tcp_initialize(tcp_sock_t *p_self, char *msg);
-int tcp_shutdown(tcp_sock_t *p_self);
+int tcp_initialize         (tcp_sock_t *tcp, char *msg);
+int tcp_shutdown           (tcp_sock_t *tcp);
 
-int tcp_send(tcp_sock_t *p_self, const char *p_buf, int len);
-int tcp_recv(tcp_sock_t *p_self, char *p_buf, int max_recv_len, int *p_recv_len);
+int tcp_send               (tcp_sock_t *tcp, const char *buf, int len);
+int tcp_recv               (tcp_sock_t *tcp,       char *buf, int len, int *recv_len);
 
-int tcp_set_port(tcp_sock_t *p_self, int p);
-int tcp_set_remote_name(tcp_sock_t *p_self, const char *p);
-int tcp_set_remote_timeout(tcp_sock_t *p_self, int t);
-int tcp_set_bind_iface(tcp_sock_t *p_self, char *ifname);
+int tcp_set_port           (tcp_sock_t *tcp, int  port);
+int tcp_get_port           (tcp_sock_t *tcp, int *port);
 
-int tcp_get_port(tcp_sock_t *p_self, int *p_port);
-int tcp_get_remote_name(tcp_sock_t *p_self, const char * *p);
-int tcp_get_remote_timeout(tcp_sock_t *p_self, int *p);
-int tcp_get_bind_iface(tcp_sock_t *p_self, char **ifname);
+int tcp_set_remote_name    (tcp_sock_t *tcp, const char  *name);
+int tcp_get_remote_name    (tcp_sock_t *tcp, const char **name);
+
+int tcp_set_remote_timeout (tcp_sock_t *tcp, int  timeout);
+int tcp_get_remote_timeout (tcp_sock_t *tcp, int *timeout);
+
+int tcp_set_bind_iface     (tcp_sock_t *tcp, char  *ifname);
+int tcp_get_bind_iface     (tcp_sock_t *tcp, char **ifname);
 
 #endif /* INADYN_TCP_H_ */
 
