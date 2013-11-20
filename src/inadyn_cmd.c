@@ -179,7 +179,7 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--period", 1, {get_update_period_sec_handler, NULL}, "<SEC>\n"
 	 "\t\t\tIP change check interval.  Default: 2 min. Max: 10 days"},
 	{"--update_period_sec", 1, {get_update_period_sec_handler, NULL}, NULL},
-	{"--update_period", 1, {get_update_period_handler, NULL}, NULL},
+	{"--update_period", 1, {get_update_period_handler, NULL}, NULL}, /* TODO: Replaced with startup-delay, remove in 2.0 */
 
 	{"-P", 1, {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DYNDNS_DEFAULT_PIDFILE},
@@ -521,36 +521,43 @@ static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context)
 */
 static int get_update_period_handler(cmd_data_t *cmd, int num, void *context)
 {
+	int val;
 	ddns_t *ctx = (ddns_t *)context;
 
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sscanf(cmd->argv[num], "%d", &ctx->sleep_sec) != 1)
+	if (sscanf(cmd->argv[num], "%d", &val) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
 
-	ctx->sleep_sec /= 1000;
-	ctx->sleep_sec = (ctx->sleep_sec < DYNDNS_MIN_SLEEP) ? DYNDNS_MIN_SLEEP : ctx->sleep_sec;
-	(ctx->sleep_sec > DYNDNS_MAX_SLEEP) ? ctx->sleep_sec = DYNDNS_MAX_SLEEP : 1;
+	val /= 1000;
+	if (val < DYNDNS_MIN_SLEEP)
+		val = DYNDNS_MIN_SLEEP;
+	if (val > DYNDNS_MAX_SLEEP)
+		val = DYNDNS_MAX_SLEEP;
+
+	ctx->sleep_sec = val;
 
 	return 0;
 }
 
 static int get_update_period_sec_handler(cmd_data_t *cmd, int num, void *context)
 {
+	int val = DYNDNS_DEFAULT_SLEEP;
 	ddns_t *ctx = (ddns_t *)context;
 
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sscanf(cmd->argv[num], "%d", &ctx->normal_update_period_sec) != 1)
+	if (sscanf(cmd->argv[num], "%d", &val) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
 
-	ctx->normal_update_period_sec =
-	    (ctx->normal_update_period_sec <
-	     DYNDNS_MIN_SLEEP) ? DYNDNS_MIN_SLEEP : ctx->normal_update_period_sec;
-	(ctx->normal_update_period_sec >
-	 DYNDNS_MAX_SLEEP) ? ctx->normal_update_period_sec = DYNDNS_MAX_SLEEP : 1;
+	if (val < DYNDNS_MIN_SLEEP)
+		val = DYNDNS_MIN_SLEEP;
+	if (val > DYNDNS_MAX_SLEEP)
+		val = DYNDNS_MAX_SLEEP;
+
+	ctx->normal_update_period_sec = val;
 
 	return 0;
 }
