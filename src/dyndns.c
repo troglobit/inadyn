@@ -1252,6 +1252,14 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 		DO(os_change_persona(&user));
 	}
 
+	/* if silent required, close console window */
+	if (ctx->run_in_background == 1) {
+		DO(close_console_window());
+
+		if (get_dbg_dest() == DBG_SYS_LOG)
+			fclose(stdout);
+	}
+
 	/* Check file system permissions and create pidfile */
 	DO(os_check_perms(ctx));
 
@@ -1262,14 +1270,6 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	if (ctx->debug_to_syslog == 1 || (ctx->run_in_background == 1)) {
 		if (get_dbg_dest() == DBG_STD_LOG)	/* avoid file and syslog output */
 			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
-	}
-
-	/* if silent required, close console window */
-	if (ctx->run_in_background == 1) {
-		DO(close_console_window());
-
-		if (get_dbg_dest() == DBG_SYS_LOG)
-			fclose(stdout);
 	}
 
 	/* "Hello!" Let user know we've started up OK */
