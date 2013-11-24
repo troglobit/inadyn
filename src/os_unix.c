@@ -210,7 +210,7 @@ int os_syslog_close(void)
 
 int os_change_persona(ddns_user_t *user)
 {
-	int rc;
+	int rc = 0;
 
 	do {
 		if (user->gid != getgid()) {
