@@ -297,6 +297,7 @@ typedef struct {
 	int normal_update_period_sec;
 	int error_update_period_sec;
 	int forced_update_period_sec;
+	int forced_update_fake_addr;
 	int time_since_last_update;
 	int cmd_check_period;	/*time to wait for a command */
 	int total_iterations;

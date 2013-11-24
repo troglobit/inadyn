@@ -62,6 +62,7 @@ static int get_dyndns_system_handler(cmd_data_t *cmd, int num, void *context);
 static int get_update_period_handler(cmd_data_t *cmd, int num, void *context);
 static int get_update_period_sec_handler(cmd_data_t *cmd, int num, void *context);
 static int get_forced_update_period_handler(cmd_data_t *cmd, int num, void *context);
+static int forced_update_fake_addr(cmd_data_t *cmd, int num, void *context);
 static int get_logfile_name(cmd_data_t *cmd, int num, void *context);
 static int set_silent_handler(cmd_data_t *cmd, int num, void *context);
 static int set_verbose_handler(cmd_data_t *cmd, int num, void *context);
@@ -206,6 +207,10 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--wildcard", 0, {get_wildcard_handler, NULL},
 	 "Enable domain wildcarding for easydns.com."},
 
+	{"-z",               0, {forced_update_fake_addr, NULL}, ""},
+	{"--fake-address", 0, {forced_update_fake_addr, NULL},
+	 "On SIGUSR1, fake address using random 203.0.113.0/24 before real update."},
+
 	{"-h", 0, {help_handler, NULL}, ""},
 	{"--help", 0, {help_handler, NULL}, "This online help."},
 
@@ -237,6 +242,12 @@ static void print_help_page(void)
 		}
 		++it;
 	}
+
+	puts("==============================================================================");
+	puts("SIGINT/TERM: Stops inadyn");
+	puts("SIGUP      : Reload inadyn.conf");
+	puts("SIGUSR1    : Force update, works with the optional --fake-address");
+	puts("SIGUSR2    : Abort any wait and check now");
 }
 
 static int help_handler(cmd_data_t *cmd, int num, void *context)
@@ -571,6 +582,21 @@ static int get_forced_update_period_handler(cmd_data_t *cmd, int num, void *cont
 
 	if (sscanf(cmd->argv[num], "%d", &ctx->forced_update_period_sec) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
+
+	return 0;
+}
+
+static int forced_update_fake_addr(cmd_data_t *cmd, int num, void *context)
+{
+	ddns_t *ctx = (ddns_t *)context;
+
+	(void)cmd;
+	(void)num;
+
+	if (ctx == NULL)
+		return RC_INVALID_POINTER;
+
+	ctx->forced_update_fake_addr = 1;
 
 	return 0;
 }

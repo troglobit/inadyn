@@ -1013,6 +1013,26 @@ static int update_alias_table(ddns_t *ctx)
 	int rc = 0, remember = 0;
 	int anychange = 0;
 
+	/* Issue #15: On external trig. force update to random addr. */
+	if (ctx->force_addr_update && ctx->forced_update_fake_addr) {
+		/* If the DDNS server responds with an error, we ignore it here,
+		 * since this is just to fool the DDNS server to register a a
+		 * change, i.e., an active user. */
+		for (i = 0; i < ctx->info_count; i++) {
+			ddns_info_t *info = &ctx->info[i];
+			ddns_server_name_t backup = info->my_ip_address;
+
+			/* TODO: Use random address in 203.0.113.0/24 instead */
+			snprintf(info->my_ip_address.name, sizeof(info->my_ip_address.name), "203.0.113.42");
+			for (j = 0; j < info->alias_count; j++)
+				TRY(send_update(ctx,i, j, &anychange));
+
+			info->my_ip_address = backup;
+		}
+
+		os_sleep_ms(1000);
+	}
+
 	for (i = 0; i < ctx->info_count; i++) {
 		ddns_info_t *info = &ctx->info[i];
 
