@@ -25,203 +25,171 @@
 #define super_init(p,msg)  tcp_initialize(p, msg)
 #define super_shutdown(p)  tcp_shutdown(p)
 
-/*
-  basic resource allocations for the http object
-*/
-int http_client_construct(http_client_t *p_self)
+
+int http_client_construct(http_client_t *client)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
+	ASSERT(client);
 
-	DO(super_construct(&p_self->super));
+	DO(super_construct(&client->super));
 
-	memset((char *)p_self + sizeof(p_self->super), 0, sizeof(*p_self) - sizeof(p_self->super));
-	p_self->initialized = 0;
+	memset((char *)client + sizeof(client->super), 0, sizeof(*client) - sizeof(client->super));
+	client->initialized = 0;
 
 	return 0;
 }
 
-/*
-  Resource free.
-*/
-int http_client_destruct(http_client_t *p_self, int num)
+/* Resource free. */
+int http_client_destruct(http_client_t *client, int num)
 {
 	int i = 0, rv = 0;
 
 	while (i < num)
-		rv = super_destruct(&p_self[i++].super);
+		rv = super_destruct(&client[i++].super);
 
 	return rv;
 }
 
 /* Set default TCP specififc params */
-static int local_set_params(http_client_t *p_self)
+static int local_set_params(http_client_t *client)
 {
 	int timeout = 0;
 	int port;
 
-	http_client_get_remote_timeout(p_self, &timeout);
+	http_client_get_remote_timeout(client, &timeout);
 	if (timeout == 0)
-		http_client_set_remote_timeout(p_self, HTTP_DEFAULT_TIMEOUT);
+		http_client_set_remote_timeout(client, HTTP_DEFAULT_TIMEOUT);
 
-	http_client_get_port(p_self, &port);
+	http_client_get_port(client, &port);
 	if (port == 0)
-		http_client_set_port(p_self, HTTP_DEFAULT_PORT);
+		http_client_set_port(client, HTTP_DEFAULT_PORT);
 
 	return 0;
 }
 
-/*
-  Sets up the object.
-*/
-int http_client_init(http_client_t *p_self, char *msg)
+/* Sets up the object. */
+int http_client_init(http_client_t *client, char *msg)
 {
 	int rc;
 
 	do {
-		rc = local_set_params(p_self);
-		if (rc != 0)
-			break;
-
-		rc = super_init(&p_self->super, msg);
-		if (rc != 0)
-			break;
+		TRY(local_set_params(client));
+		TRY(super_init(&client->super, msg));
 	}
 	while (0);
 
-	if (rc != 0) {
-		http_client_shutdown(p_self);
+	if (rc) {
+		http_client_shutdown(client);
 		return rc;
 	}
 
-	p_self->initialized = 1;
+	client->initialized = 1;
 
 	return 0;
 }
 
-/*
-  Disconnect and some other clean up.
-*/
-int http_client_shutdown(http_client_t *p_self)
+/* Disconnect and some other clean up. */
+int http_client_shutdown(http_client_t *client)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
+	ASSERT(client);
 
-	if (!p_self->initialized)
+	if (!client->initialized)
 		return 0;
 
-	p_self->initialized = 0;
+	client->initialized = 0;
 
-	return super_shutdown(&p_self->super);
+	return super_shutdown(&client->super);
 }
 
-static void http_response_parse(http_trans_t *p_tr)
+static void http_response_parse(http_trans_t *trans)
 {
 	char *body;
-	char *rsp = p_tr->p_rsp_body = p_tr->p_rsp;
-	int status = p_tr->status = 0;
+	char *rsp = trans->p_rsp_body = trans->p_rsp;
+	int status = trans->status = 0;
 	const char sep[] = "\r\n\r\n";
 
-	memset(p_tr->status_desc, 0, sizeof(p_tr->status_desc));
+	memset(trans->status_desc, 0, sizeof(trans->status_desc));
 
 	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
 		body += strlen(sep);
-		p_tr->p_rsp_body = body;
+		trans->p_rsp_body = body;
 	}
 
-	if (sscanf(p_tr->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, p_tr->status_desc) == 2)
-		p_tr->status = status;
+	if (sscanf(trans->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, trans->status_desc) == 2)
+		trans->status = status;
 }
 
 /* Send req and get response */
-int http_client_transaction(http_client_t *p_self, http_trans_t *p_tr)
+int http_client_transaction(http_client_t *client, http_trans_t *trans)
 {
 	int rc;
 
-	if (p_self == NULL || p_tr == NULL)
-		return RC_INVALID_POINTER;
+	ASSERT(client);
+	ASSERT(trans);
 
-	if (!p_self->initialized)
+	if (!client->initialized)
 		return RC_HTTP_OBJECT_NOT_INITIALIZED;
 
 	do {
-		rc = tcp_send(&p_self->super, p_tr->p_req, p_tr->req_len);
-		if (rc != 0)
-			break;
-
-		rc = tcp_recv(&p_self->super, p_tr->p_rsp, p_tr->max_rsp_len, &p_tr->rsp_len);
+		TRY(tcp_send(&client->super, trans->p_req, trans->req_len));
+		TRY(tcp_recv(&client->super, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
 	}
 	while (0);
 
-	http_response_parse(p_tr);
+	trans->p_rsp[trans->rsp_len] = 0;
+	http_response_parse(trans);
 
 	return rc;
 }
 
-/* Accessors */
 
-int http_client_set_port(http_client_t *p_self, int p)
+int http_client_set_port(http_client_t *client, int port)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_set_port(&p_self->super, p);
+	ASSERT(client);
+	return tcp_set_port(&client->super, port);
 }
 
-int http_client_set_remote_name(http_client_t *p_self, const char *p)
+int http_client_get_port(http_client_t *client, int *port)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_set_remote_name(&p_self->super, p);
+	ASSERT(client);
+	return tcp_get_port(&client->super, port);
 }
 
-int http_client_set_remote_timeout(http_client_t *p_self, int p)
-{
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
 
-	return tcp_set_remote_timeout(&p_self->super, p);
+int http_client_set_remote_name(http_client_t *client, const char *name)
+{
+	ASSERT(client);
+	return tcp_set_remote_name(&client->super, name);
 }
 
-int http_client_set_bind_iface(http_client_t *p_self, char *ifname)
+int http_client_get_remote_name(http_client_t *client, const char **name)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_set_bind_iface(&p_self->super, ifname);
+	ASSERT(client);
+	return tcp_get_remote_name(&client->super, name);
 }
 
-int http_client_get_port(http_client_t *p_self, int *p)
+int http_client_set_remote_timeout(http_client_t *client, int timeout)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_get_port(&p_self->super, p);
+	ASSERT(client);
+	return tcp_set_remote_timeout(&client->super, timeout);
 }
 
-int http_client_get_remote_name(http_client_t *p_self, const char * *p)
+int http_client_get_remote_timeout(http_client_t *client, int *timeout)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_get_remote_name(&p_self->super, p);
+	ASSERT(client);
+	return tcp_get_remote_timeout(&client->super, timeout);
 }
 
-int http_client_get_remote_timeout(http_client_t *p_self, int *p)
+int http_client_set_bind_iface(http_client_t *client, char *ifname)
 {
-	if (p_self == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_get_remote_timeout(&p_self->super, p);
+	ASSERT(client);
+	return tcp_set_bind_iface(&client->super, ifname);
 }
 
-int http_client_get_bind_iface(http_client_t *p_self, char **ifname)
+int http_client_get_bind_iface(http_client_t *client, char **ifname)
 {
-	if (p_self == NULL || ifname == NULL)
-		return RC_INVALID_POINTER;
-
-	return tcp_get_bind_iface(&p_self->super, ifname);
+	ASSERT(client);
+	ASSERT(ifname);
+	return tcp_get_bind_iface(&client->super, ifname);
 }
 
 /**
