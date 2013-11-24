@@ -1,5 +1,7 @@
-/*
+/* HTTP functions
+ *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
+ * Copyright (C) 2010-2013  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -67,7 +69,7 @@ static int local_set_params(http_client_t *client)
 }
 
 /* Sets up the object. */
-int http_client_init(http_client_t *client, char *msg)
+int http_client_initialize(http_client_t *client, char *msg)
 {
 	int rc;
 

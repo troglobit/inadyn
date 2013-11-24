@@ -50,7 +50,7 @@ typedef struct {
 int http_client_construct          (http_client_t *client);
 int http_client_destruct           (http_client_t *client, int num);
 
-int http_client_init               (http_client_t *client, char *msg);
+int http_client_initialize         (http_client_t *client, char *msg);
 int http_client_shutdown           (http_client_t *client);
 
 int http_client_transaction        (http_client_t *client, http_trans_t *trans);

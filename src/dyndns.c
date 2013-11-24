@@ -262,7 +262,7 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 		http_client_set_remote_name(&client, ctx->info[infcnt].dyndns_server_name.name);
 		http_client_set_bind_iface(&client, ctx->bind_interface);
 
-		if ((rc = http_client_init(&client, "Sending update URL query")) != 0)
+		if ((rc = http_client_initialize(&client, "Sending update URL query")) != 0)
 			break;
 
 		snprintf(buffer, sizeof(buffer), "%s|%s",
@@ -527,7 +527,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 
 	p_http = &ctx->http_to_ip_server[servernum];
 
-	DO(http_client_init(p_http, "Checking for IP# change"));
+	DO(http_client_initialize(p_http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
 	p_tr = &ctx->http_transaction;
@@ -964,7 +964,7 @@ static int send_update(ddns_t *ctx, int i, int j, int *changed)
 	ddns_info_t   *info   = &ctx->info[i];
 	http_client_t *client = &ctx->http_to_dyndns[i];
 
-	DO(http_client_init(client, "Sending IP# update to DDNS server"));
+	DO(http_client_initialize(client, "Sending IP# update to DDNS server"));
 
 	trans.req_len     = info->system->update_request_func(ctx, i, j);
 	trans.p_req       = (char *)ctx->request_buf;
