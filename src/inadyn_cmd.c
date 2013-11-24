@@ -1270,23 +1270,24 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 		}
 
 		/* Setup a default cache file, unless the user provided one for us. */
-		if (ctx->bind_interface && !ctx->cache_file) {
-			cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) + strlen(ctx->bind_interface);
-			if ((ctx->cache_file = malloc(cache_file_len + 1)) == NULL) {
-				rc = RC_OUT_OF_MEMORY;
-				break;
-			}
+		if (!ctx->cache_file) {
+			if (ctx->bind_interface) {
+				cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) + strlen(ctx->bind_interface);
+				if ((ctx->cache_file = malloc(cache_file_len + 1)) == NULL) {
+					rc = RC_OUT_OF_MEMORY;
+					break;
+				}
 
-			if (snprintf
-			    (ctx->cache_file, cache_file_len + 1,
-			     DYNDNS_CACHE_FILE, ctx->bind_interface) != cache_file_len) {
-				rc = RC_ERROR;
-				break;
+				if (snprintf
+				    (ctx->cache_file, cache_file_len + 1,
+				     DYNDNS_CACHE_FILE, ctx->bind_interface) != cache_file_len) {
+					rc = RC_ERROR;
+					break;
+				}
+			} else {
+				ctx->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
 			}
-		} else {
-			ctx->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
 		}
-
 	}
 	while (0);
 
