@@ -618,11 +618,11 @@ static int set_change_persona_handler(cmd_data_t *cmd, int num, void *context)
 		p_gid = strstr(arg, ":");
 		if (p_gid) {
 			if ((strlen(p_gid + 1) > 0) &&	/* if something is present after : */
-			    sscanf(p_gid + 1, "%32[a-zA-Z-]", groupname) != 1)
+			    sscanf(p_gid + 1, "%32[a-zA-Z_-]", groupname) != 1)
 				return RC_DYNDNS_INVALID_OPTION;
 		}
 
-		snprintf(fmt, sizeof(fmt), "%%%ld[a-zA-Z-]", login_len_max);
+		snprintf(fmt, sizeof(fmt), "%%%ld[a-zA-Z_-]", login_len_max);
 		if (sscanf(arg, fmt, username) != 1)
 			return RC_DYNDNS_INVALID_OPTION;
 
