@@ -24,7 +24,7 @@
 
 #include "os.h"
 #include "errorcode.h"
-#include "http_client.h"
+#include "http.h"
 #include "debug_if.h"
 
 #define DYNDNS_VERSION_STRING	"Inadyn version " VERSION_STRING " -- Dynamic DNS update client."

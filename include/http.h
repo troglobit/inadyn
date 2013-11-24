@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#ifndef INADYN_HTTP_CLIENT_H_
-#define INADYN_HTTP_CLIENT_H_
+#ifndef INADYN_HTTP_H_
+#define INADYN_HTTP_H_
 
 #include "os.h"
 #include "errorcode.h"
@@ -67,7 +67,7 @@ int http_client_get_remote_timeout (http_client_t *client, int *timeout);
 int http_client_set_bind_iface     (http_client_t *client, char  *ifname);
 int http_client_get_bind_iface     (http_client_t *client, char **ifname);
 
-#endif /* INADYN_HTTP_CLIENT_H_ */
+#endif /* INADYN_HTTP_H_ */
 
 /**
  * Local Variables:

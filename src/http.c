@@ -19,7 +19,7 @@
  */
 
 #include <string.h>
-#include "http_client.h"
+#include "http.h"
 #include "errorcode.h"
 
 #define super_construct(p) tcp_construct(p)
