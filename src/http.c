@@ -28,7 +28,7 @@
 #define super_shutdown(p)  tcp_shutdown(p)
 
 
-int http_client_construct(http_client_t *client)
+int http_construct(http_t *client)
 {
 	ASSERT(client);
 
@@ -41,7 +41,7 @@ int http_client_construct(http_client_t *client)
 }
 
 /* Resource free. */
-int http_client_destruct(http_client_t *client, int num)
+int http_destruct(http_t *client, int num)
 {
 	int i = 0, rv = 0;
 
@@ -52,24 +52,24 @@ int http_client_destruct(http_client_t *client, int num)
 }
 
 /* Set default TCP specififc params */
-static int local_set_params(http_client_t *client)
+static int local_set_params(http_t *client)
 {
 	int timeout = 0;
 	int port;
 
-	http_client_get_remote_timeout(client, &timeout);
+	http_get_remote_timeout(client, &timeout);
 	if (timeout == 0)
-		http_client_set_remote_timeout(client, HTTP_DEFAULT_TIMEOUT);
+		http_set_remote_timeout(client, HTTP_DEFAULT_TIMEOUT);
 
-	http_client_get_port(client, &port);
+	http_get_port(client, &port);
 	if (port == 0)
-		http_client_set_port(client, HTTP_DEFAULT_PORT);
+		http_set_port(client, HTTP_DEFAULT_PORT);
 
 	return 0;
 }
 
 /* Sets up the object. */
-int http_client_initialize(http_client_t *client, char *msg)
+int http_initialize(http_t *client, char *msg)
 {
 	int rc;
 
@@ -80,7 +80,7 @@ int http_client_initialize(http_client_t *client, char *msg)
 	while (0);
 
 	if (rc) {
-		http_client_shutdown(client);
+		http_shutdown(client);
 		return rc;
 	}
 
@@ -90,7 +90,7 @@ int http_client_initialize(http_client_t *client, char *msg)
 }
 
 /* Disconnect and some other clean up. */
-int http_client_shutdown(http_client_t *client)
+int http_shutdown(http_t *client)
 {
 	ASSERT(client);
 
@@ -121,7 +121,7 @@ static void http_response_parse(http_trans_t *trans)
 }
 
 /* Send req and get response */
-int http_client_transaction(http_client_t *client, http_trans_t *trans)
+int http_transaction(http_t *client, http_trans_t *trans)
 {
 	int rc;
 
@@ -144,50 +144,50 @@ int http_client_transaction(http_client_t *client, http_trans_t *trans)
 }
 
 
-int http_client_set_port(http_client_t *client, int port)
+int http_set_port(http_t *client, int port)
 {
 	ASSERT(client);
 	return tcp_set_port(&client->super, port);
 }
 
-int http_client_get_port(http_client_t *client, int *port)
+int http_get_port(http_t *client, int *port)
 {
 	ASSERT(client);
 	return tcp_get_port(&client->super, port);
 }
 
 
-int http_client_set_remote_name(http_client_t *client, const char *name)
+int http_set_remote_name(http_t *client, const char *name)
 {
 	ASSERT(client);
 	return tcp_set_remote_name(&client->super, name);
 }
 
-int http_client_get_remote_name(http_client_t *client, const char **name)
+int http_get_remote_name(http_t *client, const char **name)
 {
 	ASSERT(client);
 	return tcp_get_remote_name(&client->super, name);
 }
 
-int http_client_set_remote_timeout(http_client_t *client, int timeout)
+int http_set_remote_timeout(http_t *client, int timeout)
 {
 	ASSERT(client);
 	return tcp_set_remote_timeout(&client->super, timeout);
 }
 
-int http_client_get_remote_timeout(http_client_t *client, int *timeout)
+int http_get_remote_timeout(http_t *client, int *timeout)
 {
 	ASSERT(client);
 	return tcp_get_remote_timeout(&client->super, timeout);
 }
 
-int http_client_set_bind_iface(http_client_t *client, char *ifname)
+int http_set_bind_iface(http_t *client, char *ifname)
 {
 	ASSERT(client);
 	return tcp_set_bind_iface(&client->super, ifname);
 }
 
-int http_client_get_bind_iface(http_client_t *client, char **ifname)
+int http_get_bind_iface(http_t *client, char **ifname)
 {
 	ASSERT(client);
 	ASSERT(ifname);

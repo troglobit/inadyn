@@ -314,8 +314,8 @@ typedef struct {
 	int use_proxy;
 	int abort;
 
-	http_client_t http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
-	http_client_t http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
+	http_t http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
+	http_t http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
 	http_trans_t http_transaction;
 	char *work_buf;		/* for HTTP responses */
 	int work_buflen;

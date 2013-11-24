@@ -63,7 +63,7 @@ static int alloc_context(ddns_t **pctx)
 
 		i = 0;
 		while (i < DYNDNS_MAX_SERVER_NUMBER) {
-			if (http_client_construct(&ctx->http_to_ip_server[i++])) {
+			if (http_construct(&ctx->http_to_ip_server[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
@@ -72,7 +72,7 @@ static int alloc_context(ddns_t **pctx)
 
 		i = 0;
 		while (i < DYNDNS_MAX_SERVER_NUMBER) {
-			if (http_client_construct(&ctx->http_to_dyndns[i++])) {
+			if (http_construct(&ctx->http_to_dyndns[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
 			}
@@ -104,10 +104,10 @@ static int alloc_context(ddns_t **pctx)
 			free(ctx->work_buf);
 
 		if (http_to_dyndns_constructed)
-			http_client_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
+			http_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
 
 		if (http_to_ip_constructed)
-			http_client_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
+			http_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
 
 		free(ctx);
 		*pctx = NULL;
@@ -120,8 +120,8 @@ static void free_context(ddns_t *ctx)
 {
 	int i;
 
-	http_client_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
-	http_client_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
+	http_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
+	http_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
 
 	free(ctx->work_buf);
 	ctx->work_buf = NULL;

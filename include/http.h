@@ -31,7 +31,7 @@
 typedef struct {
 	tcp_sock_t super;
 	int        initialized;
-} http_client_t;
+} http_t;
 
 typedef struct {
 	char *p_req;
@@ -47,25 +47,25 @@ typedef struct {
 	char  status_desc[256];
 } http_trans_t;
 
-int http_client_construct          (http_client_t *client);
-int http_client_destruct           (http_client_t *client, int num);
+int http_construct          (http_t *client);
+int http_destruct           (http_t *client, int num);
 
-int http_client_initialize         (http_client_t *client, char *msg);
-int http_client_shutdown           (http_client_t *client);
+int http_initialize         (http_t *client, char *msg);
+int http_shutdown           (http_t *client);
 
-int http_client_transaction        (http_client_t *client, http_trans_t *trans);
+int http_transaction        (http_t *client, http_trans_t *trans);
 
-int http_client_set_port           (http_client_t *client, int  porg);
-int http_client_get_port           (http_client_t *client, int *port);
+int http_set_port           (http_t *client, int  porg);
+int http_get_port           (http_t *client, int *port);
 
-int http_client_set_remote_name    (http_client_t *client, const char  *name);
-int http_client_get_remote_name    (http_client_t *client, const char **name);
+int http_set_remote_name    (http_t *client, const char  *name);
+int http_get_remote_name    (http_t *client, const char **name);
 
-int http_client_set_remote_timeout (http_client_t *client, int  timeout);
-int http_client_get_remote_timeout (http_client_t *client, int *timeout);
+int http_set_remote_timeout (http_t *client, int  timeout);
+int http_get_remote_timeout (http_t *client, int *timeout);
 
-int http_client_set_bind_iface     (http_client_t *client, char  *ifname);
-int http_client_get_bind_iface     (http_client_t *client, char **ifname);
+int http_set_bind_iface     (http_t *client, char  *ifname);
+int http_get_bind_iface     (http_t *client, char **ifname);
 
 #endif /* INADYN_HTTP_H_ */
 
