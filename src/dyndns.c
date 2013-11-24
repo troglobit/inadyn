@@ -278,7 +278,6 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 		trans.rsp_len = 0;
 
 		rc = http_client_transaction(&client, &trans);
-		trans.p_rsp[trans.rsp_len] = 0;
 
 		rc2 = http_client_shutdown(&client);
 
@@ -540,7 +539,6 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	p_tr->rsp_len = 0;
 
 	rc = http_client_transaction(p_http, &ctx->http_transaction);
-	p_tr->p_rsp[p_tr->rsp_len] = 0;
 
 	if (p_tr->status != 200)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
@@ -615,6 +613,13 @@ static int parse_my_ip_address(ddns_t *ctx, int servernum)
 	return RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 }
 
+static int time_to_check(ddns_t *ctx)
+{
+	return ctx->force_addr_update
+		|| (ctx->time_since_last_update >
+		    ctx->forced_update_period_sec);
+}
+
 /*
   Updates for every maintained name the property: 'update_required'.
   The property will be checked in another function and updates performed.
@@ -627,20 +632,22 @@ static int parse_my_ip_address(ddns_t *ctx, int servernum)
 static int check_alias_update_table(ddns_t *ctx)
 {
 	int i, j;
+	int override = time_to_check(ctx);
 
 	/* Uses fix test if ip of server 0 has changed.
 	 * That should be OK even if changes check_address() to
 	 * iterate over servernum, but not if it's fix set to =! 0 */
-	if (ctx->info[0].ip_has_changed || ctx->force_addr_update ||
-	    (ctx->time_since_last_update > ctx->forced_update_period_sec)) {
-		for (i = 0; i < ctx->info_count; i++) {
-			ddns_info_t *info = &ctx->info[i];
+	for (i = 0; i < ctx->info_count; i++) {
+		ddns_info_t *info = &ctx->info[i];
 
-			for (j = 0; j < info->alias_count; j++) {
-				info->alias[j].update_required = 1;
-				logit(LOG_WARNING, "Update needed for alias %s, new IP# %s",
-				      info->alias[j].names.name, info->my_ip_address.name);
-			}
+		if (!info->ip_has_changed && !override)
+			continue;
+
+		for (j = 0; j < info->alias_count; j++) {
+			info->alias[j].update_required = 1;
+			logit(LOG_WARNING, "Update %s for alias %s, new IP# %s",
+			      override ? "forced" : "needed",
+			      info->alias[j].names.name, info->my_ip_address.name);
 		}
 	}
 
@@ -855,7 +862,7 @@ static int nslookup(ddns_info_t *entry)
 	hints.ai_family = AF_INET;	/* IPv4 */
 	hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
 	hints.ai_flags = 0;
-	hints.ai_protocol = 0;	        /* Any protocol */
+	hints.ai_protocol = 0;          /* Any protocol */
 
 	error = getaddrinfo(entry->alias[0].names.name, NULL, &hints, &result);
 	if (!error) {
@@ -947,78 +954,81 @@ static int write_cache_file(ddns_t *ctx)
 	return 1;
 }
 
+static int send_update(ddns_t *ctx, int i, int j, int *changed)
+{
+	int            rc;
+	http_trans_t   trans;
+	ddns_info_t   *info   = &ctx->info[i];
+	http_client_t *client = &ctx->http_to_dyndns[i];
+
+	DO(http_client_init(client, "Sending IP# update to DDNS server"));
+
+	trans.req_len     = info->system->update_request_func(ctx, i, j);
+	trans.p_req       = (char *)ctx->request_buf;
+	trans.p_rsp       = (char *)ctx->work_buf;
+	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
+	trans.rsp_len     = 0;
+
+	if (ctx->dbg.level > 2) {
+		ctx->request_buf[trans.req_len] = 0;
+		logit(LOG_DEBUG, "Sending alias table update to DDNS server:");
+		logit(LOG_DEBUG, "%s", ctx->request_buf);
+	}
+
+	rc = http_client_transaction(client, &trans);
+
+	if (ctx->dbg.level > 2) {
+		logit(LOG_DEBUG, "DDNS server response:");
+		logit(LOG_DEBUG, "%s", trans.p_rsp);
+	}
+
+	if (rc) {
+		http_client_shutdown(client);
+		return rc;
+	}
+
+	rc = info->system->response_ok_func(ctx, &trans, i);
+	if (rc) {
+		logit(LOG_WARNING, "%s error in DDNS server response:",
+		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
+		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
+		      trans.p_rsp_body != trans.p_rsp ? trans.p_rsp_body : "");
+	} else {
+		logit(LOG_INFO, "Successful alias table update for %s => new IP# %s",
+		      info->alias[j].names.name, info->my_ip_address.name);
+
+		ctx->time_since_last_update = 0;
+		ctx->force_addr_update = 0;
+		(*changed)++;
+	}
+
+	http_client_shutdown(client);
+
+	return rc;
+}
+
 static int update_alias_table(ddns_t *ctx)
 {
 	int i, j;
-	int rc = 0, rc2;
-	http_trans_t http_tr;
+	int rc = 0, remember = 0;
 	int anychange = 0;
 
 	for (i = 0; i < ctx->info_count; i++) {
 		ddns_info_t *info = &ctx->info[i];
 
 		for (j = 0; j < info->alias_count; j++) {
-			if (info->alias[j].update_required != 1)
+			if (!info->alias[j].update_required)
 				continue;
 
-			rc = http_client_init(&ctx->http_to_dyndns[i], "Sending IP# update to DDNS server");
-			if (rc != 0)
-				break;
-
-			/* Build dyndns transaction */
-			http_tr.req_len = info->system->update_request_func(ctx, i, j);
-			http_tr.p_req = (char *)ctx->request_buf;
-			http_tr.p_rsp = (char *)ctx->work_buf;
-			http_tr.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
-			http_tr.rsp_len = 0;
-
-			rc = http_client_transaction(&ctx->http_to_dyndns[i], &http_tr);
-			http_tr.p_rsp[http_tr.rsp_len] = 0;
-
-			if (ctx->dbg.level > 2) {
-				ctx->request_buf[http_tr.req_len] = 0;
-				logit(LOG_DEBUG, "Sending alias table update to DDNS server:");
-				logit(LOG_DEBUG, "%s", ctx->request_buf);
-			}
-
-			if (rc == 0) {
-				rc = info->system->response_ok_func(ctx, &http_tr, i);
-				if (rc == 0) {
-					info->alias[j].update_required = 0;
-
-					logit(LOG_INFO,
-					      "Successful alias table update for %s => new IP# %s",
-					      info->alias[j].names.name, info->my_ip_address.name);
-					ctx->time_since_last_update = 0;
-					ctx->force_addr_update = 0;
-					anychange++;
-				} else {
-					logit(LOG_WARNING,
-					      "%s error in DDNS server response:",
-					      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
-					logit(LOG_WARNING, "[%d %s] %s",
-					      http_tr.status,
-					      http_tr.status_desc,
-					      http_tr.p_rsp_body != http_tr.p_rsp ? http_tr.p_rsp_body : "");
-				}
-
-				if (ctx->dbg.level > 2) {
-					logit(LOG_DEBUG, "DDNS server response:");
-					logit(LOG_DEBUG, "%s", http_tr.p_rsp);
-				}
-			}
-
-			rc2 = http_client_shutdown(&ctx->http_to_dyndns[i]);
-			if (rc == 0) {
-				/* Only overwrite rc with of http_client_shutdown() rc if previous call, in
-				 * e.g., http_client_transaction() or the response_ok_func() callback was OK. */
-				rc = rc2;
-			}
-			if (rc != 0) {
-				break;
-			}
-			os_sleep_ms(1000);
+			TRY(send_update(ctx,i, j, &anychange));
+			info->alias[j].update_required = 0;
 		}
+
+		if (RC_DYNDNS_RSP_NOTOK == rc)
+			remember = rc;
+
+		if (RC_DYNDNS_RSP_RETRY_LATER == rc && !remember)
+			remember = rc;
 	}
 
 	/* Successful change or when cache file does not yet exist! */
@@ -1032,7 +1042,7 @@ static int update_alias_table(ddns_t *ctx)
 					 ctx->info[0].alias[0].names.name, ctx->bind_interface);
 	}
 
-	return rc;
+	return remember;
 }
 
 static int get_encoded_user_passwd(ddns_t *ctx)
