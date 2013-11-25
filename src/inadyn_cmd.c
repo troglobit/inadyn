@@ -1169,6 +1169,34 @@ static int default_config(ddns_t *ctx)
 	return 0;
 }
 
+static int create_cache_file(ddns_t *ctx)
+{
+	int len, bytes;
+
+	if (!ctx->bind_interface) {
+		ctx->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
+		if (!ctx->cache_file)
+			return RC_OUT_OF_MEMORY;
+
+		return 0;
+	}
+
+	/* The '-2' adjusts for the '%s' format specifier */
+	len = strlen(DYNDNS_CACHE_FILE) - 2 + strlen(ctx->bind_interface);
+	ctx->cache_file = malloc(len + 1);
+	if (!ctx->cache_file)
+		return RC_OUT_OF_MEMORY;
+
+	bytes = snprintf(ctx->cache_file, len + 1, DYNDNS_CACHE_FILE, ctx->bind_interface);
+	if (bytes != len) {
+		free(ctx->cache_file);
+		ctx->cache_file = NULL;
+		return RC_ERROR;
+	}
+
+	return 0;
+}
+
 /*
   Set up all details:
   - ip server name
@@ -1188,7 +1216,6 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 {
 	int i;
 	int rc = 0;
-	int cache_file_len;
 	cmd_desc_t *it;
 
 	do {
@@ -1270,24 +1297,8 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 		}
 
 		/* Setup a default cache file, unless the user provided one for us. */
-		if (!ctx->cache_file) {
-			if (ctx->bind_interface) {
-				cache_file_len = (strlen(DYNDNS_CACHE_FILE) - 2) + strlen(ctx->bind_interface);
-				if ((ctx->cache_file = malloc(cache_file_len + 1)) == NULL) {
-					rc = RC_OUT_OF_MEMORY;
-					break;
-				}
-
-				if (snprintf
-				    (ctx->cache_file, cache_file_len + 1,
-				     DYNDNS_CACHE_FILE, ctx->bind_interface) != cache_file_len) {
-					rc = RC_ERROR;
-					break;
-				}
-			} else {
-				ctx->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
-			}
-		}
+		if (!ctx->cache_file)
+			TRY(create_cache_file(ctx));
 	}
 	while (0);
 
