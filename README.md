@@ -45,21 +45,26 @@ how it can be used.
 
 Feature is courtesy of [Christian Eyrich](http://eyrich-net.org/programmiertes.html)
 
+Example /etc/inadyn.conf:
+
     background
     verbose 1
+    period  300
     logfile /var/log/inadyn.log
     pidfile /var/run/inadyn.pid
     
     system default@dyndns.org
       username yxxx
       password xyxx
-      period 300
       alias yyyy
       alias yyyy
     
     system default@no-ip.com
       username xxyx
       password xxxy
-      period 300
       alias yyyy
+
+In a multi-user setup, make sure to chmod your .conf to 600 (read-write
+only by you/root) to prevent other users from accessing your DDNS server
+credentials.
 
