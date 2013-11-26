@@ -1045,6 +1045,8 @@ static int update_alias_table(ddns_t *ctx)
 				continue;
 
 			TRY(send_update(ctx,i, j, &anychange));
+
+			/* Only reset if send_update() succeeds. */
 			info->alias[j].update_required = 0;
 		}
 
@@ -1055,8 +1057,9 @@ static int update_alias_table(ddns_t *ctx)
 			remember = rc;
 	}
 
-	/* Successful change or when cache file does not yet exist! */
-	if (anychange || access(ctx->cache_file, F_OK)) {
+	/* Only on successful change!
+	 * TODO: Update cache for each updated DDNS provider */
+	if (anychange) {
 		write_cache_file(ctx);
 
 		/* Run external command hook on update. */
