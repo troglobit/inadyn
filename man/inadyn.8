@@ -9,7 +9,7 @@
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd October 31, 2010
+.Dd November 27, 2013
 .Dt INADYN 8 SMM
 .Os
 .Sh NAME
@@ -203,8 +203,18 @@ External IP check is not performed
 Set pidfile, defaults to
 .Pa /var/run/inadyn/inadyn.pid 
 .It Fl c, -cachefile Ar FILE
-Set cachefile, defaults to
+Set cache file, defaults to
 .Pa /var/run/inadyn/inadyn.cache 
+.Pp
+The cache file is used to keep track of what address has been sent to
+the DDNS provider and resulted in a successful update.  Hence it is only
+written when a successful update has been made.
+.Pp
+However, to protect against too frequent updates, that may be caused by
+inadyn being completely restarted, the absence of a cache file does not
+in itself cause an update.  Instead, each alias is queried for using a
+DNS lookup for each alias entry.  This IP is then compared to the IP
+returned by the DDNS providers 'checkip' service.
 .It Fl e, -exec Ar SCRIPT
 Full path to external command, or script, to run after a successful
 DDNS update
@@ -231,7 +241,7 @@ responds to signals.
 Intended to allow time for embedded devices without a battery backed
 real time clock to set their clock via NTP at bootup.  This is so that
 the time since the last update can be calculated correctly from the
-cachefile and the
+cache file and the
 .Fl -forced-update
 option honored across reboots, avoiding unnecessary IP address updates
 .It Fl o, -once
@@ -362,14 +372,14 @@ For convenience in sending signals,
 writes its process ID to
 .Pa /var/run/inadyn/inadyn.pid
 .Sh FILES
-.Bl -tag -width /var/tmp/pimd.cache -compact
+.Bl -tag -width /var/run/inadyn/inadyn.cache -compact
 .It Pa /etc/inadyn.conf
 .It Pa /var/run/inadyn/inadyn.cache
 .It Pa /var/run/inadyn/inadyn.pid
 .El
 .Sh SEE ALSO
 .Xr inadyn.conf 5
-.br
+.Pp
 The
 .Nm
 home page is http://github.com/troglobit/inadyn
