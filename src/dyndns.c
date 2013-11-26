@@ -1002,7 +1002,8 @@ static int send_update(ddns_t *ctx, int i, int j, int *changed)
 
 		ctx->time_since_last_update = 0;
 		ctx->force_addr_update = 0;
-		(*changed)++;
+		if (changed)
+			(*changed)++;
 	}
 
 	http_shutdown(client);
@@ -1028,7 +1029,7 @@ static int update_alias_table(ddns_t *ctx)
 			/* TODO: Use random address in 203.0.113.0/24 instead */
 			snprintf(info->my_ip_address.name, sizeof(info->my_ip_address.name), "203.0.113.42");
 			for (j = 0; j < info->alias_count; j++)
-				TRY(send_update(ctx,i, j, &anychange));
+				TRY(send_update(ctx,i, j, NULL));
 
 			info->my_ip_address = backup;
 		}
