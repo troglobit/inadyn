@@ -166,8 +166,8 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\to For dns.he.net:         dyndns@he.net\n"
 	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
 	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
-	 "\t\t\to For dnsexit.com:   	  default@dnsexit.com\n"
-	 "\t\t\to For generic:            custom@http_svr_basic_auth\n\n"
+	 "\t\t\to For dnsexit.com:        default@dnsexit.com\n"
+	 "\t\t\to For generic:            custom@http_srv_basic_auth\n\n"
 	 "\t\t\tDefault value:            default@dyndns.org"},
 	{"--dyndns_system", 1, {get_dyndns_system_handler, NULL}, NULL},
 
@@ -441,8 +441,11 @@ static int get_name_and_port(char *p_src, char *p_dest_name, int *p_dest_port)
 	return 0;
 }
 
-/** Returns the svr name and port if the format is :
- * name[:port] url.
+/**
+ * get_ip_server_name_handler - Returns the server name and port
+ *
+ * If the format is 'name[:port] url' this function returns the name and
+ * port of the server.
  */
 static int get_ip_server_name_handler(cmd_data_t *cmd, int num, void *context)
 {
