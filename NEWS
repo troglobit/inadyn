@@ -1,8 +1,13 @@
+ChangeLog
+=========
+
 Ver. 1.99.6 - Dec 25 2013
-    Fix nasty socket leak. Update documentation for custom servers and
-    add missing compatibility entry for custom servers.
+-------------------------
+Fix nasty socket leak. Update documentation for custom servers and
+add missing compatibility entry for custom servers.
 
 Ver. 1.99.5 - Nov 27 2013
+-------------------------
     This release adds support for --fake-address on new SIGUSR1 (forced
     update), support for SIGUSR2 (check now), new --startup-delay
     support for embedded systems, and many bugfixes and manpage updates.
