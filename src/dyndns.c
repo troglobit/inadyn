@@ -467,6 +467,7 @@ static int check_interface_address(ddns_t *ctx)
 
 		logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
 		      ctx->check_interface, strerror(code));
+		close(sd);
 
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
