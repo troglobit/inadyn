@@ -176,6 +176,14 @@ ddns_sysinfo_t dns_system_table[] = {
 	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
 	  "", ""}},
 
+	/* Compatiblity entry, new canonical is @http_srv */
+	{CUSTOM_HTTP_BASIC_AUTH,
+	 {"custom@http_svr_basic_auth",
+	  (ddns_response_ok_func_t) is_generic_server_rsp_ok,
+	  (ddns_request_func_t) get_req_for_generic_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  "", ""}},
+
 	{LAST_DNS_SYSTEM, {NULL, NULL, NULL, NULL, NULL, NULL, NULL}}
 };
 
