@@ -1,10 +1,28 @@
-Ver.  current
+Ver. 1.99.6 - Dec 25 2013
+    Fix nasty socket leak. Update documentation for custom servers and
+    add missing compatibility entry for custom servers.
+
+Ver. 1.99.5 - Nov 27 2013
+    This release adds support for --fake-address on new SIGUSR1 (forced
+    update), support for SIGUSR2 (check now), new --startup-delay
+    support for embedded systems, and many bugfixes and manpage updates.
+
+Ver. 1.99.4 - Aug 8 2013
+    This release fixes a base64 password encoding regression in 1.99.3
+
+Ver. 1.99.3 - Jul 15 2013
+    This release adds the ability to specify the cache file and the
+    ability to check the IP of the interface (UNIX only).  If no
+    interface is specified, no external IP check is performed.  The old
+    --iface option has been renamed --bind. changeip.com support has
+    been added.  Minor bugfixes and code optimizations have been made.
+
     - Add ability to specify cache file.
     - Add ability to check IP of interface (unix only).
-    If interface is specified, no external IP check permormed.
-    Old --iface option renamed to --bind.
-    - Specify IP address in freedns.afraid.org update request (only autodetect
-    was used).
+      If interface is specified, no external IP check permormed.
+      Old --iface option renamed to --bind.
+    - Specify IP address in freedns.afraid.org update request (only
+      autodetect was used).
     - Add changeip.com support.
     - Minor bugfixes and code optimization
 
