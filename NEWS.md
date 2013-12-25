@@ -1,46 +1,51 @@
 ChangeLog
 =========
 
-Ver. 1.99.6 - Dec 25 2013
--------------------------
+Version 1.99.6: Dec 25 2013
+---------------------------
 Fix nasty socket leak. Update documentation for custom servers and
 add missing compatibility entry for custom servers.
 
-Ver. 1.99.5 - Nov 27 2013
--------------------------
-    This release adds support for --fake-address on new SIGUSR1 (forced
-    update), support for SIGUSR2 (check now), new --startup-delay
-    support for embedded systems, and many bugfixes and manpage updates.
+Version 1.99.5: Nov 27 2013
+---------------------------
+This release adds support for --fake-address on new SIGUSR1 (forced
+update), support for SIGUSR2 (check now), new --startup-delay
+support for embedded systems, and many bugfixes and manpage updates.
 
-Ver. 1.99.4 - Aug 8 2013
-    This release fixes a base64 password encoding regression in 1.99.3
+Version 1.99.4: Aug 8 2013
+--------------------------
+This release fixes a base64 password encoding regression in 1.99.3
 
-Ver. 1.99.3 - Jul 15 2013
-    This release adds the ability to specify the cache file and the
-    ability to check the IP of the interface (UNIX only).  If no
-    interface is specified, no external IP check is performed.  The old
-    --iface option has been renamed --bind. changeip.com support has
-    been added.  Minor bugfixes and code optimizations have been made.
+Version 1.99.3: Jul 15 2013
+---------------------------
+This release adds the ability to specify the cache file and the
+ability to check the IP of the interface (UNIX only).  If no
+interface is specified, no external IP check is performed.  The old
+--iface option has been renamed --bind. changeip.com support has
+been added.  Minor bugfixes and code optimizations have been made.
 
-    - Add ability to specify cache file.
-    - Add ability to check IP of interface (unix only).
-      If interface is specified, no external IP check permormed.
-      Old --iface option renamed to --bind.
-    - Specify IP address in freedns.afraid.org update request (only
-      autodetect was used).
-    - Add changeip.com support.
-    - Minor bugfixes and code optimization
+- Add ability to specify cache file.
+- Add ability to check IP of interface (unix only).
+  If interface is specified, no external IP check permormed.
+  Old --iface option renamed to --bind.
+- Specify IP address in freedns.afraid.org update request (only
+  autodetect was used).
+- Add changeip.com support.
+- Minor bugfixes and code optimization
 
-Ver.  1.99.2 - Sep 7 2012
-    - Fix inability to change update period (broken in 1.99.0).
-    - Get http status description.
-    - Fix debug output description.
+Version 1.99.2: Sep 7 2012
+--------------------------
+- Fix inability to change update period (broken in 1.99.0).
+- Get http status description.
+- Fix debug output description.
 
-Ver.  1.99.1 - Sep 1 2012
-    - Make HTTP status code check server-specific.
-    - Change e-mail address.
+Version 1.99.1: Sep 1 2012
+--------------------------
+- Make HTTP status code check server-specific.
+- Change e-mail address.
 
-Ver.  1.99.0 - Aug 17 2012
+Version 1.99.0: Aug 17 2012
+---------------------------
     - Merge wl500g patches from http://code.google.com/p/wl500g:
       - 120-heipv6tb.patch adds support for tunnelbroker.
       - 121-hedyndns.patch adds support for HE dyndns.
@@ -63,7 +68,8 @@ Ver.  1.99.0 - Aug 17 2012
     - Remake zoneedit response validation.
     - Little code cleanup.    
 
-Ver.  1.98.1 - Jul 18 2011
+Version 1.98.1: Jul 18 2011
+---------------------------
     - Preserve time since last update (forced update counter) and num interations
       from being reset by SIGHUP restart command.
     - Bug fix --drop-privs uid/gid was swapped and a possible buffer overflow.
@@ -72,18 +78,21 @@ Ver.  1.98.1 - Jul 18 2011
     - Cleanup of inadyn log messages, reformat & clarification.
     - Typo fixes and polish to man pages inadyn(8) and inadyn.conf(5)
 
-Ver.  1.98.0 - Feb 28 2011
+Version 1.98.0: Feb 28 2011
+---------------------------
     - New config file, command line, syntax (still backwards compatible!).
     - New option --drop-privs USER[:GROUP] to support privilege separation.
     - Drop privileges before creating any files.
     - Documentation updates.
 
-Ver.  1.97.4 - Nov 2 2010
+Version 1.97.4: Nov 2 2010
+--------------------------
     - Support for dynsip.org by milkfish, from DD-WRT.
     - Add support for sitelutions.com, from inadyn-mt (untested).
     - Clear DNS cache before calling getaddrinfo(), should fix GitHub issue #3.
     
-Ver.  1.97.3 - Nov 2 2010
+Version 1.97.3: Nov 2 2010
+--------------------------
     - Merge wl500g patches from http://code.google.com/p/wl500g:
       - 101-http-request.patch. This cleans up the DDNS server
         defintions and callbacks, evidently originating from ideas
@@ -102,17 +111,21 @@ Ver.  1.97.3 - Nov 2 2010
     - Fix Debian bug #575549: freedns.afraid.org example in inadyn(8) is
       incorrect.
     
-Ver.  1.97.2 - Oct 30 2010
+Version 1.97.2: Oct 30 2010
+---------------------------
     - Fix missing man pages from install/uninstall targets.
     - Fix GitHub issue #2: setsocktopt() takes pointer to struct timeval,
       not int as argument.
     - Replace gethostbyname() with getaddrinfo() and improve logging at
       connect().
-Ver.  1.97.1 - Oct 19 2010
+
+Version 1.97.1: Oct 19 2010
+---------------------------
     - Add support for properly restarting inadyn on SIGHUP.
     - Remove INADYN: prefix in MODULE_TAG entirely - messes up syslog output.
     
-Ver.  1.97.0 - Oct 18 2010
+Version 1.97.0: Oct 18 2010
+---------------------------
     - Apply patches by Neufbox4 from http://dev.efixo.net:
       - 100-inadyn-1.96.2.patch, cache file support.
       - 100-inadyn-1.96.2.patch, bind interface support.
@@ -141,7 +154,8 @@ Ver.  1.97.0 - Oct 18 2010
       --exec options and support for easydns.org and 3322.org services.
     - Misc fixes and cleanups.
     
-Ver.  1.96.2 - 12 March 2007
+Version 1.96.2: 12 Mar 2007
+---------------------------
     - Fixes:
        - If the Dynamic DNS server responds with an error Inadyn will abort.
          This will prevent further retries with wrong dyndns credentials.
@@ -149,7 +163,8 @@ Ver.  1.96.2 - 12 March 2007
          via Proxy, to ports different than 80.
        - Simplified main inadyn update loop function. (there was no bug there)
 
-Ver. 1.96  -  9 September 2005
+Version 1.96: 9 Sep 2005
+------------------------
     - New features:
         - zoneedit.com supported.
         - no-ip.com supported.
@@ -160,7 +175,8 @@ Ver. 1.96  -  9 September 2005
         - added missing option for specifying the path in the DNS
           server
 
-Ver. 1.95  - 20 July      2005
+Version 1.95: 20 Jul 2005
+-------------------------
     - New features:
         - UNIX signals supported - inadyn will stop gracefully in case
           of  ALRM, HUP, INT, ...
@@ -170,7 +186,8 @@ Ver. 1.95  - 20 July      2005
           with basic authentication not yet fully complete. Not known where
           might be applicable.
 
-Ver. 1.90  - 24 February  2005
+Version 1.90: 24 Feb 2005
+-------------------------
     - New features/enhancements:
         - new option '--change_persona uid:gid' - inadyn can switch the
           user after launch. Typical feature for daemons.
@@ -182,7 +199,8 @@ Ver. 1.90  - 24 February  2005
     - Bugfixes:
         - typo fixed (--ip_server_name option)
 
-Ver. 1.86  - 30 January   2005
+Version 1.86: 30 Jan 2005
+-------------------------
     - Updated UNIX man pages for inadyn. Even a page for inadyn.conf!
       (thanks to Shaul Karl)
 
@@ -194,7 +212,8 @@ Ver. 1.86  - 30 January   2005
     - Bugfix:
         - Corrected check of the return code from socket() call.
  
-Ver. 1.85  - 10 January   2005
+Version 1.85: 10 Jan 2005
+-------------------------
     - Config file related enhancements:
         - a default location for the config file in case of no arguments
           for inadyn
@@ -206,12 +225,14 @@ Ver. 1.85  - 10 January   2005
           inadyn exits immediately after first update, not after the
           sleep period as before. 
  
-Ver. 1.81  - 23 November  2004 
+Version 1.81: 23 Nov 2004
+-------------------------
      No new features. Just a better integration with Linux OS:
      Reviewed usage of syslog and fork to background in 'daemon mode',
      thanks to Shaul Karl. 
  
-Ver. 1.80  - 16 October   2004
+Version 1.80: 16 Oct 2004
+-------------------------
     - New feature:
         - syslog: output to syslog for Linux (should work for all **nix
           systems)
@@ -220,63 +241,73 @@ Ver. 1.80  - 16 October   2004
  
     - Minor compile warnings removed.
  
-Ver. 1.70  -  5 July      2004
-	- Bugfix: 
-		- custom dns from dyndns option was not accepted by the cmd line
-		  parser. "Copy-paste" error :-( !
+Version 1.70: 5 Jul 2004
+------------------------
+    - Bugfix: 
+	- custom dns from dyndns option was not accepted by the cmd line
+	  parser. "Copy-paste" error :-( !
     - New option:
-		- --iterations. Now one can run inadyn with only one iteration.
-		  (not tested. It was a debug option now made accessible via cmd 
-		   line. It should work)
+	- --iterations. Now one can run inadyn with only one iteration.
+	  (not tested. It was a debug option now made accessible via cmd 
+	   line. It should work)
 		   
-Ver. 1.60  -  5 June      2004
-	On users' request the inadyn can read the options from file.
+Version 1.60: 5 Jun 2004
+------------------------
+On users' request the inadyn can read the options from file.
 
-Ver. 1.51  -  3 May       2004
-	- support for more aliases for DNS service offered by
-	  freedns.afraid.org 
+Version 1.51: 3 May 2004
+------------------------
+Support for more aliases for DNS service offered by freedns.afraid.org 
 
-Ver. 1.5   -  1 May       2004
+Version 1.5: 1 May 2004
+-----------------------
 	- Support for dynamic DNS service offered by freedns.afraid.org
 	- support for http proxy
 	- GPL Copyright notice added.
 	
-Ver. 1.4   -  1 March     2004
+Version 1.4: 1 Mar 2004
+-----------------------
 	- Support for custom DNS and static DNS services offered by 
 	  dyndns.org.
 	- support for forced IP update (so the account will not expire even
 	  though the IP never changes)
 	
-Ver. 1.35  -    February  2004
-	- Bugfixes:
-		- multiple aliases are AGAIN supported
-		- in case of error in IP update the OS signal handler is not installed again.
-Ver. 1.34  
-	- Various bugfixes. 
+Version 1.35: Feb 2004
+----------------------
+Bugfixes:
+- multiple aliases are AGAIN supported
+- in case of error in IP update the OS signal handler is not installed again.
+
+Ver. 1.34:
+----------
+Various bugfixes. 
 	
-Ver. 1.3   -  6 November  2003 - first port to *NIX - (Linux)
-
-    - Linux version running OK as console app
+Version 1.3: 6 Nov 2003 -- first port to *NIX - (Linux)
+-------------------------------------------------------
+Linux version running OK as console app
         
-	Future plans:
-		- run as a background daemon in Unix
-		- better interface
+Future plans:
+- run as a background daemon in Unix
+- better interface
 
-Ver 1.2    -    June      2003
-    - port to pSOS
-    Note:
-        - no DNS support under pSOS -> hard coded IP addresses of the
-		  server
+Version 1.2: Jun 2003
+---------------------
+Port to pSOS
 
-Ver. 1.0   - 20 May       2003, first stable version.
-	main features ready: 
-		- DYNDNS client
-		- free
-		- works fine behind a NAT router
-		- runs fine as a service
-		- has a nice log file
-		- it is MINE ;)
-	Future plans:
-		- port to *NIX
-		- port to pSOS
+Note:
+- no DNS support under pSOS -> hard coded IP addresses of the server
+
+Version 1.0: 20 May 2003, first stable version
+----------------------------------------------
+Main features ready: 
+- DYNDNS client
+- free
+- works fine behind a NAT router
+- runs fine as a service
+- has a nice log file
+- it is MINE ;)
+
+Future plans:
+- port to *NIX
+- port to pSOS
 
