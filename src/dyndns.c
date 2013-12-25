@@ -46,28 +46,28 @@
 
 /* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_time_since_last_update = 0;
-static int cached_num_iterations = 0;
+static int cached_num_iterations         = 0;
 
-static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_zoneedit_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_easydns_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_tzo_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_sitelutions_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_dnsexit_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_he_ipv6tb_server(ddns_t *ctx, int infcnt, int alcnt);
-static int get_req_for_changeip_server(ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_dyndns_server      (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_freedns_server     (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_generic_server     (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_zoneedit_server    (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_easydns_server     (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_tzo_server         (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_sitelutions_server (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_dnsexit_server     (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_he_ipv6tb_server   (ddns_t *ctx, int infcnt, int alcnt);
+static int get_req_for_changeip_server    (ddns_t *ctx, int infcnt, int alcnt);
 
-static int is_dyndns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_freedns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_generic_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_zoneedit_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_easydns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_tzo_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_sitelutions_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_dnsexit_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
-static int is_he_ipv6_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infcnt);
+static int is_dyndns_server_rsp_ok        (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_freedns_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_generic_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_zoneedit_server_rsp_ok      (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_easydns_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_tzo_server_rsp_ok           (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_sitelutions_server_rsp_ok   (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_dnsexit_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int infcnt);
+static int is_he_ipv6_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int infcnt);
 
 ddns_sysinfo_t dns_system_table[] = {
 	{DYNDNS_DEFAULT,
@@ -220,7 +220,8 @@ static int is_http_status_code_ok(int status)
 {
 	if (status == 200)
 		return 0;
-	else if (status >= 500 && status < 600)
+
+	if (status >= 500 && status < 600)
 		return RC_DYNDNS_RSP_RETRY_LATER;
 
 	return RC_DYNDNS_RSP_NOTOK;
@@ -228,53 +229,43 @@ static int is_http_status_code_ok(int status)
 
 static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DYNDNS_UPDATE_IP_HTTP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name, ctx->info[infcnt].creds.encoded_password);
+		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].creds.encoded_password);
 }
 
 static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	int rc = 0, rc2;
-	http_t client;
-	http_trans_t trans;
-
-	char buffer[256];
-
+	int           i, rc = 0, rc2;
+	http_t        client;
+	http_trans_t  trans;
+	char         *buf, *tmp, *line, *hash = NULL;
+	char          host[256], updateurl[256];
+	char          buffer[256];
+	char          digeststr[SHA1_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[SHA1_DIGEST_BYTES];
-	char digeststr[SHA1_DIGEST_BYTES * 2 + 1];
-	int i;
 
-	char *buf, *tmp, *line;
-	char host[256], updateurl[256];
-	char *hash = NULL;
-
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
-	// I know it's ugly, http client needs redesign.
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	do {
-		if ((rc = http_construct(&client)) != 0)
-			break;
+		TRY(http_construct(&client));
 
 		http_set_port(&client, ctx->info[infcnt].dyndns_server_name.port);
 		http_set_remote_name(&client, ctx->info[infcnt].dyndns_server_name.name);
 		http_set_bind_iface(&client, ctx->bind_interface);
 
-		if ((rc = http_initialize(&client, "Sending update URL query")) != 0)
-			break;
+		TRY(http_initialize(&client, "Sending update URL query"));
 
 		snprintf(buffer, sizeof(buffer), "%s|%s",
-			 ctx->info[infcnt].creds.username, ctx->info[infcnt].creds.password);
+			 ctx->info[infcnt].creds.username,
+			 ctx->info[infcnt].creds.password);
 		sha1((unsigned char *)buffer, strlen(buffer), digestbuf);
 		for (i = 0; i < SHA1_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
@@ -288,8 +279,7 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 		trans.rsp_len = 0;
 
-		rc = http_transaction(&client, &trans);
-
+		rc  = http_transaction(&client, &trans);
 		rc2 = http_shutdown(&client);
 
 		http_destruct(&client, 1);
@@ -297,8 +287,7 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 		if (rc != 0 || rc2 != 0)
 			break;
 
-		if ((rc = is_http_status_code_ok(trans.status)) != 0)
-			break;
+		TRY(is_http_status_code_ok(trans.status));
 
 		tmp = buf = strdup(trans.p_rsp_body);
 
@@ -326,131 +315,125 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 
 	return sprintf(ctx->request_buf, FREEDNS_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
-		       hash, ctx->info[infcnt].my_ip_address.name, ctx->info[infcnt].dyndns_server_name.name);
+		       hash, ctx->info[infcnt].my_ip_address.name,
+		       ctx->info[infcnt].dyndns_server_name.name);
 }
 
 static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
-		       ctx->info[infcnt].dyndns_server_name.name, ctx->info[infcnt].creds.encoded_password);
+		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].creds.encoded_password);
 }
 
 static int get_req_for_zoneedit_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, ZONEEDIT_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name, ctx->info[infcnt].creds.encoded_password);
+		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].creds.encoded_password);
 }
 
 static int get_req_for_easydns_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, EASYDNS_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
 		       ctx->info[infcnt].wildcard ? "ON" : "OFF",
-		       ctx->info[infcnt].dyndns_server_name.name, ctx->info[infcnt].creds.encoded_password);
+		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].creds.encoded_password);
 }
 
 static int get_req_for_tzo_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, TZO_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
-		       ctx->info[infcnt].my_ip_address.name, ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].my_ip_address.name,
+		       ctx->info[infcnt].dyndns_server_name.name);
 }
 
 static int get_req_for_sitelutions_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, SITELUTIONS_UPDATE_IP_HTTP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
 		       ctx->info[infcnt].alias[alcnt].names.name,
-		       ctx->info[infcnt].my_ip_address.name, ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].my_ip_address.name,
+		       ctx->info[infcnt].dyndns_server_name.name);
 }
 
 static int get_req_for_dnsexit_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DNSEXIT_UPDATE_IP_HTTP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
 		       ctx->info[infcnt].alias[alcnt].names.name,
-		       ctx->info[infcnt].my_ip_address.name, ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].my_ip_address.name,
+		       ctx->info[infcnt].dyndns_server_name.name);
 }
 
 static int get_req_for_he_ipv6tb_server(ddns_t *ctx, int infcnt, int alcnt)
 {
+	int           i;
+	char          digeststr[MD5_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[MD5_DIGEST_BYTES];
-	char digeststr[MD5_DIGEST_BYTES * 2 + 1];
-	int i;
 
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	md5((unsigned char *)ctx->info[infcnt].creds.password,
 	    strlen(ctx->info[infcnt].creds.password), digestbuf);
 	for (i = 0; i < MD5_DIGEST_BYTES; i++)
 		sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
+
 	return sprintf(ctx->request_buf, HE_IPV6TB_UPDATE_IP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].my_ip_address.name,
 		       ctx->info[infcnt].creds.username,
 		       digeststr,
-		       ctx->info[infcnt].alias[alcnt].names.name, ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].alias[alcnt].names.name,
+		       ctx->info[infcnt].dyndns_server_name.name);
 }
 
 static int get_req_for_changeip_server(ddns_t *ctx, int infcnt, int alcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, CHANGEIP_UPDATE_IP_HTTP_REQUEST,
 		       ctx->info[infcnt].dyndns_server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name, ctx->info[infcnt].creds.encoded_password);
+		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].creds.encoded_password);
 }
 
 /*
@@ -484,13 +467,15 @@ static int check_interface_address(ddns_t *ctx)
 
 		logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
 		      ctx->check_interface, strerror(code));
+
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
 	close(sd);
 
-	if (IN_ZERONET(new_ip) ||
-	    IN_LOOPBACK(new_ip) || IN_LINKLOCAL(new_ip) || IN_MULTICAST(new_ip) || IN_EXPERIMENTAL(new_ip)) {
+	if (IN_ZERONET(new_ip)   || IN_LOOPBACK(new_ip)  ||
+	    IN_LINKLOCAL(new_ip) || IN_MULTICAST(new_ip) || IN_EXPERIMENTAL(new_ip)) {
 		logit(LOG_WARNING, "Interface %s has invalid IP# %s", ctx->check_interface, new_ip_str);
+
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
 
@@ -512,13 +497,12 @@ static int check_interface_address(ddns_t *ctx)
 
 static int get_req_for_ip_server(ddns_t *ctx, int infcnt)
 {
-	if (ctx == NULL) {
-		/* 0 == "No characters written" */
-		return 0;
-	}
+	if (!ctx)
+		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DYNDNS_GET_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].ip_server_url, ctx->info[infcnt].ip_server_name.name);
+		       ctx->info[infcnt].ip_server_url,
+		       ctx->info[infcnt].ip_server_name.name);
 }
 
 /*
@@ -528,7 +512,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 {
 	int rc = 0;
 	http_t *p_http;
-	http_trans_t *p_tr;
+	http_trans_t *trans;
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
@@ -538,20 +522,20 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	DO(http_initialize(p_http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
-	p_tr = &ctx->http_transaction;
-	p_tr->req_len = get_req_for_ip_server(ctx, servernum);
+	trans = &ctx->http_transaction;
+	trans->req_len = get_req_for_ip_server(ctx, servernum);
 	if (ctx->dbg.level > 2) {
 		logit(LOG_DEBUG, "Querying DDNS server for my public IP#:");
 		logit(LOG_DEBUG, "%s", ctx->request_buf);
 	}
-	p_tr->p_req = (char *)ctx->request_buf;
-	p_tr->p_rsp = (char *)ctx->work_buf;
-	p_tr->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
-	p_tr->rsp_len = 0;
+	trans->p_req = (char *)ctx->request_buf;
+	trans->p_rsp = (char *)ctx->work_buf;
+	trans->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
+	trans->rsp_len = 0;
 
 	rc = http_transaction(p_http, &ctx->http_transaction);
 
-	if (p_tr->status != 200)
+	if (trans->status != 200)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
 	http_shutdown(p_http);
@@ -565,15 +549,13 @@ static int server_transaction(ddns_t *ctx, int servernum)
   Note:
   it updates the flag: info->'ip_has_changed' if the old address was different
 */
-static int parse_my_ip_address(ddns_t *ctx, int servernum)
+static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 {
 	int ip1 = 0, ip2 = 0, ip3 = 0, ip4 = 0;
 	int count, i;
 	char *p_ip, *p_current_str;
 	int found;
 	char new_ip_str[IP_V4_MAX_LEN];
-
-	(void)servernum;
 
 	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
 		return RC_INVALID_POINTER;
@@ -614,9 +596,8 @@ static int parse_my_ip_address(ddns_t *ctx, int servernum)
 			}
 		}
 
-		if (!anychange) {
+		if (!anychange)
 			logit(LOG_INFO, "No IP# change detected, still at %s", new_ip_str);
-		}
 
 		return 0;
 	}
@@ -626,9 +607,8 @@ static int parse_my_ip_address(ddns_t *ctx, int servernum)
 
 static int time_to_check(ddns_t *ctx)
 {
-	return ctx->force_addr_update
-		|| (ctx->time_since_last_update >
-		    ctx->forced_update_period_sec);
+	return ctx->force_addr_update ||
+		(ctx->time_since_last_update > ctx->forced_update_period_sec);
 }
 
 /*
@@ -668,22 +648,19 @@ static int check_alias_update_table(ddns_t *ctx)
 /* DynDNS org.specific response validator.
    'good' or 'nochg' are the good answers,
 */
-static int is_dyndns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_dyndns_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	char *p_rsp = p_tr->p_rsp_body;
-	(void)infnr;
+	char *resp = trans->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, "good") != NULL || strstr(p_rsp, "nochg") != NULL)
+	if (strstr(resp, "good") != NULL || strstr(resp, "nochg"))
 		return 0;
-	else if (strstr(p_rsp, "dnserr") != NULL || strstr(p_rsp, "911") != NULL)
+
+	if (strstr(resp, "dnserr") != NULL || strstr(resp, "911"))
 		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* Freedns afraid.org.specific response validator.
@@ -691,38 +668,32 @@ static int is_dyndns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
     fail blabla and n.n.n.n
     are the good answers. We search our own IP address in response and that's enough.
 */
-static int is_freedns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_freedns_server_rsp_ok(ddns_t *ctx, http_trans_t *trans, int infnr)
 {
-	char *p_rsp = p_tr->p_rsp_body;
+	char *resp = trans->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, ctx->info[infnr].my_ip_address.name) != NULL)
+	if (strstr(resp, ctx->info[infnr].my_ip_address.name))
 		return 0;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /** generic http dns server ok parser
     parses a given string. If found is ok,
     Example : 'SUCCESS CODE='
 */
-static int is_generic_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_generic_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	char *p_rsp = p_tr->p_rsp_body;
-	(void)infnr;
+	char *resp = trans->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, "OK") != NULL)
+	if (strstr(resp, "OK"))
 		return 0;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /**
@@ -730,63 +701,52 @@ static int is_generic_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
    CODE=200, 201
    CODE=707, for duplicated updates
 */
-static int is_zoneedit_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_zoneedit_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	(void)infnr;
-
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
-
 	int code = -1;
-	sscanf(p_tr->p_rsp_body, "%*s CODE=\"%d\" ", &code);
 
+	DO(is_http_status_code_ok(trans->status));
+
+	sscanf(trans->p_rsp_body, "%*s CODE=\"%d\" ", &code);
 	switch (code) {
 	case 200:
 	case 201:
 	case 707:
-		// is 707 really ok??
+		/* XXX: is 707 really OK? */
 		return 0;
 	default:
-		return RC_DYNDNS_RSP_NOTOK;
+		break;
 	}
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /**
    NOERROR is the OK code here
 */
-static int is_easydns_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_easydns_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	char *p_rsp = p_tr->p_rsp_body;
-	(void)infnr;
+	char *resp = trans->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, "NOERROR") != NULL)
+	if (strstr(resp, "NOERROR"))
 		return 0;
-	else if (strstr(p_rsp, "TOOSOON") != NULL)
+
+	if (strstr(resp, "TOOSOON"))
 		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* TZO specific response validator. */
-static int is_tzo_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_tzo_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	(void)infnr;
-
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
-
 	int code = -1;
-	sscanf(p_tr->p_rsp_body, "%d ", &code);
 
+	DO(is_http_status_code_ok(trans->status));
+
+	sscanf(trans->p_rsp_body, "%d ", &code);
 	switch (code) {
 	case 200:
 	case 304:
@@ -795,40 +755,36 @@ static int is_tzo_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
 	case 500:
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	default:
-		return RC_DYNDNS_RSP_NOTOK;
+		break;
 	}
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
-static int is_sitelutions_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_sitelutions_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	char *p_rsp = p_tr->p_rsp_body;
-	(void)infnr;
+	char *resp = trans->p_rsp_body;
 
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, "success") != NULL)
+	if (strstr(resp, "success"))
 		return 0;
-	else if (strstr(p_rsp, "dberror") != NULL)
+
+	if (strstr(resp, "dberror"))
 		return RC_DYNDNS_RSP_RETRY_LATER;
-	else
-		return RC_DYNDNS_RSP_NOTOK;
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
-static int is_dnsexit_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_dnsexit_server_rsp_ok(ddns_t *UNUSED(ctx), http_trans_t *trans, int UNUSED(infnr))
 {
-	(void)ctx;
-	(void)infnr;
-
-	int rc;
-	if ((rc = is_http_status_code_ok(p_tr->status)) != 0)
-		return rc;
-
-	int code = -1;
+	int   code = -1;
 	char *tmp;
-	if ((tmp = strstr(p_tr->p_rsp_body, "\n")) != NULL)
+
+	DO(is_http_status_code_ok(trans->status));
+
+	tmp = strstr(trans->p_rsp_body, "\n");
+	if (tmp)
 		sscanf(++tmp, "%d=", &code);
 
 	switch (code) {
@@ -839,22 +795,23 @@ static int is_dnsexit_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
 	case 11:
 		return RC_DYNDNS_RSP_RETRY_LATER;
 	default:
-		return RC_DYNDNS_RSP_NOTOK;
+		break;
 	}
+
+	return RC_DYNDNS_RSP_NOTOK;
 }
 
 /* HE ipv6 tunnelbroker specific response validator.
    own IP address and 'already in use' are the good answers.
 */
-static int is_he_ipv6_server_rsp_ok(ddns_t *ctx, http_trans_t *p_tr, int infnr)
+static int is_he_ipv6_server_rsp_ok(ddns_t *ctx, http_trans_t *trans, int infnr)
 {
-	char *p_rsp = p_tr->p_rsp_body;
+	char *resp = trans->p_rsp_body;
 
-	DO(is_http_status_code_ok(p_tr->status));
+	DO(is_http_status_code_ok(trans->status));
 
-	if (strstr(p_rsp, ctx->info[infnr].my_ip_address.name) != NULL ||
-	    strstr(p_rsp, "-ERROR: This tunnel is already associated with this IP address.")
-	    != NULL)
+	if (strstr(resp, ctx->info[infnr].my_ip_address.name) ||
+	    strstr(resp, "-ERROR: This tunnel is already associated with this IP address."))
 		return 0;
 
 	return RC_DYNDNS_RSP_NOTOK;

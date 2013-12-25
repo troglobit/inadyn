@@ -73,6 +73,7 @@
 #define DO(fn)       { int rc = fn; if (rc) return rc; }
 #define TRY(fn)      {     rc = fn; if (rc) break; }
 #define ASSERT(cond) { if (!cond) return RC_INVALID_POINTER; }
+#define UNUSED(var)  (var)__attribute__((unused))
 
 const char *errorcode_get_name(int rc);
 

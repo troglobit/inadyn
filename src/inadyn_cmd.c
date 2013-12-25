@@ -230,7 +230,7 @@ static void print_help_page(void)
 	puts("Inadyn is a dynamic DNS (DDNS) client.  It does periodic and/or on-demand checks\n"
 	     "of your externally visible IP address and updates the hostname to IP mapping at\n"
 	     "your DDNS service provider when necessary.\n");
-	puts("dyndns.org:\n" "\tinadyn -u username -p password -a my.registrated.name\n");
+	puts("dyndns.org:\n" "\tinadyn -u username -p password -a my.registered.name\n");
 
 	it = cmd_options_table;
 	while (it->option != NULL) {
