@@ -13,6 +13,7 @@ MAN8          = inadyn.8
 ROOTDIR      ?= $(dir $(shell pwd))
 RM           ?= rm -f
 CC           ?= $(CROSS)gcc
+CHECK        := cppcheck $(CPPFLAGS) --quiet --enable=all
 
 prefix       ?= /usr/local
 sysconfdir   ?= /etc
@@ -72,6 +73,9 @@ clean:
 
 distclean:
 	-@$(RM) $(OBJS) core $(EXEC) src/*~ include/*~ *~ src/*.o *.map src/.*.d *.out tags TAGS
+
+check:
+	$(CHECK) src/*.c
 
 dist:
 	@echo "Building bzip2 tarball of $(PKG) in parent dir..."
