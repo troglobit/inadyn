@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "debug_if.h"
+#include "debug.h"
 #include "ip.h"
 
 

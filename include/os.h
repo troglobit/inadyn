@@ -57,7 +57,7 @@
 #define IN_ZERONET(addr) ((addr & IN_CLASSA_NET) == 0)
 #endif
 
-#include "errorcode.h"
+#include "error.h"
 
 typedef struct {
 	uid_t uid;

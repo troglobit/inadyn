@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "debug_if.h"
+#include "debug.h"
 #include "tcp.h"
 
 int tcp_construct(tcp_sock_t *tcp)

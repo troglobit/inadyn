@@ -24,7 +24,7 @@
 #define INADYN_IP_H_
 
 #include "os.h"
-#include "errorcode.h"
+#include "error.h"
 
 #define IP_DEFAULT_TIMEOUT		20000	/* msec */
 #define IP_SOCKET_MAX_PORT		65535

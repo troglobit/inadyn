@@ -37,12 +37,12 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "dyndns.h"
-#include "debug_if.h"
+#include "ddns.h"
+#include "debug.h"
 #include "base64.h"
 #include "md5.h"
 #include "sha1.h"
-#include "get_cmd.h"
+#include "cmd.h"
 
 #define MD5_DIGEST_BYTES  16
 #define SHA1_DIGEST_BYTES 20

@@ -20,10 +20,10 @@
  * Boston, MA  02110-1301, USA.
 */
 
-#ifndef _GET_CMD_IF_INCLUDED
-#define _GET_CMD_IF_INCLUDED
+#ifndef INADYN_CMD_H_
+#define INADYN_CMD_H_
 
-#include "errorcode.h"
+#include "error.h"
 typedef struct {
 	int argc;
 	char **argv;
@@ -46,7 +46,7 @@ typedef struct {
 int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc);
 int cmd_add_val(cmd_data_t *cmd, char *val);
 
-#endif /*_GET_CMD_IF_INCLUDED*/
+#endif /* INADYN_CMD_H_ */
 
 /**
  * Local Variables:

@@ -20,8 +20,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef INADYN_ERRORCODE_H_
-#define INADYN_ERRORCODE_H_
+#ifndef INADYN_ERROR_H_
+#define INADYN_ERROR_H_
 
 #define RC_OK                                       0
 #define RC_ERROR                                    1
@@ -80,7 +80,7 @@
 
 const char *errorcode_get_name(int rc);
 
-#endif /* INADYN_ERRORCODE_H_ */
+#endif /* INADYN_ERROR_H_ */
 
 /**
  * Local Variables:

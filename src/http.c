@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include "http.h"
-#include "errorcode.h"
+#include "error.h"
 
 #define super_construct(p) tcp_construct(p)
 #define super_destruct(p)  tcp_destruct(p)

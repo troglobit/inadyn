@@ -22,7 +22,7 @@
 #define INADYN_HTTP_H_
 
 #include "os.h"
-#include "errorcode.h"
+#include "error.h"
 #include "tcp.h"
 
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */

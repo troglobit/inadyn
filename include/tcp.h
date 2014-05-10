@@ -24,7 +24,7 @@
 #define INADYN_TCP_H_
 
 #include "os.h"
-#include "errorcode.h"
+#include "error.h"
 #include "ip.h"
 
 #define TCP_DEFAULT_TIMEOUT	20000	/* msec */

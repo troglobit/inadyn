@@ -22,9 +22,9 @@
 
 #include <stdlib.h>
 
-#include "debug_if.h"
-#include "dyndns.h"
-#include "errorcode.h"
+#include "debug.h"
+#include "ddns.h"
+#include "error.h"
 
 /**
    basic resource allocations for the dyn_dns object
