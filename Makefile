@@ -31,7 +31,7 @@ OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
 CFLAGS       ?= -O2 -W -Wall -Werror
 CFLAGS       += $(CFG_INC) $(EXTRA_CFLAGS)
 CPPFLAGS     ?=
-CPPFLAGS     += -Iinclude -DVERSION_STRING=\"$(VERSION)\"
+CPPFLAGS     += -Iinclude -DVERSION=\"$(VERSION)\"
 LDFLAGS      ?=
 LDLIBS       += $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE

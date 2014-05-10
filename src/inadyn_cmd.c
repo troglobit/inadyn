@@ -57,7 +57,7 @@ static int get_password_handler(cmd_data_t *cmd, int num, void *context);
 static int get_alias_handler(cmd_data_t *cmd, int num, void *context);
 static int get_dns_server_name_handler(cmd_data_t *cmd, int num, void *context);
 static int get_dns_server_url_handler(cmd_data_t *cmd, int num, void *context);
-static int get_ip_server_name_handler(cmd_data_t *cmd, int num, void *context);
+static int get_checkip_name_handler(cmd_data_t *cmd, int num, void *context);
 static int get_dyndns_system_handler(cmd_data_t *cmd, int num, void *context);
 static int get_update_period_handler(cmd_data_t *cmd, int num, void *context);
 static int get_update_period_sec_handler(cmd_data_t *cmd, int num, void *context);
@@ -92,7 +92,7 @@ static cmd_desc_t cmd_options_table[] = {
 
 	{"-c", 1, {set_cachefile, NULL}, ""},
 	{"--cachefile", 1, {set_cachefile, NULL}, "<FILE>\n"
-	 "\t\t\tSet cachefile, default " DYNDNS_DEFAULT_CACHE_FILE},
+	 "\t\t\tSet cachefile, default " DEFAULT_CACHE_FILE},
 
 	{"-d", 1, {set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 1, {set_change_persona_handler, NULL},
@@ -111,18 +111,18 @@ static cmd_desc_t cmd_options_table[] = {
 	{"-F", 1, {get_options_from_file_handler, NULL}, ""},
 	{"--config", 1, {get_options_from_file_handler, NULL}, "<FILE>\n"
 	 "\t\t\tConfiguration file, containing further options.  Default\n"
-	 "\t\t\tconfig file: " DYNDNS_DEFAULT_CONFIG_FILE
+	 "\t\t\tconfig file: " DEFAULT_CONFIG_FILE
 	 ", is used if inadyn is\n" "\t\t\tcalled without any command line options."},
 	{DYNDNS_INPUT_FILE_OPT_STRING, 1, {get_options_from_file_handler, NULL},
 	 NULL},
 
-	{"-H", 2, {get_ip_server_name_handler, NULL}, ""},
-	{"--checkip-url", 2, {get_ip_server_name_handler, NULL},
+	{"-H", 2, {get_checkip_name_handler, NULL}, ""},
+	{"--checkip-url", 2, {get_checkip_name_handler, NULL},
 	 "<NAME[:PORT] URL>\n"
 	 "\t\t\tLocal IP is detected by parsing the response after\n"
 	 "\t\t\treturned by this server and URL.  The first IP found\n"
 	 "\t\t\tin the HTTP response is considered 'my IP'.\n" "\t\t\tDefault value: 'checkip.dyndns.org /'"},
-	{"--ip_server_name", 2, {get_ip_server_name_handler, NULL}, NULL},
+	{"--ip_server_name", 2, {get_checkip_name_handler, NULL}, NULL},
 
 	{"-n", 1, {set_iterations_handler, NULL}, ""},
 	{"--iterations", 1, {set_iterations_handler, NULL}, "<NUM>\n"
@@ -183,7 +183,7 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--update_period", 1, {get_update_period_handler, NULL}, NULL}, /* TODO: Replaced with startup-delay, remove in 2.0 */
 
 	{"-P", 1, {set_pidfile, NULL}, ""},
-	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DYNDNS_DEFAULT_PIDFILE},
+	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
 	{"-s", 0, {set_syslog_handler, NULL}, ""},
 	{"--syslog", 0, {set_syslog_handler, NULL},
@@ -442,12 +442,12 @@ static int get_name_and_port(char *p_src, char *p_dest_name, int *p_dest_port)
 }
 
 /**
- * get_ip_server_name_handler - Returns the server name and port
+ * get_checkip_name_handler - Returns the server name and port
  *
  * If the format is 'name[:port] url' this function returns the name and
  * port of the server.
  */
-static int get_ip_server_name_handler(cmd_data_t *cmd, int num, void *context)
+static int get_checkip_name_handler(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_t *ctx = (ddns_t *)context;
 	int rc;
@@ -456,19 +456,19 @@ static int get_ip_server_name_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	/*ip_server_name */
-	if (sizeof(ctx->info[curr_info].ip_server_name) < strlen(cmd->argv[num]) + 1)
+	/*checkip_name */
+	if (sizeof(ctx->info[curr_info].checkip_name) < strlen(cmd->argv[num]) + 1)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	ctx->info[curr_info].ip_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].ip_server_name.name, &port);
+	ctx->info[curr_info].checkip_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].checkip_name.name, &port);
 	if (rc == 0 && port != -1)
-		ctx->info[curr_info].ip_server_name.port = port;
+		ctx->info[curr_info].checkip_name.port = port;
 
-	if (sizeof(ctx->info[curr_info].ip_server_url) < strlen(cmd->argv[num + 1]) + 1)
+	if (sizeof(ctx->info[curr_info].checkip_url) < strlen(cmd->argv[num + 1]) + 1)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].ip_server_url, cmd->argv[num + 1]);
+	strcpy(ctx->info[curr_info].checkip_url, cmd->argv[num + 1]);
 
 	return rc;
 }
@@ -482,13 +482,13 @@ static int get_dns_server_name_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].dyndns_server_name) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[curr_info].server_name) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	ctx->info[curr_info].dyndns_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].dyndns_server_name.name, &port);
+	ctx->info[curr_info].server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].server_name.name, &port);
 	if (rc == 0 && port != -1)
-		ctx->info[curr_info].dyndns_server_name.port = port;
+		ctx->info[curr_info].server_name.port = port;
 
 	return rc;
 }
@@ -500,10 +500,10 @@ int get_dns_server_url_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].dyndns_server_url) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[curr_info].server_url) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].dyndns_server_url, cmd->argv[num]);
+	strcpy(ctx->info[curr_info].server_url, cmd->argv[num]);
 
 	return 0;
 }
@@ -784,7 +784,7 @@ int print_version_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	printf("%s\n", DYNDNS_VERSION_STRING);
+	printf("%s\n", VERSION_STRING);
 	ctx->abort = 1;
 
 	return 0;
@@ -1030,7 +1030,7 @@ static int get_options_from_file_handler(cmd_data_t *cmd, int num, void *context
 	int rc = 0;
 	FILE *fp = NULL;
 	char *buf = NULL;
-	const size_t buflen = DYNDNS_SERVER_NAME_LEN;
+	const size_t buflen = SERVER_NAME_LEN;
 	ddns_t *ctx = (ddns_t *)context;
 	cfg_parser_t parser;
 
@@ -1108,9 +1108,9 @@ static int validate_configuration(ddns_t *ctx)
 		check_setting(strlen(account->creds.username), i, "Missing username", &ok);
 		check_setting(strlen(account->creds.password), i, "Missing password", &ok);
 		check_setting(account->alias_count, i, "Missing your alias/hostname", &ok);
-		check_setting(strlen(account->dyndns_server_name.name), i,
+		check_setting(strlen(account->server_name.name), i,
 			      "Missing DDNS server address, check DDNS provider", &ok);
-		check_setting(strlen(account->ip_server_name.name), i,
+		check_setting(strlen(account->checkip_name.name), i,
 			      "Missing check IP address, check DDNS provider", &ok);
 
 		if (ok)
@@ -1146,7 +1146,7 @@ static int default_config(ddns_t *ctx)
 {
 	int i;
 
-	ctx->info[0].system = get_dns_system_by_id(DYNDNS_DEFAULT_DNS_SYSTEM);
+	ctx->info[0].system = get_dns_system_by_id(DEFAULT_DNS_SYSTEM);
 	if (ctx->info[0].system == NULL)
 		return RC_DYNDNS_INVALID_DNS_SYSTEM_DEFAULT;
 
@@ -1165,7 +1165,7 @@ static int default_config(ddns_t *ctx)
 		ctx->info[i].wildcard = 0;
 
 	/* pidfile */
-	ctx->pidfile = strdup(DYNDNS_DEFAULT_PIDFILE);
+	ctx->pidfile = strdup(DEFAULT_PIDFILE);
 
 	/* Default cache_file is setup in get_config_data() */
 
@@ -1177,7 +1177,7 @@ static int create_cache_file(ddns_t *ctx)
 	int len, bytes;
 
 	if (!ctx->bind_interface) {
-		ctx->cache_file = strdup(DYNDNS_DEFAULT_CACHE_FILE);
+		ctx->cache_file = strdup(DEFAULT_CACHE_FILE);
 		if (!ctx->cache_file)
 			return RC_OUT_OF_MEMORY;
 
@@ -1185,12 +1185,12 @@ static int create_cache_file(ddns_t *ctx)
 	}
 
 	/* The '-2' adjusts for the '%s' format specifier */
-	len = strlen(DYNDNS_CACHE_FILE) - 2 + strlen(ctx->bind_interface);
+	len = strlen(CACHE_FILE) - 2 + strlen(ctx->bind_interface);
 	ctx->cache_file = malloc(len + 1);
 	if (!ctx->cache_file)
 		return RC_OUT_OF_MEMORY;
 
-	bytes = snprintf(ctx->cache_file, len + 1, DYNDNS_CACHE_FILE, ctx->bind_interface);
+	bytes = snprintf(ctx->cache_file, len + 1, CACHE_FILE, ctx->bind_interface);
 	if (bytes != len) {
 		free(ctx->cache_file);
 		ctx->cache_file = NULL;
@@ -1235,16 +1235,16 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 		/* in case of no options, assume the default cfg file may be present */
 		if (argc == 1) {
 			char *custom_argv[] = { "", DYNDNS_INPUT_FILE_OPT_STRING,
-				DYNDNS_DEFAULT_CONFIG_FILE
+				DEFAULT_CONFIG_FILE
 			};
 			int custom_argc = sizeof(custom_argv) / sizeof(char *);
 
 			if (ctx->dbg.level)
-				logit(LOG_NOTICE, "Using default config file %s", DYNDNS_DEFAULT_CONFIG_FILE);
+				logit(LOG_NOTICE, "Using default config file %s", DEFAULT_CONFIG_FILE);
 
 			if (ctx->cfgfile)
 				free(ctx->cfgfile);
-			ctx->cfgfile = strdup(DYNDNS_DEFAULT_CONFIG_FILE);
+			ctx->cfgfile = strdup(DEFAULT_CONFIG_FILE);
 			rc = get_cmd_parse_data(custom_argv, custom_argc, cmd_options_table);
 		} else {
 			rc = get_cmd_parse_data(argv, argc, cmd_options_table);
@@ -1257,38 +1257,38 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 		i = 0;
 		do {
 			/*ip server */
-			if (strlen(ctx->info[i].ip_server_name.name) == 0) {
-				if (sizeof(ctx->info[i].ip_server_name.name) <
-				    strlen(ctx->info[i].system->ip_server_name)) {
+			if (strlen(ctx->info[i].checkip_name.name) == 0) {
+				if (sizeof(ctx->info[i].checkip_name.name) <
+				    strlen(ctx->info[i].system->checkip_name)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].ip_server_name.name, ctx->info[i].system->ip_server_name);
+				strcpy(ctx->info[i].checkip_name.name, ctx->info[i].system->checkip_name);
 
-				if (sizeof(ctx->info[i].ip_server_url) <
-				    strlen(ctx->info[i].system->ip_server_url)) {
+				if (sizeof(ctx->info[i].checkip_url) <
+				    strlen(ctx->info[i].system->checkip_url)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].ip_server_url, ctx->info[i].system->ip_server_url);
+				strcpy(ctx->info[i].checkip_url, ctx->info[i].system->checkip_url);
 			}
 
 			/*dyndns server */
-			if (strlen(ctx->info[i].dyndns_server_name.name) == 0) {
-				if (sizeof(ctx->info[i].dyndns_server_name.name)
-				    < strlen(ctx->info[i].system->ddns_server_name)) {
+			if (strlen(ctx->info[i].server_name.name) == 0) {
+				if (sizeof(ctx->info[i].server_name.name)
+				    < strlen(ctx->info[i].system->server_name)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].dyndns_server_name.name,
-				       ctx->info[i].system->ddns_server_name);
+				strcpy(ctx->info[i].server_name.name,
+				       ctx->info[i].system->server_name);
 
-				if (sizeof(ctx->info[i].dyndns_server_url) <
-				    strlen(ctx->info[i].system->ddns_server_url)) {
+				if (sizeof(ctx->info[i].server_url) <
+				    strlen(ctx->info[i].system->server_url)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].dyndns_server_url, ctx->info[i].system->ddns_server_url);
+				strcpy(ctx->info[i].server_url, ctx->info[i].system->server_url);
 			}
 		}
 		while (++i < ctx->info_count);

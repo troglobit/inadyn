@@ -1,7 +1,8 @@
 /* DDNS client updater main implementation file
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2006  Steve Horbachuk
+ * Copyright (C) 2006       Steve Horbachuk
+ * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,8 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * along with this program; if not, visit the Free Software Foundation
+ * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
  */
 
 #include <sys/types.h>
@@ -72,116 +75,116 @@ static int is_he_ipv6_server_rsp_ok       (ddns_t *ctx, http_trans_t *trans, int
 ddns_sysinfo_t dns_system_table[] = {
 	{DYNDNS_DEFAULT,
 	 {"default@dyndns.org",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "members.dyndns.org", "/nic/update"}},
 
 	{FREEDNS_AFRAID_ORG_DEFAULT,
 	 {"default@freedns.afraid.org",
-	  (ddns_response_ok_func_t) is_freedns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_freedns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_freedns_server_rsp_ok,
+	  (req_fn_t) get_req_for_freedns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "freedns.afraid.org", "/dynamic/update.php"}},
 
 	{ZONE_EDIT_DEFAULT,
 	 {"default@zoneedit.com",
-	  (ddns_response_ok_func_t) is_zoneedit_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_zoneedit_server,
+	  (rsp_fn_t) is_zoneedit_server_rsp_ok,
+	  (req_fn_t) get_req_for_zoneedit_server,
 	  "dynamic.zoneedit.com", "/checkip.html",
 	  "dynamic.zoneedit.com", "/auth/dynamic.html"}},
 
 	{NOIP_DEFAULT,
 	 {"default@no-ip.com",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
 	  "ip1.dynupdate.no-ip.com", "/",
 	  "dynupdate.no-ip.com", "/nic/update"}},
 
 	{EASYDNS_DEFAULT,
 	 {"default@easydns.com",
-	  (ddns_response_ok_func_t) is_easydns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_easydns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_easydns_server_rsp_ok,
+	  (req_fn_t) get_req_for_easydns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "members.easydns.com", "/dyn/dyndns.php"}},
 
 	{TZO_DEFAULT,
 	 {"default@tzo.com",
-	  (ddns_response_ok_func_t) is_tzo_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_tzo_server,
+	  (rsp_fn_t) is_tzo_server_rsp_ok,
+	  (req_fn_t) get_req_for_tzo_server,
 	  "echo.tzo.com", "/",
 	  "rh.tzo.com", "/webclient/tzoperl.html"}},
 
 	{DYNDNS_3322_DYNAMIC,
 	 {"dyndns@3322.org",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
 	  "bliao.com", "/ip.phtml",
 	  "members.3322.org", "/dyndns/update"}},
 
 	{SITELUTIONS_DOMAIN,
 	 {"default@sitelutions.com",
-	  (ddns_response_ok_func_t) is_sitelutions_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_sitelutions_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_sitelutions_server_rsp_ok,
+	  (req_fn_t) get_req_for_sitelutions_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "www.sitelutions.com", "/dnsup"}},
 
 	{DNSOMATIC_DEFAULT,
 	 {"default@dnsomatic.com",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
 	  "myip.dnsomatic.com", "/",
 	  "updates.dnsomatic.com", "/nic/update"}},
 
 	{DNSEXIT_DEFAULT,
 	 {"default@dnsexit.com",
-	  (ddns_response_ok_func_t) is_dnsexit_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dnsexit_server,
+	  (rsp_fn_t) is_dnsexit_server_rsp_ok,
+	  (req_fn_t) get_req_for_dnsexit_server,
 	  "ip.dnsexit.com", "/",
 	  "update.dnsexit.com", "/RemoteUpdate.sv"}},
 
 	{HE_IPV6TB,
 	 {"ipv6tb@he.net",
-	  (ddns_response_ok_func_t) is_he_ipv6_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_he_ipv6tb_server,
+	  (rsp_fn_t) is_he_ipv6_server_rsp_ok,
+	  (req_fn_t) get_req_for_he_ipv6tb_server,
 	  "checkip.dns.he.net", "/",
 	  "ipv4.tunnelbroker.net", "/ipv4_end.php"}},
 
 	{HE_DYNDNS,
 	 {"dyndns@he.net",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
 	  "checkip.dns.he.net", "/",
 	  "dyn.dns.he.net", "/nic/update"}},
 
 	{CHANGEIP_DEFAULT,
 	 {"default@changeip.com",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_changeip_server,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_changeip_server,
 	  "ip.changeip.com", "/",
 	  "nic.changeip.com", "/nic/update"}},
 
 	/* Support for dynsip.org by milkfish, from DD-WRT */
 	{DYNSIP_DEFAULT,
 	 {"default@dynsip.org",
-	  (ddns_response_ok_func_t) is_dyndns_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_dyndns_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_dyndns_server_rsp_ok,
+	  (req_fn_t) get_req_for_dyndns_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "dynsip.org", "/nic/update"}},
 
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_srv_basic_auth",
-	  (ddns_response_ok_func_t) is_generic_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_generic_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_generic_server_rsp_ok,
+	  (req_fn_t) get_req_for_generic_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "", ""}},
 
 	/* Compatiblity entry, new canonical is @http_srv */
 	{CUSTOM_HTTP_BASIC_AUTH,
 	 {"custom@http_svr_basic_auth",
-	  (ddns_response_ok_func_t) is_generic_server_rsp_ok,
-	  (ddns_request_func_t) get_req_for_generic_server,
-	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_IP_SERVER_URL,
+	  (rsp_fn_t) is_generic_server_rsp_ok,
+	  (req_fn_t) get_req_for_generic_server,
+	  DYNDNS_MY_IP_SERVER, DYNDNS_MY_CHECKIP_URL,
 	  "", ""}},
 
 	{LAST_DNS_SYSTEM, {NULL, NULL, NULL, NULL, NULL, NULL, NULL}}
@@ -233,10 +236,10 @@ static int get_req_for_dyndns_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DYNDNS_UPDATE_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].server_name.name,
 		       ctx->info[infcnt].creds.encoded_password);
 }
 
@@ -257,8 +260,8 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 	do {
 		TRY(http_construct(&client));
 
-		http_set_port(&client, ctx->info[infcnt].dyndns_server_name.port);
-		http_set_remote_name(&client, ctx->info[infcnt].dyndns_server_name.name);
+		http_set_port(&client, ctx->info[infcnt].server_name.port);
+		http_set_remote_name(&client, ctx->info[infcnt].server_name.name);
 		http_set_bind_iface(&client, ctx->bind_interface);
 
 		TRY(http_initialize(&client, "Sending update URL query"));
@@ -273,7 +276,7 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&sha=%s", digeststr);
 
 		trans.req_len = sprintf(ctx->request_buf, GENERIC_HTTP_REQUEST,
-					buffer, ctx->info[infcnt].dyndns_server_name.name);
+					buffer, ctx->info[infcnt].server_name.name);
 		trans.p_req = (char *)ctx->request_buf;
 		trans.p_rsp = (char *)ctx->work_buf;
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
@@ -314,9 +317,9 @@ static int get_req_for_freedns_server(ddns_t *ctx, int infcnt, int alcnt)
 	}
 
 	return sprintf(ctx->request_buf, FREEDNS_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       hash, ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].server_name.name);
 }
 
 static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -325,9 +328,9 @@ static int get_req_for_generic_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
-		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].server_name.name,
 		       ctx->info[infcnt].creds.encoded_password);
 }
 
@@ -337,10 +340,10 @@ static int get_req_for_zoneedit_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, ZONEEDIT_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].server_name.name,
 		       ctx->info[infcnt].creds.encoded_password);
 }
 
@@ -350,11 +353,11 @@ static int get_req_for_easydns_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, EASYDNS_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
 		       ctx->info[infcnt].wildcard ? "ON" : "OFF",
-		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].server_name.name,
 		       ctx->info[infcnt].creds.encoded_password);
 }
 
@@ -364,12 +367,12 @@ static int get_req_for_tzo_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, TZO_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].server_name.name);
 }
 
 static int get_req_for_sitelutions_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -378,12 +381,12 @@ static int get_req_for_sitelutions_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, SITELUTIONS_UPDATE_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].server_name.name);
 }
 
 static int get_req_for_dnsexit_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -392,12 +395,12 @@ static int get_req_for_dnsexit_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DNSEXIT_UPDATE_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].creds.username,
 		       ctx->info[infcnt].creds.password,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].server_name.name);
 }
 
 static int get_req_for_he_ipv6tb_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -415,12 +418,12 @@ static int get_req_for_he_ipv6tb_server(ddns_t *ctx, int infcnt, int alcnt)
 		sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
 	return sprintf(ctx->request_buf, HE_IPV6TB_UPDATE_IP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].my_ip_address.name,
 		       ctx->info[infcnt].creds.username,
 		       digeststr,
 		       ctx->info[infcnt].alias[alcnt].names.name,
-		       ctx->info[infcnt].dyndns_server_name.name);
+		       ctx->info[infcnt].server_name.name);
 }
 
 static int get_req_for_changeip_server(ddns_t *ctx, int infcnt, int alcnt)
@@ -429,10 +432,10 @@ static int get_req_for_changeip_server(ddns_t *ctx, int infcnt, int alcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, CHANGEIP_UPDATE_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].dyndns_server_url,
+		       ctx->info[infcnt].server_url,
 		       ctx->info[infcnt].alias[alcnt].names.name,
 		       ctx->info[infcnt].my_ip_address.name,
-		       ctx->info[infcnt].dyndns_server_name.name,
+		       ctx->info[infcnt].server_name.name,
 		       ctx->info[infcnt].creds.encoded_password);
 }
 
@@ -502,8 +505,8 @@ static int get_req_for_ip_server(ddns_t *ctx, int infcnt)
 		return 0;	/* 0 == "No characters written" */
 
 	return sprintf(ctx->request_buf, DYNDNS_GET_IP_HTTP_REQUEST,
-		       ctx->info[infcnt].ip_server_url,
-		       ctx->info[infcnt].ip_server_name.name);
+		       ctx->info[infcnt].checkip_url,
+		       ctx->info[infcnt].checkip_name.name);
 }
 
 /*
@@ -823,7 +826,7 @@ static int is_he_ipv6_server_rsp_ok(ddns_t *ctx, http_trans_t *trans, int infnr)
 static int nslookup(ddns_info_t *entry)
 {
 	int error;
-	char name[DYNDNS_SERVER_NAME_LEN];
+	char name[SERVER_NAME_LEN];
 	struct addrinfo hints;
 	struct addrinfo *result;
 
@@ -860,7 +863,7 @@ static int read_cache_file (ddns_t *ctx)
 {
 	int i;
 	FILE *fp;
-	char name[DYNDNS_SERVER_NAME_LEN];
+	char name[SERVER_NAME_LEN];
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
@@ -932,7 +935,7 @@ static int send_update(ddns_t *ctx, int i, int j, int *changed)
 
 	DO(http_initialize(client, "Sending IP# update to DDNS server"));
 
-	trans.req_len     = info->system->update_request_func(ctx, i, j);
+	trans.req_len     = info->system->update_fn(ctx, i, j);
 	trans.p_req       = (char *)ctx->request_buf;
 	trans.p_rsp       = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
@@ -956,7 +959,7 @@ static int send_update(ddns_t *ctx, int i, int j, int *changed)
 		return rc;
 	}
 
-	rc = info->system->response_ok_func(ctx, &trans, i);
+	rc = info->system->rsp_fn(ctx, &trans, i);
 	if (rc) {
 		logit(LOG_WARNING, "%s error in DDNS server response:",
 		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
@@ -990,7 +993,7 @@ static int update_alias_table(ddns_t *ctx)
 		 * change, i.e., an active user. */
 		for (i = 0; i < ctx->info_count; i++) {
 			ddns_info_t *info = &ctx->info[i];
-			ddns_server_name_t backup = info->my_ip_address;
+			ddns_name_t backup = info->my_ip_address;
 
 			/* TODO: Use random address in 203.0.113.0/24 instead */
 			snprintf(info->my_ip_address.name, sizeof(info->my_ip_address.name), "203.0.113.42");
@@ -1126,11 +1129,11 @@ static int init_context(ddns_t *ctx)
 			http_set_port(&ctx->http_to_dyndns[i], info->proxy_server_name.port);
 			http_set_remote_name(&ctx->http_to_dyndns[i], info->proxy_server_name.name);
 		} else {
-			http_set_port(&ctx->http_to_ip_server[i], info->ip_server_name.port);
-			http_set_remote_name(&ctx->http_to_ip_server[i], info->ip_server_name.name);
+			http_set_port(&ctx->http_to_ip_server[i], info->checkip_name.port);
+			http_set_remote_name(&ctx->http_to_ip_server[i], info->checkip_name.name);
 
-			http_set_port(&ctx->http_to_dyndns[i], info->dyndns_server_name.port);
-			http_set_remote_name(&ctx->http_to_dyndns[i], info->dyndns_server_name.name);
+			http_set_port(&ctx->http_to_dyndns[i], info->server_name.port);
+			http_set_remote_name(&ctx->http_to_dyndns[i], info->server_name.name);
 		}
 
 		http_set_bind_iface(&ctx->http_to_dyndns[i], ctx->bind_interface);
@@ -1276,7 +1279,7 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	}
 
 	/* "Hello!" Let user know we've started up OK */
-	logit(LOG_INFO, "%s", DYNDNS_VERSION_STRING);
+	logit(LOG_INFO, "%s", VERSION_STRING);
 
 	/* On first startup only, optionally wait for network and any NTP daemon
 	 * to set system time correctly.  Intended for devices without battery
