@@ -35,6 +35,8 @@
 
 #define MAXSTRING 1024
 
+static char *pidfile_path = NULL;
+
 /**
     The dbg destination.
     DBG_SYS_LOG for SysLog
@@ -417,6 +419,12 @@ static int mkparentdir(char *file)
 	return rc;
 }
 
+static void pidexit(void)
+{
+	if (pidfile_path)
+		unlink(pidfile_path);
+}
+
 static int pidfile(char *pidfile)
 {
 	FILE *fp;
@@ -433,6 +441,9 @@ static int pidfile(char *pidfile)
 
 	fprintf(fp, "%u\n", getpid());
 	fclose(fp);
+
+	pidfile_path = pidfile;
+	atexit(pidexit);
 
 	return 0;
 }
