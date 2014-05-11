@@ -2,7 +2,7 @@
 # Use "make V=1" to see full GCC output
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.99.6
+VERSION      ?= 1.99.7-beta1
 NAME          = inadyn
 EXEC          = src/$(NAME)
 PKG           = $(NAME)-$(VERSION)
@@ -24,7 +24,7 @@ mandir        = $(prefix)/share/man
 #include <config.mk>
 include config.mk
 
-BASE_OBJS     = src/main.o  src/ddns.o 			\
+BASE_OBJS     = src/main.o  src/ddns.o 	 src/cache.o	\
 		src/error.o src/cmd.o    src/os.o	\
 		src/http.o  src/tcp.o    src/ip.o       \
 	        src/sha1.o  src/base64.o src/md5.o

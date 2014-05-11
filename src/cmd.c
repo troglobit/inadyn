@@ -30,7 +30,7 @@
 #include "base64.h"
 #include "cmd.h"
 
-static int curr_info;
+static int infid;
 
 /* command line options */
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
@@ -74,7 +74,6 @@ static int set_change_persona_handler(cmd_data_t *cmd, int num, void *context);
 static int set_bind_interface(cmd_data_t *cmd, int num, void *context);
 static int set_check_interface(cmd_data_t *cmd, int num, void *context);
 static int set_pidfile(cmd_data_t *cmd, int num, void *context);
-static int set_cachefile(cmd_data_t *cmd, int num, void *context);
 static int print_version_handler(cmd_data_t *cmd, int num, void *context);
 static int get_exec_handler(cmd_data_t *cmd, int num, void *context);
 
@@ -89,10 +88,6 @@ static cmd_desc_t cmd_options_table[] = {
 	{"-B", 1, {set_bind_interface, NULL}, ""},
 	{"--bind", 1, {set_bind_interface, NULL}, "<IFNAME>\n"
 	 "\t\t\tSet interface to bind to, only on UNIX systems."},
-
-	{"-c", 1, {set_cachefile, NULL}, ""},
-	{"--cachefile", 1, {set_cachefile, NULL}, "<FILE>\n"
-	 "\t\t\tSet cachefile, default " DEFAULT_CACHE_FILE},
 
 	{"-d", 1, {set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 1, {set_change_persona_handler, NULL},
@@ -471,7 +466,7 @@ static int get_wildcard_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	ctx->info[curr_info].wildcard = 1;
+	ctx->info[infid].wildcard = 1;
 
 	return 0;
 }
@@ -542,10 +537,10 @@ static int get_username_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].creds.username) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].creds.username) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].creds.username, cmd->argv[num]);
+	strcpy(ctx->info[infid].creds.username, cmd->argv[num]);
 
 	return 0;
 }
@@ -557,10 +552,10 @@ static int get_password_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].creds.password) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].creds.password) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].creds.password, (cmd->argv[num]));
+	strcpy(ctx->info[infid].creds.password, (cmd->argv[num]));
 
 	return 0;
 }
@@ -572,14 +567,14 @@ static int get_alias_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (ctx->info[curr_info].alias_count >= DYNDNS_MAX_ALIAS_NUMBER)
+	if (ctx->info[infid].alias_count >= DYNDNS_MAX_ALIAS_NUMBER)
 		return RC_DYNDNS_TOO_MANY_ALIASES;
 
-	if (sizeof(ctx->info[curr_info].alias[ctx->info[curr_info].alias_count].names) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].alias[ctx->info[infid].alias_count].name) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].alias[ctx->info[curr_info].alias_count].names.name, (cmd->argv[num]));
-	ctx->info[curr_info].alias_count++;
+	strcpy(ctx->info[infid].alias[ctx->info[infid].alias_count].name, (cmd->argv[num]));
+	ctx->info[infid].alias_count++;
 
 	return 0;
 }
@@ -622,18 +617,18 @@ static int get_checkip_name_handler(cmd_data_t *cmd, int num, void *context)
 		return RC_INVALID_POINTER;
 
 	/*checkip_name */
-	if (sizeof(ctx->info[curr_info].checkip_name) < strlen(cmd->argv[num]) + 1)
+	if (sizeof(ctx->info[infid].checkip_name) < strlen(cmd->argv[num]) + 1)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	ctx->info[curr_info].checkip_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].checkip_name.name, &port);
+	ctx->info[infid].checkip_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].checkip_name.name, &port);
 	if (rc == 0 && port != -1)
-		ctx->info[curr_info].checkip_name.port = port;
+		ctx->info[infid].checkip_name.port = port;
 
-	if (sizeof(ctx->info[curr_info].checkip_url) < strlen(cmd->argv[num + 1]) + 1)
+	if (sizeof(ctx->info[infid].checkip_url) < strlen(cmd->argv[num + 1]) + 1)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].checkip_url, cmd->argv[num + 1]);
+	strcpy(ctx->info[infid].checkip_url, cmd->argv[num + 1]);
 
 	return rc;
 }
@@ -647,13 +642,13 @@ static int get_dns_server_name_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].server_name) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].server_name) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	ctx->info[curr_info].server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].server_name.name, &port);
+	ctx->info[infid].server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].server_name.name, &port);
 	if (rc == 0 && port != -1)
-		ctx->info[curr_info].server_name.port = port;
+		ctx->info[infid].server_name.port = port;
 
 	return rc;
 }
@@ -665,10 +660,10 @@ int get_dns_server_url_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].server_url) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].server_url) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[curr_info].server_url, cmd->argv[num]);
+	strcpy(ctx->info[infid].server_url, cmd->argv[num]);
 
 	return 0;
 }
@@ -684,13 +679,13 @@ static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sizeof(ctx->info[curr_info].proxy_server_name) < strlen(cmd->argv[num]))
+	if (sizeof(ctx->info[infid].proxy_server_name) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	ctx->info[curr_info].proxy_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[curr_info].proxy_server_name.name, &port);
+	ctx->info[infid].proxy_server_name.port = HTTP_DEFAULT_PORT;
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].proxy_server_name.name, &port);
 	if (rc == 0 && port != -1)
-		ctx->info[curr_info].proxy_server_name.port = port;
+		ctx->info[infid].proxy_server_name.port = port;
 
 	return rc;
 }
@@ -927,18 +922,6 @@ static int set_pidfile(cmd_data_t *cmd, int num, void *context)
 	return 0;
 }
 
-static int set_cachefile(cmd_data_t *cmd, int num, void *context)
-{
-	ddns_t *ctx = (ddns_t *)context;
-
-	if (ctx == NULL)
-		return RC_INVALID_POINTER;
-
-	ctx->cache_file = strdup(cmd->argv[num]);
-
-	return 0;
-}
-
 int print_version_handler(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_t *ctx = (ddns_t *)context;
@@ -987,29 +970,30 @@ static int get_dyndns_system_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	it = ddns_system_table();
-	for (; it != NULL && it->id != LAST_DNS_SYSTEM; ++it) {
-		if (strcmp(it->system.key, cmd->argv[num]) == 0) {
+	for (it = ddns_system_table(); it && it->id != LAST_DNS_SYSTEM; it++) {
+		if (!strcmp(it->system.key, cmd->argv[num])) {
 			system = &it->system;
 			break;
 		}
 	}
 
-	if (system == NULL) {
+	if (!system) {
 		logit(LOG_ERR, "Cannot find DDNS provider %s, check your spelling.", cmd->argv[num]);
 		return RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
 	}
 
-	for (curr_info = 0; curr_info < ctx->info_count &&
-	     curr_info < DYNDNS_MAX_SERVER_NUMBER && ctx->info[curr_info].system != system; curr_info++) ;
+	for (infid = 0; infid < ctx->info_count && infid < DYNDNS_MAX_SERVER_NUMBER; infid++) {
+		if (ctx->info[infid].system == system)
+			break;
+	}
 
-	if (curr_info >= ctx->info_count) {
-		if (curr_info < DYNDNS_MAX_SERVER_NUMBER) {
-			ctx->info_count++;
-			ctx->info[curr_info].system = system;
-		} else {
+	if (infid >= ctx->info_count) {
+		if (infid >= DYNDNS_MAX_SERVER_NUMBER)
 			return RC_DYNDNS_BUFFER_TOO_SMALL;
-		}
+
+		ctx->info[infid].id     = infid;
+		ctx->info[infid].system = system;
+		ctx->info_count++;
 	}
 
 	return 0;
@@ -1263,7 +1247,7 @@ static int validate_configuration(ddns_t *ctx)
 
 	if (!ctx->info_count) {
 		logit(LOG_ERR, "No DDNS provider setup in configuration.");
-		return 1;
+		return RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 	}
 
 	for (i = 0; i < ctx->info_count; i++) {
@@ -1284,7 +1268,7 @@ static int validate_configuration(ddns_t *ctx)
 
 	if (!num) {
 		logit(LOG_ERR, "No valid DDNS setup exists.");
-		return 1;
+		return RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 	}
 
 	if (num != ctx->info_count)
@@ -1332,36 +1316,6 @@ static int default_config(ddns_t *ctx)
 	/* pidfile */
 	ctx->pidfile = strdup(DEFAULT_PIDFILE);
 
-	/* Default cache_file is setup in get_config_data() */
-
-	return 0;
-}
-
-static int create_cache_file(ddns_t *ctx)
-{
-	int len, bytes;
-
-	if (!ctx->bind_interface) {
-		ctx->cache_file = strdup(DEFAULT_CACHE_FILE);
-		if (!ctx->cache_file)
-			return RC_OUT_OF_MEMORY;
-
-		return 0;
-	}
-
-	/* The '-2' adjusts for the '%s' format specifier */
-	len = strlen(CACHE_FILE) - 2 + strlen(ctx->bind_interface);
-	ctx->cache_file = malloc(len + 1);
-	if (!ctx->cache_file)
-		return RC_OUT_OF_MEMORY;
-
-	bytes = snprintf(ctx->cache_file, len + 1, CACHE_FILE, ctx->bind_interface);
-	if (bytes != len) {
-		free(ctx->cache_file);
-		ctx->cache_file = NULL;
-		return RC_ERROR;
-	}
-
 	return 0;
 }
 
@@ -1387,9 +1341,7 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 	cmd_desc_t *it;
 
 	do {
-		rc = default_config(ctx);
-		if (rc != 0)
-			break;
+		TRY(default_config(ctx));
 
 		it = cmd_options_table;
 		while (it->option != NULL) {
@@ -1399,7 +1351,9 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 
 		/* in case of no options, assume the default cfg file may be present */
 		if (argc == 1) {
-			char *custom_argv[] = { "", DYNDNS_INPUT_FILE_OPT_STRING,
+			char *custom_argv[] = {
+				"",
+				DYNDNS_INPUT_FILE_OPT_STRING,
 				DEFAULT_CONFIG_FILE
 			};
 			int custom_argc = sizeof(custom_argv) / sizeof(char *);
@@ -1415,58 +1369,46 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 			rc = get_cmd_parse_data(argv, argc, cmd_options_table);
 		}
 
-		if (rc != 0 || ctx->abort)
+		if (rc || ctx->abort)
 			break;
 
 		/* settings that may change due to cmd line options */
 		i = 0;
 		do {
-			/*ip server */
-			if (strlen(ctx->info[i].checkip_name.name) == 0) {
-				if (sizeof(ctx->info[i].checkip_name.name) <
-				    strlen(ctx->info[i].system->checkip_name)) {
-					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
-					break;
-				}
-				strcpy(ctx->info[i].checkip_name.name, ctx->info[i].system->checkip_name);
+			ddns_info_t *info = &ctx->info[i];
 
-				if (sizeof(ctx->info[i].checkip_url) <
-				    strlen(ctx->info[i].system->checkip_url)) {
+			if (strlen(info->checkip_name.name) == 0) {
+				if (sizeof(info->checkip_name.name) < strlen(info->system->checkip_name)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].checkip_url, ctx->info[i].system->checkip_url);
+				strcpy(info->checkip_name.name, info->system->checkip_name);
+
+				if (sizeof(info->checkip_url) < strlen(info->system->checkip_url)) {
+					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
+					break;
+				}
+				strcpy(info->checkip_url, info->system->checkip_url);
 			}
 
-			/*dyndns server */
-			if (strlen(ctx->info[i].server_name.name) == 0) {
-				if (sizeof(ctx->info[i].server_name.name)
-				    < strlen(ctx->info[i].system->server_name)) {
+			if (strlen(info->server_name.name) == 0) {
+				if (sizeof(info->server_name.name) < strlen(info->system->server_name)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].server_name.name,
-				       ctx->info[i].system->server_name);
+				strcpy(info->server_name.name, info->system->server_name);
 
-				if (sizeof(ctx->info[i].server_url) <
-				    strlen(ctx->info[i].system->server_url)) {
+				if (sizeof(info->server_url) < strlen(info->system->server_url)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(ctx->info[i].server_url, ctx->info[i].system->server_url);
+				strcpy(info->server_url, info->system->server_url);
 			}
 		}
 		while (++i < ctx->info_count);
 
 		/* Check if the neccessary params have been provided */
-		if (validate_configuration(ctx)) {
-			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
-			break;
-		}
-
-		/* Setup a default cache file, unless the user provided one for us. */
-		if (!ctx->cache_file)
-			TRY(create_cache_file(ctx));
+		TRY(validate_configuration(ctx));
 	}
 	while (0);
 

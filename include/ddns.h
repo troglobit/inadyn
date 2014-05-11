@@ -56,7 +56,6 @@ enum {
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define RUNTIME_DATA_DIR	"/var/run/inadyn"
-#define DEFAULT_CACHE_FILE	RUNTIME_DATA_DIR "/inadyn.cache"
 #define CACHE_FILE		RUNTIME_DATA_DIR "/%s.cache"
 #define DEFAULT_PIDFILE		RUNTIME_DATA_DIR "/inadyn.pid"
 
@@ -210,21 +209,25 @@ enum {
 #define DYNDNS_MAX_SERVER_NUMBER          5       /* maximum number of servers that can be maintained */
 
 /* local configs */
-#define USERNAME_LEN               50      /* chars */
-#define PASSWORD_LEN               50      /* chars */
+#define USERNAME_LEN                      50      /* chars */
+#define PASSWORD_LEN                      50      /* chars */
 #define SERVER_NAME_LEN                   256     /* chars */
 #define SERVER_URL_LEN                    256     /* chars */
-#define IP_V4_MAX_LEN                     16      /* chars: nnn.nnn.nnn.nnn\0 */
+#ifdef INET6_ADDRSTRLEN
+# define MAX_ADDRESS_LEN                  INET6_ADDRSTRLEN
+#else
+# define MAX_ADDRESS_LEN                  46
+#endif
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
-typedef int (*req_fn_t) (void *this, int infnr, int alnr);
-typedef int (*rsp_fn_t) (void *this, http_trans_t *p_tr, int infnr);
+typedef int (*req_fn_t) (void *this, void *info, void *alias);
+typedef int (*rsp_fn_t) (void *this, void *info, void *alias);
 
 typedef struct {
 	const char    *key;
 	rsp_fn_t       rsp_fn;
-	req_fn_t       update_fn;
+	req_fn_t       req_fn;
 	const char    *checkip_name;
 	const char    *checkip_url;
 	const char    *server_name;
@@ -259,13 +262,16 @@ typedef struct {
 } ddns_name_t;
 
 typedef struct {
-	ddns_name_t    names;
+	int            ip_has_changed;
+	char           address[MAX_ADDRESS_LEN];
+
+	char           name[SERVER_NAME_LEN];
 	int            update_required;
+	time_t         last_update;
 } ddns_alias_t;
 
 typedef struct {
-	int            ip_has_changed;
-	ddns_name_t    my_ip_address;
+	int            id;
 
 	ddns_creds_t   creds;
 	ddns_system_t *system;
@@ -301,11 +307,9 @@ typedef struct {
 	int            error_update_period_sec;
 	int            forced_update_period_sec;
 	int            forced_update_fake_addr;
-	int            time_since_last_update;
 	int            cmd_check_period; /*time to wait for a command */
 	int            total_iterations;
 	int            num_iterations;
-	char          *cache_file;
 	char          *bind_interface;
 	char          *check_interface;
 	int            initialized;

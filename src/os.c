@@ -82,6 +82,7 @@ static char *current_time(void)
 
 void os_printf(int prio, char *fmt, ...)
 {
+	size_t len;
 	va_list args;
 	static char message[MAXSTRING + 1];
 
@@ -89,6 +90,10 @@ void os_printf(int prio, char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(message, sizeof(message), fmt, args);
 	va_end(args);
+
+	len = strlen(message);
+	if (message[len - 1] == '\n')
+		message[len - 1] = 0;
 
 	if (get_dbg_dest() == DBG_SYS_LOG) {
 		syslog(prio, "%s", message);
@@ -438,13 +443,15 @@ static int pidfile(char *pidfile)
  * for excessive updates. */
 int os_check_perms(void *arg)
 {
+	char path[256];
 	ddns_t *ctx = arg;
 
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
 
-	if (mkparentdir(ctx->cache_file)) {
-		logit(LOG_ERR, "No write permission to %s, aborting.", ctx->cache_file);
+        snprintf(path, sizeof(path), CACHE_FILE, "example.com");
+	if (mkparentdir(path)) {
+		logit(LOG_ERR, "No write permission to %s, aborting.", path);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
 
 		return RC_FILE_IO_ACCESS_ERROR;

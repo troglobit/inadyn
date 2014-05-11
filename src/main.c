@@ -154,9 +154,6 @@ static void free_context(ddns_t *ctx)
 	free(ctx->check_interface);
 	ctx->check_interface = NULL;
 
-	free(ctx->cache_file);
-	ctx->cache_file = NULL;
-
 	free(ctx);
 }
 

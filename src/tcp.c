@@ -141,9 +141,10 @@ int tcp_initialize(tcp_sock_t *tcp, char *msg)
 
 		sa    = tcp->super.remote_addr;
 		salen = tcp->super.remote_len;
-		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST)) {
+		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
 			logit(LOG_INFO, "%s, connecting to %s(%s)", msg, tcp->super.p_remote_host_name, host);
-		}
+		else
+			logit(LOG_ERR, "%s, failed resolving %s!", msg, host);
 
 		if (connect(sd, &sa, salen)) {
 			if (!check_error(sd, tcp->super.timeout))

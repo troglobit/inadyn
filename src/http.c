@@ -131,6 +131,7 @@ int http_transaction(http_t *client, http_trans_t *trans)
 	if (!client->initialized)
 		return RC_HTTP_OBJECT_NOT_INITIALIZED;
 
+	trans->rsp_len = 0;
 	do {
 		TRY(tcp_send(&client->super, trans->p_req, trans->req_len));
 		TRY(tcp_recv(&client->super, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
