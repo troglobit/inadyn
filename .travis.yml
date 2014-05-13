@@ -1,0 +1,6 @@
+# Travis CI integration
+language: c
+compiler:
+  - gcc
+
+script: make
