@@ -965,18 +965,11 @@ static int get_dyndns_system_handler(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_system_t *system = NULL;
 	ddns_t *ctx = (ddns_t *)context;
-	ddns_sysinfo_t *it;
 
-	if (ctx == NULL)
+	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	for (it = ddns_system_table(); it && it->id != LAST_DNS_SYSTEM; it++) {
-		if (!strcmp(it->system.key, cmd->argv[num])) {
-			system = &it->system;
-			break;
-		}
-	}
-
+	system = plugin_find(cmd->argv[num]);
 	if (!system) {
 		logit(LOG_ERR, "Cannot find DDNS provider %s, check your spelling.", cmd->argv[num]);
 		return RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
@@ -1278,24 +1271,11 @@ static int validate_configuration(ddns_t *ctx)
 }
 
 
-static ddns_system_t *get_dns_system_by_id(int id)
-{
-	ddns_sysinfo_t *it;
-
-	it = ddns_system_table();
-	for (; it->id != LAST_DNS_SYSTEM; ++it) {
-		if (it->id == id)
-			return &it->system;
-	}
-
-	return NULL;
-}
-
 static int default_config(ddns_t *ctx)
 {
 	int i;
 
-	ctx->info[0].system = get_dns_system_by_id(DEFAULT_DNS_SYSTEM);
+	ctx->info[0].system = plugin_find(DEFAULT_DNS_SYSTEM);
 	if (ctx->info[0].system == NULL)
 		return RC_DYNDNS_INVALID_DNS_SYSTEM_DEFAULT;
 

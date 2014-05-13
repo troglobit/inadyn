@@ -24,17 +24,26 @@ mandir        = $(prefix)/share/man
 #include <config.mk>
 include config.mk
 
+PLUGIN_OBJS   = src/plugin.o		plugins/common.o	\
+		plugins/dyndns.o	plugins/changeip.o	\
+		plugins/dnsexit.o	plugins/easydns.o	\
+		plugins/freedns.o	plugins/generic.o	\
+		plugins/sitelutions.o	plugins/tunnelbroker.o	\
+		plugins/tzo.o		plugins/zoneedit.o
+
 BASE_OBJS     = src/main.o  src/ddns.o 	 src/cache.o	\
 		src/error.o src/cmd.o    src/os.o	\
 		src/http.o  src/tcp.o    src/ip.o       \
 	        src/sha1.o  src/base64.o src/md5.o
-OBJS	      = $(BASE_OBJS) $(CFG_OBJ) $(EXTRA_OBJS)
+
+OBJS	      = $(BASE_OBJS) $(PLUGIN_OBJS)
 CFLAGS       ?= -O2 -W -Wall -Werror
 CFLAGS       += $(CFG_INC) $(EXTRA_CFLAGS)
-CPPFLAGS     ?=
+# -U_FORTIFY_SOURCE -- Disable annoying gcc warning for "warn_unused_result"
+CPPFLAGS     += -U_FORTIFY_SOURCE -D_BSD_SOURCE -D_GNU_SOURCE
 CPPFLAGS     += -Iinclude -DVERSION=\"$(VERSION)\"
 LDFLAGS      ?=
-LDLIBS       += $(EXTRA_LIBS)
+LDLIBS       += -ldl
 DISTFILES     = README COPYING LICENSE
 
 # Pattern rules

@@ -54,6 +54,7 @@ int http_initialize         (http_t *client, char *msg);
 int http_shutdown           (http_t *client);
 
 int http_transaction        (http_t *client, http_trans_t *trans);
+int http_status_valid       (int status);
 
 int http_set_port           (http_t *client, int  porg);
 int http_get_port           (http_t *client, int *port);

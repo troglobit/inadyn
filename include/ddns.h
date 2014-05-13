@@ -28,30 +28,11 @@
 #include "error.h"
 #include "http.h"
 #include "debug.h"
+#include "plugin.h"
 
 #define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
 #define SUPPORT_ADDR	"troglobit@gmail.com"
-
-/* DDNS system ID's */
-enum {
-	DYNDNS_DEFAULT = 0,
-	FREEDNS_AFRAID_ORG_DEFAULT,
-	ZONE_EDIT_DEFAULT,
-	CUSTOM_HTTP_BASIC_AUTH,
-	NOIP_DEFAULT,
-	EASYDNS_DEFAULT,
-	TZO_DEFAULT,
-	DYNDNS_3322_DYNAMIC,
-	SITELUTIONS_DOMAIN,
-	DNSOMATIC_DEFAULT,
-	DNSEXIT_DEFAULT,
-	HE_IPV6TB,
-	HE_DYNDNS,
-	CHANGEIP_DEFAULT,
-	DYNSIP_DEFAULT,
-	LAST_DNS_SYSTEM = -1
-};
 
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
@@ -62,136 +43,12 @@ enum {
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"
 
-/* REQ/RSP definitions */
+#define DEFAULT_DNS_SYSTEM	"default@dyndns.org"
 
-#define DEFAULT_DNS_SYSTEM	DYNDNS_DEFAULT
-
-/* Conversation with the IP server */
-#define DYNDNS_GET_IP_HTTP_REQUEST  					\
+/* Conversation with the checkip server */
+#define DYNDNS_CHECKIP_HTTP_REQUEST  					\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-#define GENERIC_HTTP_REQUEST                                      	\
-	"GET %s HTTP/1.0\r\n"						\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-#define GENERIC_AUTH_HTTP_REQUEST					\
-	"GET %s HTTP/1.0\r\n"						\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* dyndns.org specific update address format
- * 3322.org has the same parameters ... */
-#define DYNDNS_UPDATE_IP_HTTP_REQUEST					\
-	"GET %s?"							\
-	"hostname=%s&"							\
-	"myip=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* freedns.afraid.org specific update request format */
-#define FREEDNS_UPDATE_IP_REQUEST					\
-	"GET %s?"							\
-	"%s&"								\
-	"address=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/** generic update format for sites that perform the update
-	with:
-	http://some.address.domain/somesubdir
-	?some_param_name=ALIAS
-	and then the normal http stuff and basic base64 encoded auth.
-	The parameter here is the entire request but NOT including the alias.
-*/
-#define GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST				\
-	"GET %s"							\
-	"%s "								\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-#define ZONEEDIT_UPDATE_IP_REQUEST					\
-	"GET %s?"							\
-	"host=%s&"							\
-	"dnsto=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* dont ask me why easydns is so picky
- * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php */
-#define EASYDNS_UPDATE_IP_REQUEST					\
-	"GET %s?"							\
-	"hostname=%s&"							\
-	"myip=%s&"							\
-	"wildcard=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* tzo doesnt encode password */
-#define TZO_UPDATE_IP_REQUEST						\
-	"GET %s?"							\
-	"tzoname=%s&"							\
-	"email=%s&"							\
-	"tzokey=%s&"							\
-	"ipaddress=%s&"							\
-	"system=tzodns&"						\
-	"info=1 "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* sitelutions.com specific update address format */
-#define SITELUTIONS_UPDATE_IP_HTTP_REQUEST				\
-	"GET %s?"							\
-	"user=%s&"							\
-	"pass=%s&"							\
-	"id=%s&"							\
-	"ip=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-#define DNSEXIT_UPDATE_IP_HTTP_REQUEST					\
-	"GET %s?"							\
-	"login=%s&"							\
-	"password=%s&"							\
-	"host=%s&"							\
-	"myip=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* HE tunnelbroker.com specific update request format */
-#define HE_IPV6TB_UPDATE_IP_REQUEST					\
-	"GET %s?"							\
-	"ip=%s&"							\
-	"apikey=%s&"							\
-	"pass=%s&"							\
-	"tid=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-#define CHANGEIP_UPDATE_IP_HTTP_REQUEST					\
-	"GET %s?"							\
-	"system=dyndns&"						\
-	"hostname=%s&"							\
-	"myip=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
 
 /* Some default configurations */
@@ -218,26 +75,6 @@ enum {
 #else
 # define MAX_ADDRESS_LEN                  46
 #endif
-
-/* Types used for DNS system specific configuration */
-/* Function to prepare DNS system specific server requests */
-typedef int (*req_fn_t) (void *this, void *info, void *alias);
-typedef int (*rsp_fn_t) (void *this, void *info, void *alias);
-
-typedef struct {
-	const char    *key;
-	rsp_fn_t       rsp_fn;
-	req_fn_t       req_fn;
-	const char    *checkip_name;
-	const char    *checkip_url;
-	const char    *server_name;
-	const char    *server_url;
-} ddns_system_t;
-
-typedef struct {
-	int            id;
-	ddns_system_t  system;
-} ddns_sysinfo_t;
 
 typedef enum {
 	NO_CMD = 0,
@@ -337,9 +174,11 @@ typedef struct {
 	int            info_count;
 } ddns_t;
 
-ddns_sysinfo_t *ddns_system_table (void);
-int             ddns_main_loop    (ddns_t *ctx, int argc, char *argv[]);
-int             get_config_data   (ddns_t *ctx, int argc, char *argv[]);
+int  ddns_main_loop    (ddns_t *ctx, int argc, char *argv[]);
+int  get_config_data   (ddns_t *ctx, int argc, char *argv[]);
+
+int common_request (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
+int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 #endif /* DYNDNS_H_ */
 

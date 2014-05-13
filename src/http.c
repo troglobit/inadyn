@@ -144,6 +144,19 @@ int http_transaction(http_t *client, http_trans_t *trans)
 	return rc;
 }
 
+/*
+ * Validate HTTP status code
+ */
+int http_status_valid(int status)
+{
+	if (status == 200)
+		return 0;
+
+	if (status >= 500 && status < 600)
+		return RC_DYNDNS_RSP_RETRY_LATER;
+
+	return RC_DYNDNS_RSP_NOTOK;
+}
 
 int http_set_port(http_t *client, int port)
 {
