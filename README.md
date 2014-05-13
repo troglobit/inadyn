@@ -1,5 +1,6 @@
 README
 ======
+[![Build Status](https://travis-ci.org/troglobit/inadyn.png?branch=master)](https://travis-ci.org/troglobit/inadyn)
 
 Inadyn is a simple and small dynamic DNS (DDNS) client written in C.
 DDNS is a popular service for Internet users with dynamically allocated
