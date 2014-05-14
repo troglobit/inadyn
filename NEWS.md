@@ -6,7 +6,6 @@ Version 1.99.7: May 14 2014
 Add support for multiple cache files, one per DDNS provider.  Fixes
 issue #35.  Refactored DDNS providers as plugins, fixes issue #30.
 
-
 Version 1.99.6: Dec 25 2013
 ---------------------------
 Fix nasty socket leak. Update documentation for custom servers and
