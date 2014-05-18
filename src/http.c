@@ -24,19 +24,13 @@
 #include "http.h"
 #include "error.h"
 
-#define super_construct(p) tcp_construct(p)
-#define super_destruct(p)  tcp_destruct(p)
-#define super_init(p,msg)  tcp_initialize(p, msg)
-#define super_shutdown(p)  tcp_shutdown(p)
-
-
 int http_construct(http_t *client)
 {
 	ASSERT(client);
 
-	DO(super_construct(&client->super));
+	DO(tcp_construct(&client->tcp));
 
-	memset((char *)client + sizeof(client->super), 0, sizeof(*client) - sizeof(client->super));
+	memset((char *)client + sizeof(client->tcp), 0, sizeof(*client) - sizeof(client->tcp));
 	client->initialized = 0;
 
 	return 0;
@@ -48,7 +42,7 @@ int http_destruct(http_t *client, int num)
 	int i = 0, rv = 0;
 
 	while (i < num)
-		rv = super_destruct(&client[i++].super);
+		rv = tcp_destruct(&client[i++].tcp);
 
 	return rv;
 }
@@ -77,7 +71,7 @@ int http_initialize(http_t *client, char *msg)
 
 	do {
 		TRY(local_set_params(client));
-		TRY(super_init(&client->super, msg));
+		TRY(tcp_init(&client->tcp, msg));
 	}
 	while (0);
 
@@ -101,7 +95,7 @@ int http_shutdown(http_t *client)
 
 	client->initialized = 0;
 
-	return super_shutdown(&client->super);
+	return tcp_shutdown(&client->tcp);
 }
 
 static void http_response_parse(http_trans_t *trans)
@@ -135,8 +129,8 @@ int http_transaction(http_t *client, http_trans_t *trans)
 
 	trans->rsp_len = 0;
 	do {
-		TRY(tcp_send(&client->super, trans->p_req, trans->req_len));
-		TRY(tcp_recv(&client->super, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		TRY(tcp_send(&client->tcp, trans->p_req, trans->req_len));
+		TRY(tcp_recv(&client->tcp, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
 	}
 	while (0);
 
@@ -163,51 +157,51 @@ int http_status_valid(int status)
 int http_set_port(http_t *client, int port)
 {
 	ASSERT(client);
-	return tcp_set_port(&client->super, port);
+	return tcp_set_port(&client->tcp, port);
 }
 
 int http_get_port(http_t *client, int *port)
 {
 	ASSERT(client);
-	return tcp_get_port(&client->super, port);
+	return tcp_get_port(&client->tcp, port);
 }
 
 
 int http_set_remote_name(http_t *client, const char *name)
 {
 	ASSERT(client);
-	return tcp_set_remote_name(&client->super, name);
+	return tcp_set_remote_name(&client->tcp, name);
 }
 
 int http_get_remote_name(http_t *client, const char **name)
 {
 	ASSERT(client);
-	return tcp_get_remote_name(&client->super, name);
+	return tcp_get_remote_name(&client->tcp, name);
 }
 
 int http_set_remote_timeout(http_t *client, int timeout)
 {
 	ASSERT(client);
-	return tcp_set_remote_timeout(&client->super, timeout);
+	return tcp_set_remote_timeout(&client->tcp, timeout);
 }
 
 int http_get_remote_timeout(http_t *client, int *timeout)
 {
 	ASSERT(client);
-	return tcp_get_remote_timeout(&client->super, timeout);
+	return tcp_get_remote_timeout(&client->tcp, timeout);
 }
 
 int http_set_bind_iface(http_t *client, char *ifname)
 {
 	ASSERT(client);
-	return tcp_set_bind_iface(&client->super, ifname);
+	return tcp_set_bind_iface(&client->tcp, ifname);
 }
 
 int http_get_bind_iface(http_t *client, char **ifname)
 {
 	ASSERT(client);
 	ASSERT(ifname);
-	return tcp_get_bind_iface(&client->super, ifname);
+	return tcp_get_bind_iface(&client->tcp, ifname);
 }
 
 /**

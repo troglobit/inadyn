@@ -64,7 +64,7 @@ int ip_destruct(ip_sock_t *ip)
 }
 
 /* Sets up the object. */
-int ip_initialize(ip_sock_t *ip)
+int ip_init(ip_sock_t *ip)
 {
 	int rc = 0;
 	struct ifreq ifr;

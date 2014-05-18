@@ -29,7 +29,7 @@
 #define	HTTP_DEFAULT_PORT	80
 
 typedef struct {
-	tcp_sock_t super;
+	tcp_sock_t tcp;
 	int        initialized;
 } http_t;
 

@@ -55,7 +55,7 @@ typedef struct {
 int ip_construct          (ip_sock_t *ip);
 int ip_destruct           (ip_sock_t *ip);
 
-int ip_initialize         (ip_sock_t *ip);
+int ip_init               (ip_sock_t *ip);
 int ip_shutdown           (ip_sock_t *ip);
 
 int ip_send               (ip_sock_t *ip, const char *buf, int len);

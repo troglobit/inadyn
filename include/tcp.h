@@ -30,14 +30,14 @@
 #define TCP_DEFAULT_TIMEOUT	20000	/* msec */
 
 typedef struct {
-	ip_sock_t super;
+	ip_sock_t ip;
 	int       initialized;
 } tcp_sock_t;
 
 int tcp_construct          (tcp_sock_t *tcp);
 int tcp_destruct           (tcp_sock_t *tcp);
 
-int tcp_initialize         (tcp_sock_t *tcp, char *msg);
+int tcp_init               (tcp_sock_t *tcp, char *msg);
 int tcp_shutdown           (tcp_sock_t *tcp);
 
 int tcp_send               (tcp_sock_t *tcp, const char *buf, int len);
