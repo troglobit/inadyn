@@ -17,7 +17,7 @@
  * along with this program; if not, visit the Free Software Foundation
  * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA  02110-1301, USA.
+ * Boston, MA 02110-1301, USA.
  */
 
 #include <sys/types.h>
