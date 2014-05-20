@@ -1,7 +1,6 @@
 bin/*
 src/inadyn
 src/inadyn.exe
-depcomp
 inadyn.anjuta
 install-sh
 missing
@@ -9,7 +8,7 @@ missing
 .tm_project*
 .anjuta_sym_db.db
 .libs
-.deps
+*.d
 .*swp
 .nautilus-metafile.xml
 *.autosave
