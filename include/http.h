@@ -21,8 +21,16 @@
 #ifndef INADYN_HTTP_H_
 #define INADYN_HTTP_H_
 
-#include "os.h"
+#ifdef CONFIG_OPENSSL
+#include <openssl/crypto.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#endif
+
 #include "error.h"
+#include "os.h"
 #include "tcp.h"
 
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */
@@ -30,6 +38,13 @@
 
 typedef struct {
 	tcp_sock_t tcp;
+
+	int        ssl_enabled;
+#ifdef CONFIG_OPENSSL
+	SSL       *ssl;
+	SSL_CTX   *ssl_ctx;
+#endif
+
 	int        initialized;
 } http_t;
 

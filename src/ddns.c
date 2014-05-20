@@ -151,6 +151,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	DO(http_initialize(http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
+	memset(ctx->work_buf, 0, ctx->work_buflen);
 	trans              = &ctx->http_transaction;
 	trans->req_len     = get_req_for_ip_server(ctx, &ctx->info[servernum]);
 	trans->p_req       = ctx->request_buf;
@@ -165,6 +166,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
 	http_shutdown(http);
+	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
 
 	return rc;
 }
@@ -267,6 +269,11 @@ static int check_alias_update_table(ddns_t *ctx)
 			int override;
 			ddns_alias_t *alias = &info->alias[j];
 
+/* XXX: TODO time_to_check() will return false positive if the cache
+ *     file is missing => causing unnnecessary update.  We should save
+ *     the cache file with the current IP instead and fall back to
+ *     standard update interval!
+ */
 			override = time_to_check(ctx, alias);
 			if (!alias->ip_has_changed && !override) {
 				alias->update_required = 0;
@@ -288,8 +295,13 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	http_trans_t   trans;
 	http_t        *client = &ctx->http_to_dyndns[info->id];
 
+	client->ssl_enabled = info->ssl_enabled;
+	if (client->ssl_enabled) /* XXX: Fix this better, possibly in http_init() */
+		client->tcp.ip.port = 443;
+
 	DO(http_initialize(client, "Sending IP# update to DDNS server"));
 
+	memset(ctx->work_buf, 0, ctx->work_buflen);
 	trans.req_len     = info->system->request(ctx, info, alias);
 	trans.p_req       = (char *)ctx->request_buf;
 	trans.p_rsp       = (char *)ctx->work_buf;

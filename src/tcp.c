@@ -142,7 +142,7 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		sa    = tcp->ip.remote_addr;
 		salen = tcp->ip.remote_len;
 		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
-			logit(LOG_INFO, "%s, connecting to %s(%s)", msg, tcp->ip.p_remote_host_name, host);
+			logit(LOG_INFO, "%s, connecting to %s(%s:%d)", msg, tcp->ip.p_remote_host_name, host, tcp->ip.port);
 		else
 			logit(LOG_ERR, "%s, failed resolving %s!", msg, host);
 

@@ -27,14 +27,15 @@
 .Op Fl L, -logfile Ar FILE
 .Op Fl P, -pidfile Ar FILE
 .Op Fl c, -cachefile Ar FILE
-.Op Fl s, -syslog
 .Op Fl h, -help
 .Op Fl i, -iface Ar IFNAME
+.Op Fl l, -syslog
 .Op Fl n, -iterations Ar NUM
 .Op Fl H, -checkip-url Ar SERVER Ns Oo : Ns Ar PORT Oc Ar URL
 .Op Fl N, -server-name Ar SERVER Ns Op : Ns Ar PORT
 .Op Fl U, -server-url Ar PATH
 .Op Fl S, -system Ar PROVIDER
+.Op Fl s, -ssl
 .Op Fl o, -once
 .Op Fl t, -startup-delay Ar SEC
 .Op Fl T, -period Ar SEC
@@ -188,7 +189,7 @@ to
 Set the number of DNS updates. The default is
 .Ar 0 ,
 which means infinity.
-.It Fl s, -syslog
+.It Fl l, -syslog
 Use the system
 .Xr syslog 3
 mechanism for log messages, warnings and error conditions.
@@ -244,6 +245,8 @@ the time since the last update can be calculated correctly from the
 cache file and the
 .Fl -forced-update
 option honored across reboots, avoiding unnecessary IP address updates
+.It Fl s, -ssl
+Use HTTPS to connect to this DDNS service provider, default HTTP
 .It Fl o, -once
 Force one update and quit
 .It Fl z, -fake-address

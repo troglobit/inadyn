@@ -2,7 +2,7 @@
 # Use "make V=1" to see full GCC output
 
 #VERSION      ?= $(shell git tag -l | tail -1)
-VERSION      ?= 1.99.7
+VERSION      ?= 1.99.8-beta1
 NAME          = inadyn
 PKG           = $(NAME)-$(VERSION)
 DEV           = $(NAME)-dev
@@ -34,10 +34,10 @@ PLUGIN_OBJS   = src/plugin.o		plugins/common.o	\
 		plugins/sitelutions.o	plugins/tunnelbroker.o	\
 		plugins/tzo.o		plugins/zoneedit.o
 
-BASE_OBJS     = src/main.o  src/ddns.o 	 src/cache.o	\
-		src/error.o src/cmd.o    src/os.o	\
-		src/http.o  src/tcp.o    src/ip.o       \
-	        src/sha1.o  src/base64.o src/md5.o
+BASE_OBJS     = src/main.o	src/ddns.o	src/cache.o	src/error.o	\
+		src/cmd.o	src/os.o					\
+		src/http.o	src/ssl.o	src/tcp.o	src/ip.o	\
+	        src/sha1.o	src/base64.o	src/md5.o
 
 OBJS	      = $(BASE_OBJS) $(PLUGIN_OBJS) $(EXTRA_OBJS)
 SRCS          = $(OBJS:.o=.c)
@@ -48,6 +48,7 @@ CFLAGS       += $(CFG_INC) $(EXTRA_CFLAGS)
 # -U_FORTIFY_SOURCE -- Disable annoying gcc warning for "warn_unused_result"
 CPPFLAGS     += -U_FORTIFY_SOURCE -D_BSD_SOURCE -D_GNU_SOURCE
 CPPFLAGS     += -Iinclude -DVERSION=\"$(VERSION)\"
+CPPFLAGS     += $(EXTRA_CPPFLAGS)
 LDFLAGS      ?=
 LDLIBS       += -ldl $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE

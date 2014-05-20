@@ -43,6 +43,12 @@
 
 #define RC_HTTP_OBJECT_NOT_INITIALIZED              30
 #define RC_HTTP_BAD_PARAMETER                       31
+#define RC_HTTPS_OUT_OF_MEMORY                      32
+#define RC_HTTPS_FAILED_CONNECT                     33
+#define RC_HTTPS_FAILED_GETTING_CERT                34
+#define RC_HTTPS_NO_SSL_SUPPORT                     35
+#define RC_HTTPS_SEND_ERROR                         36
+#define RC_HTTPS_RECV_ERROR                         37
 
 #define RC_DYNDNS_BUFFER_TOO_SMALL                  40
 #define RC_DYNDNS_INVALID_IP_ADDR_IN_HTTP_RESPONSE  41

@@ -37,6 +37,14 @@ Common DDNS service providers supported by inadyn:
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
 
+Inadyn v1.99.8 and later support HTTPS, for DDNS providers that support
+this (you must check this yourself).  Tested are DynDNS and FreeDNS.
+Using HTTPS is recommended since it protects your credentials from wire
+snooping and further reduces the risk of someone hijacking your account.
+
+Note: No certificate validation is currently in place, patches welcome!
+
+
 Multiple Accounts Support
 =========================
 
@@ -55,6 +63,7 @@ Example /etc/inadyn.conf:
     pidfile /var/run/inadyn.pid
     
     system default@dyndns.org
+      ssl
       username yxxx
       password xyxx
       alias yyyy
@@ -68,4 +77,7 @@ Example /etc/inadyn.conf:
 In a multi-user setup, make sure to chmod your .conf to 600 (read-write
 only by you/root) to prevent other users from accessing your DDNS server
 credentials.
+
+Note: Here only the DynDNS account uses SSL, the No-IP account will
+      still use regular HTTP.
 

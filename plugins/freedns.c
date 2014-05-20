@@ -61,15 +61,16 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	char          digeststr[SHA1_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[SHA1_DIGEST_BYTES];
 
-	if (!ctx)
-		return 0;	/* 0 == "No characters written" */
-
 	do {
 		TRY(http_construct(&client));
 
 		http_set_port(&client, info->server_name.port);
 		http_set_remote_name(&client, info->server_name.name);
 		http_set_bind_iface(&client, ctx->bind_interface);
+
+		client.ssl_enabled = info->ssl_enabled;
+		if (client.ssl_enabled)	/* XXX: Fix this better, possibly in http_init() */
+			client.tcp.ip.port = 443;
 
 		TRY(http_initialize(&client, "Sending update URL query"));
 

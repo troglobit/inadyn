@@ -127,6 +127,8 @@ typedef struct {
 	int            alias_count;
 
 	int            wildcard;
+
+	int            ssl_enabled;
 } ddns_info_t;
 
 /* Client context */

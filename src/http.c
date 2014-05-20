@@ -21,6 +21,8 @@
  */
 
 #include <string.h>
+
+#include "ssl.h"
 #include "http.h"
 #include "error.h"
 
@@ -72,6 +74,8 @@ int http_initialize(http_t *client, char *msg)
 	do {
 		TRY(local_set_params(client));
 		TRY(tcp_init(&client->tcp, msg));
+		if (client->ssl_enabled)
+			TRY(ssl_init(client, msg));
 	}
 	while (0);
 
@@ -94,6 +98,8 @@ int http_shutdown(http_t *client)
 		return 0;
 
 	client->initialized = 0;
+	if (client->ssl_enabled)
+		ssl_exit(client);
 
 	return tcp_shutdown(&client->tcp);
 }
@@ -119,7 +125,7 @@ static void http_response_parse(http_trans_t *trans)
 /* Send req and get response */
 int http_transaction(http_t *client, http_trans_t *trans)
 {
-	int rc;
+	int rc = 0;
 
 	ASSERT(client);
 	ASSERT(trans);
@@ -129,8 +135,15 @@ int http_transaction(http_t *client, http_trans_t *trans)
 
 	trans->rsp_len = 0;
 	do {
-		TRY(tcp_send(&client->tcp, trans->p_req, trans->req_len));
-		TRY(tcp_recv(&client->tcp, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		if (client->ssl_enabled) {
+#ifdef CONFIG_OPENSSL
+			TRY(ssl_send(client, trans->p_req, trans->req_len));
+			TRY(ssl_recv(client, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		} else {
+#endif
+			TRY(tcp_send(&client->tcp, trans->p_req, trans->req_len));
+			TRY(tcp_recv(&client->tcp, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		}
 	}
 	while (0);
 

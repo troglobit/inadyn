@@ -72,6 +72,9 @@ static int set_verbose_handler(cmd_data_t *cmd, int num, void *context);
 static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context);
 static int get_options_from_file_handler(cmd_data_t *cmd, int num, void *context);
 static int set_iterations_handler(cmd_data_t *cmd, int num, void *context);
+#ifdef CONFIG_OPENSSL
+static int enable_ssl(cmd_data_t *cmd, int num, void *context);
+#endif
 static int set_syslog_handler(cmd_data_t *cmd, int num, void *context);
 static int set_change_persona_handler(cmd_data_t *cmd, int num, void *context);
 static int set_bind_interface(cmd_data_t *cmd, int num, void *context);
@@ -183,7 +186,12 @@ static cmd_desc_t cmd_options_table[] = {
 	{"-P", 1, {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
-	{"-s", 0, {set_syslog_handler, NULL}, ""},
+#ifdef CONFIG_OPENSSL
+	{"-s",    0, {enable_ssl, NULL}, ""},
+	{"--ssl", 0, {enable_ssl, NULL}, "Use HTTPS to connect to this DDNS service provider, default HTTP"},
+#endif
+
+	{"-l", 0, {set_syslog_handler, NULL}, ""},
 	{"--syslog", 0, {set_syslog_handler, NULL},
 	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
 
@@ -766,6 +774,23 @@ static int forced_update_fake_addr(cmd_data_t *cmd, int num, void *context)
 
 	return 0;
 }
+
+#ifdef CONFIG_OPENSSL
+static int enable_ssl(cmd_data_t *cmd, int num, void *context)
+{
+	ddns_t *ctx = (ddns_t *)context;
+
+	(void)cmd;
+	(void)num;
+
+	if (ctx == NULL)
+		return RC_INVALID_POINTER;
+
+	ctx->info[infid].ssl_enabled = 1;
+
+	return 0;
+}
+#endif
 
 static int set_syslog_handler(cmd_data_t *cmd, int num, void *context)
 {
