@@ -22,8 +22,9 @@
 #ifndef INADYN_CACHE_H_
 #define INADYN_CACHE_H_
 
-int read_cache_file(ddns_t *ctx);
-int write_cache_file(ddns_alias_t *alias);
+char *cache_file       (char *name, char *buf, size_t len);
+int   read_cache_file  (ddns_t *ctx);
+int   write_cache_file (ddns_alias_t *alias);
 
 #endif /* INADYN_CACHE_H_ */
 

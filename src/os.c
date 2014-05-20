@@ -32,6 +32,7 @@
 #include "os.h"
 #include "debug.h"
 #include "ddns.h"
+#include "cache.h"
 
 #define MAXSTRING 1024
 
@@ -460,7 +461,7 @@ int os_check_perms(void *arg)
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
 
-        snprintf(path, sizeof(path), CACHE_FILE, "example.com");
+	cache_file("example.com", path, sizeof(path));
 	if (mkparentdir(path)) {
 		logit(LOG_ERR, "No write permission to %s, aborting.", path);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");

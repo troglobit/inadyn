@@ -37,6 +37,10 @@
 #include <unistd.h>
 
 #include "ddns.h"
+#include "cache.h"
+
+/* Optional setting, e.g., --cache-dir=/etc */
+char *cache_dir = NULL;
 
 static int nslookup(ddns_alias_t *alias)
 {
@@ -79,7 +83,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
         alias->last_update = 0;
         memset(alias->address, 0, sizeof(alias->address));
 
-        snprintf(path, sizeof(path), CACHE_FILE, alias->name);
+	cache_file(alias->name, path, sizeof(path));
 	fp = fopen(path, "r");
 	if (!fp) {
                 if (nonslookup)
@@ -103,6 +107,21 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 
 		fclose(fp);
 	}
+}
+
+char *cache_file(char *name, char *buf, size_t len)
+{
+	char *path = RUNTIME_DATA_DIR;
+
+	if (!buf || !name)
+		return NULL;
+
+	if (cache_dir)
+		path = cache_dir;
+
+	snprintf(buf, len, "%s/%s.cache", path, name);
+
+	return buf;
 }
 
 /* At boot, or when restarting inadyn at runtime, the memory struct holding our
@@ -143,7 +162,7 @@ int write_cache_file(ddns_alias_t *alias)
 	FILE *fp;
         char path[256];
 
-        snprintf(path, sizeof(path), CACHE_FILE, alias->name);
+	cache_file(alias->name, path, sizeof(path));
 	fp = fopen(path, "w");
 	if (fp) {
 		fprintf(fp, "%s", alias->address);

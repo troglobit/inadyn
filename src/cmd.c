@@ -34,6 +34,7 @@
 #include "cmd.h"
 
 static int infid;
+extern char *cache_dir;
 
 /* command line options */
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
@@ -80,6 +81,7 @@ static int set_change_persona_handler(cmd_data_t *cmd, int num, void *context);
 static int set_bind_interface(cmd_data_t *cmd, int num, void *context);
 static int set_check_interface(cmd_data_t *cmd, int num, void *context);
 static int set_pidfile(cmd_data_t *cmd, int num, void *context);
+static int set_cache_dir(cmd_data_t *cmd, int num, void *context);
 static int print_version_handler(cmd_data_t *cmd, int num, void *context);
 static int get_exec_handler(cmd_data_t *cmd, int num, void *context);
 
@@ -94,6 +96,10 @@ static cmd_desc_t cmd_options_table[] = {
 	{"-B", 1, {set_bind_interface, NULL}, ""},
 	{"--bind", 1, {set_bind_interface, NULL}, "<IFNAME>\n"
 	 "\t\t\tSet interface to bind to, only on UNIX systems."},
+
+	{"-c",          1, {set_cache_dir, NULL}, ""},
+	{"--cache-dir", 1, {set_cache_dir, NULL}, "<DIR>\n"
+	 "\t\t\tSet directory for persistent cache files, default " RUNTIME_DATA_DIR},
 
 	{"-d", 1, {set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 1, {set_change_persona_handler, NULL},
@@ -946,6 +952,18 @@ static int set_pidfile(cmd_data_t *cmd, int num, void *context)
 		return RC_INVALID_POINTER;
 
 	ctx->pidfile = strdup(cmd->argv[num]);
+
+	return 0;
+}
+
+static int set_cache_dir(cmd_data_t *cmd, int num, void *context)
+{
+	ddns_t *ctx = (ddns_t *)context;
+
+	if (ctx == NULL)
+		return RC_INVALID_POINTER;
+
+	cache_dir = strdup(cmd->argv[num]);
 
 	return 0;
 }

@@ -26,7 +26,7 @@
 .Op Fl F, -config Ar FILE
 .Op Fl L, -logfile Ar FILE
 .Op Fl P, -pidfile Ar FILE
-.Op Fl c, -cachefile Ar FILE
+.Op Fl c, -cache-dir Ar PATH
 .Op Fl h, -help
 .Op Fl i, -iface Ar IFNAME
 .Op Fl l, -syslog
@@ -203,19 +203,31 @@ External IP check is not performed
 .It Fl P, -pidfile Ar FILE
 Set pidfile, defaults to
 .Pa /var/run/inadyn/inadyn.pid 
-.It Fl c, -cachefile Ar FILE
-Set cache file, defaults to
-.Pa /var/run/inadyn/inadyn.cache 
+.It Fl c, -cache-dir Ar PATH
+Set directory for persistent cache files, defaults to
+.Pa /var/run/inadyn
 .Pp
-The cache file is used to keep track of what address has been sent to
-the DDNS provider and resulted in a successful update.  Hence it is only
-written when a successful update has been made.
+The cache files are used to keep track of which addresses have been
+successfully sent to their respective DDNS provider and when.  The
+latter 'when' is important to prevent
+.Nm
+from banning you for excessive updates.
 .Pp
-However, to protect against too frequent updates, that may be caused by
-inadyn being completely restarted, the absence of a cache file does not
-in itself cause an update.  Instead, each alias is queried for using a
-DNS lookup for each alias entry.  This IP is then compared to the IP
-returned by the DDNS providers 'checkip' service.
+When restarting
+.Nm
+or rebooting your server, or embedded device,
+.Nm
+reads the cache files to seed its internal data structures with the last
+sent IP address and when the update was performed.  It is therefore very
+important to both have a cache file and for it to have the correct time
+stamp.  The absence of a cache file will currently cause a forced
+update.
+.Pp
+On an embedded device with no RTC, or no battery backed RTC, it is
+strongly recommended to pair this setting with the
+.Fl --startup-delay Ar SEC
+option to ensure that an NTP client has set the device's clock before a
+cache file is created or read.
 .It Fl e, -exec Ar SCRIPT
 Full path to external command, or script, to run after a successful
 DDNS update
