@@ -5,6 +5,7 @@ Version 1.99.8: May 20 2014
 ---------------------------
 - Support for HTTPS to secure login credentials at DNS update, issue #36
 - Support for persistent cache files with new --cache-dir PATH
+- Support for twoDNS.de in generic DDNS plugin, see README for details
 - Man page updates
 
 Version 1.99.7: May 14 2014

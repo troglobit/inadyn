@@ -92,3 +92,39 @@ a persistent store for the three cache files
 `/mnt/ddns/yyy.dyndns.org.cache`, `/mnt/ddns/zzz.dyndns.org.cache` and
 `/mnt/ddns/yyy.no-ip.com.cache`
 
+
+Generic DDNS Plugin
+===================
+
+Aside from the dedicated DDNS provider support Inadyn also has a generic
+DDNS provider plugin.  A DDNS provider like twoDNS.de can be setup like
+this:
+
+    period        300
+    startup-delay 60
+    cache-dir     /etc/inadyn
+
+    system custom@http_srv_basic_auth
+        ssl
+        checkip-url checkip.two-dns.de /
+        server-name update.twodns.de
+        server-url /update?hostname=
+        username myuser
+        password mypass
+        alias myalias.dd-dns.de
+
+When using the generic plugin you should first inspect the response from
+the DDNS provider.  Inadyn currently looks for a 200 HTTP response OK
+code and the string "good" or "OK" in the HTTP response body.  You may
+have to modify Inadyn manually, any patches for this are most welcome!
+
+
+Contact
+=======
+
+This is the continuation of the
+[original INADYN](http://www.inatech.eu/inadyn/) by Narcis Ilisei.  It
+is currently being developed and maintained by
+[Joachim Nilsson](http://troglobit.com) at
+[GitHub](http://github.com/troglobit/inadyn).  Please file bug reports,
+clone it, or send pull requests for bug fixes and proposed extensions.
