@@ -1,10 +1,16 @@
 ChangeLog
 =========
 
+Version 1.99.8: May 20 2014
+---------------------------
+- Support for HTTPS to secure login credentials at DNS update, issue #36
+- Support for persistent cache files with new --cache-dir PATH
+- Man page updates
+
 Version 1.99.7: May 14 2014
 ---------------------------
-Add support for multiple cache files, one per DDNS provider.  Fixes
-issue #35.  Refactored DDNS providers as plugins, fixes issue #30.
+- Support for multiple cache files, one per DDNS provider, issue #35
+- Refactor DDNS providers as plugins, issue #30
 
 Version 1.99.6: Dec 25 2013
 ---------------------------
@@ -13,9 +19,11 @@ add missing compatibility entry for custom servers.
 
 Version 1.99.5: Nov 27 2013
 ---------------------------
-This release adds support for --fake-address on new SIGUSR1 (forced
-update), support for SIGUSR2 (check now), new --startup-delay
-support for embedded systems, and many bugfixes and manpage updates.
+- Support for --fake-address on new SIGUSR1 (forced update)
+- Support for SIGUSR2 (check now),
+- Support for --startup-delay SEC, for embedded systems
+- Many minor bug fixes
+- Man page updates
 
 Version 1.99.4: Aug 8 2013
 --------------------------
