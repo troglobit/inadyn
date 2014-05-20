@@ -58,7 +58,7 @@ int ip_destruct(ip_sock_t *ip)
 	ASSERT(ip);
 
 	if (ip->initialized == 1)
-		ip_shutdown(ip);
+		ip_exit(ip);
 
 	return 0;
 }
@@ -146,7 +146,7 @@ int ip_init(ip_sock_t *ip)
 	while (0);
 
 	if (rc) {
-		ip_shutdown(ip);
+		ip_exit(ip);
 		return rc;
 	}
 
@@ -156,7 +156,7 @@ int ip_init(ip_sock_t *ip)
 }
 
 /* Disconnect and some other clean up. */
-int ip_shutdown(ip_sock_t *ip)
+int ip_exit(ip_sock_t *ip)
 {
 	ASSERT(ip);
 

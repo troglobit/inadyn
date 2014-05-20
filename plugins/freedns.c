@@ -72,7 +72,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		if (client.ssl_enabled)	/* XXX: Fix this better, possibly in http_init() */
 			client.tcp.ip.port = 443;
 
-		TRY(http_initialize(&client, "Sending update URL query"));
+		TRY(http_init(&client, "Sending update URL query"));
 
 		snprintf(buffer, sizeof(buffer), "%s|%s",
 			 info->creds.username, info->creds.password);
@@ -88,7 +88,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
 		rc  = http_transaction(&client, &trans);
-		rc |= http_shutdown(&client);
+		rc |= http_exit(&client);
 
 		http_destruct(&client, 1);
 

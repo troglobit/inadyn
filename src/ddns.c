@@ -148,7 +148,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	http_t *http = &ctx->http_to_ip_server[servernum];
 	http_trans_t *trans;
 
-	DO(http_initialize(http, "Checking for IP# change"));
+	DO(http_init(http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
 	memset(ctx->work_buf, 0, ctx->work_buflen);
@@ -165,7 +165,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	if (trans->status != 200)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
-	http_shutdown(http);
+	http_exit(http);
 	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
 
 	return rc;
@@ -299,7 +299,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (client->ssl_enabled) /* XXX: Fix this better, possibly in http_init() */
 		client->tcp.ip.port = 443;
 
-	DO(http_initialize(client, "Sending IP# update to DDNS server"));
+	DO(http_init(client, "Sending IP# update to DDNS server"));
 
 	memset(ctx->work_buf, 0, ctx->work_buflen);
 	trans.req_len     = info->system->request(ctx, info, alias);
@@ -318,7 +318,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		logit(LOG_DEBUG, "DDNS server response: %s", trans.p_rsp);
 
 	if (rc) {
-		http_shutdown(client);
+		http_exit(client);
 		return rc;
 	}
 
@@ -337,7 +337,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 			(*changed)++;
 	}
 
-	http_shutdown(client);
+	http_exit(client);
 
 	return rc;
 }

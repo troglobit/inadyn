@@ -45,7 +45,7 @@ int tcp_destruct(tcp_sock_t *tcp)
 	ASSERT(tcp);
 
 	if (tcp->initialized == 1)
-		tcp_shutdown(tcp);
+		tcp_exit(tcp);
 
 	return ip_destruct(&tcp->ip);
 }
@@ -95,7 +95,7 @@ static int check_error(int sd, int msec)
 	return 1;
 }
 
-/* On error tcp_shutdown() is called by upper layers. */
+/* On error tcp_exit() is called by upper layers. */
 int tcp_init(tcp_sock_t *tcp, char *msg)
 {
 	int sd, rc = 0;
@@ -120,7 +120,7 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 			break;
 		}
 
-		/* Call to socket() OK, allow tcp_shutdown() to run to
+		/* Call to socket() OK, allow tcp_exit() to run to
 		 * prevent socket leak if any of the below calls fail. */
 		tcp->ip.socket = sd;
 		tcp->initialized  = 1;
@@ -157,14 +157,14 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 	} while (0);
 
 	if (rc) {
-		tcp_shutdown(tcp);
+		tcp_exit(tcp);
 		return rc;
 	}
 
 	return 0;
 }
 
-int tcp_shutdown(tcp_sock_t *tcp)
+int tcp_exit(tcp_sock_t *tcp)
 {
 	ASSERT(tcp);
 
@@ -173,7 +173,7 @@ int tcp_shutdown(tcp_sock_t *tcp)
 
 	tcp->initialized = 0;
 
-	return ip_shutdown(&tcp->ip);
+	return ip_exit(&tcp->ip);
 }
 
 int tcp_send(tcp_sock_t *tcp, const char *buf, int len)

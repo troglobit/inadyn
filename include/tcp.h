@@ -38,7 +38,7 @@ int tcp_construct          (tcp_sock_t *tcp);
 int tcp_destruct           (tcp_sock_t *tcp);
 
 int tcp_init               (tcp_sock_t *tcp, char *msg);
-int tcp_shutdown           (tcp_sock_t *tcp);
+int tcp_exit               (tcp_sock_t *tcp);
 
 int tcp_send               (tcp_sock_t *tcp, const char *buf, int len);
 int tcp_recv               (tcp_sock_t *tcp,       char *buf, int len, int *recv_len);

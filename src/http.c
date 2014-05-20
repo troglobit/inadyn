@@ -67,7 +67,7 @@ static int local_set_params(http_t *client)
 }
 
 /* Sets up the object. */
-int http_initialize(http_t *client, char *msg)
+int http_init(http_t *client, char *msg)
 {
 	int rc;
 
@@ -80,7 +80,7 @@ int http_initialize(http_t *client, char *msg)
 	while (0);
 
 	if (rc) {
-		http_shutdown(client);
+		http_exit(client);
 		return rc;
 	}
 
@@ -90,7 +90,7 @@ int http_initialize(http_t *client, char *msg)
 }
 
 /* Disconnect and some other clean up. */
-int http_shutdown(http_t *client)
+int http_exit(http_t *client)
 {
 	ASSERT(client);
 
@@ -101,7 +101,7 @@ int http_shutdown(http_t *client)
 	if (client->ssl_enabled)
 		ssl_exit(client);
 
-	return tcp_shutdown(&client->tcp);
+	return tcp_exit(&client->tcp);
 }
 
 static void http_response_parse(http_trans_t *trans)
