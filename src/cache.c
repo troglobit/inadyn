@@ -56,6 +56,7 @@ static int nslookup(ddns_alias_t *alias)
 		/* DNS reply for alias found, convert to IP# */
 		if (!getnameinfo(result->ai_addr, result->ai_addrlen, address, sizeof(address), NULL, 0, NI_NUMERICHOST)) {
 			/* Update local record for next checkip call. */
+			alias->last_update = 0;
 			strncpy(alias->address, address, sizeof(alias->address));
 			logit(LOG_INFO, "Resolving hostname %s => IP# %s", alias->name, address);
 		}
