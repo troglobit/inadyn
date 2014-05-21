@@ -142,9 +142,6 @@ static void free_context(ddns_t *ctx)
 	free(ctx->cfgfile);
 	ctx->cfgfile = NULL;
 
-	free(ctx->pidfile);
-	ctx->pidfile = NULL;
-
 	free(ctx->external_command);
 	ctx->external_command = NULL;
 

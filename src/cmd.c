@@ -35,6 +35,7 @@
 
 static int infid;
 extern char *cache_dir;
+extern char *pidfile_path;
 
 /* command line options */
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
@@ -951,7 +952,7 @@ static int set_pidfile(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	ctx->pidfile = strdup(cmd->argv[num]);
+	pidfile_path = strdup(cmd->argv[num]);
 
 	return 0;
 }
@@ -1340,7 +1341,7 @@ static int default_config(ddns_t *ctx)
 		ctx->info[i].wildcard = 0;
 
 	/* pidfile */
-	ctx->pidfile = strdup(DEFAULT_PIDFILE);
+	pidfile_path = strdup(DEFAULT_PIDFILE);
 
 	return 0;
 }

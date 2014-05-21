@@ -36,7 +36,7 @@
 
 #define MAXSTRING 1024
 
-static char *pidfile_path = NULL;
+char *pidfile_path = NULL;
 
 /**
     The dbg destination.
@@ -422,8 +422,8 @@ static int mkparentdir(char *file)
 
 static void pidexit(void)
 {
-	if (pidfile_path)
-		unlink(pidfile_path);
+	unlink(pidfile_path);
+	free(pidfile_path);
 }
 
 static int pidfile(char *pidfile)
@@ -443,7 +443,6 @@ static int pidfile(char *pidfile)
 	fprintf(fp, "%u\n", getpid());
 	fclose(fp);
 
-	pidfile_path = pidfile;
 	atexit(pidexit);
 
 	return 0;
@@ -453,10 +452,9 @@ static int pidfile(char *pidfile)
  * we are restarted we cannot otherwise make sure we've not already updated
  * the IP -- and the user will be locked-out of their DDNS server provider
  * for excessive updates. */
-int os_check_perms(void *arg)
+int os_check_perms(void *UNUSED(arg))
 {
 	char path[256];
-	ddns_t *ctx = arg;
 
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
@@ -470,7 +468,7 @@ int os_check_perms(void *arg)
 	}
 
 	/* Not creating a pidfile is OK, the cache file is the critical point. */
-	pidfile(ctx->pidfile);
+	pidfile(pidfile_path);
 
 	return 0;
 }

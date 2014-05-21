@@ -37,7 +37,6 @@
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define RUNTIME_DATA_DIR	"/var/run/inadyn"
-#define CACHE_FILE		RUNTIME_DATA_DIR "/%s.cache"
 #define DEFAULT_PIDFILE		RUNTIME_DATA_DIR "/inadyn.pid"
 
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
@@ -134,7 +133,6 @@ typedef struct {
 /* Client context */
 typedef struct {
 	char          *cfgfile;
-	char          *pidfile;
 	char          *external_command;
 
 	ddns_dbg_t     dbg;
