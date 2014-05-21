@@ -69,7 +69,7 @@ static int local_set_params(http_t *client)
 /* Sets up the object. */
 int http_init(http_t *client, char *msg)
 {
-	int rc;
+	int rc = 0;
 
 	do {
 		TRY(local_set_params(client));
