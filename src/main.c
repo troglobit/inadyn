@@ -159,6 +159,11 @@ int main(int argc, char *argv[])
 	int rc = 0, restart;
 	ddns_t *ctx = NULL;
 
+#ifdef CONFIG_OPENSSL
+	SSL_library_init();
+	SSL_load_error_strings();
+#endif
+
 	do {
 		restart = 0;
 
@@ -175,6 +180,10 @@ int main(int argc, char *argv[])
 	} while (restart);
 
 	os_close_dbg_output();
+
+#ifdef CONFIG_OPENSSL
+	ERR_free_strings();
+#endif
 
 	return rc;
 }

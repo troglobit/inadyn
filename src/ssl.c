@@ -32,9 +32,6 @@ int ssl_init(http_t *client, char *msg)
 	char *subject, *issuer;
 	X509 *cert;
 
-	SSLeay_add_ssl_algorithms();
-	SSL_load_error_strings();
-
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
 
 	client->ssl_ctx = SSL_CTX_new(SSLv3_client_method());
