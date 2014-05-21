@@ -410,39 +410,32 @@ static int update_alias_table(ddns_t *ctx)
 
 static int get_encoded_user_passwd(ddns_t *ctx)
 {
-	int rc = 0;
-	const char *format = "%s:%s";
+	int i, rc = 0;
 	char *buf = NULL;
-	int size, actual_len;
-	int i = 0;
-	char *encode = NULL;
-	int rc2;
+	size_t len;
+	const char *format = "%s:%s"; /* : + \0 = 2 bytes */
 
-	do {
+	/* Take base64 encoding into account when allocating buf */
+	len = strlen(ctx->info[0].creds.password) + strlen(ctx->info[0].creds.username) + 2;
+	len = (len / 3 + ((len % 3) ? 1 : 0)) * 4; /* output length = 4 * [input len / 3] */
+
+	buf = malloc(len);
+	if (!buf)
+		return RC_OUT_OF_MEMORY;
+
+	for (i = 0; i < ctx->info_count; i++) {
+		int rc2;
+		char *encode;
 		size_t dlen = 0;
 		ddns_info_t *info = &ctx->info[i];
 
-		size = strlen(info->creds.password) + strlen(info->creds.username) + strlen(format) + 1;
-
-		buf = (char *)malloc(size);
-		if (!buf) {
-			info->creds.encoded = 0;
-			rc = RC_OUT_OF_MEMORY;
-			break;
-		}
-
-		actual_len = sprintf(buf, format, info->creds.username, info->creds.password);
-		if (actual_len >= size) {
-			info->creds.encoded = 0;
-			rc = RC_OUT_BUFFER_OVERFLOW;
-			break;
-		}
+		info->creds.encoded = 0;
+		snprintf(buf, len, format, info->creds.username, info->creds.password);
 
 		/* query required buffer size for base64 encoded data */
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
-		encode = (char *)malloc(dlen);
-		if (encode == NULL) {
-			info->creds.encoded = 0;
+		encode = malloc(dlen);
+		if (!encode) {
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
@@ -450,7 +443,7 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		/* encode */
 		rc2 = base64_encode((unsigned char *)encode, &dlen, (unsigned char *)buf, strlen(buf));
 		if (rc2 != 0) {
-			info->creds.encoded = 0;
+			free(encode);
 			rc = RC_OUT_BUFFER_OVERFLOW;
 			break;
 		}
@@ -458,14 +451,9 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
-
-		free(buf);
-		buf = NULL;
 	}
-	while (++i < ctx->info_count);
 
-	if (buf)
-		free(buf);
+	free(buf);
 
 	return rc;
 }
