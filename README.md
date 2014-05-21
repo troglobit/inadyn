@@ -2,9 +2,13 @@ README
 ======
 [![Build Status](https://travis-ci.org/troglobit/inadyn.png?branch=master)](https://travis-ci.org/troglobit/inadyn)
 
-Inadyn is a simple and small dynamic DNS (DDNS) client written in C.
-DDNS is a popular service for Internet users with dynamically allocated
-IP addresses.
+Inadyn is a small and simple
+[DDNS](http://en.wikipedia.org/wiki/Dynamic_DNS) client with HTTPS
+support.  It is commonly available in many GNU/Linux distributions, used
+in off-the-shelf routers and Internet gateways to automate the task of
+keeping your DNS record up to date with any IP address changes from your
+[ISP](http://en.wikipedia.org/wiki/ISP).  It can also be used in
+installations with redundant (backup) connections to the Internet.
 
 If your ISP provides you with a DHCP or PPPoE/PPPoA connection you risk
 losing your IP address every time you reconnect, or in DHCP even when
@@ -17,7 +21,9 @@ on demand when your IP changes.
 Inadyn can maintain multiple host names with the same IP address, and
 has a web based IP detection which runs well behind a NAT router.
 
-Common DDNS service providers supported by Inadyn:
+The following DDNS providers are supported natively, other providers,
+like http://twoDNS.de for instance, can be supported using the generic
+DDNS plugin:
 
 * http://www.dyndns.org
 * http://freedns.afraid.org
@@ -41,10 +47,10 @@ take a small fee, but also provide more domains to choose from.
 
 Inadyn v1.99.8 and later support HTTPS, for DDNS providers that support
 this (you must check this yourself).  Tested are DynDNS and FreeDNS.
-Using HTTPS is recommended since it protects your credentials from wire
-snooping and further reduces the risk of someone hijacking your account.
+Using HTTPS is recommended since it protects your credentials from being
+snooped and further reduces the risk of someone hijacking your account.
 
-Note: No certificate validation is currently in place, patches welcome!
+Note: No HTTPS certificate validation is currently done, patches welcome!
 
 
 Example Configuration
