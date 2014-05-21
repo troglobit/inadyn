@@ -45,7 +45,6 @@ char *cache_dir = NULL;
 static int nslookup(ddns_alias_t *alias)
 {
 	int error;
-	char address[MAX_ADDRESS_LEN];
 	struct addrinfo hints;
 	struct addrinfo *result;
 
@@ -57,6 +56,8 @@ static int nslookup(ddns_alias_t *alias)
 
 	error = getaddrinfo(alias->name, NULL, &hints, &result);
 	if (!error) {
+		char address[MAX_ADDRESS_LEN];
+
 		/* DNS reply for alias found, convert to IP# */
 		if (!getnameinfo(result->ai_addr, result->ai_addrlen, address, sizeof(address), NULL, 0, NI_NUMERICHOST)) {
 			/* Update local record for next checkip call. */
@@ -78,7 +79,6 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 {
 	FILE *fp;
         char path[256];
-	char address[MAX_ADDRESS_LEN];
 
         alias->last_update = 0;
         memset(alias->address, 0, sizeof(alias->address));
@@ -93,6 +93,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
                 nslookup(alias);
 	} else {
 		struct stat st;
+		char address[MAX_ADDRESS_LEN];
 
 		if (fgets(address, sizeof(address), fp)) {
 			logit(LOG_INFO, "Cached IP# %s from previous invocation.", address);

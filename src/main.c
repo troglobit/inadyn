@@ -35,7 +35,6 @@ static int alloc_context(ddns_t **pctx)
 	ddns_t *ctx;
 	int http_to_dyndns_constructed = 0;
 	int http_to_ip_constructed = 0;
-	int i;
 
 	if (!pctx)
 		return RC_INVALID_POINTER;
@@ -45,6 +44,8 @@ static int alloc_context(ddns_t **pctx)
 		return RC_OUT_OF_MEMORY;
 
 	do {
+		int i;
+
 		ctx = *pctx;
 		memset(ctx, 0, sizeof(ddns_t));
 

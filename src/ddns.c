@@ -182,7 +182,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 */
 static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 {
-	int i, j, found = 0;
+	int found = 0;
 	char *accept = "0123456789.";
 	char *needle, *haystack;
 	struct in_addr addr;
@@ -213,10 +213,11 @@ static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 	while (needle);
 
 	if (found) {
-		int anychange = 0;
+		int i, anychange = 0;
 		char *address = inet_ntoa(addr);
 
 		for (i = 0; i < ctx->info_count; i++) {
+			int j;
 			ddns_info_t *info = &ctx->info[i];
 
 			for (j = 0; j < info->alias_count; j++) {
@@ -523,14 +524,14 @@ static int init_context(ddns_t *ctx)
 */
 static int check_address(ddns_t *ctx)
 {
-	int servernum = 0;  /* server to use for checking IP, index 0 by default */
-
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
 	if (ctx->check_interface) {
 		DO(check_interface_address(ctx));
 	} else {
+		int servernum = 0;  /* server to use for checking IP, index 0 by default */
+
 		/* Ask IP server something so he will respond and give me my IP */
 		DO(server_transaction(ctx, servernum));
 		if (ctx->dbg.level > 1) {

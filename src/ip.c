@@ -206,7 +206,6 @@ int ip_recv(ip_sock_t *ip, char *buf, int len, int *recv_len)
 	int rc = 0;
 	int remaining_bytes = len;
 	int total_bytes = 0;
-	int bytes = 0;
 
 	ASSERT(ip);
 	ASSERT(buf);
@@ -216,6 +215,7 @@ int ip_recv(ip_sock_t *ip, char *buf, int len, int *recv_len)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 
 	while (remaining_bytes > 0) {
+		int bytes;
 		int chunk_size = remaining_bytes > IP_DEFAULT_READ_CHUNK_SIZE
 			? IP_DEFAULT_READ_CHUNK_SIZE
 			: remaining_bytes;

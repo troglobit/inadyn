@@ -98,7 +98,7 @@ static int check_error(int sd, int msec)
 /* On error tcp_exit() is called by upper layers. */
 int tcp_init(tcp_sock_t *tcp, char *msg)
 {
-	int sd, rc = 0;
+	int rc = 0;
 	char host[NI_MAXHOST];
 	struct timeval sv;
 	struct sockaddr sa;
@@ -107,6 +107,8 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 	ASSERT(tcp);
 
 	do {
+		int sd;
+
 		TRY(local_set_params(tcp));
 		TRY(ip_init(&tcp->ip));
 
