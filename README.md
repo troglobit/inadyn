@@ -33,6 +33,7 @@ Common DDNS service providers supported by Inadyn:
 * http://www.sitelutions.com
 * http://www.dnsexit.com
 * http://www.changeip.com
+* http://www.zerigo.com
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.

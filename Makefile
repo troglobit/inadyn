@@ -32,7 +32,8 @@ PLUGIN_OBJS   = src/plugin.o		plugins/common.o	\
 		plugins/dnsexit.o	plugins/easydns.o	\
 		plugins/freedns.o	plugins/generic.o	\
 		plugins/sitelutions.o	plugins/tunnelbroker.o	\
-		plugins/tzo.o		plugins/zoneedit.o
+		plugins/tzo.o		plugins/zoneedit.o	\
+		plugins/zerigo.o
 
 BASE_OBJS     = src/main.o	src/ddns.o	src/cache.o	src/error.o	\
 		src/cmd.o	src/os.o					\
