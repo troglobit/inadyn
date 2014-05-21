@@ -87,7 +87,7 @@ void os_printf(int prio, char *fmt, ...)
 {
 	size_t len;
 	va_list args;
-	static char message[MAXSTRING + 1];
+	char message[MAXSTRING + 1] = "";
 
 	message[MAXSTRING] = 0;
 	va_start(args, fmt);
