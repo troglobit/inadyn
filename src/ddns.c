@@ -152,6 +152,9 @@ static int server_transaction(ddns_t *ctx, int servernum)
 
 	/* Prepare request for IP server */
 	memset(ctx->work_buf, 0, ctx->work_buflen);
+	memset(ctx->request_buf, 0, ctx->request_buflen);
+	memset(&ctx->http_transaction, 0, sizeof(ctx->http_transaction));
+
 	trans              = &ctx->http_transaction;
 	trans->req_len     = get_req_for_ip_server(ctx, &ctx->info[servernum]);
 	trans->p_req       = ctx->request_buf;
@@ -302,6 +305,9 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	DO(http_init(client, "Sending IP# update to DDNS server"));
 
 	memset(ctx->work_buf, 0, ctx->work_buflen);
+	memset(ctx->request_buf, 0, ctx->request_buflen);
+	memset(&trans, 0, sizeof(trans));
+
 	trans.req_len     = info->system->request(ctx, info, alias);
 	trans.p_req       = (char *)ctx->request_buf;
 	trans.p_rsp       = (char *)ctx->work_buf;
