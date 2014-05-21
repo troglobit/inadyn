@@ -118,7 +118,11 @@ static void http_response_parse(http_trans_t *trans)
 		trans->p_rsp_body = body;
 	}
 
-	if (sscanf(trans->p_rsp, "HTTP/1.%*c %d %255[^\r\n]", &status, trans->status_desc) == 2)
+	/* %*c         : HTTP/1.0, 1.1 etc, discard read value
+	 * %4d         : HTTP status code, e.g. 200
+	 * %255[^\r\n] : HTTP status text, e.g. OK -- Reads max 255 bytes, including \0, not \r or \n
+	 */
+	if (sscanf(trans->p_rsp, "HTTP/1.%*c %4d %255[^\r\n]", &status, trans->status_desc) == 2)
 		trans->status = status;
 }
 
