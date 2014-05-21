@@ -70,7 +70,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 
 	tmp = strstr(trans->p_rsp_body, "\n");
 	if (tmp)
-		sscanf(++tmp, "%d=", &code);
+		sscanf(++tmp, "%4d=", &code);
 
 	switch (code) {
 	case 0:

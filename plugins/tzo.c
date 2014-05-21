@@ -71,7 +71,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 
 	DO(http_status_valid(trans->status));
 
-	sscanf(trans->p_rsp_body, "%d ", &code);
+	sscanf(trans->p_rsp_body, "%4d ", &code);
 	switch (code) {
 	case 200:
 	case 304:
