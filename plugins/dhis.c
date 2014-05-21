@@ -1,4 +1,4 @@
-/* Plugin for Zerigo
+/* Plugin for DHIS.org
  *
  * Copyright (C) 2011  Bryan Hoover <bhoover@wecs.com>
  * Copyright (C) 2014  Joachim Nilsson <troglobit@gmail.com>
@@ -22,77 +22,52 @@
 
 #include "plugin.h"
 
-#define ZERIGO_UPDATE_IP_REQUEST					\
-	"GET %s%s&"							\
-	"ip=%s "							\
+/* is.dhis.org specific update request format */
+#define DHIS_UPDATE_IP_REQUEST						\
+	"GET %s"							\
+	"hostname=%s&"							\
+	"password=%s&"							\
+	"ipaddr=%s&"							\
+	"updatetimeout=0 "						\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin = {
-	.name         = "default@zerigo.com",
+	.name         = "default@dhis.org",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "checkip.zerigo.com",
-	.checkip_url  = "/",
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 
-	.server_name  = "update.zerigo.com",
-	.server_url   = "/dynamic?host="
+	.server_name  = "is.dhis.org",
+	.server_url   =  "/?"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			ZERIGO_UPDATE_IP_REQUEST,
+			DHIS_UPDATE_IP_REQUEST,
 			info->server_url,
 			alias->name,
+			info->creds.password,
 			alias->address,
-			info->server_name.name,
-			info->creds.encoded_password);
+			info->server_name.name);
 }
 
-/*
- * Zerigo return codes https://www.zerigo.com/docs/apis/dns/1.1
- *
- * OK
- *  Status: 2xx
- *
- * Invalid argument/password/alias/etc
- *  Status: 4xx
- *
- * Server error
- *  Status: 5xx
- */
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
 {
-	char *ptr, *rsp = trans->p_rsp_body;
+	char *rsp = trans->p_rsp_body;
 
 	DO(http_status_valid(trans->status));
 
-	ptr = strstr(rsp, "Status: ");
-	if (ptr) {
-		int code = 0;
-
-		sscanf(++ptr, "%4d", &code);
-		code /= 100;
-
-		switch (code) {
-		case 2:
-			return 0;
-			
-		case 4:
-			return RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
-
-		case 5:
-			return RC_DYNDNS_RSP_RETRY_LATER;
-		}
-	}
+	if (strstr(rsp, alias->address))
+		return 0;
 
 	return RC_DYNDNS_RSP_NOTOK;
 }

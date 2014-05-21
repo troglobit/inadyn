@@ -88,7 +88,14 @@ http://www.dnsexit.com
 http://www.changeip.com
 .It
 http://www.zerigo.com
+.It
+http://www.dhis.org
 .El
+.Pp
+DDNS providers not listed here, like http://twoDNS.de, can often be
+configured using the generic DDNS provider plugin.  See
+.Xr inadyn.conf 5
+for example configurations.
 .Pp
 The basic operation of
 .Nm inadyn
@@ -167,6 +174,8 @@ http://www.dnsexit.com
 http://www.changeip.com
 .It Cm default@zerigo.com
 http://www.zerigo.com
+.It Cm default@dhis.org
+http://www.dhis.org
 .It Cm custom@http_srv_basic_auth
 Try this if your DDNS service provider is not listed
 .El
@@ -393,8 +402,10 @@ writes its process ID to
 .Sh FILES
 .Bl -tag -width /var/run/inadyn/inadyn.cache -compact
 .It Pa /etc/inadyn.conf
-.It Pa /var/run/inadyn/inadyn.cache
 .It Pa /var/run/inadyn/inadyn.pid
+.It Pa /var/run/inadyn/dyndns.org.cache
+.It Pa /var/run/inadyn/freedns.afraid.org.cache
+.It Pa ... one .cache file per DDNS provider
 .El
 .Sh SEE ALSO
 .Xr inadyn.conf 5

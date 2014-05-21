@@ -41,17 +41,23 @@ The \\ character can be used as an escape character.
 .br
 background
 .br
-verbose 1
+verbose        1
 .br
-period  300
+period         300
 .br
-logfile /var/log/inadyn.log
+startup-delay  60
 .br
-pidfile /var/run/inadyn.pid
+# logfile      /var/log/inadyn.log
+.br
+# pidfile      /var/run/inadyn.pid
+.br
+cache-dir      /etc/inadyn
 .Pp
 # Primary account, used for most operations
 .br
 system default@dyndns.org
+.br
+    ssl
 .br
     username account
 .br
@@ -72,6 +78,25 @@ system default@no-ip.com
     password secret
 .br
     alias example.no-ip.com
+.Pp
+# Generic example for twoDNS.de
+.br
+system custom@http_srv_basic_auth
+.br
+    ssl
+.br
+    checkip-url checkip.two-dns.de /
+.br
+    server-name update.twodns.de
+.br
+    server-url /update?hostname=
+.br
+    username account
+.br
+    password secret
+.br
+    alias example.dd-dns.de
+.br
 .Sh "SEE ALSO"
 .Xr inadyn 8
 .Pp
