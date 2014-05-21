@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+Version 1.99.9: May 21 2014
+---------------------------
+- Fix memory leak in new HTTPS support, found by Valgrind
+- Support for Zerigo DDNS provider
+- Support for DHIS DDNS provider
+- Other misc. Valgrind and Cppcheck fixes
+
 Version 1.99.8: May 20 2014
 ---------------------------
 - Support for HTTPS to secure login credentials at DNS update, issue #36
