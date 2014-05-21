@@ -23,7 +23,7 @@ has a web based IP detection which runs well behind a NAT router.
 
 The following DDNS providers are supported natively, other providers,
 like http://twoDNS.de for instance, can be supported using the generic
-DDNS plugin:
+DDNS plugin.  See below for configuration examples.
 
 * http://www.dyndns.org
 * http://freedns.afraid.org
@@ -65,10 +65,10 @@ Feature is courtesy of [Christian Eyrich](http://eyrich-net.org/programmiertes.h
 Example /etc/inadyn.conf:
 
     background
-    verbose 1
-    period  300
-    cache-dir /mnt/ddns
-    startup-delay 60
+    verbose        1
+    period         300
+    cache-dir      /mnt/ddns
+    startup-delay  60
     #logfile /var/log/ddns.log
     #pidfile /var/run/ddns.pid
     
@@ -108,9 +108,9 @@ Aside from the dedicated DDNS provider support Inadyn also has a generic
 DDNS provider plugin.  A DDNS provider like twoDNS.de can be setup like
 this:
 
-    period        300
-    startup-delay 60
-    cache-dir     /etc/inadyn
+    period         300
+    startup-delay  60
+    cache-dir      /etc/inadyn
 
     system custom@http_srv_basic_auth
         ssl
@@ -136,3 +136,4 @@ is currently being developed and maintained by
 [Joachim Nilsson](http://troglobit.com) at
 [GitHub](http://github.com/troglobit/inadyn).  Please file bug reports,
 clone it, or send pull requests for bug fixes and proposed extensions.
+
