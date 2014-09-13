@@ -105,7 +105,7 @@ static int alloc_context(ddns_t **pctx)
 			free(ctx->work_buf);
 
 		if (ctx->request_buf)
-			free(ctx->work_buf);
+			free(ctx->request_buf);
 
 		if (http_to_dyndns_constructed)
 			http_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
