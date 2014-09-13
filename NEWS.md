@@ -1,6 +1,11 @@
 ChangeLog
 =========
 
+Version 1.99.10: Sep 13 2014
+----------------------------
+- Add support for GnuTLS as the default SSL library, to get around GPL
+  incompatiblities with OpenSSL when the latter is not a system library.
+
 Version 1.99.9: May 21 2014
 ---------------------------
 - Fix memory leak in new HTTPS support, found by Valgrind
