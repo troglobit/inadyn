@@ -36,7 +36,7 @@ PLUGIN_OBJS   = src/plugin.o		plugins/common.o	\
 		plugins/zerigo.o	plugins/dhis.o
 
 BASE_OBJS     = src/main.o	src/ddns.o	src/cache.o	src/error.o	\
-		src/cmd.o	src/os.o					\
+		src/cmd.o	src/os.o	src/strlcpy.o	src/strlcat.o	\
 		src/http.o	src/ssl.o	src/tcp.o	src/ip.o	\
 	        src/sha1.o	src/base64.o	src/md5.o
 
