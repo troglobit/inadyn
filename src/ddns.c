@@ -428,6 +428,7 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 	buf = calloc(len, sizeof(char));
 	if (!buf)
 		return RC_OUT_OF_MEMORY;
+	logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
 
 	for (i = 0; i < ctx->info_count; i++) {
 		int rc2;
@@ -445,9 +446,13 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		strlcat(buf, info->creds.password, len);
 
 		/* query required buffer size for base64 encoded data */
+		logit(LOG_DEBUG, "Checking required size for base64 encoding of user:pass for %s ...", info->system->name);
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
+
+		logit(LOG_DEBUG, "Allocating %zd bytes buffer for base64 encoding.", dlen);
 		encode = malloc(dlen);
 		if (!encode) {
+			logit(LOG_WARNING, "Out of memory when base64 encoding user:pass for %s!", info->system->name);
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
@@ -455,16 +460,19 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		/* encode */
 		rc2 = base64_encode((unsigned char *)encode, &dlen, (unsigned char *)buf, strlen(buf));
 		if (rc2 != 0) {
+			logit(LOG_WARNING, "Failed base64 encoding of user:pass for %s!", info->system->name);
 			free(encode);
 			rc = RC_OUT_BUFFER_OVERFLOW;
 			break;
 		}
 
+		logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
 	}
 
+	logit(LOG_DEBUG, "Freeing temp encoding buffer %p", buf);
 	free(buf);
 
 	return rc;
