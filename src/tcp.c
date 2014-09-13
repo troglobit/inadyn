@@ -138,8 +138,10 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		/* Attempt to set TCP timers, silently fall back to OS defaults */
 		sv.tv_sec  =  tcp->ip.timeout / 1000;
 		sv.tv_usec = (tcp->ip.timeout % 1000) * 1000;
-		setsockopt(tcp->ip.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv));
-		setsockopt(tcp->ip.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv));
+		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv)))
+			logit(LOG_WARNING, "Failed setting receive timeout socket option: %m");
+		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv)))
+			logit(LOG_WARNING, "Failed setting send timeout socket option: %m");
 
 		sa    = tcp->ip.remote_addr;
 		salen = tcp->ip.remote_len;
