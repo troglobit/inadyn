@@ -440,7 +440,7 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		/* Concatenate username and password with a ':', without
 		 * snprintf(), since that can cause information loss if
 		 * the password has "\=" or similar in it, issue #57 */
-		strlcat(buf, info->creds.username, len);
+		strlcpy(buf, info->creds.username, len);
 		strlcat(buf, ":", len);
 		strlcat(buf, info->creds.password, len);
 
