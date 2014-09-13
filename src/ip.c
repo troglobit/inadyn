@@ -34,7 +34,7 @@
 
 #include "debug.h"
 #include "ip.h"
-
+#include "strlfun.h"
 
 int ip_construct(ip_sock_t *ip)
 {
@@ -91,7 +91,7 @@ int ip_init(ip_sock_t *ip)
 			}
 
 			memset(&ifr, 0, sizeof(struct ifreq));
-			strncpy(ifr.ifr_name, ip->ifname, IFNAMSIZ);
+			strlcpy(ifr.ifr_name, ip->ifname, IFNAMSIZ);
 			if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
 				ip->local_addr.sin_family = AF_INET;
 				ip->local_addr.sin_port = htons(0);

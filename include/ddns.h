@@ -29,6 +29,7 @@
 #include "http.h"
 #include "debug.h"
 #include "plugin.h"
+#include "strlfun.h"
 
 #define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION

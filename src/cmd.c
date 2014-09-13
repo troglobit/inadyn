@@ -303,7 +303,7 @@ int cmd_add_val(cmd_data_t *cmd, char *p_val)
 	if (!p)
 		return RC_OUT_OF_MEMORY;
 
-	strcpy(p, p_val);
+	strlcpy(p, p_val, strlen(p_val) + 1);
 	cmd->argv[cmd->argc] = p;
 	cmd->argc++;
 
@@ -546,7 +546,7 @@ static int get_logfile_name(cmd_data_t *cmd, int num, void *context)
 	if (sizeof(ctx->dbg.p_logfilename) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->dbg.p_logfilename, cmd->argv[num]);
+	strlcpy(ctx->dbg.p_logfilename, cmd->argv[num], sizeof(ctx->dbg.p_logfilename));
 
 	return 0;
 }
@@ -561,7 +561,7 @@ static int get_username_handler(cmd_data_t *cmd, int num, void *context)
 	if (sizeof(ctx->info[infid].creds.username) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[infid].creds.username, cmd->argv[num]);
+	strlcpy(ctx->info[infid].creds.username, cmd->argv[num], sizeof(ctx->info[infid].creds.username));
 
 	return 0;
 }
@@ -576,7 +576,7 @@ static int get_password_handler(cmd_data_t *cmd, int num, void *context)
 	if (sizeof(ctx->info[infid].creds.password) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[infid].creds.password, (cmd->argv[num]));
+	strlcpy(ctx->info[infid].creds.password, cmd->argv[num], sizeof(ctx->info[infid].creds.password));
 
 	return 0;
 }
@@ -594,29 +594,32 @@ static int get_alias_handler(cmd_data_t *cmd, int num, void *context)
 	if (sizeof(ctx->info[infid].alias[ctx->info[infid].alias_count].name) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[infid].alias[ctx->info[infid].alias_count].name, (cmd->argv[num]));
+	strlcpy(ctx->info[infid].alias[ctx->info[infid].alias_count].name, cmd->argv[num], sizeof(ctx->info[infid].alias[ctx->info[infid].alias_count].name));
 	ctx->info[infid].alias_count++;
 
 	return 0;
 }
 
-static int get_name_and_port(char *p_src, char *p_dest_name, int *p_dest_port)
+/* p_len is the size of the p_dest_name buffer */
+static int get_name_and_port(char *p_src, char *p_dest_name, int *p_dest_port, size_t p_len)
 {
 	const char *p_port = strstr(p_src, ":");
 
 	if (p_port) {
-		int port_nr, len;
-		int port_ok = sscanf(p_port + 1, "%d", &port_nr);
+		int port_nr, port_ok = sscanf(p_port + 1, "%d", &port_nr);
+		size_t len;
 
 		if (port_ok != 1)
 			return RC_DYNDNS_INVALID_OPTION;
 
 		*p_dest_port = port_nr;
 		len = p_port - p_src;
+		if (len >= p_len)
+			len = p_len - 1;
 		memcpy(p_dest_name, p_src, len);
 		p_dest_name[len] = 0;
 	} else {
-		strcpy(p_dest_name, p_src);
+		strlcpy(p_dest_name, p_src, p_len);
 	}
 
 	return 0;
@@ -642,14 +645,14 @@ static int get_checkip_name_handler(cmd_data_t *cmd, int num, void *context)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
 	ctx->info[infid].checkip_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].checkip_name.name, &port);
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].checkip_name.name, &port, sizeof(ctx->info[infid].checkip_name.name));
 	if (rc == 0 && port != -1)
 		ctx->info[infid].checkip_name.port = port;
 
 	if (sizeof(ctx->info[infid].checkip_url) < strlen(cmd->argv[num + 1]) + 1)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[infid].checkip_url, cmd->argv[num + 1]);
+	strlcpy(ctx->info[infid].checkip_url, cmd->argv[num + 1], sizeof(ctx->info[infid].checkip_url));
 
 	return rc;
 }
@@ -667,7 +670,7 @@ static int get_dns_server_name_handler(cmd_data_t *cmd, int num, void *context)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
 	ctx->info[infid].server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].server_name.name, &port);
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].server_name.name, &port, sizeof(ctx->info[infid].server_name.name));
 	if (rc == 0 && port != -1)
 		ctx->info[infid].server_name.port = port;
 
@@ -684,7 +687,7 @@ int get_dns_server_url_handler(cmd_data_t *cmd, int num, void *context)
 	if (sizeof(ctx->info[infid].server_url) < strlen(cmd->argv[num]))
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
-	strcpy(ctx->info[infid].server_url, cmd->argv[num]);
+	strlcpy(ctx->info[infid].server_url, cmd->argv[num], sizeof(ctx->info[infid].server_url));
 
 	return 0;
 }
@@ -704,7 +707,7 @@ static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context)
 		return RC_DYNDNS_BUFFER_TOO_SMALL;
 
 	ctx->info[infid].proxy_server_name.port = HTTP_DEFAULT_PORT;
-	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].proxy_server_name.name, &port);
+	rc = get_name_and_port(cmd->argv[num], ctx->info[infid].proxy_server_name.name, &port, sizeof(ctx->info[infid].proxy_server_name.name));
 	if (rc == 0 && port != -1)
 		ctx->info[infid].proxy_server_name.port = port;
 
@@ -1412,13 +1415,13 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(info->checkip_name.name, info->system->checkip_name);
+				strlcpy(info->checkip_name.name, info->system->checkip_name, sizeof(info->checkip_name.name));
 
 				if (sizeof(info->checkip_url) < strlen(info->system->checkip_url)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(info->checkip_url, info->system->checkip_url);
+				strlcpy(info->checkip_url, info->system->checkip_url, sizeof(info->checkip_url));
 			}
 
 			if (strlen(info->server_name.name) == 0) {
@@ -1426,13 +1429,13 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(info->server_name.name, info->system->server_name);
+				strlcpy(info->server_name.name, info->system->server_name, sizeof(info->server_name.name));
 
 				if (sizeof(info->server_url) < strlen(info->system->server_url)) {
 					rc = RC_DYNDNS_BUFFER_TOO_SMALL;
 					break;
 				}
-				strcpy(info->server_url, info->system->server_url);
+				strlcpy(info->server_url, info->system->server_url, sizeof(info->server_url));
 			}
 		}
 		while (++i < ctx->info_count);

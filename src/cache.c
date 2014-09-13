@@ -62,7 +62,7 @@ static int nslookup(ddns_alias_t *alias)
 		if (!getnameinfo(result->ai_addr, result->ai_addrlen, address, sizeof(address), NULL, 0, NI_NUMERICHOST)) {
 			/* Update local record for next checkip call. */
 			alias->last_update = 0;
-			strncpy(alias->address, address, sizeof(alias->address));
+			strlcpy(alias->address, address, sizeof(alias->address));
 			logit(LOG_INFO, "Resolving hostname %s => IP# %s", alias->name, address);
 		}
 
@@ -97,7 +97,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 
 		if (fgets(address, sizeof(address), fp)) {
 			logit(LOG_INFO, "Cached IP# %s from previous invocation.", address);
-                        strncpy(alias->address, address, sizeof(alias->address));
+                        strlcpy(alias->address, address, sizeof(alias->address));
 		}
 
 		/* Initialize time since last update from modification time of cache file. */

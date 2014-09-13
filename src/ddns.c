@@ -121,7 +121,7 @@ static int check_interface_address(ddns_t *ctx)
 			alias->ip_has_changed = strcmp(alias->address, address) != 0;
 			if (alias->ip_has_changed) {
 				anychange++;
-				strcpy(alias->address, address);
+				strlcpy(alias->address, address, sizeof(alias->address));
 			}
 		}
 	}
@@ -226,7 +226,7 @@ static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 				alias->ip_has_changed = strcmp(alias->address, address) != 0;
 				if (alias->ip_has_changed) {
 					anychange++;
-					strcpy(alias->address, address);
+					strlcpy(alias->address, address, sizeof(alias->address));
 				}
 			}
 		}
@@ -364,16 +364,16 @@ static int update_alias_table(ddns_t *ctx)
 			ddns_info_t *info = &ctx->info[i];
 
 			for (j = 0; j < info->alias_count; j++) {
-				char backup[SERVER_NAME_LEN];
 				ddns_alias_t *alias = &info->alias[j];
+				char backup[sizeof(alias->address)];
 
-				strcpy(backup, alias->address);
+				strlcpy(backup, alias->address, sizeof(backup));
 
 				/* TODO: Use random address in 203.0.113.0/24 instead */
 				snprintf(alias->address, sizeof(alias->address), "203.0.113.42");
 				TRY(send_update(ctx, info, alias, NULL));
 
-				strcpy(alias->address, backup);
+				strlcpy(alias->address, backup, sizeof(alias->address));
 			}
 		}
 
@@ -440,9 +440,9 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		/* Concatenate username and password with a ':', without
 		 * snprintf(), since that can cause information loss if
 		 * the password has "\=" or similar in it, issue #57 */
-		strcat(buf, info->creds.username);
-		strcat(buf, ":");
-		strcat(buf, info->creds.password);
+		strlcat(buf, info->creds.username, len);
+		strlcat(buf, ":", len);
+		strlcat(buf, info->creds.password, len);
 
 		/* query required buffer size for base64 encoded data */
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
