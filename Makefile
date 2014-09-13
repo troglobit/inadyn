@@ -40,9 +40,9 @@ BASE_OBJS     = src/main.o	src/ddns.o	src/cache.o	src/error.o	\
 		src/http.o	src/ssl.o	src/tcp.o	src/ip.o	\
 	        src/sha1.o	src/base64.o	src/md5.o
 
-OBJS	      = $(BASE_OBJS) $(PLUGIN_OBJS) $(EXTRA_OBJS)
-SRCS          = $(OBJS:.o=.c)
-DEPS          = $(SRCS:.c=.d)
+OBJS	     := $(BASE_OBJS) $(PLUGIN_OBJS) $(EXTRA_OBJS)
+SRCS         := $(OBJS:.o=.c)
+DEPS         := $(SRCS:.c=.d)
 
 CFLAGS       ?= -O2 -W -Wall -Werror
 CFLAGS       += $(CFG_INC) $(EXTRA_CFLAGS)
@@ -54,16 +54,10 @@ LDFLAGS      ?=
 LDLIBS       += -ldl $(EXTRA_LIBS)
 DISTFILES     = README COPYING LICENSE
 
-# Smart autodependecy generation via GCC -M.
-%.d: %.c
-	@$(SHELL) -ec "$(CC) -MM $(CFLAGS) $(CPPFLAGS) $< \
-		| sed 's,.*: ,$*.o $@ : ,g' > $@; \
-                [ -s $@ ] || rm -f $@"
-
-# Pattern rules
-.c.o:
+# Override default implicit rules
+%.o: %.c
 	$(PRINTF) "  CC      $@\n"
-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -c -MMD -MP -o $@ $<
 
 # Build rules
 all: $(EXEC)
