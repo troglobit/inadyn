@@ -89,7 +89,7 @@ only by you/root) to prevent other users from accessing your DDNS server
 credentials.
 
 Note, here only the DynDNS account uses SSL, the No-IP account will
-still use regular HTTP.
+still use regular HTTP.  See below for SSL build instructions.
 
 The example has two commented out lines: logfile is disabled, causing
 Inadyn to default to use syslog, the pidfile is also commented out, so
@@ -125,6 +125,26 @@ When using the generic plugin you should first inspect the response from
 the DDNS provider.  Inadyn currently looks for a 200 HTTP response OK
 code and the string "good" or "OK" in the HTTP response body.  You may
 have to modify Inadyn manually, any patches for this are most welcome!
+
+
+Building with/witouth HTTPS Support
+===================================
+
+By default Inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
+is the recommended SSL library to use on UNIX distributions which do not
+provide OpenSSL as a system library.  However, when OpenSSL is available
+as a system library, for example in many embedded systems:
+
+    USE_OPENSSL=1 make distclean all
+
+To completely disable the HTTPS support in Inadyn:
+
+    ENABLE_SSL=0 make distclean all
+
+For more details on the OpenSSL and GNU GPL license issue, see:
+
+* https://lists.debian.org/debian-legal/2004/05/msg00595.html
+* https://people.gnome.org/~markmc/openssl-and-the-gpl
 
 
 Contact

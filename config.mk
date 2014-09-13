@@ -4,10 +4,28 @@ EXTRA_OBJS      =
 EXTRA_CPPFLAGS  =
 EXTRA_LIBS      =
 
-# HTTPS support for update, if DDNS provider supports it
+# HTTPS support for update, if DDNS provider supports it.  To disable
+# SSL support in Inadyn, set to 0 outside the Inadyn Makefile
+ENABLE_SSL     ?= 1
+
+# Default to use GnuTLS instead of OpenSSL, for the benefit of Debian
+# and the GNU GPL license stipulations.
+ifeq ($(ENABLE_SSL),1)
+ifndef USE_OPENSSL
+USE_GNUTLS    = 1
+endif
+endif
+
+ifdef USE_GNUTLS
+EXTRA_CPPFLAGS += -DENABLE_SSL -DCONFIG_GNUTLS
+EXTRA_LIBS     += -lgnutls-openssl -lgnutls -lgcrypt
+endif
+
 # This requires dynamic linking to OpenSSL and the libc crypto library
-EXTRA_CPPFLAGS += -DCONFIG_OPENSSL
+ifdef USE_OPENSSL
+EXTRA_CPPFLAGS += -DENABLE_SSL -DCONFIG_OPENSSL
 EXTRA_LIBS     += -lssl -lcrypto
+endif
 
 # Oversimplified arch setup, no smart detection.
 # Possible values: linux, mac, solaris, yourown

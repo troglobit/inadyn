@@ -24,13 +24,16 @@
 
 int ssl_init(http_t *client, char *msg)
 {
-#ifndef CONFIG_OPENSSL
+#ifndef ENABLE_SSL
 	(void)client;
 	(void)msg;
 	return 0;
 #else
 	char *subject, *issuer;
-	X509 *cert;
+#ifdef CONFIG_GNUTLS
+	const
+#endif
+		X509 *cert;
 
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
 
@@ -45,7 +48,6 @@ int ssl_init(http_t *client, char *msg)
 	SSL_set_fd(client->ssl, client->tcp.ip.socket);
 	if (-1 == SSL_connect(client->ssl))
 		return RC_HTTPS_FAILED_CONNECT;
-
 
 	logit(LOG_INFO, "SSL connection using %s", SSL_get_cipher(client->ssl));
 
@@ -76,7 +78,7 @@ int ssl_init(http_t *client, char *msg)
 
 int ssl_exit(http_t *client)
 {
-#ifndef CONFIG_OPENSSL
+#ifndef ENABLE_SSL
 	(void)client;
 	return 0;
 #else
@@ -93,7 +95,7 @@ int ssl_exit(http_t *client)
 
 int ssl_send(http_t *client, const char *buf, int len)
 {
-#ifndef CONFIG_OPENSSL
+#ifndef ENABLE_SSL
 	(void)client;
 	(void)buf;
 	(void)len;
@@ -112,7 +114,7 @@ int ssl_send(http_t *client, const char *buf, int len)
 
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
-#ifndef CONFIG_OPENSSL
+#ifndef ENABLE_SSL
 	(void)client;
 	(void)buf;
 	(void)buf_len;

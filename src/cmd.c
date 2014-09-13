@@ -74,7 +74,7 @@ static int set_verbose_handler(cmd_data_t *cmd, int num, void *context);
 static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context);
 static int get_options_from_file_handler(cmd_data_t *cmd, int num, void *context);
 static int set_iterations_handler(cmd_data_t *cmd, int num, void *context);
-#ifdef CONFIG_OPENSSL
+#ifdef ENABLE_SSL
 static int enable_ssl(cmd_data_t *cmd, int num, void *context);
 #endif
 static int set_syslog_handler(cmd_data_t *cmd, int num, void *context);
@@ -196,7 +196,7 @@ static cmd_desc_t cmd_options_table[] = {
 	{"-P", 1, {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
-#ifdef CONFIG_OPENSSL
+#ifdef ENABLE_SSL
 	{"-s",    0, {enable_ssl, NULL}, ""},
 	{"--ssl", 0, {enable_ssl, NULL}, "Use HTTPS to connect to this DDNS service provider, default HTTP"},
 #endif
@@ -785,7 +785,7 @@ static int forced_update_fake_addr(cmd_data_t *cmd, int num, void *context)
 	return 0;
 }
 
-#ifdef CONFIG_OPENSSL
+#ifdef ENABLE_SSL
 static int enable_ssl(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_t *ctx = (ddns_t *)context;
