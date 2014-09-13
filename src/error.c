@@ -20,7 +20,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#include "error.h"
+#include "../include/error.h"
 #include <stdlib.h>
 
 typedef struct {
