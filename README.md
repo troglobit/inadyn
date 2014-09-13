@@ -1,6 +1,6 @@
 README
 ======
-[![Build Status](https://travis-ci.org/troglobit/inadyn.png?branch=master)](https://travis-ci.org/troglobit/inadyn)
+[![Build Status](https://travis-ci.org/troglobit/inadyn.png?branch=master)](https://travis-ci.org/troglobit/inadyn)[![Coverity Scan Status](https://scan.coverity.com/projects/2981/badge.svg)](https://scan.coverity.com/projects/2981)
 
 Inadyn is a small and simple
 [DDNS](http://en.wikipedia.org/wiki/Dynamic_DNS) client with HTTPS

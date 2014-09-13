@@ -3,4 +3,20 @@ language: c
 compiler:
   - gcc
 
-script: make
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "JFknJb+purjGIPuKNWFBPlsSLX6KohuYmYV4dmisIhjkeFhhXFQNmoabYQ6D+r/mWYPWiNnohoTSyKv8gjj6eC1SbXb+f2dEXHrmAwr36Enbp2tV0XLx7V2KHZzUmKeJxOSwnNUVZxmSvzVbuiDodtU1PJ2YPK0CM0KF/J+wePA="
+
+addons:
+  coverity_scan:
+    project:
+      name: "troglobit/inadyn"
+      description: "Inadyn | Small and Simple DDNS Client"
+    notification_email: troglobit@gmail.com
+    build_command_prepend: "make distclean"
+    build_command:   "make -j5"
+    branch_pattern: master
+
+script: make -j5
