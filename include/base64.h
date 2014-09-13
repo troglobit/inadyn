@@ -29,6 +29,7 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include <stdint.h>
 #include <string.h>
 
 #define ERR_BASE64_BUFFER_TOO_SMALL               -0x002A  /**< Output buffer too small. */

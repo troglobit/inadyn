@@ -29,6 +29,7 @@
 #ifndef MD5_H
 #define MD5_H
 
+#include <stdint.h>
 #include <string.h>
 
 /**

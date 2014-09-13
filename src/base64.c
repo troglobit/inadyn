@@ -1,27 +1,26 @@
-/* RFC 1521 base64 encoding/decoding
+/*
+ *  RFC 1521 base64 encoding/decoding
  *
- * Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
- * This file is part of PolarSSL (http://www.polarssl.org)
- * Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
+ *  This file is part of PolarSSL (http://www.polarssl.org)
+ *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
  *
- * All rights reserved.
+ *  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, visit the Free Software Foundation
- * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301, USA.
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 #include "base64.h"
@@ -123,11 +122,11 @@ int base64_encode( unsigned char *dst, size_t *dlen,
 int base64_decode( unsigned char *dst, size_t *dlen,
                    const unsigned char *src, size_t slen )
 {
-    size_t i, j, n;
-    unsigned long x;
+    size_t i, n;
+    uint32_t j, x;
     unsigned char *p;
 
-    for( i = j = n = 0; i < slen; i++ )
+    for( i = n = j = 0; i < slen; i++ )
     {
         if( ( slen - i ) >= 2 &&
             src[i] == '\r' && src[i + 1] == '\n' )
@@ -153,7 +152,7 @@ int base64_decode( unsigned char *dst, size_t *dlen,
 
     n = ((n * 6) + 7) >> 3;
 
-    if( *dlen < n )
+    if( dst == NULL || *dlen < n )
     {
         *dlen = n;
         return( ERR_BASE64_BUFFER_TOO_SMALL );
