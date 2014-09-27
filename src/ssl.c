@@ -37,7 +37,7 @@ int ssl_init(http_t *client, char *msg)
 
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
 
-	client->ssl_ctx = SSL_CTX_new(SSLv3_client_method());
+	client->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
 	if (!client->ssl_ctx)
 		return RC_HTTPS_OUT_OF_MEMORY;
 
