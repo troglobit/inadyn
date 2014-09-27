@@ -41,6 +41,7 @@ DDNS plugin.  See below for configuration examples.
 * http://www.changeip.com
 * http://www.zerigo.com
 * http://www.dhis.org
+* https://nsupdate.info
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
