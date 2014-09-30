@@ -18,7 +18,7 @@ endif
 
 ifdef USE_GNUTLS
 EXTRA_CPPFLAGS += -DENABLE_SSL -DCONFIG_GNUTLS
-EXTRA_LIBS     += -lgnutls-openssl
+EXTRA_LIBS     += -lgnutls -lgnutls-openssl
 endif
 
 # This requires dynamic linking to OpenSSL and the libc crypto library
