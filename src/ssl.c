@@ -29,7 +29,7 @@ int ssl_init(http_t *client, char *msg)
 	(void)msg;
 	return 0;
 #else
-	char *subject, *issuer;
+	char buf[256];
 #ifdef CONFIG_GNUTLS
 	const
 #endif
@@ -56,17 +56,12 @@ int ssl_init(http_t *client, char *msg)
 	if (!cert)
 		return RC_HTTPS_FAILED_GETTING_CERT;
 
-	subject = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-	issuer  = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-	if (subject || issuer) {
-		logit(LOG_INFO, "Server certificate -- subject: %s; issuer: %s", subject ?: "<NONE>", issuer ?: "<NONE>");
-
-		if (subject)
-			OPENSSL_free(subject);
-
-		if (issuer)
-			OPENSSL_free(issuer);
-	}
+	/* Logging some cert details. Please note: X509_NAME_oneline doesn't
+	   work when giving NULL instead of a buffer. */
+	X509_NAME_oneline(X509_get_subject_name(cert), buf, 256);
+	logit(LOG_INFO, "SSL server cert subject: %s", buf);
+	X509_NAME_oneline(X509_get_issuer_name(cert), buf, 256);
+	logit(LOG_INFO, "SSL server cert issuer: %s", buf);
 
 	/* We could do all sorts of certificate verification stuff here before
 	   deallocating the certificate. */
