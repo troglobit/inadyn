@@ -21,6 +21,21 @@
 
 #include "debug.h"
 #include "http.h"
+#include "string.h"
+
+/* SSL SNI support: tell the servername we want to speak to */
+int set_server_name(void *ssl, char *servername) {
+	int rc = 0;
+#if defined(CONFIG_OPENSSL)
+	/* api call returns 1 for success */
+	rc = !(1 == SSL_set_tlsext_host_name(ssl, servername));
+#elif defined(CONFIG_GNUTLS)
+	/* api call returns 0 for success */
+	rc = gnutls_server_name_set(ssl, GNUTLS_NAME_DNS,
+				    servername, strlen(servername));
+#endif
+	return rc; /* 0 means success */
+}
 
 int ssl_init(http_t *client, char *msg)
 {
@@ -44,6 +59,11 @@ int ssl_init(http_t *client, char *msg)
 	client->ssl = SSL_new(client->ssl_ctx);
 	if (!client->ssl)
 		return RC_HTTPS_OUT_OF_MEMORY;
+
+	char *servername;
+	http_get_remote_name(client, (const char **)&servername);
+	if (set_server_name(client->ssl, servername))
+		return RC_HTTPS_SNI_ERROR;
 
 	SSL_set_fd(client->ssl, client->tcp.ip.socket);
 	if (-1 == SSL_connect(client->ssl))
