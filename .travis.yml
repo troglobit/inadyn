@@ -15,8 +15,8 @@ addons:
       name: "troglobit/inadyn"
       description: "Inadyn | Small and Simple DDNS Client"
     notification_email: troglobit@gmail.com
-    build_command_prepend: "make distclean"
-    build_command:   "make -j5"
+    build_command_prepend: "./configure"
+    build_command:   "make"
     branch_pattern: master
 
-script: make -j5
+script: ./configure && make
