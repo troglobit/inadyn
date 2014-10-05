@@ -25,7 +25,7 @@
 
 #ifdef ENABLE_SSL
 /* SSL SNI support: tell the servername we want to speak to */
-static int set_server_name(void *ssl, const char *sn)
+static int set_server_name(SSL *ssl, const char *sn)
 {
 	int rc = 0;
 
@@ -34,7 +34,7 @@ static int set_server_name(void *ssl, const char *sn)
 	rc = !SSL_set_tlsext_host_name(ssl, sn);
 #elif defined(CONFIG_GNUTLS)
 	/* api returns 0 for success */
-	rc = gnutls_server_name_set(ssl, GNUTLS_NAME_DNS, sn, strlen(sn));
+	rc = gnutls_server_name_set(ssl->gnutls_state, GNUTLS_NAME_DNS, sn, strlen(sn));
 #endif
 
 	return rc;
