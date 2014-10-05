@@ -24,6 +24,7 @@
 #ifndef DYNDNS_H_
 #define DYNDNS_H_
 
+#include "config.h"
 #include "os.h"
 #include "error.h"
 #include "http.h"
@@ -33,7 +34,7 @@
 
 #define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
-#define SUPPORT_ADDR	"troglobit@gmail.com"
+#define SUPPORT_ADDR	PACKAGE_BUGREPORT
 
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"

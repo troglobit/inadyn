@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 
+#include "config.h"
 #include <errno.h>
 #include <dlfcn.h>		/* dlopen() et al */
 #include <dirent.h>		/* readdir() et al */

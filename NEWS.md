@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+Version 1.99.11: ???????????
+----------------------------
+- Several fixes to add support for TLS 1.x with SNI, thanks to Thomas Waldmann
+- Add support https://nsupdate.info, thanks to Thomas Waldmann
+- Fix building on FreeBSD by converting to use GNU Configure & Build system
+
 Version 1.99.10: Sep 13 2014
 ----------------------------
 - Fix issue #57: snprintf() causes loss of \= from password string
