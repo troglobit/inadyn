@@ -1,4 +1,4 @@
-/* Inadyn is a simple and small dynamic DNS (DDNS) client
+/* Inadyn is a small and simple dynamic DNS (DDNS) client
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>

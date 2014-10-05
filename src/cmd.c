@@ -161,26 +161,25 @@ static cmd_desc_t cmd_options_table[] = {
 
 	{"-S", 1, {get_dyndns_system_handler, NULL}, ""},
 	{"--system", 1, {get_dyndns_system_handler, NULL}, "<PROVIDER>\n"
-	 "\t\t\tSelect DDNS service provider, one of the following.\n"
-	 "\t\t\to For dyndns.org:         default@dyndns.org\n"
-	 "\t\t\to For freedns.afraid.org: default@freedns.afraid.org\n"
-	 "\t\t\to For zoneedit.com:       default@zoneedit.com\n"
-	 "\t\t\to For no-ip.com:          default@no-ip.com\n"
-	 "\t\t\to For easydns.com:        default@easydns.com\n"
-	 "\t\t\to For tzo.com:            default@tzo.com\n"
-	 "\t\t\to For 3322.org:           dyndns@3322.org\n"
-	 "\t\t\to For dnsomatic.com:      default@dnsomatic.com\n"
-	 "\t\t\to For tunnelbroker.net:   ipv6tb@he.net\n"
-	 "\t\t\to For dns.he.net:         dyndns@he.net\n"
-	 "\t\t\to For dynsip.org:         default@dynsip.org\n"
-	 "\t\t\to For sitelutions.com:    default@sitelutions.com\n"
-	 "\t\t\to For dnsexit.com:        default@dnsexit.com\n"
-	 "\t\t\to For changeip.com:       default@changeip.com\n"
-	 "\t\t\to For zerigo.com:         default@zerigo.com\n"
-	 "\t\t\to For dhis.org:           default@dhis.org\n"
-	 "\t\t\to For nsupdate.info:      ipv4@nsupdate.info\n"
-	 "\t\t\to For generic:            custom@http_srv_basic_auth\n\n"
-	 "\t\t\tDefault value:            default@dyndns.org"},
+	 "\t\t\tDDNS service provider, one of:\n"
+	 "\t\t\t     default@dyndns.org\n"
+	 "\t\t\t     default@freedns.afraid.org\n"
+	 "\t\t\t     default@zoneedit.com\n"
+	 "\t\t\t     default@no-ip.com\n"
+	 "\t\t\t     default@easydns.com\n"
+	 "\t\t\t     default@tzo.com\n"
+	 "\t\t\t     dyndns@3322.org\n"
+	 "\t\t\t     default@dnsomatic.com\n"
+	 "\t\t\t     ipv6tb@he.net\n"
+	 "\t\t\t     dyndns@he.net\n"
+	 "\t\t\t     default@dynsip.org\n"
+	 "\t\t\t     default@sitelutions.com\n"
+	 "\t\t\t     default@dnsexit.com\n"
+	 "\t\t\t     default@changeip.com\n"
+	 "\t\t\t     default@zerigo.com\n"
+	 "\t\t\t     default@dhis.org\n"
+	 "\t\t\t     ipv4@nsupdate.info\n"
+	 "\t\t\t     custom@http_srv_basic_auth"},
 	{"--dyndns_system", 1, {get_dyndns_system_handler, NULL}, NULL},
 
 	{"-x", 1, {get_proxy_server_handler, NULL}, ""},
@@ -409,10 +408,7 @@ static void print_help_page(void)
 {
 	cmd_desc_t *it;
 
-	puts("Inadyn is a dynamic DNS (DDNS) client.  It does periodic and/or on-demand checks\n"
-	     "of your externally visible IP address and updates the hostname to IP mapping at\n"
-	     "your DDNS service provider when necessary.\n");
-	puts("dyndns.org:\n" "\tinadyn -u username -p password -a my.registered.name\n");
+	puts("Usage: inadyn [OPTIONS]\n");
 
 	it = cmd_options_table;
 	while (it->option != NULL) {
@@ -420,16 +416,10 @@ static void print_help_page(void)
 			if (strlen(it->option) == 2)
 				printf("  %s, ", it->option);
 			else
-				printf("%-16s  %s\n", it->option, it->description);
+				printf("%-16s  %s\n\n", it->option, it->description);
 		}
 		++it;
 	}
-
-	puts("==============================================================================");
-	puts("SIGINT/TERM: Stops inadyn");
-	puts("SIGUP      : Reload inadyn.conf");
-	puts("SIGUSR1    : Force update, works with the optional --fake-address");
-	puts("SIGUSR2    : Abort any wait and check now");
 }
 
 static int help_handler(cmd_data_t *cmd, int num, void *context)
