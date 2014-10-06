@@ -7,6 +7,3 @@ config.log
 config.status
 config.guess
 config.sub
-install-sh
-mkinstalldirs
-missing
