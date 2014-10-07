@@ -49,14 +49,17 @@ static ddns_system_t plugin = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char name[64], *p;
+	char name[SERVER_NAME_LEN], *p;
 
+	/* Handle some.name.duckdns.org properly */
 	p = strstr(alias->name, "duckdns.org");
 	if (p) {
-		strlcpy(name, alias->name, sizeof(name));
-		p = strchr(name, '.');
-		if (p)
-			p = 0;
+		size_t len = p - alias->name;
+
+		if (len > sizeof(name))
+			len = sizeof(name);
+
+		strlcpy(name, alias->name, len);
 	} else {
 		snprintf(name, sizeof(name), "%s", alias->name);
 	}
