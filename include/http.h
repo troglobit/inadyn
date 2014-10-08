@@ -21,6 +21,8 @@
 #ifndef INADYN_HTTP_H_
 #define INADYN_HTTP_H_
 
+#include "config.h"
+
 #if defined(CONFIG_OPENSSL)
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
