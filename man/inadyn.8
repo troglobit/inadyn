@@ -94,6 +94,8 @@ http://www.dhis.org
 https://nsupdate.info
 .It
 http://duckdns.org
+.It
+https://www.loopia.com
 .El
 .Pp
 DDNS providers not listed here, like http://twoDNS.de, can often be
@@ -184,6 +186,8 @@ http://www.dhis.org
 https://nsupdate.info
 .It Cm default@duckdns.org
 http://duckdns.org
+.It Cm default@loopia.com
+https://www.loopia.com
 .It Cm custom@http_srv_basic_auth
 Try this if your DDNS service provider is not listed
 .El
@@ -259,8 +263,10 @@ second one - host name alias. INADYN_IFACE is available, if
 .Fl -iface
 option used.
 .It Fl w, -wildcard
-Enable domain name wildcarding for easydns.com. Default
-disabled. For
+Enable domain name wildcarding of your domain name, for DDNS providers
+that support this, e.g. easydns.com and loopia.com.  This means that
+anything typed before your hostname, e.g. www. or ftp., is also updated
+when your IP changes.  Default: disabled.  For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default
 .It Fl t, -startup-delay Ar SEC
