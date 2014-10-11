@@ -1,3 +1,9 @@
+inadyn (1.99.9-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Timur Birsh <taem@linukz.org>  Sat, 19 Jul 2014 18:55:35 +0600
+
 inadyn (1.99.4-1) unstable; urgency=low
 
   * New upstream release:

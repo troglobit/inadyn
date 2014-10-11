@@ -5,6 +5,7 @@ set -e
 NAME=inadyn
 RUNDIR=/run/$NAME
 LOGDIR=/var/log/$NAME
+CACHEDIR=/var/cache/$NAME
 CONF=/etc/$NAME.conf
 
 if [ "$1" = "configure" ]
@@ -42,20 +43,24 @@ then
                 fi
         fi
 
-        own=`stat --printf="%u" "$LOGDIR" 2>/dev/null`
-        grp=`stat --printf="%g" "$LOGDIR" 2>/dev/null`
-        if [ "$own" = "0" -a "$grp" = "0" ]
-        then
-                if ! dpkg-statoverride --list $LOGDIR >/dev/null 2>&1
-                then
-                        dpkg-statoverride --update --add \
-                            debian-inadyn debian-inadyn 755 $LOGDIR
-                fi
-        fi
+        for item in $LOGDIR $CACHEDIR
+	do
+		own=`stat --printf="%u" "$item" 2>/dev/null`
+		grp=`stat --printf="%g" "$item" 2>/dev/null`
+		if [ "$own" = "0" -a "$grp" = "0" ]
+		then
+			if ! dpkg-statoverride --list $item >/dev/null 2>&1
+			then
+				dpkg-statoverride --update --add \
+					debian-inadyn debian-inadyn 755 $item
+			fi
+		fi
+	done
 
-        for item in $LOGDIR/*
+        for item in $LOGDIR/* $CACHEDIR/*
         do
                 [ "$item" = "$LOGDIR/*" ] && continue
+                [ "$item" = "$CACHEDIR/*" ] && continue
 
                 own=`stat --printf="%u" "$item" 2>/dev/null`
                 grp=`stat --printf="%g" "$item" 2>/dev/null`

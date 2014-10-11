@@ -1,5 +1,5 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: inadyn - simple and small DynDNS client written in the C language
+Upstream-Name: inadyn - simple and small DynDNS client with HTTPS support
 Upstream-Contact: Joachim Nilsson <troglobit@gmail.com>
 Source: http://github.com/troglobit/inadyn
 
@@ -11,44 +11,21 @@ Copyright: 2004 Narcis Ilisei <inarcis2002@hotpop.com>
 	   2010 Timur Birsh <taem@linukz.org>
 License: GPL-2+
 
-Files: src/base64utils.c
-Copyright: 2001 Marc Niegowski
-License: other
-    This file comes from
-    http://www.marcsweb.com/downloads/base64.tar.gz
-    and according to the included README file it has this copyright and license:
-    .
-    Distribution and use:
-    ---------------------
-    This software may be freely used and distributed as long as the author is
-    credited where ever it is used or distributed, including, but not limited to,
-    educational facilities.
-    .
-    Copyright (c) 1994 - 2001
-    Marc Niegowski
-    Connectivity, Inc.
-    All rights reserved.
-
-Files: include/base64.h
-Copyright: 2001 Marc Niegowski
-License: other
-    This file has this copyright and license:
-    .
-    Copyright (c) 1994 - 2003
-    Marc Niegowski
-    Connectivity, Inc.
-    All rights reserved.
-    .    
-    Licensing: this file is basically free to use in any way as long the above
-    copyright notice is kept.
-
-Files: src/md5.c include/md5.h
-Copyright: 1995 Ulrich Drepper <drepper@gnu.ai.mit.edu>
+Files: src/base64.c src/md5.c src/sha1.c include/base64.h include/md5.h include/sha1.h
+Copyright: 2006-2010 Brainspark B.V.
 License: GPL-2+
+
+Files: src/strlcat.c src/strlcpy.c
+Copyright: 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+License: ISC
+
+Files: include/strlfun.h
+Copyright: 2014 Joachim Nilsson <troglobit@gmail.com>
+License: ISC
 
 Files: debian/*
 Copyright: 2005 Shaul Karl <shaul@debian.org>
-	   2010-2013 Timur Birsh <taem@linukz.org>
+	   2010-2014 Timur Birsh <taem@linukz.org>
 License: GPL-2+
 
 License: GPL-2+
@@ -69,3 +46,16 @@ License: GPL-2+
     On Debian systems, the full text of the GNU General Public
     License version 2 can be found in the file
     `/usr/share/common-licenses/GPL-2'.
+
+License: ISC
+    Permission to use, copy, modify, and distribute this software for any
+    purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+    .
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
