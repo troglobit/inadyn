@@ -43,13 +43,15 @@ DDNS plugin.  See below for configuration examples.
 * http://www.dhis.org
 * https://nsupdate.info
 * http://duckdns.org
+* https://www.loopia.com
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
 
-Inadyn v1.99.8 and later support HTTPS (v1.99.11 and later also support SNI),
-for DDNS providers that support this (you must check this yourself).
-Tested are DynDNS, FreeDNS and nsupdate.info.
+Inadyn v1.99.8 and later support HTTPS (v1.99.11 and later also support
+SNI), for DDNS providers that support this (you must check this
+yourself).  Tested are DynDNS, FreeDNS, nsupdate.info, and Loopia.
+
 Using HTTPS is recommended since it protects your credentials from being
 snooped and further reduces the risk of someone hijacking your account.
 
