@@ -248,7 +248,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src include man
-doc_DATA = README COPYING LICENSE
+doc_DATA = AUTHORS COPYING NEWS README
 EXTRA_DIST = autogen.sh
 DISTCLEANFILES = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 GPG = gpg
@@ -786,7 +786,7 @@ release-hook:
 		echo;									\
 	fi
 
-release: distcheck release-hook md5-dist gpg-dist
+release: dist release-hook md5-dist gpg-dist
 	@echo
 	@echo "Resulting release files:"
 	@echo "================================================================="

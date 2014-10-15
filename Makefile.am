@@ -1,7 +1,7 @@
 ## Inadyn - A small and simple DDNS client                -*-Makefile-*-
 
 SUBDIRS         = src include man
-doc_DATA	= README COPYING LICENSE
+doc_DATA	= AUTHORS COPYING NEWS README
 EXTRA_DIST	= autogen.sh
 DISTCLEANFILES	= *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 
@@ -38,7 +38,8 @@ release-hook:
 	fi
 
 ## Target to run when building a release
-release: distcheck release-hook md5-dist gpg-dist
+## distcheck <-- does not work atm., wrong search path for source/header files
+release: dist release-hook md5-dist gpg-dist
 	@echo
 	@echo "Resulting release files:"
 	@echo "================================================================="
