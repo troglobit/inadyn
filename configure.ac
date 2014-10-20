@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(inadyn, 1.99.11, https://github.com/troglobit/inadyn/issues)
+AC_INIT(inadyn, 1.99.12, https://github.com/troglobit/inadyn/issues)
 AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz])
 AM_SILENT_RULES()
 
@@ -71,7 +71,6 @@ AC_TYPE_UINT32_T
 # Checks for library functions.
 AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
-AC_FUNC_MALLOC
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([atexit memset poll socket strerror])
 

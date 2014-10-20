@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+Version 1.99.12: Oct 21 2014
+----------------------------
+- Fix cross compilation issues with OpenSSL (depends on libcrypto)
+- Fix cross compilation issues with malloc/rpl_malloc (remove AC check)
+- Add custom support for Namecheap.com, thanks to Terzeus S. Dominguez
+
 Version 1.99.11: Oct 15 2014
 ----------------------------
 - Fix building on FreeBSD by converting to use GNU Configure & Build system

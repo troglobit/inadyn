@@ -39,10 +39,6 @@
 /* Define to 1 if you have the `ssl' library (-lssl). */
 #undef HAVE_LIBSSL
 
-/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
-   to 0 otherwise. */
-#undef HAVE_MALLOC
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -208,9 +204,6 @@
 #ifndef __cplusplus
 #undef inline
 #endif
-
-/* Define to rpl_malloc if the replacement function should be used. */
-#undef malloc
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
