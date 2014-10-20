@@ -49,7 +49,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = inadyn$(EXEEXT)
+sbin_PROGRAMS = inadyn$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,8 +60,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+am__installdirs = "$(DESTDIR)$(sbindir)"
+PROGRAMS = $(sbin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_inadyn_OBJECTS = main.$(OBJEXT) ddns.$(OBJEXT) cache.$(OBJEXT) \
 	error.$(OBJEXT) cmd.$(OBJEXT) os.$(OBJEXT) strlcpy.$(OBJEXT) \
@@ -238,12 +238,12 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-binPROGRAMS: $(bin_PROGRAMS)
+install-sbinPROGRAMS: $(sbin_PROGRAMS)
 	@$(NORMAL_INSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(bindir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(bindir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(sbindir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(sbindir)" || exit 1; \
 	fi; \
 	for p in $$list; do echo "$$p $$p"; done | \
 	sed 's/$(EXEEXT)$$//' | \
@@ -261,23 +261,23 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	while read type dir files; do \
 	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
 	    test -z "$$files" || { \
-	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
-	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	      echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(sbindir)$$dir'"; \
+	      $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(sbindir)$$dir" || exit $$?; \
 	    } \
 	; done
 
-uninstall-binPROGRAMS:
+uninstall-sbinPROGRAMS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	@list='$(sbin_PROGRAMS)'; test -n "$(sbindir)" || list=; \
 	files=`for p in $$list; do echo "$$p"; done | \
 	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
 	      -e 's/$$/$(EXEEXT)/' `; \
 	test -n "$$list" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+	echo " ( cd '$(DESTDIR)$(sbindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(sbindir)" && rm -f $$files
 
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+clean-sbinPROGRAMS:
+	-test -z "$(sbin_PROGRAMS)" || rm -f $(sbin_PROGRAMS)
 ../plugins/$(am__dirstamp):
 	@$(MKDIR_P) ../plugins
 	@: > ../plugins/$(am__dirstamp)
@@ -469,7 +469,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(sbindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -506,7 +506,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-generic clean-sbinPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ../plugins/$(DEPDIR) ./$(DEPDIR)
@@ -532,7 +532,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-sbinPROGRAMS
 
 install-html: install-html-am
 
@@ -571,22 +571,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-sbinPROGRAMS
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic ctags distclean distclean-compile \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-sbinPROGRAMS ctags distclean distclean-compile \
 	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-sbinPROGRAMS install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS
+	uninstall-am uninstall-sbinPROGRAMS
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
