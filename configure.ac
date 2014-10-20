@@ -45,10 +45,10 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
 if test "$ac_enable_ssl" = "yes"; then
    if test "$ac_enable_openssl" = "yes"; then
-      AC_CHECK_LIB([ssl], [SSL_library_init], [],
-                          AC_MSG_ERROR([*** SSL library (OpenSSL) not found!]))
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
+      AC_CHECK_LIB([ssl], [SSL_library_init], [],
+                          AC_MSG_ERROR([*** SSL library (OpenSSL) not found!]))
       AC_CHECK_HEADERS([openssl/crypto.h openssl/x509.h openssl/pem.h openssl/ssl.h \
                         openssl/tls1.h openssl/err.h])
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL library])
