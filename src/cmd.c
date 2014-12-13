@@ -181,6 +181,7 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\t     ipv4@nsupdate.info\n"
 	 "\t\t\t     default@duckdns.org\n"
 	 "\t\t\t     default@loopia.com\n"
+	 "\t\t\t     default@domains.google.com\n"
 	 "\t\t\t     custom@http_srv_basic_auth"},
 	{"--dyndns_system", 1, {get_dyndns_system_handler, NULL}, NULL},
 
