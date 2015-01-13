@@ -1,7 +1,7 @@
 ChangeLog
 =========
 
-Version 1.99.12: Oct 21 2014
+Version 1.99.12: Oct 20 2014
 ----------------------------
 - Fix cross compilation issues with OpenSSL (depends on libcrypto)
 - Fix cross compilation issues with malloc/rpl_malloc (remove AC check)
