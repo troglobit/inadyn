@@ -46,6 +46,7 @@ DDNS plugin.  See below for configuration examples.
 * https://www.loopia.com
 * https://www.namecheap.com
 * https://domains.google.com
+* https://www.ovh.com
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
