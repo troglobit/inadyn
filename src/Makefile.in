@@ -74,7 +74,8 @@ am_inadyn_OBJECTS = main.$(OBJEXT) ddns.$(OBJEXT) cache.$(OBJEXT) \
 	../plugins/sitelutions.$(OBJEXT) \
 	../plugins/tunnelbroker.$(OBJEXT) ../plugins/tzo.$(OBJEXT) \
 	../plugins/zoneedit.$(OBJEXT) ../plugins/zerigo.$(OBJEXT) \
-	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT)
+	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT)	\
+	../plugins/dtdns.$(OBJEXT)
 inadyn_OBJECTS = $(am_inadyn_OBJECTS)
 inadyn_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
