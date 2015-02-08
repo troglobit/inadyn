@@ -108,11 +108,6 @@ int os_syslog_open(const char *name);
 int os_syslog_close(void);
 
 /**
- * Drop privileges to the given user
- */
-int os_change_persona (ddns_user_t *user);
-
-/**
  * Check file system permissions and create pidfile
  */
 int os_check_perms(void *);

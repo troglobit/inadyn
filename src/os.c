@@ -365,31 +365,6 @@ int os_syslog_close(void)
 	return 0;
 }
 
-int os_change_persona(ddns_user_t *user)
-{
-	int rc = 0;
-
-	do {
-		if (user->gid != getgid()) {
-			if ((rc = setgid(user->gid)) != 0)
-				break;
-		}
-
-		if (user->uid != getuid()) {
-			if ((rc = setuid(user->uid)) != 0)
-				break;
-		}
-	}
-	while (0);
-
-	if (rc != 0) {
-		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
-		return RC_OS_CHANGE_PERSONA_FAILURE;
-	}
-
-	return 0;
-}
-
 static int mkparentdir(char *file)
 {
 	int rc = 0;

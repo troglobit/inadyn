@@ -636,21 +636,6 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	/* read cmd line options and set object properties */
-	rc = get_config_data(ctx, argc, argv);
-	if (rc != 0 || ctx->abort)
-		return rc;
-
-	if (ctx->change_persona) {
-		ddns_user_t user;
-
-		memset(&user, 0, sizeof(user));
-		user.gid = ctx->sys_usr_info.gid;
-		user.uid = ctx->sys_usr_info.uid;
-
-		DO(os_change_persona(&user));
-	}
-
 	/* if silent required, close console window */
 	if (ctx->run_in_background == 1) {
 		DO(close_console_window());

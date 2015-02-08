@@ -90,42 +90,42 @@ static int get_exec_handler(cmd_data_t *cmd, int num, void *context);
 static cmd_desc_t cmd_options_table[] = {
 	{"-a", 1, {get_alias_handler, NULL}, ""},
 	{"--alias", 1, {get_alias_handler, NULL}, "<NAME>\n"
-	 "\t\t\tAlias hostname. This option can appear multiple times."},
+***	 "\t\t\tAlias hostname. This option can appear multiple times."},
 
 	{"-b", 0, {set_silent_handler, NULL}, ""},
-	{"--background", 0, {set_silent_handler, NULL}, "Run in background."},
+***	{"--background", 0, {set_silent_handler, NULL}, "Run in background."},
 
 	{"-B", 1, {set_bind_interface, NULL}, ""},
 	{"--bind", 1, {set_bind_interface, NULL}, "<IFNAME>\n"
-	 "\t\t\tSet interface to bind to, only on UNIX systems."},
+???	 "\t\t\tSet interface to bind to, only on UNIX systems."},
 
 	{"-c",          1, {set_cache_dir, NULL}, ""},
 	{"--cache-dir", 1, {set_cache_dir, NULL}, "<DIR>\n"
-	 "\t\t\tSet directory for persistent cache files, default " RUNTIME_DATA_DIR},
+???	 "\t\t\tSet directory for persistent cache files, default " RUNTIME_DATA_DIR},
 
 	{"-d", 1, {set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 1, {set_change_persona_handler, NULL},
 	 "<USER[:GROUP]>\n" "\t\t\tAfter init switch to a new user/group.\n" "\t\t\tOnly on UNIX systems."},
-	{"--change_persona", 1, {set_change_persona_handler, NULL}, NULL},	/* COMPAT */
+*****	{"--change_persona", 1, {set_change_persona_handler, NULL}, NULL},	/* COMPAT */
 
 	{"-e", 1, {get_exec_handler, NULL}, ""},
 	{"--exec", 1, {get_exec_handler, NULL},
-	 "Full path to external command to run after an IP update."},
+????	 "Full path to external command to run after an IP update."},
 
 	{"-f", 1, {get_forced_update_period_handler, NULL}, ""},
 	{"--forced-update", 1, {get_forced_update_period_handler, NULL},
 	 "<SEC>\n" "\t\t\tForced DDNS server update interval. Default: 30 days"},
-	{"--forced_update_period", 1, {get_forced_update_period_handler, NULL}, NULL},	/* COMPAT */
+****	{"--forced_update_period", 1, {get_forced_update_period_handler, NULL}, NULL},	/* COMPAT */
 
 	{"-F", 1, {get_options_from_file_handler, NULL}, ""},
-	{"--config", 1, {get_options_from_file_handler, NULL}, "<FILE>\n"
+****	{"--config", 1, {get_options_from_file_handler, NULL}, "<FILE>\n"
 	 "\t\t\tConfiguration file, containing further options.  Default\n"
 	 "\t\t\tconfig file: " DEFAULT_CONFIG_FILE
 	 ", is used if inadyn is\n" "\t\t\tcalled without any command line options."},
 	{DYNDNS_INPUT_FILE_OPT_STRING, 1, {get_options_from_file_handler, NULL},
 	 NULL},
 
-	{"-H", 2, {get_checkip_name_handler, NULL}, ""},
+????	{"-H", 2, {get_checkip_name_handler, NULL}, ""},
 	{"--checkip-url", 2, {get_checkip_name_handler, NULL},
 	 "<NAME[:PORT] URL>\n"
 	 "\t\t\tLocal IP is detected by parsing the response after\n"
@@ -134,19 +134,19 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--ip_server_name", 2, {get_checkip_name_handler, NULL}, NULL},
 
 	{"-n", 1, {set_iterations_handler, NULL}, ""},
-	{"--iterations", 1, {set_iterations_handler, NULL}, "<NUM>\n"
+***	{"--iterations", 1, {set_iterations_handler, NULL}, "<NUM>\n"
 	 "\t\t\tSet the number of DNS updates. Default: 0 (forever)"},
 
-	{"-i", 1, {set_check_interface, NULL}, ""},
+???	{"-i", 1, {set_check_interface, NULL}, ""},
 	{"--iface", 1, {set_check_interface, NULL}, "<IFNAME>\n"
 	 "\t\t\tSet interface to check for IP, only on UNIX systems.\n"
 	 "\t\t\tExternal IP check is not performed."},
 
-	{"-L", 1, {get_logfile_name, NULL}, ""},
+****	{"-L", 1, {get_logfile_name, NULL}, ""},
 	{"--logfile", 1, {get_logfile_name, NULL}, "<FILE>\n" "\t\t\tFull path to log file"},
 	{"--log_file", 1, {get_logfile_name, NULL}, NULL},
 
-	{"-N", 1, {get_dns_server_name_handler, NULL}, ""},
+????	{"-N", 1, {get_dns_server_name_handler, NULL}, ""},
 	{"--server-name", 1, {get_dns_server_name_handler, NULL},
 	 "[<NAME>[:port]]\n"
 	 "\t\t\tThe server that receives the update DNS request.\n"
@@ -155,13 +155,13 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\tset the dyndns system.  Default servers will be taken."},
 	{"--dyndns_server_name", 1, {get_dns_server_name_handler, NULL}, NULL},
 
-	{"-U", 1, {get_dns_server_url_handler, NULL}, ""},
+????	{"-U", 1, {get_dns_server_url_handler, NULL}, ""},
 	{"--server-url", 1, {get_dns_server_url_handler, NULL}, "<URL>\n"
 	 "\t\t\tFull URL relative to DynDNS server root.\n"
 	 "\t\t\tE.g. '/some_script.php?hostname='"},
 	{"--dyndns_server_url", 1, {get_dns_server_url_handler, NULL}, NULL},
 
-	{"-A",            0, {append_myip, NULL}, ""},
+????	{"-A",            0, {append_myip, NULL}, ""},
 	{"--append-myip", 0, {append_myip, NULL},
 	 "For custom@ setups, append current IP to server update URL.\n"
 	 "\t\t\tE.g., if custom server URL looks something like this (dyn.com):\n\n"
@@ -169,7 +169,7 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\tthis setting appends your current IP address to the end of the\n"
 	"\t\t\tURL.  Without this flag your hostname alias is added instead."},
 
-	{"-S", 1, {get_dyndns_system_handler, NULL}, ""},
+????	{"-S", 1, {get_dyndns_system_handler, NULL}, ""},
 	{"--system", 1, {get_dyndns_system_handler, NULL}, "<PROVIDER>\n"
 	 "\t\t\tDDNS service provider, one of:\n"
 	 "\t\t\t     default@dyndns.org\n"
@@ -198,58 +198,58 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\t     custom@http_srv_basic_auth"},
 	{"--dyndns_system", 1, {get_dyndns_system_handler, NULL}, NULL},
 
-	{"-x", 1, {get_proxy_server_handler, NULL}, ""},
+????	{"-x", 1, {get_proxy_server_handler, NULL}, ""},
 	{"--proxy-server", 1, {get_proxy_server_handler, NULL},
 	 "[NAME[:port]]\n" "\t\t\tHTTP proxy server name, and optional port. Default: N/A"},
 	{"--proxy_server", 1, {get_proxy_server_handler, NULL}, NULL},	/* COMPAT */
 
-	{"-T", 1, {get_update_period_sec_handler, NULL}, ""},
+****	{"-T", 1, {get_update_period_sec_handler, NULL}, ""},
 	{"--period", 1, {get_update_period_sec_handler, NULL}, "<SEC>\n"
 	 "\t\t\tIP change check interval.  Default: 2 min. Max: 10 days"},
 	{"--update_period_sec", 1, {get_update_period_sec_handler, NULL}, NULL},
 	{"--update_period", 1, {get_update_period_handler, NULL}, NULL}, /* TODO: Replaced with startup-delay, remove in 2.0 */
 
-	{"-P", 1,        {set_pidfile, NULL}, ""},
+????	{"-P", 1,        {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
 #ifdef ENABLE_SSL
-	{"-s",    0, {enable_ssl, NULL}, ""},
+***	{"-s",    0, {enable_ssl, NULL}, ""},
 	{"--ssl", 0, {enable_ssl, NULL}, "Use HTTPS to connect to this DDNS service provider, default HTTP"},
 #endif
 
-	{"-l", 0, {set_syslog_handler, NULL}, ""},
+***	{"-l", 0, {set_syslog_handler, NULL}, ""},
 	{"--syslog", 0, {set_syslog_handler, NULL},
 	 "Force logging to syslog, e.g., /var/log/messages, only on UNIX systems"},
 
-	{"-t", 1, {startup_delay_handler, NULL}, ""},
+*****	{"-t", 1, {startup_delay_handler, NULL}, ""},
 	{"--startup-delay", 1, {startup_delay_handler, NULL}, "<SEC>\n"
 	 "\t\t\tWait for network/NTP to come up at boot.  Default: 0 sec"},
 
-	{"-o", 0, {update_once_handler, NULL}, ""},
+****	{"-o", 0, {update_once_handler, NULL}, ""},
 	{"--once", 0, {update_once_handler, NULL},
 	 "Force one update and quit."},
 
-	{"-u", 1, {get_username_handler, NULL}, ""},
+****	{"-u", 1, {get_username_handler, NULL}, ""},
 	{"--username", 1, {get_username_handler, NULL}, "<USERNAME>\n" "\t\t\tYour DDNS user name, or hash"},
 
-	{"-p", 1, {get_password_handler, NULL}, ""},
+****	{"-p", 1, {get_password_handler, NULL}, ""},
 	{"--password", 1, {get_password_handler, NULL}, "<PASSWORD>\n" "\t\t\tYour DDNS user password."},
 
-	{"-w", 0, {get_wildcard_handler, NULL}, ""},
+****	{"-w", 0, {get_wildcard_handler, NULL}, ""},
 	{"--wildcard", 0, {get_wildcard_handler, NULL},
 	 "Enable domain wildcarding for easydns.com."},
 
 	{"-z",               0, {forced_update_fake_addr, NULL}, ""},
-	{"--fake-address", 0, {forced_update_fake_addr, NULL},
+???	{"--fake-address", 0, {forced_update_fake_addr, NULL},
 	 "On SIGUSR1, fake address using random 203.0.113.0/24 before real update."},
 
-	{"-h", 0, {help_handler, NULL}, ""},
+****	{"-h", 0, {help_handler, NULL}, ""},
 	{"--help", 0, {help_handler, NULL}, "This online help."},
 
-	{"-V", 1, {set_verbose_handler, NULL}, ""},
+*****	{"-V", 1, {set_verbose_handler, NULL}, ""},
 	{"--verbose", 1, {set_verbose_handler, NULL}, "Debug level: 0 - 5"},
 
-	{"-v", 0, {print_version_handler, NULL}, ""},
+****	{"-v", 0, {print_version_handler, NULL}, ""},
 	{"--version", 0, {print_version_handler, NULL}, "Show inadyn version"},
 
 	{NULL, 0, {0, NULL}, NULL}
