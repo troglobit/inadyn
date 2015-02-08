@@ -497,8 +497,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.12...HEAD
-[1.99.12]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.13...HEAD
+[1.99.13]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
 [1.99.12]: https://github.com/troglobit/inadyn/compare/1.99.11...1.99.12
 [1.99.11]: https://github.com/troglobit/inadyn/compare/1.99.10...1.99.11
 [1.99.10]: https://github.com/troglobit/inadyn/compare/1.99.9...1.99.10
