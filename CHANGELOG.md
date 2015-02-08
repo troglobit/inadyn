@@ -4,12 +4,12 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[UNRELEASED]
-------------
+[1.99.13] - 2015-02-08
+----------------------
 
 ### Changes
-- Add support for Google Domains DDNS, by Justin McManus
-- Add support for OVH DDNS service, by Andres Gomez
+- Add support for https://domains.google.com DDNS, by Justin McManus
+- Add support for https://www.ovh.com DDNS service, by Andres Gomez
 - Add support for http://dtdns.com DDNS, by Denton Gentry
 - Rename `NEWS.md` to `CHANGELOG.md` and update formatting in an attempt
   to align with http://keepachangelog.com -- this also means using ISO
@@ -56,19 +56,19 @@ All notable changes to the project are documented in this file.
   OpenBSD replacements `strlcat()` and `strlcpy()` instead.
 
 ### Fixes
-- Fix issue #57: snprintf() causes loss of \= from password string
+- Fix issue #57: `snprintf()` causes loss of \= from password string
 - Fix issue #58: Add support for GnuTLS as the default SSL library
 - Fix bugs found by Coverity Scan
-- Fix memory leaks found by Glibc on PowerPC
-- Fix include order problem with error.h
+- Fix memory leaks found by GLIBC (!) on PowerPC
+- Fix include order problem with `error.h`
 
 
 [1.99.9] - 2014-05-21
 ---------------------
 
 ### Changes
-- Support for Zerigo DDNS provider
-- Support for DHIS DDNS provider
+- Support for http://www.zerigo.com DDNS provider
+- Support for http://www.dhis.org DDNS provider
 
 ### Fixes
 - Fix memory leak in new HTTPS support, found by Valgrind
@@ -120,7 +120,7 @@ All notable changes to the project are documented in this file.
 [1.99.4] - 2013-08-08
 ---------------------
 
-This release fixes a base64 password encoding regression in 1.99.3
+This release fixes a base64 password encoding regression in [1.99.3]
 
 
 [1.99.3] - 2013-07-15 [YANKED]
@@ -496,7 +496,9 @@ First stable version.
 - port to *NIX
 - port to pSOS
 
+
 [UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.12...HEAD
+[1.99.12]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
 [1.99.12]: https://github.com/troglobit/inadyn/compare/1.99.11...1.99.12
 [1.99.11]: https://github.com/troglobit/inadyn/compare/1.99.10...1.99.11
 [1.99.10]: https://github.com/troglobit/inadyn/compare/1.99.9...1.99.10

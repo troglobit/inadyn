@@ -74,7 +74,7 @@ am_inadyn_OBJECTS = main.$(OBJEXT) ddns.$(OBJEXT) cache.$(OBJEXT) \
 	../plugins/sitelutions.$(OBJEXT) \
 	../plugins/tunnelbroker.$(OBJEXT) ../plugins/tzo.$(OBJEXT) \
 	../plugins/zoneedit.$(OBJEXT) ../plugins/zerigo.$(OBJEXT) \
-	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT)	\
+	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT) \
 	../plugins/dtdns.$(OBJEXT)
 inadyn_OBJECTS = $(am_inadyn_OBJECTS)
 inadyn_DEPENDENCIES =
@@ -203,7 +203,7 @@ inadyn_SOURCES = main.c ddns.c cache.c error.c cmd.c os.c strlcpy.c \
 	../plugins/easydns.c ../plugins/freedns.c ../plugins/generic.c \
 	../plugins/sitelutions.c ../plugins/tunnelbroker.c \
 	../plugins/tzo.c ../plugins/zoneedit.c ../plugins/zerigo.c \
-	../plugins/dhis.c ../plugins/duckdns.c
+	../plugins/dhis.c ../plugins/duckdns.c ../plugins/dtdns.c
 inadyn_LDADD = -ldl
 all: all-am
 
@@ -313,6 +313,8 @@ clean-sbinPROGRAMS:
 	../plugins/$(DEPDIR)/$(am__dirstamp)
 ../plugins/duckdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
+../plugins/dtdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+	../plugins/$(DEPDIR)/$(am__dirstamp)
 inadyn$(EXEEXT): $(inadyn_OBJECTS) $(inadyn_DEPENDENCIES) $(EXTRA_inadyn_DEPENDENCIES) 
 	@rm -f inadyn$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(inadyn_OBJECTS) $(inadyn_LDADD) $(LIBS)
@@ -323,6 +325,7 @@ mostlyclean-compile:
 	-rm -f ../plugins/common.$(OBJEXT)
 	-rm -f ../plugins/dhis.$(OBJEXT)
 	-rm -f ../plugins/dnsexit.$(OBJEXT)
+	-rm -f ../plugins/dtdns.$(OBJEXT)
 	-rm -f ../plugins/duckdns.$(OBJEXT)
 	-rm -f ../plugins/dyndns.$(OBJEXT)
 	-rm -f ../plugins/easydns.$(OBJEXT)
@@ -341,6 +344,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dhis.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dnsexit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dtdns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/duckdns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dyndns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/easydns.Po@am__quote@
