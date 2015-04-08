@@ -19,5 +19,5 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/tunnelbroker.c	../plugins/tzo.c	\
 		  ../plugins/zoneedit.c		../plugins/zerigo.c	\
 		  ../plugins/dhis.c		../plugins/duckdns.c	\
-		  ../plugins/dtdns.c
+		  ../plugins/dtdns.c		../plugins/giradns.c
 inadyn_LDADD	= -ldl

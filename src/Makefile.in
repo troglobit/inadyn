@@ -75,7 +75,7 @@ am_inadyn_OBJECTS = main.$(OBJEXT) ddns.$(OBJEXT) cache.$(OBJEXT) \
 	../plugins/tunnelbroker.$(OBJEXT) ../plugins/tzo.$(OBJEXT) \
 	../plugins/zoneedit.$(OBJEXT) ../plugins/zerigo.$(OBJEXT) \
 	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT) \
-	../plugins/dtdns.$(OBJEXT)
+	../plugins/dtdns.$(OBJEXT) ../plugins/giradns.$(OBJEXT)
 inadyn_OBJECTS = $(am_inadyn_OBJECTS)
 inadyn_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
@@ -203,7 +203,8 @@ inadyn_SOURCES = main.c ddns.c cache.c error.c cmd.c os.c strlcpy.c \
 	../plugins/easydns.c ../plugins/freedns.c ../plugins/generic.c \
 	../plugins/sitelutions.c ../plugins/tunnelbroker.c \
 	../plugins/tzo.c ../plugins/zoneedit.c ../plugins/zerigo.c \
-	../plugins/dhis.c ../plugins/duckdns.c ../plugins/dtdns.c
+	../plugins/dhis.c ../plugins/duckdns.c ../plugins/dtdns.c \
+	../plugins/giradns.c
 inadyn_LDADD = -ldl
 all: all-am
 
@@ -315,6 +316,8 @@ clean-sbinPROGRAMS:
 	../plugins/$(DEPDIR)/$(am__dirstamp)
 ../plugins/dtdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
+../plugins/giradns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+	../plugins/$(DEPDIR)/$(am__dirstamp)
 inadyn$(EXEEXT): $(inadyn_OBJECTS) $(inadyn_DEPENDENCIES) $(EXTRA_inadyn_DEPENDENCIES) 
 	@rm -f inadyn$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(inadyn_OBJECTS) $(inadyn_LDADD) $(LIBS)
@@ -331,6 +334,7 @@ mostlyclean-compile:
 	-rm -f ../plugins/easydns.$(OBJEXT)
 	-rm -f ../plugins/freedns.$(OBJEXT)
 	-rm -f ../plugins/generic.$(OBJEXT)
+	-rm -f ../plugins/giradns.$(OBJEXT)
 	-rm -f ../plugins/sitelutions.$(OBJEXT)
 	-rm -f ../plugins/tunnelbroker.$(OBJEXT)
 	-rm -f ../plugins/tzo.$(OBJEXT)
@@ -350,6 +354,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/easydns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/freedns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/generic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/giradns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/sitelutions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/tunnelbroker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/tzo.Po@am__quote@
