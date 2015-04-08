@@ -169,7 +169,8 @@ static int server_transaction(ddns_t *ctx, int servernum)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
 	http_exit(http);
-	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
+	if (ctx->dbg.level > 2)
+		logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
 
 	return rc;
 }
@@ -429,7 +430,8 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 	buf = calloc(len, sizeof(char));
 	if (!buf)
 		return RC_OUT_OF_MEMORY;
-	logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
+	if (ctx->dbg.level > 2)
+		logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
 
 	for (i = 0; i < ctx->info_count; i++) {
 		int rc2;
@@ -447,10 +449,12 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		strlcat(buf, info->creds.password, len);
 
 		/* query required buffer size for base64 encoded data */
-		logit(LOG_DEBUG, "Checking required size for base64 encoding of user:pass for %s ...", info->system->name);
+		if (ctx->dbg.level > 2)
+			logit(LOG_DEBUG, "Checking required size for base64 encoding of user:pass for %s ...", info->system->name);
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
 
-		logit(LOG_DEBUG, "Allocating %zd bytes buffer for base64 encoding.", dlen);
+		if (ctx->dbg.level > 2)
+			logit(LOG_DEBUG, "Allocating %zd bytes buffer for base64 encoding.", dlen);
 		encode = malloc(dlen);
 		if (!encode) {
 			logit(LOG_WARNING, "Out of memory when base64 encoding user:pass for %s!", info->system->name);
@@ -467,13 +471,15 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 			break;
 		}
 
-		logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
+		if (ctx->dbg.level > 2)
+			logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
 	}
 
-	logit(LOG_DEBUG, "Freeing temp encoding buffer %p", buf);
+	if (ctx->dbg.level > 2)
+		logit(LOG_DEBUG, "Freeing temp encoding buffer %p", buf);
 	free(buf);
 
 	return rc;
@@ -548,7 +554,7 @@ static int check_address(ddns_t *ctx)
 
 		/* Ask IP server something so he will respond and give me my IP */
 		DO(server_transaction(ctx, servernum));
-		if (ctx->dbg.level > 1) {
+		if (ctx->dbg.level > 2) {
 			logit(LOG_DEBUG, "IP server response:");
 			logit(LOG_DEBUG, "%s", ctx->work_buf);
 		}
