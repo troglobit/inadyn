@@ -1,7 +1,5 @@
 /* Plugin for GiraDNS
  *
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
- * Copyright (C) 2014       Andy Padavan <andy.padavan@gmail.com>
  * Copyright (C) 2015       Thorsten Mühlfelder <thenktor@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
