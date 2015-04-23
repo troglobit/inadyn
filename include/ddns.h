@@ -63,7 +63,7 @@
 #define DYNDNS_DEFAULT_ITERATIONS         0       /* Forever */
 #define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE  2500    /* Bytes */
 #define DYNDNS_HTTP_REQUEST_BUFFER_SIZE   2500    /* Bytes */
-#define DYNDNS_MAX_ALIAS_NUMBER           10      /* maximum number of aliases per server that can be maintained */
+#define DYNDNS_MAX_ALIAS_NUMBER           50      /* maximum number of aliases per server that can be maintained */
 #define DYNDNS_MAX_SERVER_NUMBER          5       /* maximum number of servers that can be maintained */
 
 /* local configs */
