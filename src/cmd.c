@@ -184,6 +184,7 @@ static cmd_desc_t cmd_options_table[] = {
 	 "\t\t\t     default@domains.google.com\n"
 	 "\t\t\t     default@ovh.com\n"
 	 "\t\t\t     default@gira.de\n"
+	 "\t\t\t     default@duiadns.net\n"
 	 "\t\t\t     custom@http_srv_basic_auth"},
 	{"--dyndns_system", 1, {get_dyndns_system_handler, NULL}, NULL},
 
