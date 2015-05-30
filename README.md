@@ -67,6 +67,7 @@ DDNS plugin.  See below for configuration examples.
 * https://www.ovh.com
 * https://www.dtdns.com
 * http://giradns.com
+* https://www.duiadns.net
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
