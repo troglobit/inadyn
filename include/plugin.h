@@ -24,7 +24,7 @@
 #ifndef INADYN_PLUGIN_H_
 #define INADYN_PLUGIN_H_
 
-#include "queue.h"		/* BSD sys/queue.h API */
+#include "libite/queue.h"	/* BSD sys/queue.h API */
 
 #define GENERIC_HTTP_REQUEST                                      	\
 	"GET %s HTTP/1.0\r\n"						\

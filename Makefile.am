@@ -1,6 +1,6 @@
 ## Inadyn - A small and simple DDNS client                -*-Makefile-*-
 
-SUBDIRS         = src include man
+SUBDIRS         = libite src include man
 doc_DATA	= README AUTHORS COPYING NEWS ChangeLog
 EXTRA_DIST	= autogen.sh
 DISTCLEANFILES	= *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d

@@ -1,0 +1,3 @@
+[submodule "libite"]
+	path = libite
+	url = git@github.com:troglobit/libite.git

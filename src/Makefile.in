@@ -63,26 +63,40 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(sbin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_inadyn_OBJECTS = main.$(OBJEXT) ddns.$(OBJEXT) cache.$(OBJEXT) \
-	error.$(OBJEXT) cmd.$(OBJEXT) os.$(OBJEXT) strlcpy.$(OBJEXT) \
-	strlcat.$(OBJEXT) http.$(OBJEXT) ssl.$(OBJEXT) tcp.$(OBJEXT) \
-	ip.$(OBJEXT) sha1.$(OBJEXT) base64.$(OBJEXT) md5.$(OBJEXT) \
-	plugin.$(OBJEXT) ../plugins/common.$(OBJEXT) \
-	../plugins/dyndns.$(OBJEXT) ../plugins/changeip.$(OBJEXT) \
-	../plugins/dnsexit.$(OBJEXT) ../plugins/easydns.$(OBJEXT) \
-	../plugins/freedns.$(OBJEXT) ../plugins/generic.$(OBJEXT) \
-	../plugins/sitelutions.$(OBJEXT) \
-	../plugins/tunnelbroker.$(OBJEXT) ../plugins/tzo.$(OBJEXT) \
-	../plugins/zoneedit.$(OBJEXT) ../plugins/zerigo.$(OBJEXT) \
-	../plugins/dhis.$(OBJEXT) ../plugins/duckdns.$(OBJEXT) \
-	../plugins/dtdns.$(OBJEXT) ../plugins/giradns.$(OBJEXT) \
-	../plugins/duiadns.$(OBJEXT)
+am_inadyn_OBJECTS = inadyn-main.$(OBJEXT) inadyn-ddns.$(OBJEXT) \
+	inadyn-cache.$(OBJEXT) inadyn-error.$(OBJEXT) \
+	inadyn-cmd.$(OBJEXT) inadyn-os.$(OBJEXT) inadyn-http.$(OBJEXT) \
+	inadyn-ssl.$(OBJEXT) inadyn-tcp.$(OBJEXT) inadyn-ip.$(OBJEXT) \
+	inadyn-sha1.$(OBJEXT) inadyn-base64.$(OBJEXT) \
+	inadyn-md5.$(OBJEXT) inadyn-plugin.$(OBJEXT) \
+	../plugins/inadyn-common.$(OBJEXT) \
+	../plugins/inadyn-dyndns.$(OBJEXT) \
+	../plugins/inadyn-changeip.$(OBJEXT) \
+	../plugins/inadyn-dnsexit.$(OBJEXT) \
+	../plugins/inadyn-easydns.$(OBJEXT) \
+	../plugins/inadyn-freedns.$(OBJEXT) \
+	../plugins/inadyn-generic.$(OBJEXT) \
+	../plugins/inadyn-sitelutions.$(OBJEXT) \
+	../plugins/inadyn-tunnelbroker.$(OBJEXT) \
+	../plugins/inadyn-tzo.$(OBJEXT) \
+	../plugins/inadyn-zoneedit.$(OBJEXT) \
+	../plugins/inadyn-zerigo.$(OBJEXT) \
+	../plugins/inadyn-dhis.$(OBJEXT) \
+	../plugins/inadyn-duckdns.$(OBJEXT) \
+	../plugins/inadyn-dtdns.$(OBJEXT) \
+	../plugins/inadyn-giradns.$(OBJEXT) \
+	../plugins/inadyn-duiadns.$(OBJEXT)
 inadyn_OBJECTS = $(am_inadyn_OBJECTS)
 inadyn_DEPENDENCIES =
+inadyn_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(inadyn_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
@@ -197,16 +211,17 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
-inadyn_SOURCES = main.c ddns.c cache.c error.c cmd.c os.c strlcpy.c \
-	strlcat.c http.c ssl.c tcp.c ip.c sha1.c base64.c md5.c \
-	plugin.c ../plugins/common.c ../plugins/dyndns.c \
-	../plugins/changeip.c ../plugins/dnsexit.c \
+inadyn_SOURCES = main.c ddns.c cache.c error.c cmd.c os.c http.c ssl.c \
+	tcp.c ip.c sha1.c base64.c md5.c plugin.c ../plugins/common.c \
+	../plugins/dyndns.c ../plugins/changeip.c ../plugins/dnsexit.c \
 	../plugins/easydns.c ../plugins/freedns.c ../plugins/generic.c \
 	../plugins/sitelutions.c ../plugins/tunnelbroker.c \
 	../plugins/tzo.c ../plugins/zoneedit.c ../plugins/zerigo.c \
 	../plugins/dhis.c ../plugins/duckdns.c ../plugins/dtdns.c \
 	../plugins/giradns.c ../plugins/duiadns.c
-inadyn_LDADD = -ldl
+inadyn_CPPFLAGS = -I../
+inadyn_LDFLAGS = -L../libite
+inadyn_LDADD = -ldl -lite
 all: all-am
 
 .SUFFIXES:
@@ -287,100 +302,98 @@ clean-sbinPROGRAMS:
 ../plugins/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ../plugins/$(DEPDIR)
 	@: > ../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/common.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-common.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/dyndns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-dyndns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/changeip.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-changeip.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/dnsexit.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-dnsexit.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/easydns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-easydns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/freedns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-freedns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/generic.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-generic.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/sitelutions.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-sitelutions.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/tunnelbroker.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-tunnelbroker.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/tzo.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-tzo.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/zoneedit.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-zoneedit.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/zerigo.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-zerigo.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/dhis.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-dhis.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/duckdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-duckdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/dtdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-dtdns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/giradns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-giradns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
-../plugins/duiadns.$(OBJEXT): ../plugins/$(am__dirstamp) \
+../plugins/inadyn-duiadns.$(OBJEXT): ../plugins/$(am__dirstamp) \
 	../plugins/$(DEPDIR)/$(am__dirstamp)
 inadyn$(EXEEXT): $(inadyn_OBJECTS) $(inadyn_DEPENDENCIES) $(EXTRA_inadyn_DEPENDENCIES) 
 	@rm -f inadyn$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(inadyn_OBJECTS) $(inadyn_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(inadyn_LINK) $(inadyn_OBJECTS) $(inadyn_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ../plugins/changeip.$(OBJEXT)
-	-rm -f ../plugins/common.$(OBJEXT)
-	-rm -f ../plugins/dhis.$(OBJEXT)
-	-rm -f ../plugins/dnsexit.$(OBJEXT)
-	-rm -f ../plugins/dtdns.$(OBJEXT)
-	-rm -f ../plugins/duckdns.$(OBJEXT)
-	-rm -f ../plugins/duiadns.$(OBJEXT)
-	-rm -f ../plugins/dyndns.$(OBJEXT)
-	-rm -f ../plugins/easydns.$(OBJEXT)
-	-rm -f ../plugins/freedns.$(OBJEXT)
-	-rm -f ../plugins/generic.$(OBJEXT)
-	-rm -f ../plugins/giradns.$(OBJEXT)
-	-rm -f ../plugins/sitelutions.$(OBJEXT)
-	-rm -f ../plugins/tunnelbroker.$(OBJEXT)
-	-rm -f ../plugins/tzo.$(OBJEXT)
-	-rm -f ../plugins/zerigo.$(OBJEXT)
-	-rm -f ../plugins/zoneedit.$(OBJEXT)
+	-rm -f ../plugins/inadyn-changeip.$(OBJEXT)
+	-rm -f ../plugins/inadyn-common.$(OBJEXT)
+	-rm -f ../plugins/inadyn-dhis.$(OBJEXT)
+	-rm -f ../plugins/inadyn-dnsexit.$(OBJEXT)
+	-rm -f ../plugins/inadyn-dtdns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-duckdns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-duiadns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-dyndns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-easydns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-freedns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-generic.$(OBJEXT)
+	-rm -f ../plugins/inadyn-giradns.$(OBJEXT)
+	-rm -f ../plugins/inadyn-sitelutions.$(OBJEXT)
+	-rm -f ../plugins/inadyn-tunnelbroker.$(OBJEXT)
+	-rm -f ../plugins/inadyn-tzo.$(OBJEXT)
+	-rm -f ../plugins/inadyn-zerigo.$(OBJEXT)
+	-rm -f ../plugins/inadyn-zoneedit.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/changeip.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/common.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dhis.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dnsexit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dtdns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/duckdns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/duiadns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/dyndns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/easydns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/freedns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/generic.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/giradns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/sitelutions.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/tunnelbroker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/tzo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/zerigo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/zoneedit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cache.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ddns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ip.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/os.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plugin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sha1.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strlcpy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tcp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-changeip.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-common.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-dhis.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-dnsexit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-dtdns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-duckdns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-duiadns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-dyndns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-easydns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-freedns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-generic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-giradns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-sitelutions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-tunnelbroker.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-tzo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-zerigo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-zoneedit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-base64.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-cache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-ddns.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-http.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-ip.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-md5.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-os.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-plugin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-sha1.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-ssl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-tcp.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -397,6 +410,440 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+inadyn-main.o: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-main.o -MD -MP -MF $(DEPDIR)/inadyn-main.Tpo -c -o inadyn-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-main.Tpo $(DEPDIR)/inadyn-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='inadyn-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-main.o `test -f 'main.c' || echo '$(srcdir)/'`main.c
+
+inadyn-main.obj: main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-main.obj -MD -MP -MF $(DEPDIR)/inadyn-main.Tpo -c -o inadyn-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-main.Tpo $(DEPDIR)/inadyn-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='main.c' object='inadyn-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-main.obj `if test -f 'main.c'; then $(CYGPATH_W) 'main.c'; else $(CYGPATH_W) '$(srcdir)/main.c'; fi`
+
+inadyn-ddns.o: ddns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ddns.o -MD -MP -MF $(DEPDIR)/inadyn-ddns.Tpo -c -o inadyn-ddns.o `test -f 'ddns.c' || echo '$(srcdir)/'`ddns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ddns.Tpo $(DEPDIR)/inadyn-ddns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ddns.c' object='inadyn-ddns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ddns.o `test -f 'ddns.c' || echo '$(srcdir)/'`ddns.c
+
+inadyn-ddns.obj: ddns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ddns.obj -MD -MP -MF $(DEPDIR)/inadyn-ddns.Tpo -c -o inadyn-ddns.obj `if test -f 'ddns.c'; then $(CYGPATH_W) 'ddns.c'; else $(CYGPATH_W) '$(srcdir)/ddns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ddns.Tpo $(DEPDIR)/inadyn-ddns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ddns.c' object='inadyn-ddns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ddns.obj `if test -f 'ddns.c'; then $(CYGPATH_W) 'ddns.c'; else $(CYGPATH_W) '$(srcdir)/ddns.c'; fi`
+
+inadyn-cache.o: cache.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cache.o -MD -MP -MF $(DEPDIR)/inadyn-cache.Tpo -c -o inadyn-cache.o `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cache.Tpo $(DEPDIR)/inadyn-cache.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cache.c' object='inadyn-cache.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cache.o `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
+
+inadyn-cache.obj: cache.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cache.obj -MD -MP -MF $(DEPDIR)/inadyn-cache.Tpo -c -o inadyn-cache.obj `if test -f 'cache.c'; then $(CYGPATH_W) 'cache.c'; else $(CYGPATH_W) '$(srcdir)/cache.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cache.Tpo $(DEPDIR)/inadyn-cache.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cache.c' object='inadyn-cache.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cache.obj `if test -f 'cache.c'; then $(CYGPATH_W) 'cache.c'; else $(CYGPATH_W) '$(srcdir)/cache.c'; fi`
+
+inadyn-error.o: error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-error.o -MD -MP -MF $(DEPDIR)/inadyn-error.Tpo -c -o inadyn-error.o `test -f 'error.c' || echo '$(srcdir)/'`error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-error.Tpo $(DEPDIR)/inadyn-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='error.c' object='inadyn-error.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-error.o `test -f 'error.c' || echo '$(srcdir)/'`error.c
+
+inadyn-error.obj: error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-error.obj -MD -MP -MF $(DEPDIR)/inadyn-error.Tpo -c -o inadyn-error.obj `if test -f 'error.c'; then $(CYGPATH_W) 'error.c'; else $(CYGPATH_W) '$(srcdir)/error.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-error.Tpo $(DEPDIR)/inadyn-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='error.c' object='inadyn-error.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-error.obj `if test -f 'error.c'; then $(CYGPATH_W) 'error.c'; else $(CYGPATH_W) '$(srcdir)/error.c'; fi`
+
+inadyn-cmd.o: cmd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cmd.o -MD -MP -MF $(DEPDIR)/inadyn-cmd.Tpo -c -o inadyn-cmd.o `test -f 'cmd.c' || echo '$(srcdir)/'`cmd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cmd.Tpo $(DEPDIR)/inadyn-cmd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmd.c' object='inadyn-cmd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cmd.o `test -f 'cmd.c' || echo '$(srcdir)/'`cmd.c
+
+inadyn-cmd.obj: cmd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cmd.obj -MD -MP -MF $(DEPDIR)/inadyn-cmd.Tpo -c -o inadyn-cmd.obj `if test -f 'cmd.c'; then $(CYGPATH_W) 'cmd.c'; else $(CYGPATH_W) '$(srcdir)/cmd.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cmd.Tpo $(DEPDIR)/inadyn-cmd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmd.c' object='inadyn-cmd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cmd.obj `if test -f 'cmd.c'; then $(CYGPATH_W) 'cmd.c'; else $(CYGPATH_W) '$(srcdir)/cmd.c'; fi`
+
+inadyn-os.o: os.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-os.o -MD -MP -MF $(DEPDIR)/inadyn-os.Tpo -c -o inadyn-os.o `test -f 'os.c' || echo '$(srcdir)/'`os.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-os.Tpo $(DEPDIR)/inadyn-os.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='os.c' object='inadyn-os.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-os.o `test -f 'os.c' || echo '$(srcdir)/'`os.c
+
+inadyn-os.obj: os.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-os.obj -MD -MP -MF $(DEPDIR)/inadyn-os.Tpo -c -o inadyn-os.obj `if test -f 'os.c'; then $(CYGPATH_W) 'os.c'; else $(CYGPATH_W) '$(srcdir)/os.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-os.Tpo $(DEPDIR)/inadyn-os.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='os.c' object='inadyn-os.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-os.obj `if test -f 'os.c'; then $(CYGPATH_W) 'os.c'; else $(CYGPATH_W) '$(srcdir)/os.c'; fi`
+
+inadyn-http.o: http.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-http.o -MD -MP -MF $(DEPDIR)/inadyn-http.Tpo -c -o inadyn-http.o `test -f 'http.c' || echo '$(srcdir)/'`http.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-http.Tpo $(DEPDIR)/inadyn-http.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='http.c' object='inadyn-http.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-http.o `test -f 'http.c' || echo '$(srcdir)/'`http.c
+
+inadyn-http.obj: http.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-http.obj -MD -MP -MF $(DEPDIR)/inadyn-http.Tpo -c -o inadyn-http.obj `if test -f 'http.c'; then $(CYGPATH_W) 'http.c'; else $(CYGPATH_W) '$(srcdir)/http.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-http.Tpo $(DEPDIR)/inadyn-http.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='http.c' object='inadyn-http.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-http.obj `if test -f 'http.c'; then $(CYGPATH_W) 'http.c'; else $(CYGPATH_W) '$(srcdir)/http.c'; fi`
+
+inadyn-ssl.o: ssl.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ssl.o -MD -MP -MF $(DEPDIR)/inadyn-ssl.Tpo -c -o inadyn-ssl.o `test -f 'ssl.c' || echo '$(srcdir)/'`ssl.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ssl.Tpo $(DEPDIR)/inadyn-ssl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ssl.c' object='inadyn-ssl.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ssl.o `test -f 'ssl.c' || echo '$(srcdir)/'`ssl.c
+
+inadyn-ssl.obj: ssl.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ssl.obj -MD -MP -MF $(DEPDIR)/inadyn-ssl.Tpo -c -o inadyn-ssl.obj `if test -f 'ssl.c'; then $(CYGPATH_W) 'ssl.c'; else $(CYGPATH_W) '$(srcdir)/ssl.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ssl.Tpo $(DEPDIR)/inadyn-ssl.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ssl.c' object='inadyn-ssl.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ssl.obj `if test -f 'ssl.c'; then $(CYGPATH_W) 'ssl.c'; else $(CYGPATH_W) '$(srcdir)/ssl.c'; fi`
+
+inadyn-tcp.o: tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-tcp.o -MD -MP -MF $(DEPDIR)/inadyn-tcp.Tpo -c -o inadyn-tcp.o `test -f 'tcp.c' || echo '$(srcdir)/'`tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-tcp.Tpo $(DEPDIR)/inadyn-tcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tcp.c' object='inadyn-tcp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-tcp.o `test -f 'tcp.c' || echo '$(srcdir)/'`tcp.c
+
+inadyn-tcp.obj: tcp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-tcp.obj -MD -MP -MF $(DEPDIR)/inadyn-tcp.Tpo -c -o inadyn-tcp.obj `if test -f 'tcp.c'; then $(CYGPATH_W) 'tcp.c'; else $(CYGPATH_W) '$(srcdir)/tcp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-tcp.Tpo $(DEPDIR)/inadyn-tcp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tcp.c' object='inadyn-tcp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-tcp.obj `if test -f 'tcp.c'; then $(CYGPATH_W) 'tcp.c'; else $(CYGPATH_W) '$(srcdir)/tcp.c'; fi`
+
+inadyn-ip.o: ip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ip.o -MD -MP -MF $(DEPDIR)/inadyn-ip.Tpo -c -o inadyn-ip.o `test -f 'ip.c' || echo '$(srcdir)/'`ip.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ip.Tpo $(DEPDIR)/inadyn-ip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ip.c' object='inadyn-ip.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ip.o `test -f 'ip.c' || echo '$(srcdir)/'`ip.c
+
+inadyn-ip.obj: ip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-ip.obj -MD -MP -MF $(DEPDIR)/inadyn-ip.Tpo -c -o inadyn-ip.obj `if test -f 'ip.c'; then $(CYGPATH_W) 'ip.c'; else $(CYGPATH_W) '$(srcdir)/ip.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-ip.Tpo $(DEPDIR)/inadyn-ip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ip.c' object='inadyn-ip.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-ip.obj `if test -f 'ip.c'; then $(CYGPATH_W) 'ip.c'; else $(CYGPATH_W) '$(srcdir)/ip.c'; fi`
+
+inadyn-sha1.o: sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-sha1.o -MD -MP -MF $(DEPDIR)/inadyn-sha1.Tpo -c -o inadyn-sha1.o `test -f 'sha1.c' || echo '$(srcdir)/'`sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-sha1.Tpo $(DEPDIR)/inadyn-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sha1.c' object='inadyn-sha1.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-sha1.o `test -f 'sha1.c' || echo '$(srcdir)/'`sha1.c
+
+inadyn-sha1.obj: sha1.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-sha1.obj -MD -MP -MF $(DEPDIR)/inadyn-sha1.Tpo -c -o inadyn-sha1.obj `if test -f 'sha1.c'; then $(CYGPATH_W) 'sha1.c'; else $(CYGPATH_W) '$(srcdir)/sha1.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-sha1.Tpo $(DEPDIR)/inadyn-sha1.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sha1.c' object='inadyn-sha1.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-sha1.obj `if test -f 'sha1.c'; then $(CYGPATH_W) 'sha1.c'; else $(CYGPATH_W) '$(srcdir)/sha1.c'; fi`
+
+inadyn-base64.o: base64.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-base64.o -MD -MP -MF $(DEPDIR)/inadyn-base64.Tpo -c -o inadyn-base64.o `test -f 'base64.c' || echo '$(srcdir)/'`base64.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-base64.Tpo $(DEPDIR)/inadyn-base64.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='base64.c' object='inadyn-base64.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-base64.o `test -f 'base64.c' || echo '$(srcdir)/'`base64.c
+
+inadyn-base64.obj: base64.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-base64.obj -MD -MP -MF $(DEPDIR)/inadyn-base64.Tpo -c -o inadyn-base64.obj `if test -f 'base64.c'; then $(CYGPATH_W) 'base64.c'; else $(CYGPATH_W) '$(srcdir)/base64.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-base64.Tpo $(DEPDIR)/inadyn-base64.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='base64.c' object='inadyn-base64.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-base64.obj `if test -f 'base64.c'; then $(CYGPATH_W) 'base64.c'; else $(CYGPATH_W) '$(srcdir)/base64.c'; fi`
+
+inadyn-md5.o: md5.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-md5.o -MD -MP -MF $(DEPDIR)/inadyn-md5.Tpo -c -o inadyn-md5.o `test -f 'md5.c' || echo '$(srcdir)/'`md5.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-md5.Tpo $(DEPDIR)/inadyn-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='md5.c' object='inadyn-md5.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-md5.o `test -f 'md5.c' || echo '$(srcdir)/'`md5.c
+
+inadyn-md5.obj: md5.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-md5.obj -MD -MP -MF $(DEPDIR)/inadyn-md5.Tpo -c -o inadyn-md5.obj `if test -f 'md5.c'; then $(CYGPATH_W) 'md5.c'; else $(CYGPATH_W) '$(srcdir)/md5.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-md5.Tpo $(DEPDIR)/inadyn-md5.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='md5.c' object='inadyn-md5.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-md5.obj `if test -f 'md5.c'; then $(CYGPATH_W) 'md5.c'; else $(CYGPATH_W) '$(srcdir)/md5.c'; fi`
+
+inadyn-plugin.o: plugin.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-plugin.o -MD -MP -MF $(DEPDIR)/inadyn-plugin.Tpo -c -o inadyn-plugin.o `test -f 'plugin.c' || echo '$(srcdir)/'`plugin.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-plugin.Tpo $(DEPDIR)/inadyn-plugin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='plugin.c' object='inadyn-plugin.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-plugin.o `test -f 'plugin.c' || echo '$(srcdir)/'`plugin.c
+
+inadyn-plugin.obj: plugin.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-plugin.obj -MD -MP -MF $(DEPDIR)/inadyn-plugin.Tpo -c -o inadyn-plugin.obj `if test -f 'plugin.c'; then $(CYGPATH_W) 'plugin.c'; else $(CYGPATH_W) '$(srcdir)/plugin.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-plugin.Tpo $(DEPDIR)/inadyn-plugin.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='plugin.c' object='inadyn-plugin.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-plugin.obj `if test -f 'plugin.c'; then $(CYGPATH_W) 'plugin.c'; else $(CYGPATH_W) '$(srcdir)/plugin.c'; fi`
+
+../plugins/inadyn-common.o: ../plugins/common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-common.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-common.Tpo -c -o ../plugins/inadyn-common.o `test -f '../plugins/common.c' || echo '$(srcdir)/'`../plugins/common.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-common.Tpo ../plugins/$(DEPDIR)/inadyn-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/common.c' object='../plugins/inadyn-common.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-common.o `test -f '../plugins/common.c' || echo '$(srcdir)/'`../plugins/common.c
+
+../plugins/inadyn-common.obj: ../plugins/common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-common.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-common.Tpo -c -o ../plugins/inadyn-common.obj `if test -f '../plugins/common.c'; then $(CYGPATH_W) '../plugins/common.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/common.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-common.Tpo ../plugins/$(DEPDIR)/inadyn-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/common.c' object='../plugins/inadyn-common.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-common.obj `if test -f '../plugins/common.c'; then $(CYGPATH_W) '../plugins/common.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/common.c'; fi`
+
+../plugins/inadyn-dyndns.o: ../plugins/dyndns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dyndns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dyndns.Tpo -c -o ../plugins/inadyn-dyndns.o `test -f '../plugins/dyndns.c' || echo '$(srcdir)/'`../plugins/dyndns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dyndns.Tpo ../plugins/$(DEPDIR)/inadyn-dyndns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dyndns.c' object='../plugins/inadyn-dyndns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dyndns.o `test -f '../plugins/dyndns.c' || echo '$(srcdir)/'`../plugins/dyndns.c
+
+../plugins/inadyn-dyndns.obj: ../plugins/dyndns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dyndns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dyndns.Tpo -c -o ../plugins/inadyn-dyndns.obj `if test -f '../plugins/dyndns.c'; then $(CYGPATH_W) '../plugins/dyndns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dyndns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dyndns.Tpo ../plugins/$(DEPDIR)/inadyn-dyndns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dyndns.c' object='../plugins/inadyn-dyndns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dyndns.obj `if test -f '../plugins/dyndns.c'; then $(CYGPATH_W) '../plugins/dyndns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dyndns.c'; fi`
+
+../plugins/inadyn-changeip.o: ../plugins/changeip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-changeip.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-changeip.Tpo -c -o ../plugins/inadyn-changeip.o `test -f '../plugins/changeip.c' || echo '$(srcdir)/'`../plugins/changeip.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-changeip.Tpo ../plugins/$(DEPDIR)/inadyn-changeip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/changeip.c' object='../plugins/inadyn-changeip.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-changeip.o `test -f '../plugins/changeip.c' || echo '$(srcdir)/'`../plugins/changeip.c
+
+../plugins/inadyn-changeip.obj: ../plugins/changeip.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-changeip.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-changeip.Tpo -c -o ../plugins/inadyn-changeip.obj `if test -f '../plugins/changeip.c'; then $(CYGPATH_W) '../plugins/changeip.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/changeip.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-changeip.Tpo ../plugins/$(DEPDIR)/inadyn-changeip.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/changeip.c' object='../plugins/inadyn-changeip.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-changeip.obj `if test -f '../plugins/changeip.c'; then $(CYGPATH_W) '../plugins/changeip.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/changeip.c'; fi`
+
+../plugins/inadyn-dnsexit.o: ../plugins/dnsexit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dnsexit.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dnsexit.Tpo -c -o ../plugins/inadyn-dnsexit.o `test -f '../plugins/dnsexit.c' || echo '$(srcdir)/'`../plugins/dnsexit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dnsexit.Tpo ../plugins/$(DEPDIR)/inadyn-dnsexit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dnsexit.c' object='../plugins/inadyn-dnsexit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dnsexit.o `test -f '../plugins/dnsexit.c' || echo '$(srcdir)/'`../plugins/dnsexit.c
+
+../plugins/inadyn-dnsexit.obj: ../plugins/dnsexit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dnsexit.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dnsexit.Tpo -c -o ../plugins/inadyn-dnsexit.obj `if test -f '../plugins/dnsexit.c'; then $(CYGPATH_W) '../plugins/dnsexit.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dnsexit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dnsexit.Tpo ../plugins/$(DEPDIR)/inadyn-dnsexit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dnsexit.c' object='../plugins/inadyn-dnsexit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dnsexit.obj `if test -f '../plugins/dnsexit.c'; then $(CYGPATH_W) '../plugins/dnsexit.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dnsexit.c'; fi`
+
+../plugins/inadyn-easydns.o: ../plugins/easydns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-easydns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-easydns.Tpo -c -o ../plugins/inadyn-easydns.o `test -f '../plugins/easydns.c' || echo '$(srcdir)/'`../plugins/easydns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-easydns.Tpo ../plugins/$(DEPDIR)/inadyn-easydns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/easydns.c' object='../plugins/inadyn-easydns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-easydns.o `test -f '../plugins/easydns.c' || echo '$(srcdir)/'`../plugins/easydns.c
+
+../plugins/inadyn-easydns.obj: ../plugins/easydns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-easydns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-easydns.Tpo -c -o ../plugins/inadyn-easydns.obj `if test -f '../plugins/easydns.c'; then $(CYGPATH_W) '../plugins/easydns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/easydns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-easydns.Tpo ../plugins/$(DEPDIR)/inadyn-easydns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/easydns.c' object='../plugins/inadyn-easydns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-easydns.obj `if test -f '../plugins/easydns.c'; then $(CYGPATH_W) '../plugins/easydns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/easydns.c'; fi`
+
+../plugins/inadyn-freedns.o: ../plugins/freedns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-freedns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-freedns.Tpo -c -o ../plugins/inadyn-freedns.o `test -f '../plugins/freedns.c' || echo '$(srcdir)/'`../plugins/freedns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-freedns.Tpo ../plugins/$(DEPDIR)/inadyn-freedns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/freedns.c' object='../plugins/inadyn-freedns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-freedns.o `test -f '../plugins/freedns.c' || echo '$(srcdir)/'`../plugins/freedns.c
+
+../plugins/inadyn-freedns.obj: ../plugins/freedns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-freedns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-freedns.Tpo -c -o ../plugins/inadyn-freedns.obj `if test -f '../plugins/freedns.c'; then $(CYGPATH_W) '../plugins/freedns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/freedns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-freedns.Tpo ../plugins/$(DEPDIR)/inadyn-freedns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/freedns.c' object='../plugins/inadyn-freedns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-freedns.obj `if test -f '../plugins/freedns.c'; then $(CYGPATH_W) '../plugins/freedns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/freedns.c'; fi`
+
+../plugins/inadyn-generic.o: ../plugins/generic.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-generic.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-generic.Tpo -c -o ../plugins/inadyn-generic.o `test -f '../plugins/generic.c' || echo '$(srcdir)/'`../plugins/generic.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-generic.Tpo ../plugins/$(DEPDIR)/inadyn-generic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/generic.c' object='../plugins/inadyn-generic.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-generic.o `test -f '../plugins/generic.c' || echo '$(srcdir)/'`../plugins/generic.c
+
+../plugins/inadyn-generic.obj: ../plugins/generic.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-generic.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-generic.Tpo -c -o ../plugins/inadyn-generic.obj `if test -f '../plugins/generic.c'; then $(CYGPATH_W) '../plugins/generic.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/generic.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-generic.Tpo ../plugins/$(DEPDIR)/inadyn-generic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/generic.c' object='../plugins/inadyn-generic.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-generic.obj `if test -f '../plugins/generic.c'; then $(CYGPATH_W) '../plugins/generic.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/generic.c'; fi`
+
+../plugins/inadyn-sitelutions.o: ../plugins/sitelutions.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-sitelutions.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-sitelutions.Tpo -c -o ../plugins/inadyn-sitelutions.o `test -f '../plugins/sitelutions.c' || echo '$(srcdir)/'`../plugins/sitelutions.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-sitelutions.Tpo ../plugins/$(DEPDIR)/inadyn-sitelutions.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/sitelutions.c' object='../plugins/inadyn-sitelutions.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-sitelutions.o `test -f '../plugins/sitelutions.c' || echo '$(srcdir)/'`../plugins/sitelutions.c
+
+../plugins/inadyn-sitelutions.obj: ../plugins/sitelutions.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-sitelutions.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-sitelutions.Tpo -c -o ../plugins/inadyn-sitelutions.obj `if test -f '../plugins/sitelutions.c'; then $(CYGPATH_W) '../plugins/sitelutions.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/sitelutions.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-sitelutions.Tpo ../plugins/$(DEPDIR)/inadyn-sitelutions.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/sitelutions.c' object='../plugins/inadyn-sitelutions.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-sitelutions.obj `if test -f '../plugins/sitelutions.c'; then $(CYGPATH_W) '../plugins/sitelutions.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/sitelutions.c'; fi`
+
+../plugins/inadyn-tunnelbroker.o: ../plugins/tunnelbroker.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-tunnelbroker.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Tpo -c -o ../plugins/inadyn-tunnelbroker.o `test -f '../plugins/tunnelbroker.c' || echo '$(srcdir)/'`../plugins/tunnelbroker.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Tpo ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/tunnelbroker.c' object='../plugins/inadyn-tunnelbroker.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-tunnelbroker.o `test -f '../plugins/tunnelbroker.c' || echo '$(srcdir)/'`../plugins/tunnelbroker.c
+
+../plugins/inadyn-tunnelbroker.obj: ../plugins/tunnelbroker.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-tunnelbroker.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Tpo -c -o ../plugins/inadyn-tunnelbroker.obj `if test -f '../plugins/tunnelbroker.c'; then $(CYGPATH_W) '../plugins/tunnelbroker.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/tunnelbroker.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Tpo ../plugins/$(DEPDIR)/inadyn-tunnelbroker.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/tunnelbroker.c' object='../plugins/inadyn-tunnelbroker.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-tunnelbroker.obj `if test -f '../plugins/tunnelbroker.c'; then $(CYGPATH_W) '../plugins/tunnelbroker.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/tunnelbroker.c'; fi`
+
+../plugins/inadyn-tzo.o: ../plugins/tzo.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-tzo.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-tzo.Tpo -c -o ../plugins/inadyn-tzo.o `test -f '../plugins/tzo.c' || echo '$(srcdir)/'`../plugins/tzo.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-tzo.Tpo ../plugins/$(DEPDIR)/inadyn-tzo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/tzo.c' object='../plugins/inadyn-tzo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-tzo.o `test -f '../plugins/tzo.c' || echo '$(srcdir)/'`../plugins/tzo.c
+
+../plugins/inadyn-tzo.obj: ../plugins/tzo.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-tzo.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-tzo.Tpo -c -o ../plugins/inadyn-tzo.obj `if test -f '../plugins/tzo.c'; then $(CYGPATH_W) '../plugins/tzo.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/tzo.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-tzo.Tpo ../plugins/$(DEPDIR)/inadyn-tzo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/tzo.c' object='../plugins/inadyn-tzo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-tzo.obj `if test -f '../plugins/tzo.c'; then $(CYGPATH_W) '../plugins/tzo.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/tzo.c'; fi`
+
+../plugins/inadyn-zoneedit.o: ../plugins/zoneedit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-zoneedit.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-zoneedit.Tpo -c -o ../plugins/inadyn-zoneedit.o `test -f '../plugins/zoneedit.c' || echo '$(srcdir)/'`../plugins/zoneedit.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-zoneedit.Tpo ../plugins/$(DEPDIR)/inadyn-zoneedit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/zoneedit.c' object='../plugins/inadyn-zoneedit.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-zoneedit.o `test -f '../plugins/zoneedit.c' || echo '$(srcdir)/'`../plugins/zoneedit.c
+
+../plugins/inadyn-zoneedit.obj: ../plugins/zoneedit.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-zoneedit.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-zoneedit.Tpo -c -o ../plugins/inadyn-zoneedit.obj `if test -f '../plugins/zoneedit.c'; then $(CYGPATH_W) '../plugins/zoneedit.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/zoneedit.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-zoneedit.Tpo ../plugins/$(DEPDIR)/inadyn-zoneedit.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/zoneedit.c' object='../plugins/inadyn-zoneedit.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-zoneedit.obj `if test -f '../plugins/zoneedit.c'; then $(CYGPATH_W) '../plugins/zoneedit.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/zoneedit.c'; fi`
+
+../plugins/inadyn-zerigo.o: ../plugins/zerigo.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-zerigo.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-zerigo.Tpo -c -o ../plugins/inadyn-zerigo.o `test -f '../plugins/zerigo.c' || echo '$(srcdir)/'`../plugins/zerigo.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-zerigo.Tpo ../plugins/$(DEPDIR)/inadyn-zerigo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/zerigo.c' object='../plugins/inadyn-zerigo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-zerigo.o `test -f '../plugins/zerigo.c' || echo '$(srcdir)/'`../plugins/zerigo.c
+
+../plugins/inadyn-zerigo.obj: ../plugins/zerigo.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-zerigo.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-zerigo.Tpo -c -o ../plugins/inadyn-zerigo.obj `if test -f '../plugins/zerigo.c'; then $(CYGPATH_W) '../plugins/zerigo.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/zerigo.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-zerigo.Tpo ../plugins/$(DEPDIR)/inadyn-zerigo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/zerigo.c' object='../plugins/inadyn-zerigo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-zerigo.obj `if test -f '../plugins/zerigo.c'; then $(CYGPATH_W) '../plugins/zerigo.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/zerigo.c'; fi`
+
+../plugins/inadyn-dhis.o: ../plugins/dhis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dhis.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dhis.Tpo -c -o ../plugins/inadyn-dhis.o `test -f '../plugins/dhis.c' || echo '$(srcdir)/'`../plugins/dhis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dhis.Tpo ../plugins/$(DEPDIR)/inadyn-dhis.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dhis.c' object='../plugins/inadyn-dhis.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dhis.o `test -f '../plugins/dhis.c' || echo '$(srcdir)/'`../plugins/dhis.c
+
+../plugins/inadyn-dhis.obj: ../plugins/dhis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dhis.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dhis.Tpo -c -o ../plugins/inadyn-dhis.obj `if test -f '../plugins/dhis.c'; then $(CYGPATH_W) '../plugins/dhis.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dhis.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dhis.Tpo ../plugins/$(DEPDIR)/inadyn-dhis.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dhis.c' object='../plugins/inadyn-dhis.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dhis.obj `if test -f '../plugins/dhis.c'; then $(CYGPATH_W) '../plugins/dhis.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dhis.c'; fi`
+
+../plugins/inadyn-duckdns.o: ../plugins/duckdns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-duckdns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-duckdns.Tpo -c -o ../plugins/inadyn-duckdns.o `test -f '../plugins/duckdns.c' || echo '$(srcdir)/'`../plugins/duckdns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-duckdns.Tpo ../plugins/$(DEPDIR)/inadyn-duckdns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/duckdns.c' object='../plugins/inadyn-duckdns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-duckdns.o `test -f '../plugins/duckdns.c' || echo '$(srcdir)/'`../plugins/duckdns.c
+
+../plugins/inadyn-duckdns.obj: ../plugins/duckdns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-duckdns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-duckdns.Tpo -c -o ../plugins/inadyn-duckdns.obj `if test -f '../plugins/duckdns.c'; then $(CYGPATH_W) '../plugins/duckdns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/duckdns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-duckdns.Tpo ../plugins/$(DEPDIR)/inadyn-duckdns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/duckdns.c' object='../plugins/inadyn-duckdns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-duckdns.obj `if test -f '../plugins/duckdns.c'; then $(CYGPATH_W) '../plugins/duckdns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/duckdns.c'; fi`
+
+../plugins/inadyn-dtdns.o: ../plugins/dtdns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dtdns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dtdns.Tpo -c -o ../plugins/inadyn-dtdns.o `test -f '../plugins/dtdns.c' || echo '$(srcdir)/'`../plugins/dtdns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dtdns.Tpo ../plugins/$(DEPDIR)/inadyn-dtdns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dtdns.c' object='../plugins/inadyn-dtdns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dtdns.o `test -f '../plugins/dtdns.c' || echo '$(srcdir)/'`../plugins/dtdns.c
+
+../plugins/inadyn-dtdns.obj: ../plugins/dtdns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-dtdns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-dtdns.Tpo -c -o ../plugins/inadyn-dtdns.obj `if test -f '../plugins/dtdns.c'; then $(CYGPATH_W) '../plugins/dtdns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dtdns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-dtdns.Tpo ../plugins/$(DEPDIR)/inadyn-dtdns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/dtdns.c' object='../plugins/inadyn-dtdns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-dtdns.obj `if test -f '../plugins/dtdns.c'; then $(CYGPATH_W) '../plugins/dtdns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/dtdns.c'; fi`
+
+../plugins/inadyn-giradns.o: ../plugins/giradns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-giradns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-giradns.Tpo -c -o ../plugins/inadyn-giradns.o `test -f '../plugins/giradns.c' || echo '$(srcdir)/'`../plugins/giradns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-giradns.Tpo ../plugins/$(DEPDIR)/inadyn-giradns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/giradns.c' object='../plugins/inadyn-giradns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-giradns.o `test -f '../plugins/giradns.c' || echo '$(srcdir)/'`../plugins/giradns.c
+
+../plugins/inadyn-giradns.obj: ../plugins/giradns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-giradns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-giradns.Tpo -c -o ../plugins/inadyn-giradns.obj `if test -f '../plugins/giradns.c'; then $(CYGPATH_W) '../plugins/giradns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/giradns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-giradns.Tpo ../plugins/$(DEPDIR)/inadyn-giradns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/giradns.c' object='../plugins/inadyn-giradns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-giradns.obj `if test -f '../plugins/giradns.c'; then $(CYGPATH_W) '../plugins/giradns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/giradns.c'; fi`
+
+../plugins/inadyn-duiadns.o: ../plugins/duiadns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-duiadns.o -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-duiadns.Tpo -c -o ../plugins/inadyn-duiadns.o `test -f '../plugins/duiadns.c' || echo '$(srcdir)/'`../plugins/duiadns.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-duiadns.Tpo ../plugins/$(DEPDIR)/inadyn-duiadns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/duiadns.c' object='../plugins/inadyn-duiadns.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-duiadns.o `test -f '../plugins/duiadns.c' || echo '$(srcdir)/'`../plugins/duiadns.c
+
+../plugins/inadyn-duiadns.obj: ../plugins/duiadns.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../plugins/inadyn-duiadns.obj -MD -MP -MF ../plugins/$(DEPDIR)/inadyn-duiadns.Tpo -c -o ../plugins/inadyn-duiadns.obj `if test -f '../plugins/duiadns.c'; then $(CYGPATH_W) '../plugins/duiadns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/duiadns.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../plugins/$(DEPDIR)/inadyn-duiadns.Tpo ../plugins/$(DEPDIR)/inadyn-duiadns.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='../plugins/duiadns.c' object='../plugins/inadyn-duiadns.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../plugins/inadyn-duiadns.obj `if test -f '../plugins/duiadns.c'; then $(CYGPATH_W) '../plugins/duiadns.c'; else $(CYGPATH_W) '$(srcdir)/../plugins/duiadns.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

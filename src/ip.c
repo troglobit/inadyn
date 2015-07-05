@@ -32,9 +32,9 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include "libite/lite.h"
 #include "debug.h"
 #include "ip.h"
-#include "strlfun.h"
 
 int ip_construct(ip_sock_t *ip)
 {
