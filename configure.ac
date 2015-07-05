@@ -4,7 +4,7 @@
 AC_PREREQ(2.61)
 AC_INIT(inadyn, 1.99.14-dev, https://github.com/troglobit/inadyn/issues)
 AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz])
-AM_SILENT_RULES()
+AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])

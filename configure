@@ -2765,7 +2765,7 @@ fi
 case $enable_silent_rules in
 yes) AM_DEFAULT_VERBOSITY=0;;
 no)  AM_DEFAULT_VERBOSITY=1;;
-*)   AM_DEFAULT_VERBOSITY=1;;
+*)   AM_DEFAULT_VERBOSITY=0;;
 esac
 am_make=${MAKE-make}
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
