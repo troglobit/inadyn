@@ -1294,8 +1294,11 @@ static int validate_configuration(ddns_t *ctx)
 		int ok = 1;
 		ddns_info_t *account = &ctx->info[i];
 
-		check_setting(strlen(account->creds.username), i, "Missing username", &ok);
-		check_setting(strlen(account->creds.password), i, "Missing password", &ok);
+		/* username, password, and alias not required for custom setups */
+		if (strncmp(account->system->name, "custom@", 7)) {
+			check_setting(strlen(account->creds.username), i, "Missing username", &ok);
+			check_setting(strlen(account->creds.password), i, "Missing password", &ok);
+		}
 		check_setting(account->alias_count, i, "Missing your alias/hostname", &ok);
 		check_setting(strlen(account->server_name.name), i,
 			      "Missing DDNS server address, check DDNS provider", &ok);
