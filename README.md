@@ -154,14 +154,14 @@ A DDNS provider like <http://twoDNS.de> can be setup like this:
         server-url /update?hostname=
         alias myalias.dd-dns.de
 
-For [Namecheap](https://www.namecheap.com) DDNS:
+For <https://www.namecheap.com> DDNS:
 
     system custom@http_srv_basic_auth
-        username your-username
-        password namecheap-provided-ddns-password
+        username myuser
+        password mypass
         ssl
         server-name dynamicdns.park-your-domain.com
-        server-url /update?domain=YOURDOMAIN.TLD&password=NAMECHEAP-PROVIDED-DDNS-PASSWORD&host=
+        server-url /update?domain=YOURDOMAIN.TLD&password=mypass&host=
         alias alpha.YOURDOMAIN.TLD
         alias beta.YOURDOMAIN.TLD
         alias gamma.YOURDOMAIN.TLD
@@ -172,10 +172,20 @@ Leave `server-name` as is, and change/add/remove `alias` to your DNS
 name.  If you only wish to update a subdomain, set `alias` to that, like
 the example above.  Username is your Namecheap username, and password
 would be the one given to you in the Dynamic DNS panel from Namecheap.
+Here is an alternative config to illustrate how the `alias` setting
+works:
+
+    system custom@http_srv_basic_auth
+        username myuser
+        password mypass
+        ssl
+        server-name dynamicdns.park-your-domain.com
+        server-url /update?password=mypass&domain=
+        alias YOURDOMAIN.TLD
 
 As of Inadyn v1.99.14 the generic plugin can also be used with providers
-that require the client's IP in the update request, as <http://dyn.com>
-do:
+that require the client's IP in the update request.  Here we *pretend*
+that <http://dyn.com> is not supported by Inadyn:
 
     # This emulates default@dyndns.org
     system custom@http_srv_basic_auth
@@ -190,8 +200,7 @@ do:
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  Inadyn currently looks for a `200 HTTP` response OK
 code and the strings `"good"`, `"OK"`, or `"true"` in the HTTP response
-body.  You may have to modify Inadyn manually, any patches for this are
-most welcome!
+body.
 
 **Note:** the `alias` setting is required, even if you encode everything
 in the `server-url`!  The given alias is appended to the `server-url`
@@ -238,3 +247,9 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
 [Coverity Status]:  https://scan.coverity.com/projects/2981/badge.svg
+
+<!--
+  -- Local Variables:
+  -- mode: markdown
+  -- End:
+  -->
