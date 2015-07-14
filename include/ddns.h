@@ -130,6 +130,7 @@ typedef struct {
 	int            wildcard;
 
 	int            ssl_enabled;
+	int            append_myip; /* For custom setups! */
 } ddns_info_t;
 
 /* Client context */

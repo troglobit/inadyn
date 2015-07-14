@@ -1,6 +1,6 @@
 Inadyn | Small and simple DDNS client
 =====================================
-[![Travis Status]][Travis] [![Coverity Status]][Coverity Scan]
+[![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
 Table of Contents
@@ -17,10 +17,10 @@ Table of Contents
 Introduction
 ------------
 
-Inadyn is a small and simple [DDNS] client with HTTPS support.  It is
+Inadyn is a small and simple [DDNS][] client with HTTPS support.  It is
 commonly available in many GNU/Linux distributions, used in off the
 shelf routers and Internet gateways to automate the task of keeping your
-DNS record up to date with any IP address changes from your [ISP].  It
+DNS record up to date with any IP address changes from your [ISP][].  It
 can also be used in installations with redundant (backup) connections to
 the Internet.
 
@@ -40,34 +40,34 @@ Supported Providers
 -------------------
 
 The following DDNS providers are supported natively, other providers,
-like http://twoDNS.de for instance, can be supported using the generic
+like <http://twoDNS.de> for instance, can be supported using the generic
 DDNS plugin.  See below for configuration examples.
 
-* http://www.dyndns.org
-* http://freedns.afraid.org
-* http://www.zoneedit.com
-* http://www.no-ip.com
-* http://www.easydns.com
-* http://www.tzo.com
-* http://www.3322.org
-* http://www.dnsomatic.com
-* http://www.tunnelbroker.net
-* http://dns.he.net/
-* http://www.dynsip.org
-* http://www.sitelutions.com
-* http://www.dnsexit.com
-* http://www.changeip.com
-* http://www.zerigo.com
-* http://www.dhis.org
-* https://nsupdate.info
-* http://duckdns.org
-* https://www.loopia.com
-* https://www.namecheap.com
-* https://domains.google.com
-* https://www.ovh.com
-* https://www.dtdns.com
-* http://giradns.com
-* https://www.duiadns.net
+* <http://www.dyndns.org>
+* <http://freedns.afraid.org>
+* <http://www.zoneedit.com>
+* <http://www.no-ip.com>
+* <http://www.easydns.com>
+* <http://www.tzo.com>
+* <http://www.3322.org>
+* <http://www.dnsomatic.com>
+* <http://www.tunnelbroker.net>
+* <http://dns.he.net/>
+* <http://www.dynsip.org>
+* <http://www.sitelutions.com>
+* <http://www.dnsexit.com>
+* <http://www.changeip.com>
+* <http://www.zerigo.com>
+* <http://www.dhis.org>
+* <https://nsupdate.info>
+* <http://duckdns.org>
+* <https://www.loopia.com>
+* <https://www.namecheap.com>
+* <https://domains.google.com>
+* <https://www.ovh.com>
+* <https://www.dtdns.com>
+* <http://giradns.com>
+* <https://www.duiadns.net>
 
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
@@ -87,7 +87,7 @@ Example Configuration
 
 Inadyn supports updating several DDNS servers, several accounts even on
 different DDNS providers.  The following example config file illustrates
-how it can be used.  Feature is courtesy of [Christian Eyrich].
+how it can be used.  Feature is courtesy of [Christian Eyrich][].
 
 Example `/etc/inadyn.conf`:
 
@@ -132,41 +132,73 @@ Generic DDNS Plugin
 -------------------
 
 Aside from dedicated DDNS provider support, Inadyn also has a generic
-DDNS provider plugin.  A DDNS provider like twoDNS.de can be setup like
-this:
+DDNS provider plugin.  Use `custom@http_srv_basic_auth` as your system.
+This will use HTTP basic authentication (base64 encoded username and
+password).  If you don't have a username and/or password, you can try to
+leave these fields empty for the `custom@` system.  Inadyn will still
+send basic authentication, but use an empty username and/or password
+when communicating with the server.
+
+A DDNS provider like <http://twoDNS.de> can be setup like this:
 
     period         300
     startup-delay  60
     cache-dir      /etc/inadyn
 
     system custom@http_srv_basic_auth
-        ssl
-        checkip-url checkip.two-dns.de /
-        server-name update.twodns.de
-        server-url /update?hostname=
         username myuser
         password mypass
+        checkip-url checkip.two-dns.de /
+        ssl
+        server-name update.twodns.de
+        server-url /update?hostname=
         alias myalias.dd-dns.de
 
-For Namecheap DDNS:
+For [Namecheap](https://www.namecheap.com) DDNS:
 
     system custom@http_srv_basic_auth
+        username your-username
+        password namecheap-provided-ddns-password
         ssl
         server-name dynamicdns.park-your-domain.com
         server-url /update?domain=YOURDOMAIN.TLD&password=NAMECHEAP-PROVIDED-DDNS-PASSWORD&host=
-        alias myalias
-        username your-username
-        password namecheap-provided-ddns-password
+        alias alpha.YOURDOMAIN.TLD
+        alias beta.YOURDOMAIN.TLD
+        alias gamma.YOURDOMAIN.TLD
 
-Leave `server-name` as is, and change `myalias` if you wish to use a
-subdomain if you wish to use one. Username is your Namecheap username, and
-password would be the one given to you in the Dynamic DNS panel from
-Namecheap.
+Here three subdomains are updated, one `server-url` GET update request
+per alias.  The alias is appended to `...host=` and sent to the server.
+Leave `server-name` as is, and change/add/remove `alias` to your DNS
+name.  If you only wish to update a subdomain, set `alias` to that, like
+the example above.  Username is your Namecheap username, and password
+would be the one given to you in the Dynamic DNS panel from Namecheap.
+
+As of Inadyn v1.99.14 the generic plugin can also be used with providers
+that require the client's IP in the update request, as <http://dyn.com>
+do:
+
+    # This emulates default@dyndns.org
+    system custom@http_srv_basic_auth
+        username DYNUSERNAME
+        password DYNPASSWORD
+        ssl
+        server-name members.dyndns.org
+        server-url /nic/update?hostname=YOURHOST.dyndns.org&myip=
+        append-myip
+        alias YOURHOST
 
 When using the generic plugin you should first inspect the response from
-the DDNS provider.  Inadyn currently looks for a 200 HTTP response OK
-code and the string "good" or "OK" in the HTTP response body.  You may
-have to modify Inadyn manually, any patches for this are most welcome!
+the DDNS provider.  Inadyn currently looks for a `200 HTTP` response OK
+code and the strings `"good"`, `"OK"`, or `"true"` in the HTTP response
+body.  You may have to modify Inadyn manually, any patches for this are
+most welcome!
+
+**Note:** the `alias` setting is required, even if you encode everything
+in the `server-url`!  The given alias is appended to the `server-url`
+used for updates, unless you use `append-myip` in which case your IP
+address will be appended instead.  When using `append-myip` you probably
+need to encode your DNS hostname in the `server-url` instead &mdash;
+as is done in the last example above.
 
 
 Build & Install
@@ -185,16 +217,16 @@ To completely disable the HTTPS support in Inadyn:
 
 For more details on the OpenSSL and GNU GPL license issue, see:
 
-* https://lists.debian.org/debian-legal/2004/05/msg00595.html
-* https://people.gnome.org/~markmc/openssl-and-the-gpl
+* <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
+* <https://people.gnome.org/~markmc/openssl-and-the-gpl>
 
 
 Origin & References
 -------------------
 
-This is the continuation of Narcis Ilisei's [original] INADYN.  Now
-maintained by [Joachim Nilsson] at [GitHub].  Please file bug reports,
-or send pull requests for bug fixes and proposed extensions.
+This is the continuation of Narcis Ilisei's [original][] INADYN.  Now
+maintained by [Joachim Nilsson][].  Please file bug reports, or send
+pull requests for bug fixes and proposed extensions at [GitHub][].
 
 [original]:         http://www.inatech.eu/inadyn/
 [DDNS]:             http://en.wikipedia.org/wiki/Dynamic_DNS
