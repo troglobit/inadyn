@@ -33,6 +33,7 @@
 #include "debug.h"
 #include "ddns.h"
 #include "cache.h"
+#include "libite/lite.h"
 
 #define MAXSTRING 1024
 
@@ -418,37 +419,6 @@ static int mkparentdir(char *file)
 	}
 
 	return rc;
-}
-
-static void pidexit(void)
-{
-	if (pidfile_path) {
-		unlink(pidfile_path);
-		free(pidfile_path);
-		pidfile_path = NULL;
-	}
-}
-
-static int pidfile(char *file)
-{
-	FILE *fp;
-
-	/* Ignore any errors, we may not be allowed to create the dir,
-	 * but still be able to create/overwrite the pidfile. */
-	mkparentdir(file);
-
-	fp = fopen(file, "w");
-	if (!fp) {
-		logit(LOG_ERR, "Failed creating pidfile %s: %s", file, strerror(errno));
-		return RC_FILE_IO_ACCESS_ERROR;
-	}
-
-	fprintf(fp, "%u\n", getpid());
-	fclose(fp);
-
-	atexit(pidexit);
-
-	return 0;
 }
 
 /* Create pid and cache file repository, make sure we can write to it.  If
