@@ -1,5 +1,6 @@
 # Travis CI integration
 language: c
+sudo: false
 compiler:
   - gcc
 
@@ -17,6 +18,6 @@ addons:
     notification_email: troglobit@gmail.com
     build_command_prepend: "./configure"
     build_command:   "make"
-    branch_pattern: master
+    branch_pattern: dev
 
 script: ./configure && make
