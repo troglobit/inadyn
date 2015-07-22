@@ -209,7 +209,7 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--update_period_sec", 1, {get_update_period_sec_handler, NULL}, NULL},
 	{"--update_period", 1, {get_update_period_handler, NULL}, NULL}, /* TODO: Replaced with startup-delay, remove in 2.0 */
 
-	{"-P", 1, {set_pidfile, NULL}, ""},
+	{"-P", 1,        {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
 #ifdef ENABLE_SSL

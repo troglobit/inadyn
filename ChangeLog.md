@@ -3,6 +3,17 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
+[UNRELEASED][]
+--------------
+
+Minor bugfix release.
+
+### Fixes
+- Fix issue #100: regression from [1.99.13][] pidfile is no longer
+  created.  Inadyn 1.x semantics incompatible with OpenBSD `pidfile()`
+  that replaced local version in [1.99.14][].  Reverting change.
+
+
 [1.99.14][] - 2015-07-14
 ------------------------
 
