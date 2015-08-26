@@ -327,6 +327,9 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		logit(LOG_DEBUG, "DDNS server response: %s", trans.p_rsp);
 
 	if (rc) {
+		/* Update failed, force update again in ctx->cmd_check_period seconds */
+		ctx->force_addr_update = 1;
+
 		http_exit(client);
 		return rc;
 	}
@@ -337,6 +340,9 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
 		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
 		      trans.p_rsp_body != trans.p_rsp ? trans.p_rsp_body : "");
+
+		/* Update failed, force update again in ctx->cmd_check_period seconds */
+		ctx->force_addr_update = 1;
 	} else {
 		logit(LOG_INFO, "Successful alias table update for %s => new IP# %s",
 		      alias->name, alias->address);
