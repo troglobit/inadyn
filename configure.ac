@@ -74,4 +74,19 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([atexit memset poll socket strerror])
 
+# Check if user has downloaded a GitHub ZIP file and attempt to fix it.
+AC_MSG_CHECKING([status of GIT submodules])
+if test ! -e libite/lite.h; then
+    AC_MSG_RESULT([Missing!])
+    AC_MSG_CHECKING([if we can update all submodules])
+    run=`git submodule update --init`
+    if test $? -ne 0; then
+       AC_MSG_RESULT([Failed!  No Internet access?])
+       exit 1
+    fi
+    AC_MSG_RESULT([Yes, all fixed!])
+else
+    AC_MSG_RESULT([OK])
+fi
+
 AC_OUTPUT

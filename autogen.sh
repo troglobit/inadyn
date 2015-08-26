@@ -4,4 +4,4 @@
 export ACLOCAL=aclocal-1.11
 export AUTOMAKE=automake-1.11
 
-autoreconf -vi
+autoreconf -W portability -visfm
