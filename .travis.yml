@@ -1,8 +1,9 @@
 # Travis CI integration
+# Defaults to GNU GCC and autotools: ./configure && make && make test
 language: c
+
+# We don't need to install packages, use dockerized build, quicker
 sudo: false
-compiler:
-  - gcc
 
 env:
   global:
@@ -16,8 +17,11 @@ addons:
       name: "troglobit/inadyn"
       description: "Inadyn | Small and Simple DDNS Client"
     notification_email: troglobit@gmail.com
-    build_command_prepend: "./configure"
+    build_command_prepend: "./autogen.sh && ./configure"
     build_command:   "make"
     branch_pattern: dev
 
-script: ./configure && make
+script:
+  - ./autogen.sh
+  - ./configure
+  - make
