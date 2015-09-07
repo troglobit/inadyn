@@ -305,7 +305,13 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (client->ssl_enabled) /* XXX: Fix this better, possibly in http_init() */
 		client->tcp.ip.port = 443;
 
-	DO(http_init(client, "Sending IP# update to DDNS server"));
+	rc = http_init(client, "Sending IP# update to DDNS server");
+	if (rc) {
+		/* Update failed, force update again in ctx->cmd_check_period seconds */
+		ctx->force_addr_update = 1;
+
+		return rc;
+	}
 
 	memset(ctx->work_buf, 0, ctx->work_buflen);
 	memset(ctx->request_buf, 0, ctx->request_buflen);
