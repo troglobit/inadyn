@@ -556,6 +556,7 @@ First stable version.
 
 
 [UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.14...HEAD
+[1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
 [1.99.13]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
 [1.99.12]: https://github.com/troglobit/inadyn/compare/1.99.11...1.99.12
