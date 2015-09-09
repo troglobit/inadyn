@@ -96,7 +96,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 		char address[MAX_ADDRESS_LEN];
 
 		if (fgets(address, sizeof(address), fp)) {
-			logit(LOG_INFO, "Cached IP# %s from previous invocation.", address);
+			logit(LOG_INFO, "Cached IP# %s for %s from previous invocation.", address, alias->name);
                         strlcpy(alias->address, address, sizeof(alias->address));
 		}
 
