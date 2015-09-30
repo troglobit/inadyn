@@ -22,6 +22,10 @@
 
 #include "plugin.h"
 
+/*
+ * For API documentation we currently only have this
+ *     https://www.duckdns.org/install.jsp#linux-cron
+ */
 #define DUCKDNS_UPDATE_IP_HTTP_REQUEST					\
 	"GET %s?"							\
 	"domains=%s&"							\
