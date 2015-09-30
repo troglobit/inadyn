@@ -26,7 +26,7 @@
 	"GET %s?"							\
 	"domains=%s&"							\
 	"token=%s&"							\
-	"ip=%s& "							\
+	"ip=%s "   							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
@@ -43,7 +43,7 @@ static ddns_system_t plugin = {
 	.checkip_name = "ipv4.wtfismyip.com",
 	.checkip_url  = "/text",
 
-	.server_name  = "duckdns.org",
+	.server_name  = "www.duckdns.org",
 	.server_url   = "/update"
 };
 
