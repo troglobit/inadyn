@@ -2,8 +2,8 @@
 # Defaults to GNU GCC and autotools: ./configure && make && make test
 language: c
 
-# We don't need to install packages, use dockerized build, quicker
-sudo: false
+# We need to install libConfuse, so we cannot use dockerized build
+sudo: true
 
 env:
   global:
@@ -22,6 +22,7 @@ addons:
     branch_pattern: dev
 
 script:
+  - sudo apt-get install libconfuse-dev
   - ./autogen.sh
   - ./configure
   - make
