@@ -207,7 +207,6 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--period", 1, {get_update_period_sec_handler, NULL}, "<SEC>\n"
 	 "\t\t\tIP change check interval.  Default: 2 min. Max: 10 days"},
 	{"--update_period_sec", 1, {get_update_period_sec_handler, NULL}, NULL},
-	{"--update_period", 1, {get_update_period_handler, NULL}, NULL}, /* TODO: Replaced with startup-delay, remove in 2.0 */
 
 ????	{"-P", 1,        {set_pidfile, NULL}, ""},
 	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
@@ -479,7 +478,7 @@ static int update_once_handler(cmd_data_t *cmd, int num, void *context)
 
 	ctx->update_once = 1;
 	ctx->total_iterations = 1;
-	ctx->dbg.level = 5;
+	debug = 5;
 
 	return 0;
 }
@@ -506,7 +505,7 @@ static int set_verbose_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (sscanf(cmd->argv[num], "%d", &ctx->dbg.level) != 1)
+	if (sscanf(cmd->argv[num], "%d", &debug) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
 
 	return 0;
@@ -522,8 +521,8 @@ static int set_iterations_handler(cmd_data_t *cmd, int num, void *context)
 	if (sscanf(cmd->argv[num], "%d", &ctx->total_iterations) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
 
-	ctx->total_iterations = (ctx->sleep_sec < 0)
-	    ? DYNDNS_DEFAULT_ITERATIONS : ctx->total_iterations;
+	ctx->total_iterations = (ctx->update_period < 0)
+	    ? DDNS_DEFAULT_ITERATIONS : ctx->total_iterations;
 
 	return 0;
 }
@@ -595,7 +594,7 @@ static int get_alias_handler(cmd_data_t *cmd, int num, void *context)
 	if (ctx == NULL)
 		return RC_INVALID_POINTER;
 
-	if (ctx->info[infid].alias_count >= DYNDNS_MAX_ALIAS_NUMBER)
+	if (ctx->info[infid].alias_count >= DDNS_MAX_ALIAS_NUMBER)
 		return RC_DYNDNS_TOO_MANY_ALIASES;
 
 	if (sizeof(ctx->info[infid].alias[ctx->info[infid].alias_count].name) < strlen(cmd->argv[num]))
@@ -736,34 +735,9 @@ static int get_proxy_server_handler(cmd_data_t *cmd, int num, void *context)
 	return rc;
 }
 
-/* Read the dyndnds name update period.
-   and impose the max and min limits
-*/
-static int get_update_period_handler(cmd_data_t *cmd, int num, void *context)
-{
-	int val;
-	ddns_t *ctx = (ddns_t *)context;
-
-	if (ctx == NULL)
-		return RC_INVALID_POINTER;
-
-	if (sscanf(cmd->argv[num], "%d", &val) != 1)
-		return RC_DYNDNS_INVALID_OPTION;
-
-	val /= 1000;
-	if (val < DYNDNS_MIN_SLEEP)
-		val = DYNDNS_MIN_SLEEP;
-	if (val > DYNDNS_MAX_SLEEP)
-		val = DYNDNS_MAX_SLEEP;
-
-	ctx->sleep_sec = val;
-
-	return 0;
-}
-
 static int get_update_period_sec_handler(cmd_data_t *cmd, int num, void *context)
 {
-	int val = DYNDNS_DEFAULT_SLEEP;
+	int val = DDNS_DEFAULT_PERIOD;
 	ddns_t *ctx = (ddns_t *)context;
 
 	if (ctx == NULL)
@@ -772,10 +746,10 @@ static int get_update_period_sec_handler(cmd_data_t *cmd, int num, void *context
 	if (sscanf(cmd->argv[num], "%d", &val) != 1)
 		return RC_DYNDNS_INVALID_OPTION;
 
-	if (val < DYNDNS_MIN_SLEEP)
-		val = DYNDNS_MIN_SLEEP;
-	if (val > DYNDNS_MAX_SLEEP)
-		val = DYNDNS_MAX_SLEEP;
+	if (val < DDNS_MIN_PERIOD)
+		val = DDNS_MIN_PERIOD;
+	if (val > DDNS_MAX_PERIOD)
+		val = DDNS_MAX_PERIOD;
 
 	ctx->normal_update_period_sec = val;
 
@@ -810,7 +784,6 @@ static int forced_update_fake_addr(cmd_data_t *cmd, int num, void *context)
 	return 0;
 }
 
-#ifdef ENABLE_SSL
 static int enable_ssl(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_t *ctx = (ddns_t *)context;
@@ -825,7 +798,6 @@ static int enable_ssl(cmd_data_t *cmd, int num, void *context)
 
 	return 0;
 }
-#endif
 
 static int set_syslog_handler(cmd_data_t *cmd, int num, void *context)
 {
@@ -1052,13 +1024,13 @@ static int get_dyndns_system_handler(cmd_data_t *cmd, int num, void *context)
 		return RC_CMD_PARSER_INVALID_OPTION_ARGUMENT;
 	}
 
-	for (infid = 0; infid < ctx->info_count && infid < DYNDNS_MAX_SERVER_NUMBER; infid++) {
+	for (infid = 0; infid < ctx->info_count && infid < DDNS_MAX_SERVER_NUMBER; infid++) {
 		if (ctx->info[infid].system == system)
 			break;
 	}
 
 	if (infid >= ctx->info_count) {
-		if (infid >= DYNDNS_MAX_SERVER_NUMBER)
+		if (infid >= DDNS_MAX_SERVER_NUMBER)
 			return RC_DYNDNS_BUFFER_TOO_SMALL;
 
 		ctx->info[infid].id     = infid;
@@ -1355,17 +1327,17 @@ static int default_config(ddns_t *ctx)
 		return RC_DYNDNS_INVALID_DNS_SYSTEM_DEFAULT;
 
 	/* forced update period */
-	ctx->forced_update_period_sec = DYNDNS_FORCED_UPDATE_PERIOD;
+	ctx->forced_update_period_sec = DDNS_FORCED_UPDATE_PERIOD;
 
 	/* non-fatal error update period */
-	ctx->error_update_period_sec = DYNDNS_ERROR_UPDATE_PERIOD;
+	ctx->error_update_period_sec = DDNS_ERROR_UPDATE_PERIOD;
 
 	/* normal update period */
-	ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
-	ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
+	ctx->normal_update_period_sec = DDNS_DEFAULT_PERIOD;
+	ctx->update_period = DDNS_DEFAULT_PERIOD;
 
 	/* Domain wildcarding disabled by default */
-	for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++)
+	for (i = 0; i < DDNS_MAX_SERVER_NUMBER; i++)
 		ctx->info[i].wildcard = 0;
 
 	/* pidfile */
@@ -1413,7 +1385,7 @@ int get_config_data(ddns_t *ctx, int argc, char *argv[])
 			};
 			int custom_argc = sizeof(custom_argv) / sizeof(char *);
 
-			if (ctx->dbg.level)
+			if (debug)
 				logit(LOG_NOTICE, "Using default config file %s", DEFAULT_CONFIG_FILE);
 
 			if (ctx->cfgfile)

@@ -21,8 +21,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef DYNDNS_H_
-#define DYNDNS_H_
+#ifndef DDNS_H_
+#define DDNS_H_
 
 #include <paths.h>
 
@@ -55,18 +55,18 @@
 	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
 
 /* Some default configurations */
-#define DYNDNS_DEFAULT_STARTUP_SLEEP      0       /* sec */
-#define DYNDNS_DEFAULT_SLEEP              120     /* sec */
-#define DYNDNS_MIN_SLEEP                  30      /* sec */
-#define DYNDNS_MAX_SLEEP                  (10 * 24 * 3600)        /* 10 days in sec */
-#define DYNDNS_ERROR_UPDATE_PERIOD        600     /* 10 min */
-#define DYNDNS_FORCED_UPDATE_PERIOD       (30 * 24 * 3600)        /* 30 days in sec */
-#define DYNDNS_DEFAULT_CMD_CHECK_PERIOD   1       /* sec */
-#define DYNDNS_DEFAULT_ITERATIONS         0       /* Forever */
-#define DYNDNS_HTTP_RESPONSE_BUFFER_SIZE  2500    /* Bytes */
-#define DYNDNS_HTTP_REQUEST_BUFFER_SIZE   2500    /* Bytes */
-#define DYNDNS_MAX_ALIAS_NUMBER           10      /* maximum number of aliases per server that can be maintained */
-#define DYNDNS_MAX_SERVER_NUMBER          5       /* maximum number of servers that can be maintained */
+#define DDNS_DEFAULT_STARTUP_SLEEP        0       /* sec */
+#define DDNS_DEFAULT_PERIOD               120     /* sec */
+#define DDNS_MIN_PERIOD                   30      /* sec */
+#define DDNS_MAX_PERIOD                   (10 * 24 * 3600)        /* 10 days in sec */
+#define DDNS_ERROR_UPDATE_PERIOD          600     /* 10 min */
+#define DDNS_FORCED_UPDATE_PERIOD         (30 * 24 * 3600)        /* 30 days in sec */
+#define DDNS_DEFAULT_CMD_CHECK_PERIOD     1       /* sec */
+#define DDNS_DEFAULT_ITERATIONS           0       /* Forever */
+#define DDNS_HTTP_RESPONSE_BUFFER_SIZE    2500    /* Bytes */
+#define DDNS_HTTP_REQUEST_BUFFER_SIZE     2500    /* Bytes */
+#define DDNS_MAX_ALIAS_NUMBER             10      /* maximum number of aliases per server that can be maintained */
+#define DDNS_MAX_SERVER_NUMBER            5       /* maximum number of servers that can be maintained */
 
 /* local configs */
 #define USERNAME_LEN                      50      /* chars */
@@ -126,7 +126,7 @@ typedef struct {
 
 	ddns_name_t    proxy_server_name;
 
-	ddns_alias_t   alias[DYNDNS_MAX_ALIAS_NUMBER];
+	ddns_alias_t   alias[DDNS_MAX_ALIAS_NUMBER];
 	int            alias_count;
 
 	int            wildcard;
@@ -140,11 +140,8 @@ typedef struct {
 	char          *cfgfile;
 	char          *external_command;
 
-	ddns_dbg_t     dbg;
-
 	ddns_cmd_t     cmd;
-	int            startup_delay_sec;
-	int            sleep_sec; /* time between 2 updates */
+	int            update_period; /* time between 2 updates */
 	int            normal_update_period_sec;
 	int            error_update_period_sec;
 	int            forced_update_period_sec;
@@ -155,16 +152,13 @@ typedef struct {
 	char          *bind_interface;
 	char          *check_interface;
 	int            initialized;
-	int            run_in_background;
-	int            debug_to_syslog;
 	int            change_persona;
-	int            update_once;
 	int            force_addr_update;
 	int            use_proxy;
 	int            abort;
 
-	http_t         http_to_ip_server[DYNDNS_MAX_SERVER_NUMBER];
-	http_t         http_to_dyndns[DYNDNS_MAX_SERVER_NUMBER];
+	http_t         http_to_ip_server[DDNS_MAX_SERVER_NUMBER];
+	http_t         http_to_dyndns[DDNS_MAX_SERVER_NUMBER];
 	http_trans_t   http_transaction;
 
 	char          *work_buf; /* for HTTP responses */
@@ -175,17 +169,23 @@ typedef struct {
 
 	ddns_user_t    sys_usr_info; /* info about the current account running inadyn */
 
-	ddns_info_t    info[DYNDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
+	ddns_info_t    info[DDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
 	int            info_count;
 } ddns_t;
 
-int  ddns_main_loop    (ddns_t *ctx, int argc, char *argv[]);
-int  get_config_data   (ddns_t *ctx, int argc, char *argv[]);
+extern int once;
+extern int debug;
+extern int startup_delay;
+extern int use_syslog;
+extern int foreground;
+extern char *logfile;
+
+int ddns_main_loop (ddns_t *ctx);
 
 int common_request (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
-#endif /* DYNDNS_H_ */
+#endif /* DDNS_H_ */
 
 /**
  * Local Variables:

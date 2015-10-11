@@ -27,13 +27,6 @@
 #include <stdio.h>
 #include "os.h"
 
-typedef struct {
-	int level;
-	int verbose;
-	char p_logfilename[1024];
-	FILE *p_file;
-} ddns_dbg_t;
-
 int get_dbg_dest(void);
 void set_dbg_dest(int dest);
 void os_printf(int prio, char *fmt, ...);

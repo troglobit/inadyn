@@ -65,11 +65,11 @@ PROGRAMS = $(sbin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_inadyn_OBJECTS = inadyn-main.$(OBJEXT) inadyn-ddns.$(OBJEXT) \
 	inadyn-cache.$(OBJEXT) inadyn-error.$(OBJEXT) \
-	inadyn-cmd.$(OBJEXT) inadyn-os.$(OBJEXT) inadyn-http.$(OBJEXT) \
-	inadyn-ssl.$(OBJEXT) inadyn-tcp.$(OBJEXT) inadyn-ip.$(OBJEXT) \
-	inadyn-sha1.$(OBJEXT) inadyn-base64.$(OBJEXT) \
-	inadyn-md5.$(OBJEXT) inadyn-plugin.$(OBJEXT) \
-	../plugins/inadyn-common.$(OBJEXT) \
+	inadyn-conf.$(OBJEXT) inadyn-os.$(OBJEXT) \
+	inadyn-http.$(OBJEXT) inadyn-ssl.$(OBJEXT) \
+	inadyn-tcp.$(OBJEXT) inadyn-ip.$(OBJEXT) inadyn-sha1.$(OBJEXT) \
+	inadyn-base64.$(OBJEXT) inadyn-md5.$(OBJEXT) \
+	inadyn-plugin.$(OBJEXT) ../plugins/inadyn-common.$(OBJEXT) \
 	../plugins/inadyn-dyndns.$(OBJEXT) \
 	../plugins/inadyn-changeip.$(OBJEXT) \
 	../plugins/inadyn-dnsexit.$(OBJEXT) \
@@ -211,17 +211,18 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
-inadyn_SOURCES = main.c ddns.c cache.c error.c cmd.c os.c http.c ssl.c \
-	tcp.c ip.c sha1.c base64.c md5.c plugin.c ../plugins/common.c \
-	../plugins/dyndns.c ../plugins/changeip.c ../plugins/dnsexit.c \
-	../plugins/easydns.c ../plugins/freedns.c ../plugins/generic.c \
-	../plugins/sitelutions.c ../plugins/tunnelbroker.c \
-	../plugins/tzo.c ../plugins/zoneedit.c ../plugins/zerigo.c \
-	../plugins/dhis.c ../plugins/duckdns.c ../plugins/dtdns.c \
-	../plugins/giradns.c ../plugins/duiadns.c
+inadyn_SOURCES = main.c ddns.c cache.c error.c conf.c os.c http.c \
+	ssl.c tcp.c ip.c sha1.c base64.c md5.c plugin.c \
+	../plugins/common.c ../plugins/dyndns.c ../plugins/changeip.c \
+	../plugins/dnsexit.c ../plugins/easydns.c ../plugins/freedns.c \
+	../plugins/generic.c ../plugins/sitelutions.c \
+	../plugins/tunnelbroker.c ../plugins/tzo.c \
+	../plugins/zoneedit.c ../plugins/zerigo.c ../plugins/dhis.c \
+	../plugins/duckdns.c ../plugins/dtdns.c ../plugins/giradns.c \
+	../plugins/duiadns.c
 inadyn_CPPFLAGS = -I../
 inadyn_LDFLAGS = -L../libite
-inadyn_LDADD = -ldl -lite
+inadyn_LDADD = -ldl -lite -lconfuse
 all: all-am
 
 .SUFFIXES:
@@ -382,7 +383,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../plugins/$(DEPDIR)/inadyn-zoneedit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-base64.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-cache.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-cmd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-conf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-ddns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inadyn-http.Po@am__quote@
@@ -467,19 +468,19 @@ inadyn-error.obj: error.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-error.obj `if test -f 'error.c'; then $(CYGPATH_W) 'error.c'; else $(CYGPATH_W) '$(srcdir)/error.c'; fi`
 
-inadyn-cmd.o: cmd.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cmd.o -MD -MP -MF $(DEPDIR)/inadyn-cmd.Tpo -c -o inadyn-cmd.o `test -f 'cmd.c' || echo '$(srcdir)/'`cmd.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cmd.Tpo $(DEPDIR)/inadyn-cmd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmd.c' object='inadyn-cmd.o' libtool=no @AMDEPBACKSLASH@
+inadyn-conf.o: conf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-conf.o -MD -MP -MF $(DEPDIR)/inadyn-conf.Tpo -c -o inadyn-conf.o `test -f 'conf.c' || echo '$(srcdir)/'`conf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-conf.Tpo $(DEPDIR)/inadyn-conf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='conf.c' object='inadyn-conf.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cmd.o `test -f 'cmd.c' || echo '$(srcdir)/'`cmd.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-conf.o `test -f 'conf.c' || echo '$(srcdir)/'`conf.c
 
-inadyn-cmd.obj: cmd.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-cmd.obj -MD -MP -MF $(DEPDIR)/inadyn-cmd.Tpo -c -o inadyn-cmd.obj `if test -f 'cmd.c'; then $(CYGPATH_W) 'cmd.c'; else $(CYGPATH_W) '$(srcdir)/cmd.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-cmd.Tpo $(DEPDIR)/inadyn-cmd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmd.c' object='inadyn-cmd.obj' libtool=no @AMDEPBACKSLASH@
+inadyn-conf.obj: conf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-conf.obj -MD -MP -MF $(DEPDIR)/inadyn-conf.Tpo -c -o inadyn-conf.obj `if test -f 'conf.c'; then $(CYGPATH_W) 'conf.c'; else $(CYGPATH_W) '$(srcdir)/conf.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/inadyn-conf.Tpo $(DEPDIR)/inadyn-conf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='conf.c' object='inadyn-conf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-cmd.obj `if test -f 'cmd.c'; then $(CYGPATH_W) 'cmd.c'; else $(CYGPATH_W) '$(srcdir)/cmd.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o inadyn-conf.obj `if test -f 'conf.c'; then $(CYGPATH_W) 'conf.c'; else $(CYGPATH_W) '$(srcdir)/conf.c'; fi`
 
 inadyn-os.o: os.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(inadyn_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT inadyn-os.o -MD -MP -MF $(DEPDIR)/inadyn-os.Tpo -c -o inadyn-os.o `test -f 'os.c' || echo '$(srcdir)/'`os.c

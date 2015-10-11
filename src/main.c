@@ -24,16 +24,25 @@
 #include <stdlib.h>
 #include <pwd.h>		/* getpwnam() */
 #include <grp.h>		/* getgrnam() */
+#include <confuse.h>
 
 #include "debug.h"
 #include "ddns.h"
 #include "error.h"
 
+int    once = 0;
 int    debug = 0;
+int    foreground = 0;
+int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
+int    use_syslog = 0;
 char  *config = NULL;
+char  *logfile = NULL;
 uid_t  uid = 0;
 gid_t  gid = 0;
 cfg_t *cfg;
+
+extern cfg_t *conf_parse_file(char *file, ddns_t *ctx);
+
 
 static int alloc_context(ddns_t **pctx)
 {
@@ -56,7 +65,7 @@ static int alloc_context(ddns_t **pctx)
 		memset(ctx, 0, sizeof(ddns_t));
 
 		/* Alloc space for http_to_ip_server data */
-		ctx->work_buflen = DYNDNS_HTTP_RESPONSE_BUFFER_SIZE;
+		ctx->work_buflen = DDNS_HTTP_RESPONSE_BUFFER_SIZE;
 		ctx->work_buf = (char *)malloc(ctx->work_buflen);
 		if (!ctx->work_buf) {
 			rc = RC_OUT_OF_MEMORY;
@@ -64,7 +73,7 @@ static int alloc_context(ddns_t **pctx)
 		}
 
 		/* Alloc space for request data */
-		ctx->request_buflen = DYNDNS_HTTP_REQUEST_BUFFER_SIZE;
+		ctx->request_buflen = DDNS_HTTP_REQUEST_BUFFER_SIZE;
 		ctx->request_buf = (char *)malloc(ctx->request_buflen);
 		if (!ctx->request_buf) {
 			rc = RC_OUT_OF_MEMORY;
@@ -72,7 +81,7 @@ static int alloc_context(ddns_t **pctx)
 		}
 
 		i = 0;
-		while (i < DYNDNS_MAX_SERVER_NUMBER) {
+		while (i < DDNS_MAX_SERVER_NUMBER) {
 			if (http_construct(&ctx->http_to_ip_server[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
@@ -81,7 +90,7 @@ static int alloc_context(ddns_t **pctx)
 		http_to_ip_constructed = 1;
 
 		i = 0;
-		while (i < DYNDNS_MAX_SERVER_NUMBER) {
+		while (i < DDNS_MAX_SERVER_NUMBER) {
 			if (http_construct(&ctx->http_to_dyndns[i++])) {
 				rc = RC_OUT_OF_MEMORY;
 				break;
@@ -90,15 +99,14 @@ static int alloc_context(ddns_t **pctx)
 		http_to_dyndns_constructed = 1;
 
 		ctx->cmd = NO_CMD;
-		ctx->startup_delay_sec = DYNDNS_DEFAULT_STARTUP_SLEEP;
-		ctx->normal_update_period_sec = DYNDNS_DEFAULT_SLEEP;
-		ctx->sleep_sec = DYNDNS_DEFAULT_SLEEP;
-		ctx->total_iterations = DYNDNS_DEFAULT_ITERATIONS;
-		ctx->cmd_check_period = DYNDNS_DEFAULT_CMD_CHECK_PERIOD;
+		ctx->normal_update_period_sec = DDNS_DEFAULT_PERIOD;
+		ctx->update_period = DDNS_DEFAULT_PERIOD;
+		ctx->total_iterations = DDNS_DEFAULT_ITERATIONS;
+		ctx->cmd_check_period = DDNS_DEFAULT_CMD_CHECK_PERIOD;
 		ctx->force_addr_update = 0;
 
 		i = 0;
-		while (i < DYNDNS_MAX_SERVER_NUMBER)
+		while (i < DDNS_MAX_SERVER_NUMBER)
 			ctx->info[i++].creds.encoded_password = NULL;
 
 		ctx->initialized = 0;
@@ -114,10 +122,10 @@ static int alloc_context(ddns_t **pctx)
 			free(ctx->request_buf);
 
 		if (http_to_dyndns_constructed)
-			http_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
+			http_destruct(ctx->http_to_dyndns, DDNS_MAX_SERVER_NUMBER);
 
 		if (http_to_ip_constructed)
-			http_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
+			http_destruct(ctx->http_to_ip_server, DDNS_MAX_SERVER_NUMBER);
 
 		free(ctx);
 		*pctx = NULL;
@@ -133,8 +141,8 @@ static void free_context(ddns_t *ctx)
 	if (!ctx)
 		return;
 
-	http_destruct(ctx->http_to_ip_server, DYNDNS_MAX_SERVER_NUMBER);
-	http_destruct(ctx->http_to_dyndns, DYNDNS_MAX_SERVER_NUMBER);
+	http_destruct(ctx->http_to_ip_server, DDNS_MAX_SERVER_NUMBER);
+	http_destruct(ctx->http_to_dyndns, DDNS_MAX_SERVER_NUMBER);
 
 	if (ctx->work_buf) {
 		free(ctx->work_buf);
@@ -146,7 +154,7 @@ static void free_context(ddns_t *ctx)
 		ctx->request_buf = NULL;
 	}
 
-	for (i = 0; i < DYNDNS_MAX_SERVER_NUMBER; i++) {
+	for (i = 0; i < DDNS_MAX_SERVER_NUMBER; i++) {
 		ddns_info_t *info = &ctx->info[i];
 
 		if (info->creds.encoded_password) {
@@ -287,11 +295,11 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'l':	/* --syslog */
-			syslog = 1;
+			use_syslog = 1;
 			break;
 
 		case 'V':	/* --verbose */
-			verbose = 1;
+			debug = 1;
 			break;
 
 		case 'v':
@@ -325,19 +333,21 @@ int main(int argc, char *argv[])
 	do {
 		restart = 0;
 
-		cfg = parse_conf(config);
-		if (!cfg)
-			return RC_FILE_IO_MISSING_FILE;
-
 		rc = alloc_context(&ctx);
-		if (rc == RC_OK) {
-			rc = ddns_main_loop(ctx, argc, argv);
-			if (rc == RC_RESTART)
-				restart = 1;
+		if (rc != RC_OK)
+			break;
 
+		cfg = conf_parse_file(config, ctx);
+		if (!cfg) {
 			free_context(ctx);
+			return RC_FILE_IO_MISSING_FILE;
 		}
 
+		rc = ddns_main_loop(ctx);
+		if (rc == RC_RESTART)
+			restart = 1;
+
+		free_context(ctx);
 		cfg_free(cfg);
 	} while (restart);
 

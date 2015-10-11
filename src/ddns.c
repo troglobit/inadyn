@@ -57,7 +57,7 @@ static int wait_for_cmd(ddns_t *ctx)
 	if (old_cmd != NO_CMD)
 		return 0;
 
-	counter = ctx->sleep_sec / ctx->cmd_check_period;
+	counter = ctx->update_period / ctx->cmd_check_period;
 	while (counter--) {
 		if (ctx->cmd != old_cmd)
 			break;
@@ -161,7 +161,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	trans->p_rsp       = ctx->work_buf;
 	trans->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
 
-	if (ctx->dbg.level > 2)
+	if (debug > 2)
 		logit(LOG_DEBUG, "Querying DDNS checkip server for my public IP#: %s", ctx->request_buf);
 
 	rc = http_transaction(http, &ctx->http_transaction);
@@ -169,7 +169,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
 	http_exit(http);
-	if (ctx->dbg.level > 2)
+	if (debug > 2)
 		logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
 
 	return rc;
@@ -235,7 +235,7 @@ static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 
 		if (!anychange)
 			logit(LOG_INFO, "No IP# change detected, still at %s", address);
-		else if (ctx->dbg.level > 1)
+		else if (debug > 1)
 			logit(LOG_INFO, "Current public IP# %s", address);
 
 		return 0;
@@ -322,14 +322,14 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	trans.p_rsp       = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
-	if (ctx->dbg.level > 2) {
+	if (debug > 2) {
 		ctx->request_buf[trans.req_len] = 0;
 		logit(LOG_DEBUG, "Sending alias table update to DDNS server: %s", ctx->request_buf);
 	}
 
 	rc = http_transaction(client, &trans);
 
-	if (ctx->dbg.level > 2)
+	if (debug > 2)
 		logit(LOG_DEBUG, "DDNS server response: %s", trans.p_rsp);
 
 	if (rc) {
@@ -442,7 +442,7 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 	buf = calloc(len, sizeof(char));
 	if (!buf)
 		return RC_OUT_OF_MEMORY;
-	if (ctx->dbg.level > 2)
+	if (debug > 2)
 		logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
 
 	for (i = 0; i < ctx->info_count; i++) {
@@ -461,11 +461,11 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		strlcat(buf, info->creds.password, len);
 
 		/* query required buffer size for base64 encoded data */
-		if (ctx->dbg.level > 2)
+		if (debug > 2)
 			logit(LOG_DEBUG, "Checking required size for base64 encoding of user:pass for %s ...", info->system->name);
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
 
-		if (ctx->dbg.level > 2)
+		if (debug > 2)
 			logit(LOG_DEBUG, "Allocating %zd bytes buffer for base64 encoding.", dlen);
 		encode = malloc(dlen);
 		if (!encode) {
@@ -483,14 +483,14 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 			break;
 		}
 
-		if (ctx->dbg.level > 2)
+		if (debug > 2)
 			logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
 	}
 
-	if (ctx->dbg.level > 2)
+	if (debug > 2)
 		logit(LOG_DEBUG, "Freeing temp encoding buffer %p", buf);
 	free(buf);
 
@@ -566,7 +566,7 @@ static int check_address(ddns_t *ctx)
 
 		/* Ask IP server something so he will respond and give me my IP */
 		DO(server_transaction(ctx, servernum));
-		if (ctx->dbg.level > 2) {
+		if (debug > 2) {
 			logit(LOG_DEBUG, "IP server response:");
 			logit(LOG_DEBUG, "%s", ctx->work_buf);
 		}
@@ -591,7 +591,7 @@ static int check_error(ddns_t *ctx, int rc)
 {
 	switch (rc) {
 	case RC_OK:
-		ctx->sleep_sec = ctx->normal_update_period_sec;
+		ctx->update_period = ctx->normal_update_period_sec;
 		break;
 
 	/* dyn_dns_update_ip() failed, inform the user the (network) error
@@ -603,8 +603,8 @@ static int check_error(ddns_t *ctx, int rc)
 	case RC_OS_INVALID_IP_ADDRESS:
 	case RC_DYNDNS_RSP_RETRY_LATER:
 	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:
-		ctx->sleep_sec = ctx->error_update_period_sec;
-		logit(LOG_WARNING, "Will retry again in %d sec...", ctx->sleep_sec);
+		ctx->update_period = ctx->error_update_period_sec;
+		logit(LOG_WARNING, "Will retry again in %d sec...", ctx->update_period);
 		break;
 
 	case RC_DYNDNS_RSP_NOTOK:
@@ -628,7 +628,7 @@ static int check_error(ddns_t *ctx, int rc)
  *  - create and init dyn_dns object.
  *  - launch the IP update action loop
  */
-int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
+int ddns_main_loop(ddns_t *ctx)
 {
 	int rc = 0;
 	static int first_startup = 1;
@@ -637,7 +637,7 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 		return RC_INVALID_POINTER;
 
 	/* if silent required, close console window */
-	if (ctx->run_in_background == 1) {
+	if (use_syslog || !foreground) {
 		DO(close_console_window());
 
 		if (get_dbg_dest() == DBG_SYS_LOG)
@@ -645,15 +645,15 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	}
 
 	/* Check file system permissions and create pidfile */
-	if (!ctx->update_once)
+	if (!once)
 		DO(os_check_perms(ctx));
 
 	/* if logfile provided, redirect output to log file */
-	if (strlen(ctx->dbg.p_logfilename) != 0)
-		DO(os_open_dbg_output(DBG_FILE_LOG, "", ctx->dbg.p_logfilename));
+	if (logfile)
+		DO(os_open_dbg_output(DBG_FILE_LOG, "", logfile));
 
-	if (ctx->debug_to_syslog == 1 || (ctx->run_in_background == 1)) {
-		if (get_dbg_dest() == DBG_STD_LOG)	/* avoid file and syslog output */
+	if (use_syslog || !foreground) {
+		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
 			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
 	}
 
@@ -665,12 +665,12 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	 * backed real time clocks as initialization of time since last update
 	 * requires the correct time.  Sleep can be interrupted with the usual
 	 * signals inadyn responds too. */
-	if (first_startup && ctx->startup_delay_sec) {
-		logit(LOG_NOTICE, "Startup delay: %d sec ...", ctx->startup_delay_sec);
+	if (first_startup && startup_delay) {
+		logit(LOG_NOTICE, "Startup delay: %d sec ...", startup_delay);
 		first_startup = 0;
 
-		/* Now sleep a while. Using the time set in sleep_sec data member */
-		ctx->sleep_sec = ctx->startup_delay_sec;
+		/* Now sleep a while. Using the time set in update_period data member */
+		ctx->update_period = startup_delay;
 		wait_for_cmd(ctx);
 
 		if (ctx->cmd == CMD_STOP) {
@@ -695,7 +695,7 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 	DO(read_cache_file(ctx));
 	DO(get_encoded_user_passwd(ctx));
 
-	if (ctx->update_once == 1)
+	if (once == 1)
 		ctx->force_addr_update = 1;
 
 	/* DDNS client main loop */
@@ -718,7 +718,7 @@ int ddns_main_loop(ddns_t *ctx, int argc, char *argv[])
 		if (check_error(ctx, rc))
 			break;
 
-		/* Now sleep a while. Using the time set in sleep_sec data member */
+		/* Now sleep a while. Using the time set in update_period data member */
 		wait_for_cmd(ctx);
 
 		if (ctx->cmd == CMD_STOP) {
