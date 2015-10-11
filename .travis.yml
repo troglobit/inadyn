@@ -26,3 +26,5 @@ script:
   - ./autogen.sh
   - ./configure
   - make
+  - ./configure --enable-openssl
+  - make
