@@ -50,7 +50,10 @@ if test "$ac_enable_ssl" = "yes"; then
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
                           AC_MSG_ERROR([*** SSL library (OpenSSL) not found!]))
       AC_CHECK_HEADERS([openssl/crypto.h openssl/x509.h openssl/pem.h openssl/ssl.h \
-                        openssl/tls1.h openssl/err.h])
+                        openssl/tls1.h openssl/err.h], [], [],
+			[
+			#include <openssl/conf.h>
+			])
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL library])
    else
       AC_CHECK_LIB([gnutls], [gnutls_init], [],

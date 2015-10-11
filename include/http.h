@@ -24,6 +24,7 @@
 #include "config.h"
 
 #if defined(CONFIG_OPENSSL)
+#include <openssl/conf.h>
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
