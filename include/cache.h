@@ -22,6 +22,8 @@
 #ifndef INADYN_CACHE_H_
 #define INADYN_CACHE_H_
 
+#include "ddns.h"
+
 extern char *cache_dir;
 
 char *cache_file       (char *name, char *buf, size_t len);

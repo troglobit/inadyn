@@ -18,6 +18,8 @@
 #include <errno.h>
 #include <string.h>
 #include <confuse.h>
+
+#include "cache.h"
 #include "ddns.h"
 
 /*
