@@ -36,12 +36,15 @@
 
 #define MAXSTRING 1024
 
+extern char *cache_dir;
+
 /**
     The dbg destination.
     DBG_SYS_LOG for SysLog
     DBG_STD_LOG for standard console
 */
 static int global_mod_dbg_dest = DBG_STD_LOG;
+
 /**
     Returns the dbg destination.
     DBG_SYS_LOG for SysLog
@@ -363,50 +366,17 @@ int os_syslog_close(void)
 	return 0;
 }
 
-static int mkparentdir(char *file)
-{
-	int rc = 0;
-
-	if (access(file, W_OK)) {
-		char *dir;
-		char *ptr = strdup(file);
-
-		if (!ptr)
-			return RC_OUT_OF_MEMORY;
-
-		dir = dirname(ptr);
-		if (mkdir(dir, 0755))
-			rc = 1;
-
-		if (access(file, W_OK)) {
-			rc = 1;
-
-			/* If the file doesn't exist and we can write
-			 * to the parent directory, then it's OK :) */
-			if (ENOENT == errno && !access(dir, W_OK))
-				rc = 0;
-		}
-
-		free(ptr);
-	}
-
-	return rc;
-}
-
 /* Create pid and cache file repository, make sure we can write to it.  If
  * we are restarted we cannot otherwise make sure we've not already updated
  * the IP -- and the user will be locked-out of their DDNS server provider
  * for excessive updates. */
 int os_check_perms(void *UNUSED(arg))
 {
-	char path[256];
-
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
 
-	cache_file("example.com", path, sizeof(path));
-	if (mkparentdir(path)) {
-		logit(LOG_ERR, "No write permission to %s, aborting.", path);
+	if (mkpath(cache_dir, 0755)) {
+		logit(LOG_ERR, "No write permission to %s, aborting.", cache_dir);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
 
 		return RC_FILE_IO_ACCESS_ERROR;

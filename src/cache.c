@@ -112,7 +112,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 
 char *cache_file(char *name, char *buf, size_t len)
 {
-	char *path = RUNTIME_DATA_DIR;
+	char *path = DEFAULT_CACHE_DIR;
 
 	if (!buf || !name)
 		return NULL;

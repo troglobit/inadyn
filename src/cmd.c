@@ -99,7 +99,7 @@ static cmd_desc_t cmd_options_table[] = {
 
 	{"-c",          1, {set_cache_dir, NULL}, ""},
 	{"--cache-dir", 1, {set_cache_dir, NULL}, "<DIR>\n"
-???	 "\t\t\tSet directory for persistent cache files, default " RUNTIME_DATA_DIR},
+???	 "\t\t\tSet directory for persistent cache files, default " DEFAULT_CACHE_DIR},
 
 	{"-d", 1, {set_change_persona_handler, NULL}, ""},
 	{"--drop-privs", 1, {set_change_persona_handler, NULL},

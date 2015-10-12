@@ -263,7 +263,7 @@ Set interface to check for IP. Only on UNIX systems.
 External IP check is not performed
 .It Fl c, -cache-dir Ar PATH
 Set directory for persistent cache files, defaults to
-.Pa /var/run/inadyn
+.Pa /var/cache/inadyn
 .Pp
 The cache files are used to keep track of which addresses have been
 successfully sent to their respective DDNS provider and when.  The
@@ -447,11 +447,11 @@ For convenience in sending signals,
 writes its process ID to
 .Pa /var/run/inadyn.pid
 .Sh FILES
-.Bl -tag -width /var/run/inadyn/inadyn.cache -compact
+.Bl -tag -width /var/cache/inadyn/freedns.afraid.org.cache -compact
 .It Pa /etc/inadyn.conf
 .It Pa /var/run/inadyn.pid
-.It Pa /var/run/inadyn/dyndns.org.cache
-.It Pa /var/run/inadyn/freedns.afraid.org.cache
+.It Pa /var/cache/inadyn/dyndns.org.cache
+.It Pa /var/cache/inadyn/freedns.afraid.org.cache
 .It Pa ... one .cache file per DDNS provider
 .El
 .Sh SEE ALSO

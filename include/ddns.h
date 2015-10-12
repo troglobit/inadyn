@@ -24,8 +24,6 @@
 #ifndef DDNS_H_
 #define DDNS_H_
 
-#include <paths.h>
-
 #include "config.h"
 #include "os.h"
 #include "error.h"
@@ -40,7 +38,7 @@
 
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
-#define RUNTIME_DATA_DIR        _PATH_VARRUN     "inadyn/"
+#define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"
 
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"
