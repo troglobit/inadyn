@@ -36,8 +36,6 @@
 
 #define MAXSTRING 1024
 
-extern char *cache_dir;
-
 /**
     The dbg destination.
     DBG_SYS_LOG for SysLog

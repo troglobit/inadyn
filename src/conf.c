@@ -128,6 +128,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	cfg_opt_t opts[] = {	/* Global options */
 		CFG_BOOL("fake-address",  cfg_false, CFGF_NONE),
 		CFG_STR ("bind",	  NULL, CFGF_NONE),
+		CFG_STR ("cache-dir",	  NULL, CFGF_NONE),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
 		CFG_INT ("forced-update", DDNS_FORCED_UPDATE_PERIOD, CFGF_NONE),
@@ -162,6 +163,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	} else {
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
 	}
+	cache_dir                     = cfg_getstr(cfg, "cache-dir");
 	str                           = cfg_getstr(cfg, "bind");
 	ctx->bind_interface           = str ? strdup(str) : NULL;
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
