@@ -108,7 +108,7 @@ int os_syslog_open(const char *name);
 int os_syslog_close(void);
 
 /**
- * Check file system permissions and create pidfile
+ * Check file system permissions
  */
 int os_check_perms(void *);
 

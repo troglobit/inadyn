@@ -41,7 +41,6 @@
 /* Test values */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define RUNTIME_DATA_DIR        _PATH_VARRUN     "inadyn/"
-#define DEFAULT_PIDFILE         RUNTIME_DATA_DIR "inadyn.pid"
 
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"

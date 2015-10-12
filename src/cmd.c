@@ -35,7 +35,6 @@
 
 static int infid;
 extern char *cache_dir;
-extern char *pidfile_path;
 
 /* command line options */
 #define DYNDNS_INPUT_FILE_OPT_STRING "--input_file"
@@ -82,7 +81,6 @@ static int set_syslog_handler(cmd_data_t *cmd, int num, void *context);
 static int set_change_persona_handler(cmd_data_t *cmd, int num, void *context);
 static int set_bind_interface(cmd_data_t *cmd, int num, void *context);
 static int set_check_interface(cmd_data_t *cmd, int num, void *context);
-static int set_pidfile(cmd_data_t *cmd, int num, void *context);
 static int set_cache_dir(cmd_data_t *cmd, int num, void *context);
 static int print_version_handler(cmd_data_t *cmd, int num, void *context);
 static int get_exec_handler(cmd_data_t *cmd, int num, void *context);
@@ -207,9 +205,6 @@ static cmd_desc_t cmd_options_table[] = {
 	{"--period", 1, {get_update_period_sec_handler, NULL}, "<SEC>\n"
 	 "\t\t\tIP change check interval.  Default: 2 min. Max: 10 days"},
 	{"--update_period_sec", 1, {get_update_period_sec_handler, NULL}, NULL},
-
-????	{"-P", 1,        {set_pidfile, NULL}, ""},
-	{"--pidfile", 1, {set_pidfile, NULL}, "<FILE>\n" "\t\t\tSet pidfile, default " DEFAULT_PIDFILE},
 
 #ifdef ENABLE_SSL
 ***	{"-s",    0, {enable_ssl, NULL}, ""},
@@ -945,20 +940,6 @@ static int set_check_interface(cmd_data_t *cmd, int num, void *context)
 	return 0;
 }
 
-static int set_pidfile(cmd_data_t *cmd, int num, void *context)
-{
-	ddns_t *ctx = (ddns_t *)context;
-
-	if (ctx == NULL)
-		return RC_INVALID_POINTER;
-
-	if (pidfile_path)
-		free(pidfile_path);
-	pidfile_path = strdup(cmd->argv[num]);
-
-	return 0;
-}
-
 static int set_cache_dir(cmd_data_t *cmd, int num, void *context)
 {
 	ddns_t *ctx = (ddns_t *)context;
@@ -1339,9 +1320,6 @@ static int default_config(ddns_t *ctx)
 	/* Domain wildcarding disabled by default */
 	for (i = 0; i < DDNS_MAX_SERVER_NUMBER; i++)
 		ctx->info[i].wildcard = 0;
-
-	/* pidfile */
-	pidfile_path = strdup(DEFAULT_PIDFILE);
 
 	return 0;
 }

@@ -644,7 +644,7 @@ int ddns_main_loop(ddns_t *ctx)
 			fclose(stdout);
 	}
 
-	/* Check file system permissions and create pidfile */
+	/* Check file system permissions */
 	if (!once)
 		DO(os_check_perms(ctx));
 
@@ -697,6 +697,10 @@ int ddns_main_loop(ddns_t *ctx)
 
 	if (once == 1)
 		ctx->force_addr_update = 1;
+
+	/* Initialization done, create pidfile to indicate we are ready to communicate */
+	if (pidfile(NULL))
+		logit(LOG_WARNING, "Failed creating pidfile: %m");
 
 	/* DDNS client main loop */
 	while (1) {

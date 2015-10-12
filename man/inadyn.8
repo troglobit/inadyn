@@ -25,7 +25,6 @@
 .Op Fl f, -forced-update Ar SEC
 .Op Fl F, -config Ar FILE
 .Op Fl L, -logfile Ar FILE
-.Op Fl P, -pidfile Ar FILE
 .Op Fl c, -cache-dir Ar PATH
 .Op Fl h, -help
 .Op Fl i, -iface Ar IFNAME
@@ -262,9 +261,6 @@ Set interface to bind to. Only on UNIX systems.
 .It Fl i, -iface Ar IFNAME
 Set interface to check for IP. Only on UNIX systems.
 External IP check is not performed
-.It Fl P, -pidfile Ar FILE
-Set pidfile, defaults to
-.Pa /var/run/inadyn/inadyn.pid 
 .It Fl c, -cache-dir Ar PATH
 Set directory for persistent cache files, defaults to
 .Pa /var/run/inadyn
@@ -449,11 +445,11 @@ that
 For convenience in sending signals,
 .Nm
 writes its process ID to
-.Pa /var/run/inadyn/inadyn.pid
+.Pa /var/run/inadyn.pid
 .Sh FILES
 .Bl -tag -width /var/run/inadyn/inadyn.cache -compact
 .It Pa /etc/inadyn.conf
-.It Pa /var/run/inadyn/inadyn.pid
+.It Pa /var/run/inadyn.pid
 .It Pa /var/run/inadyn/dyndns.org.cache
 .It Pa /var/run/inadyn/freedns.afraid.org.cache
 .It Pa ... one .cache file per DDNS provider

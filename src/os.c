@@ -36,8 +36,6 @@
 
 #define MAXSTRING 1024
 
-char *pidfile_path = NULL;
-
 /**
     The dbg destination.
     DBG_SYS_LOG for SysLog
@@ -395,39 +393,6 @@ static int mkparentdir(char *file)
 	return rc;
 }
 
-static void pidexit(void)
-{
-	if (pidfile_path) {
-		unlink(pidfile_path);
-		free(pidfile_path);
-		pidfile_path = NULL;
-	}
-}
-
-/* Continue using old pidfile fn for Inadyn 1.x series,
- * incompatible semantics with OpenBSD version. */
-static int old_pidfile(char *file)
-{
-	FILE *fp;
-
-	/* Ignore any errors, we may not be allowed to create the dir,
-	 * but still be able to create/overwrite the pidfile. */
-	mkparentdir(file);
-
-	fp = fopen(file, "w");
-	if (!fp) {
-		logit(LOG_ERR, "Failed creating pidfile %s: %s", file, strerror(errno));
-		return RC_FILE_IO_ACCESS_ERROR;
-	}
-
-	fprintf(fp, "%u\n", getpid());
-	fclose(fp);
-
-	atexit(pidexit);
-
-	return 0;
-}
-
 /* Create pid and cache file repository, make sure we can write to it.  If
  * we are restarted we cannot otherwise make sure we've not already updated
  * the IP -- and the user will be locked-out of their DDNS server provider
@@ -446,9 +411,6 @@ int os_check_perms(void *UNUSED(arg))
 
 		return RC_FILE_IO_ACCESS_ERROR;
 	}
-
-	if (old_pidfile(pidfile_path))
-		logit(LOG_WARNING, "Failed creating pidfile %s: %m", pidfile_path);
 
 	return 0;
 }

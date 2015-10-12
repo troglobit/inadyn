@@ -97,7 +97,6 @@ Example `/etc/inadyn.conf`:
     cache-dir      /mnt/ddns
     startup-delay  60
     #logfile /var/log/ddns.log
-    #pidfile /var/run/ddns.pid
     
     system default@dyndns.org
       ssl
@@ -123,11 +122,6 @@ credentials.
 
 Note, here only the DynDNS account uses SSL, the No-IP account will
 still use regular HTTP.  See below for SSL build instructions.
-
-The example has two commented out lines: logfile is disabled, causing
-Inadyn to default to use syslog, the pidfile is also commented out, so
-Inadyn defaults to create `/var/run/inadyn/inadyn.pid` instead.  These
-two settings will change in Inadyn 2.0.
 
 The example also has a cache directory specified, which in this case is
 a persistent store for the three cache files
