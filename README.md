@@ -105,7 +105,7 @@ Example `/etc/inadyn.conf` using *new Inadyn v2.0 file format*:
     provider default@no-ip.com {
         username    = ian
         password    = secret
-        alias       = flemming
+        alias       = flemming.no-ip.com
 	}
 	
     provider default@tunnelbroker.net {
