@@ -229,6 +229,7 @@ static int usage(char *progname)
 		 "Usage: %s [OPTIONS]\n"
 		 " -f, --config=FILE               Use FILE for config, default %s\n"
 		 " -d, --debug=LEVEL               Enable developer debug messages\n"
+		 " -e, --exec=/path/to/cmd         Script to run on IP update\n"
 		 " -p, --drop-privs=USER[:GROUP]   Drop privileges after start to USER:GROUP\n"
 		 " -n, --foreground                Run in foreground, useful when run from finit\n"
 		 " -h, --help                      This help text\n"
@@ -251,6 +252,7 @@ int main(int argc, char *argv[])
 	struct option opt[] = {
 		{"config",        1, 0, 'f'},
 		{"debug",         1, 0, 'd'},
+		{"exec",          1, 0, 'e'},
 		{"drop-privs",    1, 0, 'p'},
 		{"foreground",    0, 0, 'n'},
 		{"help",          0, 0, 'h'},
@@ -264,7 +266,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "f:d:p:nh?L:1t:lVv", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "f:d:e:p:nh?L:1t:lVv", opt, NULL)) != EOF) {
 		switch (c) {
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
@@ -272,6 +274,10 @@ int main(int argc, char *argv[])
 
 		case 'd':	/* --debug=LEVEL */
 			debug = atoi(optarg);
+			break;
+
+		case 'e':	/* --exec=CMD */
+			external_command = strdup(optarg);
 			break;
 
 		case 'p':	/* --drop-privs=USER[:GROUP] */
