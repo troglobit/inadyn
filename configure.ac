@@ -40,7 +40,13 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
+
 ])
+
+# Check for libConfuse
+AC_CHECK_LIB([confuse], [cfg_init], [],
+             AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
+AC_CHECK_HEADERS([confuse.h])
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
 if test "$ac_enable_ssl" = "yes"; then
