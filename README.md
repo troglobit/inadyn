@@ -238,6 +238,10 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
 * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
 
+Inadyn also requires [libConfuse][], as of v2.0, which is available from
+most UNIX distributions as a pre-built package.  Make sure to install the
+`-dev` or `-devel` package of libConfuse when building Inadyn.
+
 
 Origin & References
 -------------------
@@ -252,7 +256,8 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [tunnelbroker]:     https://tunnelbroker.net/
 [Christian Eyrich]: http://eyrich-net.org/programmiertes.html
 [Joachim Nilsson]:  http://troglobit.com
-[GitHub]:           http://github.com/troglobit/inadyn
+[libConfuse]:       https://github.com/martinh/libconfuse
+[GitHub]:           https://github.com/troglobit/inadyn
 [Travis]:           https://travis-ci.org/troglobit/inadyn
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
