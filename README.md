@@ -87,46 +87,46 @@ Example Configuration
 
 Inadyn supports updating several DDNS servers, several accounts even on
 different DDNS providers.  The following example config file illustrates
-how it can be used.  Feature is courtesy of [Christian Eyrich][].
+how it can be used.  Originally contributed by [Christian Eyrich][].
 
-Example `/etc/inadyn.conf`:
+Example `/etc/inadyn.conf` using *new Inadyn v2.0 file format*:
 
-    background
-    verbose        1
-    period         300
-    cache-dir      /mnt/ddns
-    startup-delay  60
-    #logfile /var/log/ddns.log
+    # Inadyn v2.0 Configuration file format
+    period          = 300
+    cache-dir       = "/mnt/ddns"
     
-    system default@dyndns.org
-      ssl
-      username yxxx
-      password xyxx
-      alias yyy
-      alias zzz
+    provider default@dyndns.org {
+	    ssl         = true
+        username    = charlie
+        password    = snoopy
+        alias       = { "peanuts", "woodstock" }
+	}
     
-    system default@no-ip.com
-      username xxyx
-      password xxxy
-      alias yyy
-    
-    system default@tunnelbroker.net
-      ssl
-      username xyzzy
-      password update-key-in-advanced-tab
-      alias tunnel-id
+    provider default@no-ip.com {
+        username    = ian
+        password    = secret
+        alias       = flemming
+	}
+	
+    provider default@tunnelbroker.net {
+        ssl         = true
+        username    = futurekid
+        password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
+        alias       = 1234534245321           # tunnel-id
+	}
 
-In a multi-user setup, make sure to chmod your .conf to 600 (read-write
-only by you/root) to prevent other users from accessing your DDNS server
-credentials.
+**NOTE:** In a multi-user setup, make sure to chmod your .conf to 600
+  (read-write only by you/root) to prevent other users from accessing
+  your DDNS server credentials.
 
-Note, here only the DynDNS account uses SSL, the No-IP account will
-still use regular HTTP.  See below for SSL build instructions.
+Note, here only the DynDNS and Tunnelbroker accounts use SSL, the No-IP
+account will still use regular HTTP.  See below for more on SSL.
 
-The example also has a cache directory specified, which in this case is
-a persistent store for the three cache files
-`/mnt/ddns/yyy.dyndns.org.cache`, `/mnt/ddns/zzz.dyndns.org.cache` and
-`/mnt/ddns/yyy.no-ip.com.cache`
+We also define a custom cache directory, which in this case is a system
+specific persistent store for caching your IP as reported to each
+provider.  Inadyn use this to ensure you are not locked out of your
+account for excessive updates due to your device constantly rebooting or
+Inadyn restarting, for any erroneous reason.
 
 The last system defined is the IPv6 <https://tunnelbroker.net> service
 provided by Hurricane Electric.  Here `alias` is set to the tunnel ID
@@ -148,7 +148,6 @@ when communicating with the server.
 A DDNS provider like <http://twoDNS.de> can be setup like this:
 
     period         300
-    startup-delay  60
     cache-dir      /etc/inadyn
 
     system custom@http_srv_basic_auth
