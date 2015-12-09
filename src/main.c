@@ -35,6 +35,7 @@ int    debug = 0;
 int    foreground = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 0;
+char  *script_exec = NULL;
 char  *config = NULL;
 char  *logfile = NULL;
 uid_t  uid = 0;
@@ -163,11 +164,6 @@ static void free_context(ddns_t *ctx)
 		}
 	}
 
-	if (ctx->external_command) {
-		free(ctx->external_command);
-		ctx->external_command = NULL;
-	}
-
 	if (ctx->bind_interface) {
 		free(ctx->bind_interface);
 		ctx->bind_interface = NULL;
@@ -277,7 +273,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'e':	/* --exec=CMD */
-			external_command = strdup(optarg);
+			script_exec = strdup(optarg);
 			break;
 
 		case 'p':	/* --drop-privs=USER[:GROUP] */

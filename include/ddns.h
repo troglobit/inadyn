@@ -135,7 +135,6 @@ typedef struct {
 /* Client context */
 typedef struct {
 	char          *cfgfile;
-	char          *external_command;
 
 	ddns_cmd_t     cmd;
 	int            update_period; /* time between 2 updates */
@@ -176,6 +175,7 @@ extern int startup_delay;
 extern int use_syslog;
 extern int foreground;
 extern char *logfile;
+extern char *script_exec;
 
 int ddns_main_loop (ddns_t *ctx);
 

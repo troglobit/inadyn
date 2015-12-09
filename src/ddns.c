@@ -412,11 +412,9 @@ static int update_alias_table(ddns_t *ctx)
 			/* Update cache file for this entry */
 			write_cache_file(alias);
 
-			/* Run external command hook on update. */
-			if (ctx->external_command)
-				os_shell_execute(ctx->external_command,
-						 alias->address, alias->name,
-						 ctx->bind_interface);
+			/* Run command or script on successful update. */
+			if (script_exec)
+				os_shell_execute(script_exec, alias->address, alias->name, ctx->bind_interface);
 		}
 
 		if (RC_DYNDNS_RSP_NOTOK == rc)
