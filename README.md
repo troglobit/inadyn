@@ -72,24 +72,24 @@ DDNS plugin.  See below for configuration examples.
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
 
-Inadyn v1.99.8 and later support HTTPS (v1.99.11 and later also support
-SNI), for DDNS providers that support this (you must check this
-yourself).  Tested are DynDNS, FreeDNS, nsupdate.info, and Loopia.
+Inadyn v1.99.8 and later support HTTPS (and SNI), for DDNS providers
+that support this (must check this yourself).  Tested so far are DynDNS,
+FreeDNS, nsupdate.info, and Loopia.
 
-Using HTTPS is recommended since it protects your credentials from being
-snooped and further reduces the risk of someone hijacking your account.
+HTTPS is recommended since it protects your credentials from being
+snooped and reduces the risk of someone hijacking your account.
 
-Note: No HTTPS certificate validation is currently done, patches welcome!
+**Note:** No HTTPS certificate validation is currently done, patches welcome!
 
 
 Example Configuration
 ---------------------
 
 Inadyn supports updating several DDNS servers, several accounts even on
-different DDNS providers.  The following example config file illustrates
-how it can be used.  Originally contributed by [Christian Eyrich][].
+different DDNS providers. The following example shows how this can be
+used.
 
-Example `/etc/inadyn.conf` using *new Inadyn v2.0 file format*:
+`[/etc/inadyn.conf]`
 
     # Inadyn v2.0 Configuration file format
     period          = 300
@@ -115,23 +115,23 @@ Example `/etc/inadyn.conf` using *new Inadyn v2.0 file format*:
         alias       = 1234534245321           # tunnel-id
 	}
 
-**NOTE:** In a multi-user setup, make sure to chmod your .conf to 600
-  (read-write only by you/root) to prevent other users from accessing
-  your DDNS server credentials.
+In this example only the DynDNS and Tunnelbroker accounts use SSL, the
+No-IP account will still use regular HTTP.  See below for more on SSL.
 
-Note, here only the DynDNS and Tunnelbroker accounts use SSL, the No-IP
-account will still use regular HTTP.  See below for more on SSL.
-
-We also define a custom cache directory, which in this case is a system
-specific persistent store for caching your IP as reported to each
-provider.  Inadyn use this to ensure you are not locked out of your
-account for excessive updates due to your device constantly rebooting or
-Inadyn restarting, for any erroneous reason.
+We also define a custom cache directory, default is to use `/var/cache`.
+In our case `/mnt` is a system specific persistent store for caching
+your IP as reported to each provider.  Inadyn use this to ensure you are
+not locked out of your account for excessive updates due to your device
+constantly rebooting or Inadyn restarting, for whatver reason.
 
 The last system defined is the IPv6 <https://tunnelbroker.net> service
 provided by Hurricane Electric.  Here `alias` is set to the tunnel ID
 and password **must** be the *Update key* found in the *Advanced*
 configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
+
+**NOTE:** In a multi-user setup, make sure to chmod your `.conf` to 600
+  (read-write only by you/root) to protect against other users reading
+  your DDNS server credentials.
 
 
 Generic DDNS Plugin
@@ -147,32 +147,30 @@ when communicating with the server.
 
 A DDNS provider like <http://twoDNS.de> can be setup like this:
 
-    period         300
-    cache-dir      /etc/inadyn
-
-    system custom@http_srv_basic_auth
-        username myuser
-        password mypass
-        checkip-url checkip.two-dns.de /
-        ssl
-        server-name update.twodns.de
-        server-url /update?hostname=
-        alias myalias.dd-dns.de
+    custom twoDNS {
+        username     = myuser
+        password     = mypass
+		checkip-name = checkip.two-dns.de
+        checkip-url  = /
+        ssl          = 
+        server-name  = update.twodns.de
+        server-url   = "/update?hostname="
+        alias        = myalias.dd-dns.de
+	}
 
 For <https://www.namecheap.com> DDNS it can look as follows.  Please
 notice how the alias syntax differs between these two DDNS providers.
 You need to investigate details like this yourself when using the
 generic/custom DDNS plugin:
 
-    system custom@http_srv_basic_auth
-        username myuser
-        password mypass
-        ssl
-        server-name dynamicdns.park-your-domain.com
-        server-url /update?domain=YOURDOMAIN.TLD&password=mypass&host=
-        alias alpha
-        alias beta
-        alias gamma
+    custom namecheap {
+        username    = myuser
+        password    = mypass
+        ssl         = true
+        server-name = dynamicdns.park-your-domain.com
+        server-url  = "/update?domain=YOURDOMAIN.TLD&password=mypass&host="
+        alias       = { "alpha", "beta", "gamma" }
+	}
 
 Here three subdomains are updated, one `server-url` GET update request
 per alias.  The alias is appended to `...host=` and sent to the server.
@@ -183,27 +181,32 @@ would be the one given to you in the Dynamic DNS panel from Namecheap.
 Here is an alternative config to illustrate how the `alias` setting
 works:
 
-    system custom@http_srv_basic_auth
-        username myuser
-        password mypass
-        ssl
-        server-name dynamicdns.park-your-domain.com
-        server-url /update?password=mypass&domain=
-        alias YOURDOMAIN.TLD
+    custom kruskakli {
+        username    = myuser
+        password    = mypass
+        ssl         = true
+        server-name = dynamicdns.park-your-domain.com
+        server-url  = /update?password=mypass&domain=
+        alias       = YOURDOMAIN.TLD
+	}
 
-As of Inadyn v1.99.14 the generic plugin can also be used with providers
-that require the client's IP in the update request.  Here we *pretend*
-that <http://dyn.com> is not supported by Inadyn:
+The generic plugin can also be used with providers that require the
+client's new IP in the update request.  Below follows an example of how
+this can be done if we *pretend* that <http://dyn.com> is not supported
+by Inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org,
+the `server-url` often differs between providers and is something you
+must find out yourself.  For example using the `inadyn --debug` mode.
 
     # This emulates default@dyndns.org
-    system custom@http_srv_basic_auth
-        username DYNUSERNAME
-        password DYNPASSWORD
-        ssl
-        server-name members.dyndns.org
-        server-url /nic/update?hostname=YOURHOST.dyndns.org&myip=
-        append-myip
-        alias YOURHOST
+    custom randomhandle {
+        username    = DYNUSERNAME
+        password    = DYNPASSWORD
+        ssl         = true
+        server-name = members.dyndns.org
+        server-url  = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
+        append-myip = true
+        alias       = YOURHOST
+	}
 
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  Inadyn currently looks for a `200 HTTP` response OK
