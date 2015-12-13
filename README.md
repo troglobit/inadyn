@@ -148,14 +148,14 @@ when communicating with the server.
 A DDNS provider like <http://twoDNS.de> can be setup like this:
 
     custom twoDNS {
-        username     = myuser
-        password     = mypass
-		checkip-name = checkip.two-dns.de
-        checkip-url  = /
-        ssl          = 
-        server-name  = update.twodns.de
-        server-url   = "/update?hostname="
-        alias        = myalias.dd-dns.de
+        username       = myuser
+        password       = mypass
+        checkip-server = checkip.two-dns.de
+        checkip-path   = /
+        ssl            = true
+        ddns-server    = update.twodns.de
+        ddns-path      = "/update?hostname="
+        alias          = myalias.dd-dns.de
 	}
 
 For <https://www.namecheap.com> DDNS it can look as follows.  Please
@@ -167,8 +167,8 @@ generic/custom DDNS plugin:
         username    = myuser
         password    = mypass
         ssl         = true
-        server-name = dynamicdns.park-your-domain.com
-        server-url  = "/update?domain=YOURDOMAIN.TLD&password=mypass&host="
+        ddns-server = dynamicdns.park-your-domain.com
+        ddns-path   = "/update?domain=YOURDOMAIN.TLD&password=mypass&host="
         alias       = { "alpha", "beta", "gamma" }
 	}
 
@@ -185,8 +185,8 @@ works:
         username    = myuser
         password    = mypass
         ssl         = true
-        server-name = dynamicdns.park-your-domain.com
-        server-url  = /update?password=mypass&domain=
+        ddns-server = dynamicdns.park-your-domain.com
+        ddns-path   = "/update?password=mypass&domain="
         alias       = YOURDOMAIN.TLD
 	}
 
@@ -202,8 +202,8 @@ must find out yourself.  For example using the `inadyn --debug` mode.
         username    = DYNUSERNAME
         password    = DYNPASSWORD
         ssl         = true
-        server-name = members.dyndns.org
-        server-url  = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
+        ddns-server = members.dyndns.org
+        ddns-path   = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
         append-myip = true
         alias       = YOURHOST
 	}
