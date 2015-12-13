@@ -19,131 +19,260 @@
 .Nm /etc/inadyn.conf
 .Sh DESCRIPTION
 .Nm inadyn
-can read the very same command line options from a configuration file.
-This feature allows the user to write the options only once, and avoids
-frequent retyping.
-.Pp
-The format of the file follows the UN*X tradition:
-.Bl -bullet -offset abcd
-.It
-The
+is configured using a simple configuration file.  The
 .Dq #\&
-character denotes a comment. 
-.It
-Settings are currently the same as the long command line options (those
-with
-.Dq \-\-
-), only without the dashes.  See example below.
-.It
-The \\ character can be used as an escape character.
+character marks start of a comment to end of line.  The \\ character can
+be used as an escape character.
+.Pp
+.Bl -tag -width TERM -compact
+.It Cm fake-address = <true | false>
+When using SIGUSR1, to do a forced update, this option can be used to
+fake an address update using the
+.Dq random
+address 203.0.113.42 (example IP address from RFC5737) before updating
+with the actual IP address.  This is completely outside spec., but can
+be useful for people who very rarely, if ever, get an IP address change.
+Because some DDNS service providers will not register even a forced
+update if the IP is the same.  As a result the user will likely be
+deregistered as an inactive user.
+.It Cm bind = IFACE
+Set interface to bind to.  Only on UNIX systems.
+.It Cm cache-dir = PATH
+Set directory for persistent cache files, defaults to
+.Pa /var/cache/inadyn
+.Pp
+The cache files are used to keep track of which addresses have been
+successfully sent to their respective DDNS provider and when.  The
+latter 'when' is important to prevent
+.Nm
+from banning you for excessive updates.
+.Pp
+When restarting
+.Nm
+or rebooting your server, or embedded device,
+.Nm
+reads the cache files to seed its internal data structures with the last
+sent IP address and when the update was performed.  It is therefore very
+important to both have a cache file and for it to have the correct time
+stamp.  The absence of a cache file will currently cause a forced
+update.
+.Pp
+On an embedded device with no RTC, or no battery backed RTC, it is
+strongly recommended to pair this setting with the
+.Fl -startup-delay=SEC
+command line option.
+.It Cm iterations = <NUM | 0>
+Set the number of DNS updates. The default is
+.Ar 0 ,
+which means infinity.
+.It Cm period = SEC
+How often the IP is checked, in seconds. Default: apx 1 minute. Max: 10 days.
+.It Cm forced-update = SEC
+How often the IP should be updated even if it is not changed. The time
+should be given in seconds.  Default is equal to 30 days.
+.Pp
+.It Cm custom randomUserID {}
+.It Cm provider email@ddns-service.tld {}
+The custom{} and provider{} sections are very similar, except that the
+custom section allows specifying checkip-server and ddns-server details.
+Common settings are:
+.Pp
+.Bl -tag -width TERM -compact
+.It Cm ssl = <true | false>
+Use HTTPS to connect to this DDNS service provider, default HTTP (false).
+.It Cm username = USERNAME.
+The username, if applicable.  This might be referred to as hash by some providers.
+.It Cm password = PASSWORD
+The password, if applicable.
+.It Cm alias = ALIAS
+.It Cm alias = { "ALIAS1.name.tld", "ALIAS2.name.tld" }
+Your hostname alias.  To list multiple names, use the second form.
+.It Cm wildcard = true
+Enable domain name wildcarding of your domain name, for DDNS providers
+that support this, e.g. easydns.com and loopia.com.  This means that
+anything typed before your hostname, e.g. www. or ftp., is also updated
+when your IP changes.  Default: disabled.  For
+.Nm inadyn
+< 1.96.3 wildcarding was enabled by default.
 .El
-.Sh EXAMPLE
+.Pp
+.It Cm provider email@ddns-service.tld {}
+Can be one of:
+.Pp
+.Bl -tag -width TERM -compact
+.It Cm default@dyndns.org
+Connect to
+.Aq http://www.dyndns.org ,
+this is the default.
+.It Cm default@freedns.afraid.org
+.Aq http://freedns.afraid.org
+.It Cm default@zoneedit.com
+.Aq http://zoneedit.com
+.It Cm default@no-ip.com
+.Aq http://www.no-ip.com
+.It Cm default@easydns.com
+.Aq http://www.easydns.com
+.It Cm default@tzo.com
+.Aq http://www.tzo.com
+.It Cm dyndns@3322.org
+.Aq http://www.3322.org
+.It Cm default@dnsomatic.com
+.Aq http://www.dnsomatic.com
+.It Cm dyndns@he.net
+.Aq http://dns.he.net
+.It Cm default@tunnelbroker.net
+IPv6
+.Aq https://www.tunnelbroker.net
+by Hurricane Electric.
+.It Cm default@dynsip.org
+.Aq http://www.dynsip.org
+.It Cm default@sitelutions.com
+.Aq http://www.sitelutions.com
+.It Cm default@dnsexit.com
+.Aq http://www.dnsexit.com
+.It Cm default@changeip.com
+.Aq http://www.changeip.com
+.It Cm default@zerigo.com
+.Aq http://www.zerigo.com
+.It Cm default@dhis.org
+.Aq http://www.dhis.org
+.It Cm ipv4@nsupdate.info
+.Aq https://nsupdate.info
+.It Cm default@duckdns.org
+.Aq http://duckdns.org
+.It Cm default@loopia.com
+.Aq https://www.loopia.com
+.It Cm default@duiadns.net
+.Aq https://www.duiadns.net
+.El
+.Pp
+.It Cm custom some@identifier {}
+Specific to the custom provider section are the following settings:
+.Pp
+.Bl -tag -width TERM -compact
+.It Cm ddns-server = update.example.com
+DDNS server name, not the full URL.
+.It Cm ddns-path   = "/update?domain="
+DDNS server path.  By default each listed alias is appended to the path, unless
+.Cm append-myip=true
+is set.
+.It Cm append-myip = true
+Append your current IP to the the DDNS server update path.  Default
+is 'false', which means each alias name is appended.
+.It Cm checkip-server = checkip.example.com
+Server used to check for IP address updates.
+.It Cm checkip-path = "/"
+Server path for check IP address update.  Defaults to "/"
+.El
+.Sh EXAMPLES
 .br
-background
+period         = 300
 .br
-verbose        1
-.br
-period         300
-.br
-startup-delay  60
-.br
-# logfile      /var/log/inadyn.log
-.br
-cache-dir      /etc/inadyn
+cache-dir      = /etc/inadyn
 .Pp
 # Primary account, used for most operations
 .br
-system default@dyndns.org
+provider default@dyndns.org {
 .br
-    ssl
+    ssl        = true
 .br
-    username account
+    username   = account
 .br
-    password secret
+    password   = secret
 .br
-    alias my.example.com
+    alias      = { "my.example.com", "other.example.org" }
 .br
-    alias other.example.org
+}
 .Pp
 # Secondary account, on another DDNS provider
 .br
 # also updated on IP change
 .br
-system default@no-ip.com
+provider default@no-ip.com {
 .br
-    username account
+    username   = account
 .br
-    password secret
+    password   = secret
 .br
-    alias example.no-ip.com
+    alias      = example.no-ip.com
+.br
+}
 .Pp
 # Tertiary account at Loopia
 .br
-system default@loopia.com
+provider default@loopia.com {
 .br
-    ssl
+    ssl        = true
 .br
-    wildcard
+    wildcard   = true
 .br
-    username account
+    username   = account
 .br
-    password secret
+    password   = secret
 .br
-    alias example.com
+    alias      = example.com
+.br
+}
 .Pp
 # IPv6 account at https://tunnelbroker.net
 .br
-system default@tunnelbroker.net
+provider default@tunnelbroker.net {
 .br
-    ssl
+    ssl        = true
 .br
-    username xyzzy
+    username   = xyzzy
 .br
-    password update-key-in-advanced-tab
+    password   = update-key-in-advanced-tab
 .br
-    alias tunnel-id
+    alias      = tunnel-id
+.br
+}
 .Pp
 # Generic example for twoDNS.de
 .br
-system custom@http_srv_basic_auth
+custom twoDNS.de {
 .br
-    ssl
+    ssl            = true
 .br
-    checkip-url checkip.two-dns.de /
+    username       = account
 .br
-    server-name update.twodns.de
+    password       = secret
 .br
-    server-url /update?hostname=
+    checkip-server = checkip.two-dns.de
+    checkip-path   = /
 .br
-    username account
+    ddns-server    = update.twodns.de
 .br
-    password secret
+    ddns-path      = "/update?hostname="
 .br
-    alias example.dd-dns.de
+    alias          = example.dd-dns.de
 .br
+}
 .Pp
 As of Inadyn 1.99.14 the generic plugin can also be used with providers
-that require the client's IP in the update request, as
+that require the client's IP in the update request, which for example
 .Aq http://dyn.com
 requires:
 .Pp
 # This emulates default@dyndns.org
 .br
-system custom@http_srv_basic_auth
+custom dyn.com {
 .br
-    alias YOURHOST
+    ssl          = true
 .br
-    server-name members.dyndns.org
+    username     = DYNUSERNAME
 .br
-    ssl
+    password     = DYNPASSWORD
 .br
-    server-url /nic/update?hostname=YOURHOST.dyndns.org&myip=
+    ddns-server  = members.dyndns.org
 .br
-    append-myip
+    ddns-path    = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
 .br
-    username DYNUSERNAME
+    append-myip  = true
 .br
-    password DYNPASSWORD
+    alias        = YOURHOST
+.br
+}
 .Pp
 Notice the use of
 .Nm append-myip
