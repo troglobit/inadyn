@@ -43,14 +43,13 @@ gid_t  gid = 0;
 cfg_t *cfg;
 
 extern cfg_t *conf_parse_file(char *file, ddns_t *ctx);
+extern void conf_info_cleanup(void);
 
 
 static int alloc_context(ddns_t **pctx)
 {
 	int rc = 0;
 	ddns_t *ctx;
-	int http_to_dyndns_constructed = 0;
-	int http_to_ip_constructed = 0;
 
 	if (!pctx)
 		return RC_INVALID_POINTER;
@@ -81,34 +80,12 @@ static int alloc_context(ddns_t **pctx)
 			break;
 		}
 
-		i = 0;
-		while (i < DDNS_MAX_SERVER_NUMBER) {
-			if (http_construct(&ctx->http_to_ip_server[i++])) {
-				rc = RC_OUT_OF_MEMORY;
-				break;
-			}
-		}
-		http_to_ip_constructed = 1;
-
-		i = 0;
-		while (i < DDNS_MAX_SERVER_NUMBER) {
-			if (http_construct(&ctx->http_to_dyndns[i++])) {
-				rc = RC_OUT_OF_MEMORY;
-				break;
-			}
-		}
-		http_to_dyndns_constructed = 1;
-
 		ctx->cmd = NO_CMD;
 		ctx->normal_update_period_sec = DDNS_DEFAULT_PERIOD;
 		ctx->update_period = DDNS_DEFAULT_PERIOD;
 		ctx->total_iterations = DDNS_DEFAULT_ITERATIONS;
 		ctx->cmd_check_period = DDNS_DEFAULT_CMD_CHECK_PERIOD;
 		ctx->force_addr_update = 0;
-
-		i = 0;
-		while (i < DDNS_MAX_SERVER_NUMBER)
-			ctx->info[i++].creds.encoded_password = NULL;
 
 		ctx->initialized = 0;
 	}
@@ -121,12 +98,6 @@ static int alloc_context(ddns_t **pctx)
 
 		if (ctx->request_buf)
 			free(ctx->request_buf);
-
-		if (http_to_dyndns_constructed)
-			http_destruct(ctx->http_to_dyndns, DDNS_MAX_SERVER_NUMBER);
-
-		if (http_to_ip_constructed)
-			http_destruct(ctx->http_to_ip_server, DDNS_MAX_SERVER_NUMBER);
 
 		free(ctx);
 		*pctx = NULL;
@@ -142,9 +113,6 @@ static void free_context(ddns_t *ctx)
 	if (!ctx)
 		return;
 
-	http_destruct(ctx->http_to_ip_server, DDNS_MAX_SERVER_NUMBER);
-	http_destruct(ctx->http_to_dyndns, DDNS_MAX_SERVER_NUMBER);
-
 	if (ctx->work_buf) {
 		free(ctx->work_buf);
 		ctx->work_buf = NULL;
@@ -155,14 +123,7 @@ static void free_context(ddns_t *ctx)
 		ctx->request_buf = NULL;
 	}
 
-	for (i = 0; i < DDNS_MAX_SERVER_NUMBER; i++) {
-		ddns_info_t *info = &ctx->info[i];
-
-		if (info->creds.encoded_password) {
-			free(info->creds.encoded_password);
-			info->creds.encoded_password = NULL;
-		}
-	}
+	conf_info_cleanup();
 
 	if (ctx->bind_interface) {
 		free(ctx->bind_interface);

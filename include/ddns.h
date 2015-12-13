@@ -31,6 +31,7 @@
 #include "debug.h"
 #include "plugin.h"
 #include "libite/lite.h"
+#include "libite/queue.h"
 
 #define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
@@ -107,7 +108,8 @@ typedef struct {
 	time_t         last_update;
 } ddns_alias_t;
 
-typedef struct {
+typedef struct di {
+	LIST_ENTRY(di) link;
 	int            id;
 
 	ddns_creds_t   creds;
@@ -116,10 +118,12 @@ typedef struct {
 	/* Address of DDNS update service */
 	ddns_name_t    server_name;
 	char           server_url[SERVER_URL_LEN];
+	http_t         server;
 
 	/* Address of "What's my IP" checker */
 	ddns_name_t    checkip_name;
 	char           checkip_url[SERVER_URL_LEN];
+	http_t         checkip;
 
 	ddns_name_t    proxy_server_name;
 
@@ -153,8 +157,6 @@ typedef struct {
 	int            use_proxy;
 	int            abort;
 
-	http_t         http_to_ip_server[DDNS_MAX_SERVER_NUMBER];
-	http_t         http_to_dyndns[DDNS_MAX_SERVER_NUMBER];
 	http_trans_t   http_transaction;
 
 	char          *work_buf; /* for HTTP responses */
@@ -164,9 +166,6 @@ typedef struct {
 	int            request_buflen;
 
 	ddns_user_t    sys_usr_info; /* info about the current account running inadyn */
-
-	ddns_info_t    info[DDNS_MAX_SERVER_NUMBER]; /* servers, names, passwd */
-	int            info_count;
 } ddns_t;
 
 extern int once;

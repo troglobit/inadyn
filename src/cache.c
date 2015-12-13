@@ -41,6 +41,7 @@
 
 /* Optional setting, e.g., --cache-dir=/etc */
 char *cache_dir = NULL;
+extern ddns_info_t *conf_info_iterator(int first);
 
 static int nslookup(ddns_alias_t *alias)
 {
@@ -132,7 +133,8 @@ char *cache_file(char *name, char *buf, size_t len)
  * DNS query. */
 int read_cache_file(ddns_t *ctx)
 {
-	int i, j;
+	int j;
+	ddns_info_t *info;
 
         /* Clear DNS cache before querying for the IP below, this to
          * prevent any artefacts from, e.g., nscd, which is a known
@@ -142,8 +144,8 @@ int read_cache_file(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-        for (i = 0; i < ctx->info_count; i++) {
-                ddns_info_t *info = &ctx->info[i];
+	info = conf_info_iterator(1);
+	while (info) {
                 int nonslookup;
 
                 /* Exception for tunnelbroker.net - no name to lookup */
@@ -151,6 +153,8 @@ int read_cache_file(ddns_t *ctx)
 // XXX: TODO better plugin identifiction here
                 for (j = 0; j < info->alias_count; j++)
                         read_one(&info->alias[j], nonslookup);
+
+		info = conf_info_iterator(0);
         }
         
 	return 0;

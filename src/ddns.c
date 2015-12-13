@@ -43,6 +43,7 @@
 
 /* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_num_iterations = 0;
+extern ddns_info_t *conf_info_iterator(int first);
 
 
 static int wait_for_cmd(ddns_t *ctx)
@@ -77,6 +78,7 @@ static int check_interface_address(ddns_t *ctx)
 	in_addr_t addr;
 	char *address;
 	int i, j, sd, anychange = 0;
+	ddns_info_t *info;
 
 	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ctx->check_interface);
 
@@ -112,9 +114,8 @@ static int check_interface_address(ddns_t *ctx)
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
 
-	for (i = 0; i < ctx->info_count; i++) {
-		ddns_info_t *info = &ctx->info[i];
-
+	info = conf_info_iterator(1);
+	while (info) {
 		for (j = 0; j < info->alias_count; j++) {
 			ddns_alias_t *alias = &info->alias[j];
 
@@ -124,6 +125,8 @@ static int check_interface_address(ddns_t *ctx)
 				strlcpy(alias->address, address, sizeof(alias->address));
 			}
 		}
+
+		info = conf_info_iterator(0);
 	}
 
 	if (!anychange)
@@ -140,14 +143,20 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 }
 
 /*
-	Send req to IP server and get the response
-*/
-static int server_transaction(ddns_t *ctx, int servernum)
+ * Send req to IP server and get the response
+ */
+static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 {
 	int rc = 0;
-	http_t *http = &ctx->http_to_ip_server[servernum];
+	http_t *http;
 	http_trans_t *trans;
 
+	if (!provider) {
+		logit(LOG_ERR, "Cannot query our address, invalid DDNS provider data!");
+		return RC_INVALID_POINTER;
+	}
+
+	http = &provider->checkip;
 	DO(http_init(http, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
@@ -156,7 +165,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
 	memset(&ctx->http_transaction, 0, sizeof(ctx->http_transaction));
 
 	trans              = &ctx->http_transaction;
-	trans->req_len     = get_req_for_ip_server(ctx, &ctx->info[servernum]);
+	trans->req_len     = get_req_for_ip_server(ctx, provider);
 	trans->p_req       = ctx->request_buf;
 	trans->p_rsp       = ctx->work_buf;
 	trans->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
@@ -181,7 +190,7 @@ static int server_transaction(ddns_t *ctx, int servernum)
   Note:
   it updates the flag: alias->ip_has_changed if the old address was different
 */
-static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
+static int parse_my_ip_address(ddns_t *ctx)
 {
 	int found = 0;
 	char *accept = "0123456789.";
@@ -217,10 +226,11 @@ static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 	if (found) {
 		int i, anychange = 0;
 		char *address = inet_ntoa(addr);
+		ddns_info_t *info;
 
-		for (i = 0; i < ctx->info_count; i++) {
+		info = conf_info_iterator(1);
+		while (info) {
 			int j;
-			ddns_info_t *info = &ctx->info[i];
 
 			for (j = 0; j < info->alias_count; j++) {
 				ddns_alias_t *alias = &info->alias[j];
@@ -231,6 +241,8 @@ static int parse_my_ip_address(ddns_t *ctx, int UNUSED(servernum))
 					strlcpy(alias->address, address, sizeof(alias->address));
 				}
 			}
+
+			info = conf_info_iterator(0);
 		}
 
 		if (!anychange)
@@ -264,13 +276,13 @@ static int time_to_check(ddns_t *ctx, ddns_alias_t *alias)
 static int check_alias_update_table(ddns_t *ctx)
 {
 	int i, j;
+	ddns_info_t *info;
 
 	/* Uses fix test if ip of server 0 has changed.
 	 * That should be OK even if changes check_address() to
 	 * iterate over servernum, but not if it's fix set to =! 0 */
-	for (i = 0; i < ctx->info_count; i++) {
-		ddns_info_t *info = &ctx->info[i];
-
+	info = conf_info_iterator(1);
+	while (info) {
 		for (j = 0; j < info->alias_count; j++) {
 			int override;
 			ddns_alias_t *alias = &info->alias[j];
@@ -290,6 +302,8 @@ static int check_alias_update_table(ddns_t *ctx)
 			logit(LOG_WARNING, "Update %s for alias %s, new IP# %s",
 			      override ? "forced" : "needed", alias->name, alias->address);
 		}
+
+		info = conf_info_iterator(0);
 	}
 
 	return 0;
@@ -299,7 +313,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 {
 	int            rc;
 	http_trans_t   trans;
-	http_t        *client = &ctx->http_to_dyndns[info->id];
+	http_t        *client = &info->server;
 
 	client->ssl_enabled = info->ssl_enabled;
 	if (client->ssl_enabled) /* XXX: Fix this better, possibly in http_init() */
@@ -368,15 +382,15 @@ static int update_alias_table(ddns_t *ctx)
 	int i, j;
 	int rc = 0, remember = 0;
 	int anychange = 0;
+	ddns_info_t *info;
 
 	/* Issue #15: On external trig. force update to random addr. */
 	if (ctx->force_addr_update && ctx->forced_update_fake_addr) {
 		/* If the DDNS server responds with an error, we ignore it here,
 		 * since this is just to fool the DDNS server to register a a
 		 * change, i.e., an active user. */
-		for (i = 0; i < ctx->info_count; i++) {
-			ddns_info_t *info = &ctx->info[i];
-
+		info = conf_info_iterator(1);
+		while (info) {
 			for (j = 0; j < info->alias_count; j++) {
 				ddns_alias_t *alias = &info->alias[j];
 				char backup[sizeof(alias->address)];
@@ -389,14 +403,15 @@ static int update_alias_table(ddns_t *ctx)
 
 				strlcpy(alias->address, backup, sizeof(alias->address));
 			}
+
+			info = conf_info_iterator(0);
 		}
 
 		os_sleep_ms(1000);
 	}
 
-	for (i = 0; i < ctx->info_count; i++) {
-		ddns_info_t *info = &ctx->info[i];
-
+	info = conf_info_iterator(1);
+	while (info) {
 		for (j = 0; j < info->alias_count; j++) {
 			ddns_alias_t *alias = &info->alias[j];
 
@@ -422,6 +437,8 @@ static int update_alias_table(ddns_t *ctx)
 
 		if (RC_DYNDNS_RSP_RETRY_LATER == rc && !remember)
 			remember = rc;
+
+		info = conf_info_iterator(0);
 	}
 
 	return remember;
@@ -429,12 +446,13 @@ static int update_alias_table(ddns_t *ctx)
 
 static int get_encoded_user_passwd(ddns_t *ctx)
 {
-	int i, rc = 0;
+	int rc = 0;
 	char *buf = NULL;
 	size_t len;
+	ddns_info_t *info;
 
 	/* Take base64 encoding into account when allocating buf */
-	len = strlen(ctx->info[0].creds.password) + strlen(ctx->info[0].creds.username) + 2;
+	len = sizeof(info->creds.password) + sizeof(info->creds.username) + 2;
 	len = (len / 3 + ((len % 3) ? 1 : 0)) * 4; /* output length = 4 * [input len / 3] */
 
 	buf = calloc(len, sizeof(char));
@@ -443,11 +461,11 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 	if (debug > 2)
 		logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
 
-	for (i = 0; i < ctx->info_count; i++) {
+	info = conf_info_iterator(1);
+	while (info) {
 		int rc2;
 		char *encode;
 		size_t dlen = 0;
-		ddns_info_t *info = &ctx->info[i];
 
 		info->creds.encoded = 0;
 
@@ -486,6 +504,8 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
+
+		info = conf_info_iterator(0);
 	}
 
 	if (debug > 2)
@@ -503,7 +523,7 @@ static int get_encoded_user_passwd(ddns_t *ctx)
 */
 static int init_context(ddns_t *ctx)
 {
-	int i;
+	ddns_info_t *info;
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
@@ -511,10 +531,10 @@ static int init_context(ddns_t *ctx)
 	if (ctx->initialized == 1)
 		return 0;
 
-	for (i = 0; i < ctx->info_count; i++) {
-		http_t      *checkip = &ctx->http_to_ip_server[i];
-		http_t      *update  = &ctx->http_to_dyndns[i];
-		ddns_info_t *info    = &ctx->info[i];
+	info = conf_info_iterator(1);
+	while (info) {
+		http_t *checkip = &info->checkip;
+		http_t *update  = &info->server;
 
 		if (strlen(info->proxy_server_name.name)) {
 			http_set_port(checkip, info->proxy_server_name.port);
@@ -532,6 +552,8 @@ static int init_context(ddns_t *ctx)
 
 		http_set_bind_iface(update,  ctx->bind_interface);
 		http_set_bind_iface(checkip, ctx->bind_interface);
+
+		info = conf_info_iterator(0);
 	}
 
 	/* Restore values, if reset by SIGHUP.  Initialize time from cache file at startup. */
@@ -560,17 +582,17 @@ static int check_address(ddns_t *ctx)
 	if (ctx->check_interface) {
 		DO(check_interface_address(ctx));
 	} else {
-		int servernum = 0;  /* server to use for checking IP, index 0 by default */
+		ddns_info_t *info = conf_info_iterator(1);
 
 		/* Ask IP server something so he will respond and give me my IP */
-		DO(server_transaction(ctx, servernum));
+		DO(server_transaction(ctx, info));
 		if (debug > 2) {
 			logit(LOG_DEBUG, "IP server response:");
 			logit(LOG_DEBUG, "%s", ctx->work_buf);
 		}
 
 		/* Extract our IP, check if different than previous one */
-		DO(parse_my_ip_address(ctx, servernum));
+		DO(parse_my_ip_address(ctx));
 	}
 
 	/* Step through aliases list, resolve them and check if they point to my IP */
