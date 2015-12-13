@@ -316,9 +316,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (os_install_signal_handler(ctx))
-		return RC_OS_INSTALL_SIGHANDLER_FAILED;
-
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
@@ -338,6 +335,9 @@ int main(int argc, char *argv[])
 		rc = alloc_context(&ctx);
 		if (rc != RC_OK)
 			break;
+
+		if (os_install_signal_handler(ctx))
+			return RC_OS_INSTALL_SIGHANDLER_FAILED;
 
 		cfg = conf_parse_file(config, ctx);
 		if (!cfg) {
