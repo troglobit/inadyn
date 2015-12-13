@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2015  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,21 +42,7 @@ static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t generic = {
-	.name         = "custom@http_srv_basic_auth",
-
-	.request      = (req_fn_t)request,
-	.response     = (rsp_fn_t)response,
-
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-
-	.server_name  = "",
-	.server_url   = ""
-};
-
-/* Compatiblity entry, new canonical is @http_srv */
-static ddns_system_t compat = {
-	.name         = "custom@http_svr_basic_auth",
+	.name         = "custom",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -103,13 +89,11 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&generic);
-	plugin_register(&compat);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&generic);
-	plugin_unregister(&compat);
 }
 
 /**
