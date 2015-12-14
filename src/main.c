@@ -142,16 +142,15 @@ static void free_context(ddns_t *ctx)
 static int drop_privs(void)
 {
 	if (uid) {
-		if (uid != getuid()) {
-			if (setuid(uid))
-				return 1;
-		}
-
 		if (gid != getgid()) {
 			if (setgid(gid))
 				return 2;
 		}
 
+		if (uid != getuid()) {
+			if (setuid(uid))
+				return 1;
+		}
 	}
 
 	return 0;
