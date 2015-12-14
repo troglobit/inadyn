@@ -373,7 +373,7 @@ int os_check_perms(void *UNUSED(arg))
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
 
-	if (mkpath(cache_dir, 0755) && errno != EEXIST) {
+	if (mkpath(cache_dir, 0755) && errno != EEXIST || access(cache_dir, W_OK)) {
 		logit(LOG_ERR, "No write permission to %s, aborting.", cache_dir);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
 
