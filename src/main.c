@@ -276,6 +276,21 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* if silent required, fork() to background and close console window */
+	if (use_syslog || !foreground) {
+		DO(close_console_window());
+
+		/* if logfile provided, redirect output to log file */
+		if (logfile)
+			DO(os_open_dbg_output(DBG_FILE_LOG, "", logfile));
+
+		if (get_dbg_dest() == DBG_SYS_LOG)
+			fclose(stdout);
+
+		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
+			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
+	}
+
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;
@@ -283,6 +298,9 @@ int main(int argc, char *argv[])
 
 	if (!config)
 		config = strdup(DEFAULT_CONFIG_FILE);
+
+	/* "Hello!" Let user know we've started up OK */
+	logit(LOG_INFO, "%s", VERSION_STRING);
 
 #ifdef ENABLE_SSL
 	SSL_library_init();

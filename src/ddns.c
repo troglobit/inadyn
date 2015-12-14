@@ -656,29 +656,9 @@ int ddns_main_loop(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	/* if silent required, close console window */
-	if (use_syslog || !foreground) {
-		DO(close_console_window());
-
-		if (get_dbg_dest() == DBG_SYS_LOG)
-			fclose(stdout);
-	}
-
 	/* Check file system permissions */
 	if (!once)
 		DO(os_check_perms(ctx));
-
-	/* if logfile provided, redirect output to log file */
-	if (logfile)
-		DO(os_open_dbg_output(DBG_FILE_LOG, "", logfile));
-
-	if (use_syslog || !foreground) {
-		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
-			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
-	}
-
-	/* "Hello!" Let user know we've started up OK */
-	logit(LOG_INFO, "%s", VERSION_STRING);
 
 	/* On first startup only, optionally wait for network and any NTP daemon
 	 * to set system time correctly.  Intended for devices without battery
