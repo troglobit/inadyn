@@ -14,7 +14,7 @@
 .Os
 .Sh NAME
 .Nm inadyn
-.Nd a small DDNS client to maintain your presence on the Internet
+.Nd a small DDNS client to ease your presence on the Internet
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl n, -foreground
@@ -29,19 +29,22 @@
 .Op Fl V, -verbose
 .Sh DESCRIPTION
 .Nm
-is a client for
+lets you have a public Internet name for your DHCP/PPPoE assigned
+system.  It is a client for
 .Dq open
-name servers, also known as DDNS service providers.  That is,
-it lets you have a public Internet name for your DHCP/PPPoE assigned system.  Some of
-these services are free of charge for non-commercial use, others take a small fee,
-but also provide more domains to choose from.
+name servers, also known as DDNS service providers, such as
+.Aq http://dyn.com .
+Some of these services are free of charge for non-commercial use, others
+take a small fee, but also provide more domains to choose from.
 .Pp
 Common DDNS service providers supported by
-.Nm
+.Nm :
 .Pp
 .Bl -bullet -compact
 .It
 .Aq http://www.dyndns.org
+a.k.a.
+.Aq http://dyn.com
 .It
 .Aq http://freedns.afraid.org
 .It
@@ -98,12 +101,22 @@ can often be configured using the generic DDNS provider plugin.  See
 .Xr inadyn.conf 5
 for example configurations.
 .Pp
-The basic operation of
-.Nm inadyn
-is to periodically check whether the actual Internet accessible IP of your system is
-the same one that is recorded in the name server, and update the name server records
-when there is a mismatch.
+.Nm
+periodically checks if the actual Internet accessible IP of your system
+is the same one that is recorded in the name server, if not
+.Nm
+updates your name server record(s).
 .Sh OPTIONS
+Earlier versions of
+.Nm
+supported more command line options, from v2.0
+.Nm
+has been greatly simplified.  See
+.Xr inadyn.conf 5
+for defails of the
+.Pa /etc/inadyn.conf
+configuration file format.
+.Pp
 .Bl -tag -width Ds
 .It Fl h, -help
 Print a summary of the options and exit
@@ -152,69 +165,6 @@ setting honored across reboots, avoiding unnecessary IP address updates.
 .It Fl 1, -once
 Force one update and quit
 .El
-.Sh TYPICAL USAGE
-.Ss http://www.dyndns.org
-.Bl -column -compact
-.It Nm
-.Fl u
-nick
-.Fl p
-secret
-.Fl a
-my.registered.name
-.It Nm
-.Fl u
-nick
-.Fl p
-secret
-.Fl T 60
-.Fl a
-test.homeip.net
-.Fl a
-my.second.domain
-.It Nm
-.Fl b
-.Fl u
-nick
-.Fl p
-secret
-.Fl T
-60
-.Fl a
-test.homeip.net
-.Fl a
-my.second.domain
-.Fl L inadyn.log
-.El
-.Ss http://freedns.afraid.org
-.Bl -column -compact
-.It Nm
-.Fl S
-default@freedns.afraid.org
-.Fl u
-nick
-.Fl p
-secret
-.Fl a
-my.registered.name
-.It Nm
-.Fl S
-default@freedns.afraid.org
-.Fl u
-nick
-.Fl p
-secret
-.Fl T
-60
-.Fl a
-test.homeip.net
-.Fl a
-my.second.domain
-.El
-.Pp
-The hash is automatically retrieved by
-.Nm inadyn
-using the FreeDNS API.
 .Sh OUTPUT
 .Nm
 prints a message when the IP is updated.  If no update is needed then by
