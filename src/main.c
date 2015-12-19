@@ -183,18 +183,18 @@ static int usage(char *progname)
 	fprintf (stderr, "Inadyn | Small and simple DDNS client\n"
 		 "------------------------------------------------------------------------------\n"
 		 "Usage: %s [OPTIONS]\n"
-		 " -f, --config=FILE               Use FILE for config, default %s\n"
+		 " -1, --once                      Run once, then exit regardless of status\n"
 		 " -d, --debug=LEVEL               Enable developer debug messages\n"
 		 " -e, --exec=/path/to/cmd         Script to run on IP update\n"
-		 " -p, --drop-privs=USER[:GROUP]   Drop privileges after start to USER:GROUP\n"
+		 " -f, --config=FILE               Use FILE for config, default %s\n"
+		 " -h, --help                      Show summary of command line options and exit\n"
+		 " -l, --logfile=FILE              Log to FILE instead of syslog\n"
 		 " -n, --foreground                Run in foreground, useful when run from finit\n"
-		 " -h, --help                      This help text\n"
-		 " -L, --logfile=FILE              Log to FILE instead of syslog\n"
-		 " -1, --once                      Run once, then exit regardless of status\n"
-		 " -t, --startup-delay=SEC         Delay initial network connections SEC seconds\n"
-		 " -l, --syslog                    Log to syslog, default unless --foreground\n"
+		 " -p, --drop-privs=USER[:GROUP]   Drop privileges after start to USER:GROUP\n"
+		 " -s, --syslog                    Log to syslog, default unless --foreground\n"
+		 " -t, --startup-delay=SEC         Initial startup delay, default none\n"
 		 " -V, --verbose                   Verbose logging\n"
-		 " -v, --version                   Display program version\n"
+		 " -v, --version                   Show program version and exit\n"
 		 "------------------------------------------------------------------------------\n"
 		 "Report bugs to %s\n\n", progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
 
@@ -206,24 +206,28 @@ int main(int argc, char *argv[])
 {
 	int c, rc = 0, restart;
 	struct option opt[] = {
-		{"config",        1, 0, 'f'},
+		{"once",          0, 0, '1'},
 		{"debug",         1, 0, 'd'},
 		{"exec",          1, 0, 'e'},
-		{"drop-privs",    1, 0, 'p'},
-		{"foreground",    0, 0, 'n'},
+		{"config",        1, 0, 'f'},
 		{"help",          0, 0, 'h'},
-		{"logfile",       1, 0, 'L'},
-		{"once",          0, 0, '1'},
+		{"logfile",       1, 0, 'l'},
+		{"foreground",    0, 0, 'n'},
+		{"drop-privs",    1, 0, 'p'},
+		{"syslog",        0, 0, 's'},
 		{"startup-delay", 1, 0, 't'},
-		{"syslog",        0, 0, 'l'},
 		{"verbose",       0, 0, 'V'},
 		{"version",       0, 0, 'v'},
 		{0,               0, 0, 0  }
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "f:d:e:p:nh?L:1t:lVv", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1d:e:f:h?l:np:st:Vv", opt, NULL)) != EOF) {
 		switch (c) {
+		case '1':	/* --once */
+			once = 1;
+			break;
+
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
 			break;
@@ -236,28 +240,24 @@ int main(int argc, char *argv[])
 			script_exec = strdup(optarg);
 			break;
 
-		case 'p':	/* --drop-privs=USER[:GROUP] */
-			parse_privs(optarg);
+		case 'l':	/* --logfile=FILE */
+			logfile = strdup(optarg);
 			break;
 
 		case 'n':	/* --foreground */
 			foreground = 1;
 			break;
 
-		case 'L':	/* --logfile=FILE */
-			logfile = strdup(optarg);
+		case 'p':	/* --drop-privs=USER[:GROUP] */
+			parse_privs(optarg);
 			break;
 
-		case '1':	/* --once */
-			once = 1;
+		case 's':	/* --syslog */
+			use_syslog = 1;
 			break;
 
 		case 't':	/* --startup-delay=SEC */
 			startup_delay = atoi(optarg);
-			break;
-
-		case 'l':	/* --syslog */
-			use_syslog = 1;
 			break;
 
 		case 'V':	/* --verbose */
