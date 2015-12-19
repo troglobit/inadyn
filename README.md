@@ -39,9 +39,12 @@ has a web based IP detection which runs well behind a NAT router.
 Supported Providers
 -------------------
 
-The following DDNS providers are supported natively, other providers,
-like <http://twoDNS.de> for instance, can be supported using the generic
-DDNS plugin.  See below for configuration examples.
+Some of these services are free of charge for non-commercial use, some
+take a small fee, but also provide more domains to choose from.
+
+DDNS providers not supported natively like <http://twoDNS.de>, can be
+enabled using the generic DDNS plugin.  See below for configuration
+examples.
 
 * <http://www.dyndns.org>
 * <http://freedns.afraid.org>
@@ -69,9 +72,6 @@ DDNS plugin.  See below for configuration examples.
 * <http://giradns.com>
 * <https://www.duiadns.net>
 
-Some of these services are free of charge for non-commercial use, others
-take a small fee, but also provide more domains to choose from.
-
 Inadyn v1.99.8 and later support HTTPS (and SNI), for DDNS providers
 that support this (must check this yourself).  Tested so far are DynDNS,
 FreeDNS, nsupdate.info, and Loopia.
@@ -90,7 +90,7 @@ different DDNS providers. The following example shows how this can be
 used.
 
 `[/etc/inadyn.conf]`
-
+    
     # Inadyn v2.0 Configuration file format
     period          = 300
     cache-dir       = "/mnt/ddns"
@@ -240,9 +240,9 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
 * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
 
-Inadyn also requires [libConfuse][], as of v2.0, which is available from
-most UNIX distributions as a pre-built package.  Make sure to install the
-`-dev` or `-devel` package of libConfuse when building Inadyn.
+Inadyn v2.0 and later requires [libConfuse][], which is available from
+most UNIX distributions as a pre-built package.  Make sure to install
+the `-dev` or `-devel` package of libConfuse when building Inadyn.
 
 
 Origin & References
