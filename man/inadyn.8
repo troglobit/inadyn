@@ -37,6 +37,12 @@ name servers, also known as DDNS service providers, such as
 Some of these services are free of charge for non-commercial use, others
 take a small fee, but also provide more domains to choose from.
 .Pp
+.Nm
+periodically checks if the actual Internet accessible IP of your system
+is the same one that is recorded in the name server, if not
+.Nm
+updates your name server record(s).
+.Pp
 Common DDNS service providers supported by
 .Nm :
 .Pp
@@ -100,12 +106,6 @@ DDNS providers not listed here, like
 can often be configured using the generic DDNS provider plugin.  See
 .Xr inadyn.conf 5
 for example configurations.
-.Pp
-.Nm
-periodically checks if the actual Internet accessible IP of your system
-is the same one that is recorded in the name server, if not
-.Nm
-updates your name server record(s).
 .Sh OPTIONS
 Earlier versions of
 .Nm
@@ -119,38 +119,36 @@ configuration file format.
 .Pp
 .Bl -tag -width Ds
 .It Fl h, -help
-Print a summary of the options and exit
+Print a summary of command line options and exit
 .It Fl f, -config Ar FILE
-The file name for the
-.Nm inadyn
-configuration.  The default configuration file name,
+Use
+.Ar FILE
+for configuration. By default
 .Pa /etc/inadyn.conf ,
-is looked at automatically if
-.Nm inadyn
-is called without any command line options. The syntax is defined in
+is used.  See
 .Xr inadyn.conf 5
+for examples.
 .It Fl n, -forground
 Run in foreground, default is to daemonize and background.
 .It Fl V, -verbose
 Enable verbose logging.
 .It Fl l, -syslog
-Use the system
+Use
 .Xr syslog 3
-mechanism for log messages, warnings and error conditions.
+for log messages, warnings and error conditions.  This is the default
+when running in the background.
 .It Fl d, -drop-privs=USER Ns Op : Ns Ar GROUP
-Drop privileges after initial setup to the given user and group.
-.It Fl t, -startup-delay=SEC
-option to ensure that an NTP client has set the device's clock before a
-cache file is created or read.
+Drop root privileges after initial setup to the given user and group.
 .It Fl e, -exec=/path/to/cmd
 Full path to command, or script, to run after a successful DDNS update.
 The following environment variables are set: INADYN_IP, INADYN_HOSTNAME.
-First environment variable contains new IP address, second one - host
-name alias.
+The first environment variable contains teh new IP address, the second
+the host name alias.  The command is called for each listed host name
+that is successfully updated.
 .It Fl t, -startup-delay Ar SEC
-Initial delay at program startup.  Default is 0 seconds.  Any signal can
-be used to abort the startup delay early, but SIGUSR2 is the recommended
-to use.  See
+Initial startup delay.  Default is 0 seconds.  Any signal can be used to
+abort the startup delay early, but SIGUSR2 is the recommended to use.
+See
 .Sx SIGNALS
 below for full details of how
 .Nm
@@ -159,6 +157,7 @@ responds to signals.
 Intended to allow time for embedded devices without a battery backed
 real time clock to set their clock via NTP at bootup.  This is so that
 the time since the last update can be calculated correctly from the
+.Nm
 cache file and the
 .Cm forced-update=SEC
 setting honored across reboots, avoiding unnecessary IP address updates.
