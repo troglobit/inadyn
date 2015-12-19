@@ -2,8 +2,8 @@
 # Defaults to GNU GCC and autotools: ./configure && make && make test
 language: c
 
-# We need to install libConfuse, so we cannot use dockerized build
-sudo: true
+# Use docker for quicker builds, it now allows https://docs.travis-ci.com/user/apt/
+sudo: false
 
 env:
   global:
@@ -12,6 +12,9 @@ env:
    - secure: "JFknJb+purjGIPuKNWFBPlsSLX6KohuYmYV4dmisIhjkeFhhXFQNmoabYQ6D+r/mWYPWiNnohoTSyKv8gjj6eC1SbXb+f2dEXHrmAwr36Enbp2tV0XLx7V2KHZzUmKeJxOSwnNUVZxmSvzVbuiDodtU1PJ2YPK0CM0KF/J+wePA="
 
 addons:
+  apt:
+    packages:
+      - libconfuse-dev
   coverity_scan:
     project:
       name: "troglobit/inadyn"
@@ -22,7 +25,6 @@ addons:
     branch_pattern: dev
 
 script:
-  - sudo apt-get install libconfuse-dev
   - ./autogen.sh
   - ./configure
   - make
