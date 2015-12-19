@@ -86,11 +86,9 @@ Example Configuration
 ---------------------
 
 Inadyn supports updating several DDNS servers, several accounts even on
-different DDNS providers. The following example shows how this can be
-used.
+different DDNS providers.  The following `/etc/inadyn.conf` example show
+how this can be done:
 
-`[/etc/inadyn.conf]`
-    
     # Inadyn v2.0 Configuration file format
     period          = 300
     cache-dir       = "/mnt/ddns"
@@ -137,13 +135,15 @@ configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
 Generic DDNS Plugin
 -------------------
 
-Aside from dedicated DDNS provider support, Inadyn also has a generic
-DDNS provider plugin.  Use `custom@http_srv_basic_auth` as your system.
-This will use HTTP basic authentication (base64 encoded username and
-password).  If you don't have a username and/or password, you can try to
-leave these fields empty for the `custom@` system.  Inadyn will still
-send basic authentication, but use an empty username and/or password
-when communicating with the server.
+In addition to dedicated DDNS provider support Inadyn also has a generic
+DDNS plugin.  Use `custom {}` in the configuration file, instead of the
+`provider {}` section used in examples above.
+
+Inadyn use HTTP basic authentication (base64 encoded) to communicate
+username and password to the server.  If you do not have a username
+and/or password, you can leave these fields out.  Basic authentication,
+will still be used in communication with the server, but with empty
+username and password.
 
 A DDNS provider like <http://twoDNS.de> can be setup like this:
 
@@ -158,10 +158,10 @@ A DDNS provider like <http://twoDNS.de> can be setup like this:
         alias          = myalias.dd-dns.de
 	}
 
-For <https://www.namecheap.com> DDNS it can look as follows.  Please
-notice how the alias syntax differs between these two DDNS providers.
-You need to investigate details like this yourself when using the
-generic/custom DDNS plugin:
+For <https://www.namecheap.com> DDNS can look as follows.  Please notice
+how the alias syntax differs between these two DDNS providers.  You need
+to investigate details like this yourself when using the generic/custom
+DDNS plugin:
 
     custom namecheap {
         username    = myuser
@@ -172,14 +172,13 @@ generic/custom DDNS plugin:
         alias       = { "alpha", "beta", "gamma" }
 	}
 
-Here three subdomains are updated, one `server-url` GET update request
-per alias.  The alias is appended to `...host=` and sent to the server.
-Leave `server-name` as is, and change/add/remove `alias` to your DNS
-name.  If you only wish to update a subdomain, set `alias` to that, like
-the example above.  Username is your Namecheap username, and password
-would be the one given to you in the Dynamic DNS panel from Namecheap.
-Here is an alternative config to illustrate how the `alias` setting
-works:
+Here three subdomains are updated, one GET update request using the
+listed DDNS server and path is performed per alias.  Your DNS alias is
+automatically appended to the end of the `ddns-path`, as is customary,
+before it is communicated to the server.  Username is your Namecheap
+username, and password would be the one given to you in the Dynamic DNS
+panel from Namecheap.  Here is an alternative config to illustrate how
+the `alias` setting works:
 
     custom kruskakli {
         username    = myuser
@@ -191,11 +190,11 @@ works:
 	}
 
 The generic plugin can also be used with providers that require the
-client's new IP in the update request.  Below follows an example of how
-this can be done if we *pretend* that <http://dyn.com> is not supported
-by Inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org,
-the `server-url` often differs between providers and is something you
-must find out yourself.  For example using the `inadyn --debug` mode.
+client's new IP in the update request.  Here is an example of how this
+can be done if we *pretend* that <http://dyn.com> is not supported by
+Inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org, the
+`ddns-path` often differs between providers and is something you must
+figure out yourself.  For example using the `inadyn --debug` mode.
 
     # This emulates default@dyndns.org
     custom randomhandle {
@@ -214,11 +213,11 @@ code and the strings `"good"`, `"OK"`, or `"true"` in the HTTP response
 body.
 
 **Note:** the `alias` setting is required, even if you encode everything
-in the `server-url`!  The given alias is appended to the `server-url`
-used for updates, unless you use `append-myip` in which case your IP
-address will be appended instead.  When using `append-myip` you probably
-need to encode your DNS hostname in the `server-url` instead &mdash;
-as is done in the last example above.
+in the `ddns-path`!  The given alias is appended to the `ddns-path` used
+for updates, unless you use `append-myip` in which case your IP address
+will be appended instead.  When using `append-myip` you probably need to
+encode your DNS hostname in the `ddns-path` instead &mdash; as is done
+in the last example above.
 
 
 Build & Install
