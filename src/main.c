@@ -38,6 +38,7 @@ int    use_syslog = 0;
 char  *script_exec = NULL;
 char  *config = NULL;
 char  *logfile = NULL;
+char  *cache_dir = NULL;
 uid_t  uid = 0;
 gid_t  gid = 0;
 cfg_t *cfg;

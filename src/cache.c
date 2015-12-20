@@ -39,8 +39,6 @@
 #include "ddns.h"
 #include "cache.h"
 
-/* Optional setting, e.g., --cache-dir=/etc */
-char *cache_dir = NULL;
 extern ddns_info_t *conf_info_iterator(int first);
 
 static int nslookup(ddns_alias_t *alias)
@@ -113,15 +111,10 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 
 char *cache_file(char *name, char *buf, size_t len)
 {
-	char *path = DEFAULT_CACHE_DIR;
-
 	if (!buf || !name)
 		return NULL;
 
-	if (cache_dir)
-		path = cache_dir;
-
-	snprintf(buf, len, "%s/%s.cache", path, name);
+	snprintf(buf, len, "%s/%s.cache", cache_dir, name);
 
 	return buf;
 }
