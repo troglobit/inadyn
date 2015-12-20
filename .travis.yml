@@ -21,12 +21,12 @@ addons:
       description: "Inadyn | Small and Simple DDNS Client"
     notification_email: troglobit@gmail.com
     build_command_prepend: "./autogen.sh && ./configure"
-    build_command:   "make"
+    build_command:   "make clean all"
     branch_pattern: dev
 
 script:
   - ./autogen.sh
   - ./configure
-  - make
+  - make clean all
   - ./configure --enable-openssl
-  - make
+  - make clean all
