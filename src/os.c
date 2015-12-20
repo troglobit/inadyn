@@ -364,10 +364,14 @@ int os_syslog_close(void)
 	return 0;
 }
 
-/* Create pid and cache file repository, make sure we can write to it.  If
+/*
+ * Check file system permissions
+ *
+ * Create pid and cache file repository, make sure we can write to it.  If
  * we are restarted we cannot otherwise make sure we've not already updated
  * the IP -- and the user will be locked-out of their DDNS server provider
- * for excessive updates. */
+ * for excessive updates.
+ */
 int os_check_perms(void *UNUSED(arg))
 {
 	/* Create files with permissions 0644 */

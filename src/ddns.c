@@ -656,7 +656,6 @@ int ddns_main_loop(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	/* Check file system permissions */
 	if (!once)
 		DO(os_check_perms(ctx));
 
