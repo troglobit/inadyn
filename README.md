@@ -89,7 +89,7 @@ Inadyn supports updating several DDNS servers, several accounts even on
 different DDNS providers.  The following `/etc/inadyn.conf` example show
 how this can be done:
 
-    # Inadyn v2.0 Configuration file format
+    # Inadyn v2.0 configuration file format
     period          = 300
     cache-dir       = "/mnt/ddns"
     
@@ -119,8 +119,15 @@ No-IP account will still use regular HTTP.  See below for more on SSL.
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
 your IP as reported to each provider.  Inadyn use this to ensure you are
-not locked out of your account for excessive updates due to your device
-constantly rebooting or Inadyn restarting, for whatver reason.
+not locked out of your account for excessive updates, which may happen
+if your device Internet gateway running Inadyn gets stuck in a reboot
+loop, or similar.
+
+However, for the caching mechanism to be 100% foolproof the system clock
+must be set correctly -- if you have issues with the system clock not
+being set properly at boot, e.g. pending receipt of an NTP message, use
+the command line option `--startup-delay=SEC`.  To tell `inadyn` it is
+OK to proceed before the `SEC` timeout, use `SIGUSR2`.
 
 The last system defined is the IPv6 <https://tunnelbroker.net> service
 provided by Hurricane Electric.  Here `alias` is set to the tunnel ID
