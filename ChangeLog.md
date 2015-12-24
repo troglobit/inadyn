@@ -3,6 +3,28 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
+
+[v2.0][UNRELEASED] - 2016-XX-YY
+-------------------------------
+
+### Changes
+- Simplify command line switches, .conf file now required to use Inadyn
+- New configuration file format using libConfuse
+- Refactored memory handling and privilige separation to simplify code
+- Refactored logging and backgrounding to simplify code
+- Massive overhaul of man pages `inadyn(8)` and `inadyn.conf(5)`
+
+### Fixes
+- Fix DuckDNS plugin: duckdns now requires the 'www.' prefix on the
+  server URL.  By Frank Aurich
+- Fix issue #110: Poodle `SSL_MODE_SEND_FALLBACK_SCSV` not needed
+- Fix issue #101: Remove support for custom pidfile
+- Fix issue #102: Move default Inadyn cache files from `/var/run/inadyn`
+  to `/var/cache/inadyn`
+- Fix issue #113: --drop-privs does not work
+- Add actual permissions check to `os_check_perms()`
+
+
 [1.99.15][] - 2015-09-09
 ------------------------
 
@@ -555,7 +577,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.14...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.15...HEAD
+[v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
 [1.99.13]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
