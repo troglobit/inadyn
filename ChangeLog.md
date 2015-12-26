@@ -1,3 +1,4 @@
+
 Change Log
 ==========
 
@@ -76,11 +77,12 @@ running in Windows, using Cygwin!
 - Add Cygwin support for running Inadyn in Windows, thanks to Scott Mann!
 
 ### Fixes
-- Sanitized default logs by placing conditions for debug logs.  Thanks
-  to Frank Aurich for this work!
-- Fix issue #82: build failure, no rule to build target CHANGELOG, a
-  regression introduced in [1.99.13][].
-- Fix Duck DNS support, thanks to Ismani Nieuweboer!
+
+- Issue #89: Fix Duck DNS support, thanks to Ismani Nieuweboer!
+- Issue #82: No rule to build target CHANGELOG, regression introduced in
+  [1.99.13][].
+- Issue #84: Sanitized default logs by placing conditions for debug
+  logs.  Big thanks to Frank Aurich for this work!
 
 
 [1.99.13][] - 2015-02-08
