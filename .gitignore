@@ -20,3 +20,8 @@ missing
 Makefile
 Makefile.in
 plugins/.dirstamp
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
+/ID
