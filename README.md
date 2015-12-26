@@ -1,5 +1,5 @@
-Inadyn | Small and simple DDNS client
-=====================================
+Small & Simple Dynamic DNS (DDNS) Client
+========================================
 [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
@@ -17,23 +17,26 @@ Table of Contents
 Introduction
 ------------
 
-Inadyn is a small and simple [DDNS][] client with HTTPS support.  It is
-commonly available in many GNU/Linux distributions, used in off the
-shelf routers and Internet gateways to automate the task of keeping your
-DNS record up to date with any IP address changes from your [ISP][].  It
-can also be used in installations with redundant (backup) connections to
-the Internet.
+Inadyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
+support.  It is commonly available in many GNU/Linux distributions, used
+in off the shelf routers and Internet gateways to automate the task of
+keeping your DNS record up to date with any IP address changes from your
+[ISP][].  It can also be used in installations with redundant (backup)
+connections to the Internet.
 
-If your ISP provides you with a DHCP or PPPoE/PPPoA connection you risk
-losing your IP address every time you reconnect, or in DHCP even when
-the lease is renegotiated.
+Most people are unaware that they share a pool of Internet addresses
+with other users of the same Internet Service Provider (ISP).  Protocols
+like DHCP, PPPoE, or PPPoA are used to give you an address and a way to
+connect to the Internet, but usually not a way for others to connect to
+you.  If you want to run an Internet server on such a connection you
+risk losing your IP address every time you reconnect, or in DHCP even
+when the lease is renegotiated.
 
 By using a DDNS client such as Inadyn you can register an Internet name
 at certain providers that the DDNS client updates, periodically and/or
-on demand when your IP changes.
-
-Inadyn can maintain multiple host names with the same IP address, and
-has a web based IP detection which runs well behind a NAT router.
+on demand when your IP changes.  Inadyn can maintain multiple host names
+with the same IP address, and has a web based IP detection which runs
+well behind a NAT router.
 
 
 Supported Providers
@@ -72,14 +75,15 @@ examples.
 * <http://giradns.com>
 * <https://www.duiadns.net>
 
-Inadyn v1.99.8 and later support HTTPS (and SNI), for DDNS providers
-that support this (must check this yourself).  Tested so far are DynDNS,
-FreeDNS, nsupdate.info, and Loopia.
+Inadyn supports HTTPS for DDNS providers that support this, which you
+must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, and Loopia
+have been verified to support HTTPS.
 
-HTTPS is recommended since it protects your credentials from being
-snooped and reduces the risk of someone hijacking your account.
+*HTTPS is strongly recommended* since it protects your credentials from
+being snooped and reduces the risk of someone hijacking your account.
 
-**Note:** No HTTPS certificate validation is currently done, patches welcome!
+**Note:** Currently no HTTPS certificate validation is performed,
+  patches welcome!
 
 
 Example Configuration
