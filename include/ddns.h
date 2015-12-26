@@ -170,9 +170,10 @@ typedef struct {
 
 extern int once;
 extern int debug;
+extern int foreground;
+extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
-extern int foreground;
 extern char *logfile;
 extern char *script_exec;
 

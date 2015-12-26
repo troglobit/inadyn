@@ -33,12 +33,13 @@
 int    once = 0;
 int    debug = 0;
 int    foreground = 0;
+int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 0;
-char  *script_exec = NULL;
 char  *config = NULL;
 char  *logfile = NULL;
 char  *cache_dir = NULL;
+char  *script_exec = NULL;
 uid_t  uid = 0;
 gid_t  gid = 0;
 cfg_t *cfg;
@@ -185,6 +186,7 @@ static int usage(char *progname)
 		 "------------------------------------------------------------------------------\n"
 		 "Usage: %s [OPTIONS]\n"
 		 " -1, --once                      Run once, then exit regardless of status\n"
+		 "     --continue-on-error         Ignore errors from DDNS provider (DO NOT USE)\n"
 		 " -d, --debug=LEVEL               Enable developer debug messages\n"
 		 " -e, --exec=/path/to/cmd         Script to run on IP update\n"
 		 " -f, --config=FILE               Use FILE for config, default %s\n"
@@ -207,30 +209,31 @@ int main(int argc, char *argv[])
 {
 	int c, rc = 0, restart;
 	struct option opt[] = {
-		{"once",          0, 0, '1'},
-		{"debug",         1, 0, 'd'},
-		{"exec",          1, 0, 'e'},
-		{"config",        1, 0, 'f'},
-		{"help",          0, 0, 'h'},
-		{"logfile",       1, 0, 'l'},
-		{"foreground",    0, 0, 'n'},
-		{"drop-privs",    1, 0, 'p'},
-		{"syslog",        0, 0, 's'},
-		{"startup-delay", 1, 0, 't'},
-		{"verbose",       0, 0, 'V'},
-		{"version",       0, 0, 'v'},
-		{0,               0, 0, 0  }
+		{ "once",              0, 0, '1' },
+		{ "continue-on-error", 0, 0, 'c' },
+		{ "debug",             1, 0, 'd' },
+		{ "exec",              1, 0, 'e' },
+		{ "config",            1, 0, 'f' },
+		{ "help",              0, 0, 'h' },
+		{ "logfile",           1, 0, 'l' },
+		{ "foreground",        0, 0, 'n' },
+		{ "drop-privs",        1, 0, 'p' },
+		{ "syslog",            0, 0, 's' },
+		{ "startup-delay",     1, 0, 't' },
+		{ "verbose",           0, 0, 'V' },
+		{ "version",           0, 0, 'v' },
+		{ NULL,                0, 0, 0   }
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1d:e:f:h?l:np:st:Vv", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1cd:e:f:h?l:np:st:Vv", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
 			break;
 
-		case 'f':	/* --config=FILE */
-			config = strdup(optarg);
+		case 'c':	/* --continue-on-error */
+			ignore_errors = 1;
 			break;
 
 		case 'd':	/* --debug=LEVEL */
@@ -239,6 +242,10 @@ int main(int argc, char *argv[])
 
 		case 'e':	/* --exec=CMD */
 			script_exec = strdup(optarg);
+			break;
+
+		case 'f':	/* --config=FILE */
+			config = strdup(optarg);
 			break;
 
 		case 'l':	/* --logfile=FILE */

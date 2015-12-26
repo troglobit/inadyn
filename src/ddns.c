@@ -609,6 +609,8 @@ static int check_address(ddns_t *ctx)
  * again, whereas others are terminal, e.g., some OS errors. */
 static int check_error(ddns_t *ctx, int rc)
 {
+	const char *errstr = "Error response from DDNS server";
+
 	switch (rc) {
 	case RC_OK:
 		ctx->update_period = ctx->normal_update_period_sec;
@@ -624,11 +626,15 @@ static int check_error(ddns_t *ctx, int rc)
 	case RC_DYNDNS_RSP_RETRY_LATER:
 	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:
 		ctx->update_period = ctx->error_update_period_sec;
-		logit(LOG_WARNING, "Will retry again in %d sec...", ctx->update_period);
+		logit(LOG_WARNING, "Will retry again in %d sec ...", ctx->update_period);
 		break;
 
 	case RC_DYNDNS_RSP_NOTOK:
-		logit(LOG_ERR, "Error response from DDNS server, exiting!");
+		if (ignore_errors) {
+			logit(LOG_WARNING, "%s, ignoring ...", errstr);
+			break;
+		}
+		logit(LOG_ERR, "%s, exiting!", errstr);
 		return 1;
 
 	/* All other errors, socket creation failures, invalid pointers etc.  */

@@ -18,6 +18,7 @@
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl n, -foreground
+.Op Fl -continue-on-error
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
@@ -120,6 +121,13 @@ configuration file format.
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
+.It Fl -continue-on-error
+Ignore errors from DDNS provider and try again later.  This command line option tells
+.Nm
+to not exit on errors from a DDNS provider and instead try again later.
+Please do not use this, it usually indicates that we are sending a
+malformed request, e.g. wrong username, password or DNS alias for the
+given account.  Continuing could possibly lock you out of your account!
 .It Fl d, -debug Ar LEVEL
 Enable developer debug messages.
 .It Fl e, -exec=/path/to/cmd
