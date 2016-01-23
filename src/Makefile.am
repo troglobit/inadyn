@@ -24,7 +24,8 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/zoneedit.c		../plugins/zerigo.c	\
 		  ../plugins/dhis.c		../plugins/duckdns.c	\
 		  ../plugins/dtdns.c		../plugins/giradns.c	\
-		  ../plugins/duiadns.c
+		  ../plugins/duiadns.c		../plugins/dynv6.c	\
+		  ../plugins/dynv6-ipv4.c
 inadyn_CPPFLAGS = -I../
 inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
 inadyn_LDFLAGS  = -L../libite/.libs/
