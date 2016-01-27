@@ -21,5 +21,6 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/dtdns.c		../plugins/giradns.c	\
 		  ../plugins/duiadns.c
 inadyn_CPPFLAGS = -I../
+inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
 inadyn_LDFLAGS  = -L../libite
 inadyn_LDADD	= -ldl -lite -lconfuse
