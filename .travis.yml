@@ -19,6 +19,7 @@ env:
 addons:
   apt:
     packages:
+      - tree
       - libconfuse-dev
   coverity_scan:
     project:
@@ -31,7 +32,13 @@ addons:
 
 script:
   - ./autogen.sh
-  - ./configure
-  - make clean all
-  - ./configure --enable-openssl
-  - make clean all
+  - ./configure --disable-silent-rules --prefix=
+  - make clean
+  - make -j5
+  - ./configure --disable-silent-rules --prefix= --enable-openssl
+  - make clean
+  - make -j5
+  - DESTDIR=~/tmp make install
+  - tree ~/tmp
+  - ldd ~/tmp/sbin/inadyn
+  - ~/tmp/sbin/inadyn -h
