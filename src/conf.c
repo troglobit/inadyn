@@ -122,8 +122,6 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 
 static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
 {
-	const char *provider;
-
 	cfg = cfg_opt_getnsec(opt, 0);
 	if (!cfg)
 		return -1;
@@ -274,7 +272,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 {
 	int ret = 0;
 	char *str;
-	size_t i, num = 0;
+	size_t i;
 	cfg_opt_t provider_opts[] = {
 		CFG_STR     ("username",     NULL, CFGF_NONE),
 		CFG_STR     ("password",     NULL, CFGF_NONE),

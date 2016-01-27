@@ -77,7 +77,7 @@ static int check_interface_address(ddns_t *ctx)
 	struct ifreq ifr;
 	in_addr_t addr;
 	char *address;
-	int i, j, sd, anychange = 0;
+	int sd, anychange = 0;
 	ddns_info_t *info;
 
 	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ctx->check_interface);
@@ -116,8 +116,8 @@ static int check_interface_address(ddns_t *ctx)
 
 	info = conf_info_iterator(1);
 	while (info) {
-		for (j = 0; j < info->alias_count; j++) {
-			ddns_alias_t *alias = &info->alias[j];
+		for (int i = 0; i < info->alias_count; i++) {
+			ddns_alias_t *alias = &info->alias[i];
 
 			alias->ip_has_changed = strcmp(alias->address, address) != 0;
 			if (alias->ip_has_changed) {
@@ -222,16 +222,14 @@ static int parse_my_ip_address(ddns_t *ctx)
 	}
 
 	if (found) {
-		int i, anychange = 0;
+		int anychange = 0;
 		char *address = inet_ntoa(addr);
 		ddns_info_t *info;
 
 		info = conf_info_iterator(1);
 		while (info) {
-			int j;
-
-			for (j = 0; j < info->alias_count; j++) {
-				ddns_alias_t *alias = &info->alias[j];
+			for (int i = 0; i < info->alias_count; i++) {
+				ddns_alias_t *alias = &info->alias[i];
 
 				alias->ip_has_changed = strcmp(alias->address, address) != 0;
 				if (alias->ip_has_changed) {
@@ -273,7 +271,6 @@ static int time_to_check(ddns_t *ctx, ddns_alias_t *alias)
 */
 static int check_alias_update_table(ddns_t *ctx)
 {
-	int i, j;
 	ddns_info_t *info;
 
 	/* Uses fix test if ip of server 0 has changed.
@@ -281,9 +278,9 @@ static int check_alias_update_table(ddns_t *ctx)
 	 * iterate over servernum, but not if it's fix set to =! 0 */
 	info = conf_info_iterator(1);
 	while (info) {
-		for (j = 0; j < info->alias_count; j++) {
+		for (int i = 0; i < info->alias_count; i++) {
 			int override;
-			ddns_alias_t *alias = &info->alias[j];
+			ddns_alias_t *alias = &info->alias[i];
 
 /* XXX: TODO time_to_check() will return false positive if the cache
  *     file is missing => causing unnnecessary update.  We should save
@@ -373,7 +370,6 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 
 static int update_alias_table(ddns_t *ctx)
 {
-	int i, j;
 	int rc = 0, remember = 0;
 	int anychange = 0;
 	ddns_info_t *info;
@@ -385,8 +381,8 @@ static int update_alias_table(ddns_t *ctx)
 		 * change, i.e., an active user. */
 		info = conf_info_iterator(1);
 		while (info) {
-			for (j = 0; j < info->alias_count; j++) {
-				ddns_alias_t *alias = &info->alias[j];
+			for (int i = 0; i < info->alias_count; i++) {
+				ddns_alias_t *alias = &info->alias[i];
 				char backup[sizeof(alias->address)];
 
 				strlcpy(backup, alias->address, sizeof(backup));
@@ -406,8 +402,8 @@ static int update_alias_table(ddns_t *ctx)
 
 	info = conf_info_iterator(1);
 	while (info) {
-		for (j = 0; j < info->alias_count; j++) {
-			ddns_alias_t *alias = &info->alias[j];
+		for (int i = 0; i < info->alias_count; i++) {
+			ddns_alias_t *alias = &info->alias[i];
 
 			if (!alias->update_required)
 				continue;
@@ -438,7 +434,7 @@ static int update_alias_table(ddns_t *ctx)
 	return remember;
 }
 
-static int get_encoded_user_passwd(ddns_t *ctx)
+static int get_encoded_user_passwd(void)
 {
 	int rc = 0;
 	char *buf = NULL;
@@ -685,7 +681,7 @@ int ddns_main_loop(ddns_t *ctx)
 
 	DO(init_context(ctx));
 	DO(read_cache_file(ctx));
-	DO(get_encoded_user_passwd(ctx));
+	DO(get_encoded_user_passwd());
 
 	if (once == 1)
 		ctx->force_addr_update = 1;

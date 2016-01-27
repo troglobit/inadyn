@@ -60,8 +60,6 @@ static int alloc_context(ddns_t **pctx)
 		return RC_OUT_OF_MEMORY;
 
 	do {
-		int i;
-
 		ctx = *pctx;
 		memset(ctx, 0, sizeof(ddns_t));
 
@@ -109,8 +107,6 @@ static int alloc_context(ddns_t **pctx)
 
 static void free_context(ddns_t *ctx)
 {
-	int i;
-
 	if (!ctx)
 		return;
 
