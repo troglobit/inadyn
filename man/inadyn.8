@@ -14,11 +14,11 @@
 .Os
 .Sh NAME
 .Nm inadyn
-.Nd a small DDNS client to ease your presence on the Internet
+.Nd Update your Internet DNS name on demand
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl 1, -once
-.Op Fl -continue-on-error
+.Op Fl c, -continue-on-error
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
@@ -29,23 +29,17 @@
 .Op Fl t, -startup-delay=SEC
 .Op Fl v, -version
 .Sh DESCRIPTION
+.Nm ,
+or In-a-Dyn, periodically checks your actual Internet accessible IP for
+changes.  When it changes
 .Nm
-lets you have a public Internet name for your DHCP/PPPoE assigned
-system.  It is a client for
-.Dq open
-name servers, also known as DDNS service providers, such as
-.Aq http://dyn.com .
-Some of these services are free of charge for non-commercial use, others
-take a small fee, but also provide more domains to choose from.
-.Pp
-.Nm
-periodically checks if the actual Internet accessible IP of your system
-is the same one that is recorded in the name server, if not
-.Nm
-updates your name server record(s).
+updates your name server record(s) automatically.
 .Pp
 Common DDNS service providers supported by
-.Nm :
+.Nm
+are listed below.  Some of these services are free of charge for
+non-commercial use, others take a small fee, but also provide more
+domain names to choose from.
 .Pp
 .Bl -bullet -compact
 .It
@@ -121,7 +115,7 @@ configuration file format.
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
-.It Fl -continue-on-error
+.It Fl c, -continue-on-error
 Ignore errors from DDNS provider and try again later.  This command line option tells
 .Nm
 to not exit on errors from a DDNS provider and instead try again later.
