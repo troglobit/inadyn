@@ -1,5 +1,5 @@
-Small & Simple Dynamic DNS (DDNS) Client
-========================================
+In-a-Dyn - Internet Dynamic DNS Client
+======================================
 [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
@@ -17,7 +17,7 @@ Table of Contents
 Introduction
 ------------
 
-Inadyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
+In-a-Dyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
 support.  It is commonly available in many GNU/Linux distributions, used
 in off the shelf routers and Internet gateways to automate the task of
 keeping your DNS record up to date with any IP address changes from your
@@ -32,11 +32,11 @@ you.  If you want to run an Internet server on such a connection you
 risk losing your IP address every time you reconnect, or in DHCP even
 when the lease is renegotiated.
 
-By using a DDNS client such as Inadyn you can register an Internet name
+By using a DDNS client such as inadyn you can register an Internet name
 at certain providers that the DDNS client updates, periodically and/or
-on demand when your IP changes.  Inadyn can maintain multiple host names
-with the same IP address, and has a web based IP detection which runs
-well behind a NAT router.
+on demand when your IP changes.  In-A-Dyn can maintain multiple host
+names with the same IP address, and has a web based IP detection which
+runs well behind a NAT router.
 
 
 Supported Providers
@@ -75,7 +75,7 @@ examples.
 * <http://giradns.com>
 * <https://www.duiadns.net>
 
-Inadyn supports HTTPS for DDNS providers that support this, which you
+In-A-Dyn supports HTTPS for DDNS providers that support this, which you
 must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, and Loopia
 have been verified to support HTTPS.
 
@@ -89,11 +89,11 @@ being snooped and reduces the risk of someone hijacking your account.
 Example Configuration
 ---------------------
 
-Inadyn supports updating several DDNS servers, several accounts even on
+In-A-Dyn supports updating several DDNS servers, several accounts even on
 different DDNS providers.  The following `/etc/inadyn.conf` example show
 how this can be done:
 
-    # Inadyn v2.0 configuration file format
+    # In-A-Dyn v2.0 configuration file format
     period          = 300
     cache-dir       = "/mnt/ddns"
     
@@ -122,10 +122,10 @@ No-IP account will still use regular HTTP.  See below for more on SSL.
 
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
-your IP as reported to each provider.  Inadyn use this to ensure you are
-not locked out of your account for excessive updates, which may happen
-if your device Internet gateway running Inadyn gets stuck in a reboot
-loop, or similar.
+your IP as reported to each provider.  In-A-Dyn use this to ensure you
+are not locked out of your account for excessive updates, which may
+happen if your device Internet gateway running inadyn gets stuck in a
+reboot loop, or similar.
 
 However, for the caching mechanism to be 100% foolproof the system clock
 must be set correctly -- if you have issues with the system clock not
@@ -146,11 +146,11 @@ configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
 Generic DDNS Plugin
 -------------------
 
-In addition to dedicated DDNS provider support Inadyn also has a generic
+In addition to dedicated DDNS provider support inadyn also has a generic
 DDNS plugin.  Use `custom {}` in the configuration file, instead of the
 `provider {}` section used in examples above.
 
-Inadyn use HTTP basic authentication (base64 encoded) to communicate
+In-A-Dyn use HTTP basic authentication (base64 encoded) to communicate
 username and password to the server.  If you do not have a username
 and/or password, you can leave these fields out.  Basic authentication,
 will still be used in communication with the server, but with empty
@@ -203,7 +203,7 @@ the `alias` setting works:
 The generic plugin can also be used with providers that require the
 client's new IP in the update request.  Here is an example of how this
 can be done if we *pretend* that <http://dyn.com> is not supported by
-Inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org, the
+inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org, the
 `ddns-path` often differs between providers and is something you must
 figure out yourself.  For example using the `inadyn --debug` mode.
 
@@ -219,9 +219,8 @@ figure out yourself.  For example using the `inadyn --debug` mode.
 	}
 
 When using the generic plugin you should first inspect the response from
-the DDNS provider.  Inadyn currently looks for a `200 HTTP` response OK
-code and the strings `"good"`, `"OK"`, or `"true"` in the HTTP response
-body.
+the DDNS provider.  In-A-Dyn looks for a `200 HTTP` response OK code and
+the strings `"good"`, `"OK"`, or `"true"` in the HTTP response body.
 
 **Note:** the `alias` setting is required, even if you encode everything
 in the `ddns-path`!  The given alias is appended to the `ddns-path` used
@@ -234,14 +233,14 @@ in the last example above.
 Build & Install
 ---------------
 
-By default Inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
+By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
 provide OpenSSL as a system library.  However, when OpenSSL is available
 as a system library, for example in many embedded systems:
 
     ./configure --enable-openssl
 
-To completely disable the HTTPS support in Inadyn:
+To completely disable inadyn HTTPS support:
 
     ./configure --disable-ssl
 
@@ -250,9 +249,9 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
 * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
 
-Inadyn v2.0 and later requires [libConfuse][], which is available from
+In-A-Dyn v2.0 and later requires [libConfuse][], which is available from
 most UNIX distributions as a pre-built package.  Make sure to install
-the `-dev` or `-devel` package of libConfuse when building Inadyn.
+the `-dev` or `-devel` package of libConfuse when building inadyn.
 
 
 Origin & References
