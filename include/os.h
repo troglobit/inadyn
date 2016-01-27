@@ -84,12 +84,6 @@ int os_install_signal_handler(void *);
 /* console */
 int close_console_window(void);
 
-enum {
-	DBG_STD_LOG = 0,	/* stdout */
-	DBG_SYS_LOG,	/* syslog */
-	DBG_FILE_LOG	/* file output */
-};
-
 /**
  * Check file system permissions
  */

@@ -27,8 +27,7 @@
 #include <stdio.h>
 #include "os.h"
 
-int get_dbg_dest(void);
-void set_dbg_dest(int dest);
+int loglvl(char *level);
 void os_printf(int prio, char *fmt, ...);
 
 #ifndef DBG_PRINT_DISABLED

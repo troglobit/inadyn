@@ -31,7 +31,7 @@
 #include "error.h"
 
 int    once = 0;
-int    debug = 0;
+int    loglevel = LOG_NOTICE;
 int    foreground = 0;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
@@ -179,27 +179,26 @@ static void parse_privs(char *user)
 	}
 }
 
-static int usage(char *progname)
+static int usage(int code)
 {
 	fprintf (stderr, "Inadyn | Small and simple DDNS client\n"
 		 "------------------------------------------------------------------------------\n"
 		 "Usage: %s [OPTIONS]\n"
-		 " -1, --once                      Run once, then exit regardless of status\n"
-		 "     --continue-on-error         Ignore errors from DDNS provider (DO NOT USE)\n"
-		 " -d, --debug=LEVEL               Enable developer debug messages\n"
-		 " -e, --exec=/path/to/cmd         Script to run on IP update\n"
-		 " -f, --config=FILE               Use FILE for config, default %s\n"
-		 " -h, --help                      Show summary of command line options and exit\n"
-		 " -n, --foreground                Run in foreground, useful when run from finit\n"
-		 " -p, --drop-privs=USER[:GROUP]   Drop privileges after start to USER:GROUP\n"
-		 " -s, --syslog                    Log to syslog, default unless --foreground\n"
-		 " -t, --startup-delay=SEC         Initial startup delay, default none\n"
-		 " -V, --verbose                   Verbose logging\n"
-		 " -v, --version                   Show program version and exit\n"
+		 " -1, --once                     Run once, then exit regardless of status\n"
+		 "     --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
+		 " -e, --exec=/path/to/cmd        Script to run on IP update\n"
+		 " -f, --config=FILE              Use FILE for config, default %s\n"
+		 " -h, --help                     Show summary of command line options and exit\n"
+		 " -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
+		 " -n, --foreground               Run in foreground, useful when run from finit\n"
+		 " -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
+		 " -s, --syslog                   Log to syslog, default unless --foreground\n"
+		 " -t, --startup-delay=SEC        Initial startup delay, default none\n"
+		 " -v, --version                  Show program version and exit\n"
 		 "------------------------------------------------------------------------------\n"
-		 "Report bugs to %s\n\n", progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
+		 "Report bugs to %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
 
-	return 1;
+	return code;
 }
 
 
@@ -209,21 +208,20 @@ int main(int argc, char *argv[])
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
 		{ "continue-on-error", 0, 0, 'c' },
-		{ "debug",             1, 0, 'd' },
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
+		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
 		{ "startup-delay",     1, 0, 't' },
-		{ "verbose",           0, 0, 'V' },
 		{ "version",           0, 0, 'v' },
 		{ NULL,                0, 0, 0   }
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1cd:e:f:h?np:st:Vv", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1ce:f:h?np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -233,16 +231,18 @@ int main(int argc, char *argv[])
 			ignore_errors = 1;
 			break;
 
-		case 'd':	/* --debug=LEVEL */
-			debug = atoi(optarg);
-			break;
-
 		case 'e':	/* --exec=CMD */
 			script_exec = strdup(optarg);
 			break;
 
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
+			break;
+
+		case 'l':	/* --loglevel=LEVEL */
+			loglevel = loglvl(optarg);
+			if (-1 == loglevel)
+				return usage(1);
 			break;
 
 		case 'n':	/* --foreground */
@@ -261,10 +261,6 @@ int main(int argc, char *argv[])
 			startup_delay = atoi(optarg);
 			break;
 
-		case 'V':	/* --verbose */
-			debug = 1;
-			break;
-
 		case 'v':
 			puts(VERSION);
 			return 0;
@@ -273,7 +269,7 @@ int main(int argc, char *argv[])
 		case ':':	/* Missing parameter for option. */
 		case '?':	/* Unknown option. */
 		default:
-			return usage(argv[0]);
+			return usage(0);
 		}
 	}
 
@@ -281,6 +277,7 @@ int main(int argc, char *argv[])
 	if (use_syslog || !foreground) {
 		DO(close_console_window());
 		openlog(NULL, LOG_PID, LOG_USER);
+		setlogmask(LOG_UPTO(loglevel));
 	}
 
 	if (drop_privs()) {

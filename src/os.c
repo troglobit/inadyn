@@ -29,34 +29,15 @@
 #include <time.h>
 #include <unistd.h>
 
+#define SYSLOG_NAMES
+#include <syslog.h>
+
 #include "os.h"
 #include "debug.h"
 #include "ddns.h"
 #include "cache.h"
 
 #define MAXSTRING 1024
-
-/**
-    The dbg destination.
-    DBG_SYS_LOG for SysLog
-    DBG_STD_LOG for standard console
-*/
-static int global_mod_dbg_dest = DBG_STD_LOG;
-
-/**
-    Returns the dbg destination.
-    DBG_SYS_LOG for SysLog
-    DBG_STD_LOG for standard console
-*/
-int get_dbg_dest(void)
-{
-	return global_mod_dbg_dest;
-}
-
-void set_dbg_dest(int dest)
-{
-	global_mod_dbg_dest = dest;
-}
 
 static char *current_time(void)
 {
@@ -75,11 +56,22 @@ static char *current_time(void)
 	time(&now);
 	timeptr = localtime(&now);
 
-	sprintf(result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d:",
+	sprintf(result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d",
 		wday_name[timeptr->tm_wday], mon_name[timeptr->tm_mon],
 		timeptr->tm_mday, timeptr->tm_hour, timeptr->tm_min, timeptr->tm_sec, 1900 + timeptr->tm_year);
 
 	return result;
+}
+
+
+int loglvl(char *level)
+{
+	for (int i = 0; prioritynames[i].c_name; i++) {
+		if (string_match(prioritynames[i].c_name, level))
+			return prioritynames[i].c_val;
+	}
+
+	return atoi(level);
 }
 
 void os_printf(int prio, char *fmt, ...)
@@ -87,6 +79,9 @@ void os_printf(int prio, char *fmt, ...)
 	size_t len;
 	va_list args;
 	char message[MAXSTRING + 1] = "";
+
+	if (loglevel == INTERNAL_NOPRI)
+		return;
 
 	message[MAXSTRING] = 0;
 	va_start(args, fmt);
@@ -97,13 +92,15 @@ void os_printf(int prio, char *fmt, ...)
 	if (message[len - 1] == '\n')
 		message[len - 1] = 0;
 
-	if (get_dbg_dest() == DBG_SYS_LOG) {
+	if (use_syslog) {
 		syslog(prio, "%s", message);
 		return;
 	}
 
-	printf("%s %s\n", current_time(), message);
-	fflush(stdout);
+	if (prio <= loglevel) {
+		printf("%s: %s\n", current_time(), message);
+		fflush(stdout);
+	}
 }
 
 /* storage for the parameter needed by the handler */

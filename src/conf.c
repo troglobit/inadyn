@@ -332,12 +332,11 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	ctx->normal_update_period_sec = cfg_getint(cfg, "period");
 	ctx->error_update_period_sec  = DDNS_ERROR_UPDATE_PERIOD;
 	ctx->forced_update_period_sec = cfg_getint(cfg, "forced-update");
-	if (once) {
-		debug = 5;
+	if (once)
 		ctx->total_iterations = 1;
-	} else {
+	else
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
-	}
+
 	cache_dir                     = cfg_getstr(cfg, "cache-dir");
 	str                           = cfg_getstr(cfg, "bind");
 	ctx->bind_interface           = str ? strdup(str) : NULL;

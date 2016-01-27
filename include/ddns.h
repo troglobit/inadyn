@@ -169,12 +169,13 @@ typedef struct {
 } ddns_t;
 
 extern int once;
-extern int debug;
+extern int loglevel;
 extern int foreground;
 extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
 extern char *script_exec;
+extern char *__progname;
 
 int ddns_main_loop (ddns_t *ctx);
 

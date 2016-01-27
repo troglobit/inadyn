@@ -19,16 +19,15 @@
 .Nm inadyn
 .Op Fl 1, -once
 .Op Fl -continue-on-error
-.Op Fl d, -debug=LEVEL
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
+.Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
 .Op Fl t, -startup-delay=SEC
 .Op Fl v, -version
-.Op Fl V, -verbose
 .Sh DESCRIPTION
 .Nm
 lets you have a public Internet name for your DHCP/PPPoE assigned
@@ -129,8 +128,6 @@ to not exit on errors from a DDNS provider and instead try again later.
 Please do not use this, it usually indicates that we are sending a
 malformed request, e.g. wrong username, password or DNS alias for the
 given account.  Continuing could possibly lock you out of your account!
-.It Fl d, -debug Ar LEVEL
-Enable developer debug messages.
 .It Fl e, -exec=/path/to/cmd
 Full path to command, or script, to run after a successful DDNS update.
 The following environment variables are set: INADYN_IP, INADYN_HOSTNAME.
@@ -147,6 +144,10 @@ is used.  See
 for examples.
 .It Fl h, -help
 Show summary of command line options and exit
+.It Fl l, -loglevel Ar LEVEL
+Set log level: none, err, info,
+.Ar notice ,
+debug
 .It Fl n, -forground
 Run in foreground, default is to daemonize and background.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
@@ -174,8 +175,6 @@ the time since the last update can be calculated correctly from the
 cache file and the
 .Cm forced-update=SEC
 setting honored across reboots, avoiding unnecessary IP address updates.
-.It Fl V, -verbose
-Enable verbose logging.
 .It Fl v, -version
 Show program version and exit.
 .El
@@ -185,13 +184,13 @@ prints a message when the IP is updated.  If no update is needed then by
 default it prints a single
 .Dq .\&
 character, unless
-.Fl -verbose
+.Fl -loglevel
 is set to
-.Ar 0 .
+.Ar none .
 Therefore, unless
-.Fl -verbose
+.Fl -loglevel
 is set to
-.Ar 0 ,
+.Ar none ,
 the log will contain lots of dots.  When the connection goes down
 .Nm
 may print some harmless error messages which should be followed by
