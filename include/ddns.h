@@ -174,7 +174,6 @@ extern int foreground;
 extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
-extern char *logfile;
 extern char *script_exec;
 
 int ddns_main_loop (ddns_t *ctx);

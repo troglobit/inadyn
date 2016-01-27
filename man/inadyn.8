@@ -17,14 +17,15 @@
 .Nd a small DDNS client to ease your presence on the Internet
 .Sh SYNOPSIS
 .Nm inadyn
-.Op Fl n, -foreground
+.Op Fl 1, -once
 .Op Fl -continue-on-error
-.Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
+.Op Fl d, -debug=LEVEL
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
-.Op Fl l, -syslog
-.Op Fl 1, -once
+.Op Fl n, -foreground
+.Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
+.Op Fl s, -syslog
 .Op Fl t, -startup-delay=SEC
 .Op Fl v, -version
 .Op Fl V, -verbose
@@ -146,11 +147,6 @@ is used.  See
 for examples.
 .It Fl h, -help
 Show summary of command line options and exit
-.It Fl l, -logfile Ar FILE
-Log to
-.Ar FILE
-instead of
-.Xr syslog 3 .
 .It Fl n, -forground
 Run in foreground, default is to daemonize and background.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
@@ -159,7 +155,9 @@ Drop root privileges after initial setup to the given user and group.
 Use
 .Xr syslog 3
 for log messages, warnings and error conditions.  This is the default
-when running in the background.
+when running in the background.  When running in the foreground, see
+.Fl n ,
+log messages are printed to stdout.
 .It Fl t, -startup-delay Ar SEC
 Initial startup delay.  Default is 0 seconds.  Any signal can be used to
 abort the startup delay early, but SIGUSR2 is the recommended to use.
@@ -194,13 +192,11 @@ Therefore, unless
 .Fl -verbose
 is set to
 .Ar 0 ,
-the log file will contains lot
-of dots. When the connection goes down it could be that
+the log will contain lots of dots.  When the connection goes down
 .Nm
-will print some error messages. Those are harmless and should be
-followed by
+may print some harmless error messages which should be followed by
 .Dq OK
-messages after the connection is back up.
+messages after the Internet connection is restored.
 .Sh SIGNALS
 .Nm
 responds to the following signals:

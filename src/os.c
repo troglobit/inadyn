@@ -106,74 +106,6 @@ void os_printf(int prio, char *fmt, ...)
 	fflush(stdout);
 }
 
-/**
- * Opens the dbg output for the required destination.
- *
- * WARNING : Open and Close bg output are quite error prone!
- * They should be called din pairs!
- * TODO:
- *  some simple solution that involves storing the dbg output device name (and filename)
- */
-int os_open_dbg_output(int dest, const char *name, const char *logfile)
-{
-	int rc = 0;
-	FILE *pF;
-
-	set_dbg_dest(dest);
-
-	switch (get_dbg_dest()) {
-	case DBG_SYS_LOG:
-		if (name == NULL) {
-			rc = RC_INVALID_POINTER;
-			break;
-		}
-		rc = os_syslog_open(name);
-		break;
-
-	case DBG_FILE_LOG:
-		if (logfile == NULL) {
-			rc = RC_INVALID_POINTER;
-			break;
-		}
-
-		pF = freopen(logfile, "ab", stdout);
-		if (pF == NULL)
-			rc = RC_FILE_IO_OPEN_ERROR;
-		break;
-
-	case DBG_STD_LOG:
-	default:
-		rc = 0;
-	}
-
-	return rc;
-}
-
-/**
- * Closes the dbg output device.
- */
-int os_close_dbg_output(void)
-{
-	int rc = 0;
-
-	switch (get_dbg_dest()) {
-	case DBG_SYS_LOG:
-		rc = os_syslog_close();
-		break;
-
-	case DBG_FILE_LOG:
-		fclose(stdout);
-		rc = 0;
-		break;
-
-	case DBG_STD_LOG:
-	default:
-		rc = 0;
-	}
-
-	return rc;
-}
-
 /* storage for the parameter needed by the handler */
 static void *param = NULL;
 
@@ -350,18 +282,6 @@ int close_console_window(void)
 	exit(0);
 
 	return 0;		/* Never reached. */
-}
-
-int os_syslog_open(const char *name)
-{
-	openlog(name, LOG_PID, LOG_USER);
-	return 0;
-}
-
-int os_syslog_close(void)
-{
-	closelog();
-	return 0;
 }
 
 /*

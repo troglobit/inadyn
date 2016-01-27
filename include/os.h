@@ -91,23 +91,6 @@ enum {
 };
 
 /**
- * Opens the dbg output for the required destination.
- *
- */
-int os_open_dbg_output(int dest, const char *name, const char *logfile);
-
-/**
- * Closes the dbg output device.
- */
-int os_close_dbg_output(void);
-
-/**
- * Opens the system's syslog. The prg name is what will be printed before every message.
- */
-int os_syslog_open(const char *name);
-int os_syslog_close(void);
-
-/**
  * Check file system permissions
  */
 int os_check_perms(void *);

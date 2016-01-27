@@ -37,7 +37,6 @@ int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 0;
 char  *config = NULL;
-char  *logfile = NULL;
 char  *cache_dir = NULL;
 char  *script_exec = NULL;
 uid_t  uid = 0;
@@ -191,7 +190,6 @@ static int usage(char *progname)
 		 " -e, --exec=/path/to/cmd         Script to run on IP update\n"
 		 " -f, --config=FILE               Use FILE for config, default %s\n"
 		 " -h, --help                      Show summary of command line options and exit\n"
-		 " -l, --logfile=FILE              Log to FILE instead of syslog\n"
 		 " -n, --foreground                Run in foreground, useful when run from finit\n"
 		 " -p, --drop-privs=USER[:GROUP]   Drop privileges after start to USER:GROUP\n"
 		 " -s, --syslog                    Log to syslog, default unless --foreground\n"
@@ -215,7 +213,6 @@ int main(int argc, char *argv[])
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
 		{ "help",              0, 0, 'h' },
-		{ "logfile",           1, 0, 'l' },
 		{ "foreground",        0, 0, 'n' },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
@@ -226,7 +223,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1cd:e:f:h?l:np:st:Vv", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1cd:e:f:h?np:st:Vv", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -246,10 +243,6 @@ int main(int argc, char *argv[])
 
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
-			break;
-
-		case 'l':	/* --logfile=FILE */
-			logfile = strdup(optarg);
 			break;
 
 		case 'n':	/* --foreground */
@@ -287,16 +280,7 @@ int main(int argc, char *argv[])
 	/* if silent required, fork() to background and close console window */
 	if (use_syslog || !foreground) {
 		DO(close_console_window());
-
-		/* if logfile provided, redirect output to log file */
-		if (logfile)
-			DO(os_open_dbg_output(DBG_FILE_LOG, "", logfile));
-
-		if (get_dbg_dest() == DBG_SYS_LOG)
-			fclose(stdout);
-
-		if (get_dbg_dest() == DBG_STD_LOG) /* avoid file and syslog output */
-			DO(os_open_dbg_output(DBG_SYS_LOG, "inadyn", NULL));
+		openlog(NULL, LOG_PID, LOG_USER);
 	}
 
 	if (drop_privs()) {
@@ -339,7 +323,8 @@ int main(int argc, char *argv[])
 		cfg_free(cfg);
 	} while (restart);
 
-	os_close_dbg_output();
+	if (use_syslog)
+		closelog();
 	free(config);
 
 #ifdef ENABLE_SSL
