@@ -1,6 +1,3 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-
 AC_PREREQ(2.61)
 AC_INIT(inadyn, 2.0.0-beta3, https://github.com/troglobit/inadyn/issues)
 AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz])

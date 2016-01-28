@@ -1,5 +1,3 @@
-## Inadyn - A small and simple DDNS client                -*-Makefile-*-
-
 AUTOMAKE_OPTIONS= subdir-objects
 sbin_PROGRAMS	= inadyn
 inadyn_SOURCES	= main.c	ddns.c		cache.c		\
