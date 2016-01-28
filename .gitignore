@@ -1,9 +1,9 @@
-src/inadyn
 *~
 #*#
 *.o
 .deps
 aclocal.m4
+ar-lib
 autom4te.cache
 compile
 config.log
@@ -16,10 +16,14 @@ depcomp
 include/stamp-h1
 INSTALL
 install-sh
+libtool
+ltmain.sh
 missing
 Makefile
 Makefile.in
 plugins/.dirstamp
+m4/*.m4
+src/inadyn
 /GPATH
 /GRTAGS
 /GSYMS
