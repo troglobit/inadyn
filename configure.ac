@@ -9,6 +9,7 @@ AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
 AC_CONFIG_FILES([Makefile libite/Makefile src/Makefile include/Makefile man/Makefile])
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_ARG_ENABLE(ssl,
         [AS_HELP_STRING([--disable-ssl], [Disable HTTPS support, default: enabled])],

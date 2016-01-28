@@ -1,4 +1,5 @@
 ## Inadyn - A small and simple DDNS client                -*-Makefile-*-
+ACLOCAL_AMFLAGS = -I m4
 SUBDIRS         = src include man
 DIST_SUBDIRS   = libite src
 doc_DATA	= README AUTHORS COPYING NEWS ChangeLog
