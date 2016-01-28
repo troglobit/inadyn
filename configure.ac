@@ -8,7 +8,7 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile libite/Makefile src/Makefile include/Makefile man/Makefile])
 
 AC_ARG_ENABLE(ssl,
         [AS_HELP_STRING([--disable-ssl], [Disable HTTPS support, default: enabled])],
@@ -42,6 +42,10 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 #endif
 
 ])
+
+# Needed for the libraries
+AM_PROG_AR
+LT_INIT([disable-shared static])
 
 # Check for libConfuse
 AC_CHECK_LIB([confuse], [cfg_init], [],
