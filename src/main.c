@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1ce:f:h?np:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1ce:f:h?l:np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
