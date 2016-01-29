@@ -39,6 +39,7 @@ int    use_syslog = 0;
 char  *config = NULL;
 char  *cache_dir = NULL;
 char  *script_exec = NULL;
+char  *pidfile_name = NULL;
 uid_t  uid = 0;
 gid_t  gid = 0;
 cfg_t *cfg;
@@ -185,6 +186,7 @@ static int usage(int code)
 		 " -h, --help                     Show summary of command line options and exit\n"
 		 " -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		 " -n, --foreground               Run in foreground, useful when run from finit\n"
+		 "     --pidfile=NAME             Override basename of default pidfile\n"
 		 " -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
 		 " -s, --syslog                   Log to syslog, default unless --foreground\n"
 		 " -t, --startup-delay=SEC        Initial startup delay, default none\n"
@@ -206,6 +208,7 @@ int main(int argc, char *argv[])
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
+		{ "pidfile",           1, 0, 100 },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
 		{ "startup-delay",     1, 0, 't' },
@@ -240,6 +243,10 @@ int main(int argc, char *argv[])
 
 		case 'n':	/* --foreground */
 			foreground = 1;
+			break;
+
+		case 100:	/* --pidfile=BASENAME */
+			pidfile_name = strdup(optarg);
 			break;
 
 		case 'p':	/* --drop-privs=USER[:GROUP] */
