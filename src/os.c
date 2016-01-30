@@ -111,11 +111,6 @@ void os_sleep_ms(int ms)
 	usleep(ms * 1000);
 }
 
-int os_ip_support_startup(void)
-{
-	return 0;
-}
-
 int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 {
 	int rc = 0;

@@ -69,9 +69,6 @@ void os_sleep_ms(int ms);
 
 /* NETWORK SUPPORT*/
 
-/* Socket system start */
-int os_ip_support_startup(void);
-
 /* OS SIGNALS */
 int os_install_signal_handler(void *);
 

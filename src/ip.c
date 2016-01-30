@@ -76,8 +76,6 @@ int ip_init(ip_sock_t *ip)
 		return 0;
 
 	do {
-		TRY(os_ip_support_startup());
-
 		/* local bind, to interface */
 		if (ip->ifname) {
 			int sd = socket(PF_INET, SOCK_DGRAM, 0);
