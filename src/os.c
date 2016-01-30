@@ -116,11 +116,6 @@ int os_ip_support_startup(void)
 	return 0;
 }
 
-int os_ip_support_cleanup(void)
-{
-	return 0;
-}
-
 int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 {
 	int rc = 0;

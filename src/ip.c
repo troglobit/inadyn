@@ -163,8 +163,6 @@ int ip_exit(ip_sock_t *ip)
 		ip->socket = -1;
 	}
 
-	os_ip_support_cleanup();
-
 	ip->initialized = 0;
 
 	return 0;
