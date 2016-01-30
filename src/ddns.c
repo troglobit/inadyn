@@ -389,7 +389,8 @@ static int update_alias_table(ddns_t *ctx)
 			info = conf_info_iterator(0);
 		}
 
-		sleep(1);
+		/* Play nice with server, wait a bit before sending actual IP */
+		sleep(3);
 	}
 
 	info = conf_info_iterator(1);
