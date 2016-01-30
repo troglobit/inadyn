@@ -22,6 +22,7 @@
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
+.Op Fl i, -iface=IFNAME
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
 .Op Fl --pidfile=NAME
@@ -117,7 +118,8 @@ configuration file format.
 .It Fl 1, -once
 Force one update and quit
 .It Fl c, -continue-on-error
-Ignore errors from DDNS provider and try again later.  This command line option tells
+Ignore errors from DDNS provider and try again later.  This command line
+option tells
 .Nm
 to not exit on errors from a DDNS provider and instead try again later.
 Please do not use this, it usually indicates that we are sending a
@@ -139,13 +141,22 @@ is used.  See
 for examples.
 .It Fl h, -help
 Show summary of command line options and exit
+.It Fl i, -iface Ar IFNAME
+Check IP of IFNAME instead of querying an external server.  With this
+command line option the external IP check is disabled and
+.Nm
+will report the IP address of
+.Ar IFNAME
+to the DDNS providers listed in the configuration file.  This can be
+very useful to set register LAN IP addresses, or to speed up the IP
+check if the DDNS provider's check-ip servers are slow to respond.
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,
 debug
 .It Fl n, -forground
 Run in foreground, default is to daemonize and background.
-.It Fl -pidfile=NAME
+.It Fl -pidfile Ar NAME
 Override basename of default PID file.  Useful if running multiple
 instances of
 .Nm .
@@ -248,33 +259,14 @@ home page is at GitHub:
 .Aq https://github.com/troglobit/inadyn
 .Sh AUTHORS
 .Nm
-was originally written by
-.Bl -bullet -compact
-.It
-Narcis Ilisei
+was originally written by Narcis Ilisei
 .Aq mailto:inarcis2002@hotpop.com
-and
-.It
-Steve Horbachuk
-.El
-.Pp
-It is now maintained at GitHub by
-.Bl -bullet -compact
-.It
-Joachim Nilsson
+and Steve Horbachuk.  Current patch monkey is Joachim Nilsson
 .Aq mailto:troglobit@gmail.com
-with a lot of help from
-.It
-Andrey Tikhomirov, and
-.It
-Mike Fleetwood
-.El
+with a lot of help from Andrey Tikhomirov and Mike Fleetwood.
 .Pp
 This manual page was originally written for the
 .Em Debian GNU/Linux
-project by
-.An -nosplit
-.An Shaul Karl Aq mailto:shaul@debian.org .
-Currently maintained by
-.An -nosplit
-.An Joachim Nilsson.
+project by Shaul Karl
+.Aq mailto:shaul@debian.org ,
+but is now maintained by Joachim Nilsson.
