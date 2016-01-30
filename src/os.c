@@ -106,11 +106,6 @@ void os_printf(int prio, char *fmt, ...)
 /* storage for the parameter needed by the handler */
 static void *param = NULL;
 
-void os_sleep_ms(int ms)
-{
-	usleep(ms * 1000);
-}
-
 int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
 {
 	int rc = 0;

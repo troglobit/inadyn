@@ -63,7 +63,7 @@ static int wait_for_cmd(ddns_t *ctx)
 		if (ctx->cmd != old_cmd)
 			break;
 
-		os_sleep_ms(ctx->cmd_check_period * 1000);
+		sleep(ctx->cmd_check_period);
 	}
 
 	return 0;
@@ -389,7 +389,7 @@ static int update_alias_table(ddns_t *ctx)
 			info = conf_info_iterator(0);
 		}
 
-		os_sleep_ms(1000);
+		sleep(1);
 	}
 
 	info = conf_info_iterator(1);

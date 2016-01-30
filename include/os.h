@@ -23,7 +23,6 @@
 #ifndef _OS_H_INCLUDED
 #define _OS_H_INCLUDED
 
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -63,11 +62,6 @@ typedef struct {
 	uid_t uid;
 	gid_t gid;
 } ddns_user_t;
-
-/* Blocks a thread the specified number of milliseconds*/
-void os_sleep_ms(int ms);
-
-/* NETWORK SUPPORT*/
 
 /* OS SIGNALS */
 int os_install_signal_handler(void *);
