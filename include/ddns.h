@@ -150,7 +150,6 @@ typedef struct {
 	int            total_iterations;
 	int            num_iterations;
 	char          *bind_interface;
-	char          *check_interface;
 	int            initialized;
 	int            change_persona;
 	int            force_addr_update;
@@ -174,6 +173,7 @@ extern int foreground;
 extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
+extern char *iface;
 extern char *script_exec;
 extern char *pidfile_name;
 extern char *__progname;

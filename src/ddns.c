@@ -69,47 +69,39 @@ static int wait_for_cmd(ddns_t *ctx)
 	return 0;
 }
 
-/*
-	Get the IP address from interface
-*/
-static int check_interface_address(ddns_t *ctx)
+static int check_interface_address(void)
 {
+	int sd, result, anychange = 0;
+	char *address;
 	struct ifreq ifr;
 	in_addr_t addr;
-	char *address;
-	int sd, anychange = 0;
 	ddns_info_t *info;
 
-	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ctx->check_interface);
+	logit(LOG_INFO, "Checking for IP# change, querying interface %s", iface);
 
 	sd = socket(PF_INET, SOCK_DGRAM, 0);
 	if (sd < 0) {
-		int code = os_get_socket_error();
-
-		logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
+		logit(LOG_WARNING, "Failed opening network socket: %m");
 		return RC_IP_OS_SOCKET_INIT_FAILED;
 	}
 
 	memset(&ifr, 0, sizeof(struct ifreq));
 	ifr.ifr_addr.sa_family = AF_INET;
-	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ctx->check_interface);
-	if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
-		addr = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
-		address = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-	} else {
-		int code = os_get_socket_error();
+	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", iface);
+	result = ioctl(sd, SIOCGIFADDR, &ifr);
+	close(sd);
 
-		logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
-		      ctx->check_interface, strerror(code));
-		close(sd);
-
+	if (result < 0) {
+		logit(LOG_ERR, "Failed reading IP address of interface %s: %m", iface);
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
-	close(sd);
+
+	addr = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
+	address = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 
 	if (IN_ZERONET(addr)   || IN_LOOPBACK(addr)  ||
 	    IN_LINKLOCAL(addr) || IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr)) {
-		logit(LOG_WARNING, "Interface %s has invalid IP# %s", ctx->check_interface, address);
+		logit(LOG_WARNING, "Interface %s has invalid IP# %s", iface, address);
 
 		return RC_OS_INVALID_IP_ADDRESS;
 	}
@@ -564,8 +556,9 @@ static int check_address(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	if (ctx->check_interface) {
-		DO(check_interface_address(ctx));
+	if (iface) {
+		/* Get the IP address from interface instead of external server */
+		DO(check_interface_address());
 	} else {
 		ddns_info_t *info = conf_info_iterator(1);
 

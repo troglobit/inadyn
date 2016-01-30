@@ -36,6 +36,7 @@ int    foreground = 0;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 0;
+char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
 char  *script_exec = NULL;
@@ -128,11 +129,6 @@ static void free_context(ddns_t *ctx)
 		ctx->bind_interface = NULL;
 	}
 
-	if (ctx->check_interface) {
-		free(ctx->check_interface);
-		ctx->check_interface = NULL;
-	}
-
 	free(ctx);
 }
 
@@ -184,6 +180,7 @@ static int usage(int code)
 		 " -e, --exec=/path/to/cmd        Script to run on IP update\n"
 		 " -f, --config=FILE              Use FILE for config, default %s\n"
 		 " -h, --help                     Show summary of command line options and exit\n"
+		 " -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
 		 " -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		 " -n, --foreground               Run in foreground, useful when run from finit\n"
 		 "     --pidfile=NAME             Override basename of default pidfile\n"
@@ -205,6 +202,7 @@ int main(int argc, char *argv[])
 		{ "continue-on-error", 0, 0, 'c' },
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
+		{ "iface",             1, 0, 'i' },
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
@@ -217,7 +215,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1ce:f:h?l:np:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1ce:f:h?i:l:np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -233,6 +231,10 @@ int main(int argc, char *argv[])
 
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
+			break;
+
+		case 'i':	/* --iface=IFNAME */
+			iface = strdup(optarg);
 			break;
 
 		case 'l':	/* --loglevel=LEVEL */
