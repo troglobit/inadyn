@@ -24,6 +24,7 @@
 .Op Fl h, -help
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
+.Op Fl --pidfile=NAME
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
 .Op Fl t, -startup-delay=SEC
@@ -144,6 +145,15 @@ Set log level: none, err, info,
 debug
 .It Fl n, -forground
 Run in foreground, default is to daemonize and background.
+.It Fl -pidfile=NAME
+Override basename of default PID file.  Useful if running multiple
+instances of
+.Nm .
+With this option you can change the base name of the PID file, not the
+location, which is system specific.  Usually
+.Pa /var/run/inadyn.pid ,
+or
+.Pa /run/inadyn.pid .
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
 .It Fl s, -syslog
