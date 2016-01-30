@@ -83,9 +83,7 @@ int ip_init(ip_sock_t *ip)
 			int sd = socket(PF_INET, SOCK_DGRAM, 0);
 
 			if (sd < 0) {
-				int code = os_get_socket_error();
-
-				logit(LOG_WARNING, "Failed opening network socket: %s", strerror(code));
+				logit(LOG_WARNING, "Failed opening network socket: %m");
 				rc = RC_IP_OS_SOCKET_INIT_FAILED;
 				break;
 			}
@@ -102,10 +100,7 @@ int ip_init(ip_sock_t *ip)
 				logit(LOG_INFO, "Bound to interface %s (IP# %s)",
 				      ip->ifname, inet_ntoa(ip->local_addr.sin_addr));
 			} else {
-				int code = os_get_socket_error();
-
-				logit(LOG_ERR, "Failed reading IP address of interface %s: %s",
-				      ip->ifname, strerror(code));
+				logit(LOG_ERR, "Failed reading IP address of interface %s: %m", ip->ifname);
 				ip->bound = 0;
 			}
 			close(sd);
@@ -183,9 +178,7 @@ int ip_send(ip_sock_t *ip, const char *buf, int len)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 
 	if (send(ip->socket, buf, len, 0) == -1) {
-		int code = os_get_socket_error();
-
-		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(code));
+		logit(LOG_WARNING, "Network error while sending query/update: %m");
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -222,10 +215,7 @@ int ip_recv(ip_sock_t *ip, char *buf, int len, int *recv_len)
 
 		bytes = recv(ip->socket, buf + total_bytes, chunk_size, 0);
 		if (bytes < 0) {
-			int code = os_get_socket_error();
-
-			logit(LOG_WARNING, "Network error while waiting for reply: %s",
-			      strerror(code));
+			logit(LOG_WARNING, "Network error while waiting for reply: %m");
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}

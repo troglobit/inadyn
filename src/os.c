@@ -111,11 +111,6 @@ void os_sleep_ms(int ms)
 	usleep(ms * 1000);
 }
 
-int os_get_socket_error(void)
-{
-	return errno;
-}
-
 int os_ip_support_startup(void)
 {
 	return 0;

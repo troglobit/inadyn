@@ -67,9 +67,6 @@ typedef struct {
 /* Blocks a thread the specified number of milliseconds*/
 void os_sleep_ms(int ms);
 
-/* returns the last error that happend in the os ip_support */
-int os_get_socket_error(void);
-
 /* NETWORK SUPPORT*/
 
 /* Socket system start */
