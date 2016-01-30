@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 		config = strdup(DEFAULT_CONFIG_FILE);
 
 	/* "Hello!" Let user know we've started up OK */
-	logit(LOG_INFO, "%s", VERSION_STRING);
+	logit(LOG_NOTICE, "%s", VERSION_STRING);
 
 #ifdef ENABLE_SSL
 	SSL_library_init();

@@ -294,7 +294,7 @@ static int check_alias_update_table(ddns_t *ctx)
 			}
 
 			alias->update_required = 1;
-			logit(LOG_WARNING, "Update %s for alias %s, new IP# %s",
+			logit(LOG_NOTICE, "Update %s for alias %s, new IP# %s",
 			      override ? "forced" : "needed", alias->name, alias->address);
 		}
 
@@ -662,7 +662,7 @@ int ddns_main_loop(ddns_t *ctx)
 		wait_for_cmd(ctx);
 
 		if (ctx->cmd == CMD_STOP) {
-			logit(LOG_INFO, "STOP command received, exiting.");
+			logit(LOG_NOTICE, "STOP command received, exiting.");
 			return 0;
 		}
 		if (ctx->cmd == CMD_RESTART) {
@@ -714,7 +714,7 @@ int ddns_main_loop(ddns_t *ctx)
 		wait_for_cmd(ctx);
 
 		if (ctx->cmd == CMD_STOP) {
-			logit(LOG_INFO, "STOP command received, exiting.");
+			logit(LOG_NOTICE, "STOP command received, exiting.");
 			rc = 0;
 			break;
 		}

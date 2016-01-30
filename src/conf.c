@@ -316,10 +316,11 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 
 	switch (cfg_parse(cfg, file)) {
 	case CFG_FILE_ERROR:
-		fprintf(stderr, "Cannot read configuration file %s: %s\n", file, strerror(errno));
+		logit(LOG_ERR, "Cannot read configuration file %s: %m\n", file);
 		return NULL;
 
 	case CFG_PARSE_ERROR:
+		logit(LOG_ERR, "Error parsing configuration file %s: %m\n", file);
 		return NULL;
 
 	case CFG_SUCCESS:
