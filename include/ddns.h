@@ -169,7 +169,6 @@ typedef struct {
 
 extern int once;
 extern int loglevel;
-extern int foreground;
 extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;

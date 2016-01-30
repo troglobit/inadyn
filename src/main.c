@@ -32,7 +32,7 @@
 
 int    once = 0;
 int    loglevel = LOG_NOTICE;
-int    foreground = 0;
+int    background = 1;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 0;
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'n':	/* --foreground */
-			foreground = 1;
+			background = 0;
 			break;
 
 		case 100:	/* --pidfile=BASENAME */
@@ -275,9 +275,15 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* if silent required, fork() to background and close console window */
-	if (use_syslog || !foreground) {
-		DO(close_console_window());
+	if (background) {
+		if (daemon(0, 0) < 0) {
+			fprintf(stderr, "Failed daemonizing %s: %m\n", __progname);
+			return RC_OS_FORK_FAILURE;
+		}
+		use_syslog = 1;
+	}
+
+	if (use_syslog) {
 		openlog(NULL, LOG_PID, LOG_USER);
 		setlogmask(LOG_UPTO(loglevel));
 	}

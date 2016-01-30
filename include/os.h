@@ -66,9 +66,6 @@ typedef struct {
 /* OS SIGNALS */
 int os_install_signal_handler(void *);
 
-/* console */
-int close_console_window(void);
-
 /**
  * Check file system permissions
  */

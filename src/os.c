@@ -217,51 +217,6 @@ int os_install_signal_handler(void *ctx)
 }
 
 /*
-    closes current console
-
-  July 5th, 2004 - Krev
-  ***
-  This function is used to close the console window to start the
-  software as a service on Windows. On Unix, closing the console window
-  isn't used for a daemon, but rather it forks. Modified this function
-  to fork into a daemon mode under Unix-compatible systems.
-
-  Actions:
-    - for child:
-	- close in and err console
-	- become session leader
-	- change working directory
-	- clear the file mode creation mask
-    - for parent
-	just exit
-*/
-int close_console_window(void)
-{
-	pid_t pid = fork();
-
-	if (pid < 0) {
-		return RC_OS_FORK_FAILURE;
-	}
-
-	if (pid == 0) {		/* child */
-		fclose(stdin);
-		fclose(stderr);
-		setsid();
-
-		if (-1 == chdir("/"))
-			logit(LOG_WARNING, "Failed changing cwd to /: %s", strerror(errno));
-
-		umask(0);
-
-		return 0;
-	}
-
-	exit(0);
-
-	return 0;		/* Never reached. */
-}
-
-/*
  * Check file system permissions
  *
  * Create pid and cache file repository, make sure we can write to it.  If
