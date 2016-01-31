@@ -412,7 +412,7 @@ static int update_alias_table(ddns_t *ctx)
 
 			/* Run command or script on successful update. */
 			if (script_exec)
-				os_shell_execute(script_exec, alias->address, alias->name, ctx->bind_interface);
+				os_shell_execute(script_exec, alias->address, alias->name);
 		}
 
 		if (RC_DYNDNS_RSP_NOTOK == rc)

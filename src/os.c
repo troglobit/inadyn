@@ -106,7 +106,10 @@ void os_printf(int prio, char *fmt, ...)
 /* storage for the parameter needed by the handler */
 static void *param = NULL;
 
-int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface)
+/**
+ * Execute command on successful update.
+ */
+int os_shell_execute(char *cmd, char *ip, char *hostname)
 {
 	int rc = 0;
 	int child;

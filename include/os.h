@@ -20,8 +20,8 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef _OS_H_INCLUDED
-#define _OS_H_INCLUDED
+#ifndef INADYN_OS_H_
+#define INADYN_OS_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,20 +63,12 @@ typedef struct {
 	gid_t gid;
 } ddns_user_t;
 
-/* OS SIGNALS */
-int os_install_signal_handler(void *);
+int os_install_signal_handler (void *ctx);
+int os_check_perms            (void *arg);
+int os_shell_execute          (char *cmd, char *ip, char *hostname);
 
-/**
- * Check file system permissions
- */
-int os_check_perms(void *);
+#endif /* INADYN_OS_H_ */
 
-/**
- * Execute command on successful update.
- */
-int os_shell_execute(char *cmd, char *ip, char *hostname, char *iface);
-
-#endif				/* _OS_H_INCLUDED */
 /**
  * Local Variables:
  *  version-control: t
