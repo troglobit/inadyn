@@ -168,21 +168,21 @@ static void parse_privs(char *user)
 
 static int usage(int code)
 {
-	fprintf (stderr, "\nUsage: %s [1chnsv] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
-		 " -1, --once                     Run once, then exit regardless of status\n"
-		 " -c, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
-		 " -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
-		 " -f, --config=FILE              Use FILE for config, default %s\n"
-		 " -h, --help                     Show summary of command line options and exit\n"
-		 " -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
-		 " -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
-		 " -n, --foreground               Run in foreground, useful when run from finit\n"
-		 "     --pidfile=NAME             Override basename of default pidfile\n"
-		 " -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
-		 " -s, --syslog                   Log to syslog, default unless --foreground\n"
-		 " -t, --startup-delay=SEC        Initial startup delay, default none\n"
-		 " -v, --version                  Show program version and exit\n\n"
-		 "Bug report address: %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
+	fprintf(stderr, "\nUsage: %s [1chnsv] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
+		" -1, --once                     Run once, then exit regardless of status\n"
+		" -c, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
+		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
+		" -f, --config=FILE              Use FILE for config, default %s\n"
+		" -h, --help                     Show summary of command line options and exit\n"
+		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
+		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
+		" -n, --foreground               Run in foreground, useful when run from finit\n"
+		"     --pidfile=NAME             Override basename of default pidfile\n"
+		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
+		" -s, --syslog                   Log to syslog, default unless --foreground\n"
+		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
+		" -v, --version                  Show program version and exit\n\n"
+		"Bug report address: %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
 
 	return code;
 }
