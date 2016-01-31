@@ -33,12 +33,6 @@
 
 #include "ddns.h"
 
-#define SEARCH_PLUGIN(n)						\
-	PLUGIN_ITERATOR(p, tmp) {					\
-		if (!strcmp(p->name, n))				\
-			return p;					\
-	}
-
 static char *plugpath = NULL;   /* Set by first load. */
 static TAILQ_HEAD(, ddns_system) plugins = TAILQ_HEAD_INITIALIZER(plugins);
 
@@ -93,6 +87,18 @@ int plugin_unregister(ddns_system_t *plugin)
 	return 0;
 }
 
+static ddns_system_t *search_plugin(const char *name)
+{
+	ddns_system_t *p, *tmp;
+
+	PLUGIN_ITERATOR(p, tmp) {
+		if (!strcmp(p->name, name))
+			return p;
+	}
+
+	return NULL;
+}
+
 
 /**
  * plugin_find - Find a plugin by name
@@ -113,28 +119,57 @@ int plugin_unregister(ddns_system_t *plugin)
  */
 ddns_system_t *plugin_find(const char *name)
 {
-	ddns_system_t *p, *tmp;
+	char *tmp, *ptr;
+	ddns_system_t *p;
 
 	if (!name) {
 		errno = EINVAL;
 		return NULL;
 	}
 
-	SEARCH_PLUGIN(name);
+	/* Check for multiple instances of plugin */
+	tmp = strdup(name);
+	if (!tmp)
+		return NULL;
+
+	ptr = strchr(tmp, ':');
+	if (ptr)
+		*ptr = 0;
+	name = tmp;
+
+	p = search_plugin(name);
+	if (p) {
+		free(tmp);
+		return p;
+	}
 
 	if (plugpath && name[0] != '/') {
 		int noext;
-		char path[256];
+		char *path;
+		size_t len = strlen(plugpath) + strlen(name) + 5;
+
+		path = malloc(len);
+		if (!path) {
+			free(tmp);
+			return NULL;
+		}
 
 		noext = strcmp(name + strlen(name) - 3, ".so");
-		snprintf (path, sizeof(path), "%s%s%s%s", plugpath,
-			  plugpath[strlen(plugpath) - 1] == '/' ? "" : "/",
-			  name, noext ? ".so" : "");
+		snprintf(path, len, "%s%s%s%s", plugpath,
+			 plugpath[strlen(plugpath) - 1] == '/' ? "" : "/",
+			 name, noext ? ".so" : "");
 
-		SEARCH_PLUGIN(path);
+		p = search_plugin(path);
+		free(path);
+		if (p) {
+			free(tmp);
+			return p;
+		}
 	}
 
+	free(tmp);
 	errno = ENOENT;
+
 	return NULL;
 }
 

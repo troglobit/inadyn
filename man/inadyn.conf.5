@@ -70,10 +70,18 @@ How often the IP should be updated even if it is not changed. The time
 should be given in seconds.  Default is equal to 30 days.
 .Pp
 .It Cm custom randomUserID {}
-.It Cm provider email@ddns-service.tld {}
+.It Cm provider email@ddns-service.tld[:ID] {}
 The custom{} and provider{} sections are very similar, except that the
 custom section allows specifying checkip-server and ddns-server details.
-Common settings are:
+.Pp
+To support multiple users of the same DDNS provider, append
+.Pa [:ID]
+to the provider name.  The
+.Pa ID
+can be any free form string or number as long as the combination is
+unique.
+.Pp
+Common settings in custom{} and provider{} sections are:
 .Pp
 .Bl -tag -width TERM -compact
 .It Cm ssl = <true | false>
@@ -163,40 +171,51 @@ Server used to check for IP address updates.
 Server path for check IP address update.  Defaults to "/"
 .El
 .Sh EXAMPLES
-.br
+Notice how two different user accounts access the same DDNS provider, No-IP.com
+.Pp
 period         = 300
 .br
 cache-dir      = /etc/inadyn
 .Pp
-# Primary account, used for most operations
+# Dyn.com
 .br
 provider default@dyndns.org {
 .br
     ssl        = true
 .br
-    username   = account
+    username   = account1
 .br
-    password   = secret
+    password   = secret1
 .br
     alias      = { "my.example.com", "other.example.org" }
 .br
 }
 .Pp
-# Secondary account, on another DDNS provider
+# No-IP.com #1
 .br
-# also updated on IP change
+provider default@no-ip.com:1 {
 .br
-provider default@no-ip.com {
+    username   = account21
 .br
-    username   = account
-.br
-    password   = secret
+    password   = secret21
 .br
     alias      = example.no-ip.com
 .br
 }
 .Pp
-# Tertiary account at Loopia
+# No-IP.com #2
+.br
+provider default@no-ip.com:2 {
+.br
+    username   = account22
+.br
+    password   = secret22
+.br
+    alias      = another.no-ip.com
+.br
+}
+.Pp
+# Loopia
 .br
 provider default@loopia.com {
 .br
@@ -204,9 +223,9 @@ provider default@loopia.com {
 .br
     wildcard   = true
 .br
-    username   = account
+    username   = account3
 .br
-    password   = secret
+    password   = secret3
 .br
     alias      = example.com
 .br
@@ -232,9 +251,9 @@ custom twoDNS.de {
 .br
     ssl            = true
 .br
-    username       = account
+    username       = account4
 .br
-    password       = secret
+    password       = secret4
 .br
     checkip-server = checkip.two-dns.de
     checkip-path   = /

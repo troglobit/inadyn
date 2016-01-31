@@ -104,12 +104,18 @@ how this can be done:
         alias       = { "peanuts", "woodstock" }
 	}
     
-    provider default@no-ip.com {
+    provider default@no-ip.com:1 {
         username    = ian
         password    = secret
         alias       = flemming.no-ip.com
 	}
-	
+    
+    provider default@no-ip.com:2 {
+        username    = james
+        password    = bond
+        alias       = spectre.no-ip.com
+    }
+    
     provider default@tunnelbroker.net {
         ssl         = true
         username    = futurekid
@@ -119,6 +125,8 @@ how this can be done:
 
 In this example only the DynDNS and Tunnelbroker accounts use SSL, the
 No-IP account will still use regular HTTP.  See below for more on SSL.
+Notice how this configuration file has two different users of the No-IP
+provider -- this is achieved by appending a `:ID` to the provider name.
 
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
