@@ -441,7 +441,6 @@ static int get_encoded_user_passwd(void)
 	buf = calloc(len, sizeof(char));
 	if (!buf)
 		return RC_OUT_OF_MEMORY;
-	logit(LOG_DEBUG, "Allocated %zd bytes buffer %p for temp buffer before encoding.", len, buf);
 
 	info = conf_info_iterator(1);
 	while (info) {
@@ -459,10 +458,8 @@ static int get_encoded_user_passwd(void)
 		strlcat(buf, info->creds.password, len);
 
 		/* query required buffer size for base64 encoded data */
-		logit(LOG_DEBUG, "Checking required size for base64 encoding of user:pass for %s ...", info->system->name);
 		base64_encode(NULL, &dlen, (unsigned char *)buf, strlen(buf));
 
-		logit(LOG_DEBUG, "Allocating %zd bytes buffer for base64 encoding.", dlen);
 		encode = malloc(dlen);
 		if (!encode) {
 			logit(LOG_WARNING, "Out of memory when base64 encoding user:pass for %s!", info->system->name);
@@ -470,7 +467,7 @@ static int get_encoded_user_passwd(void)
 			break;
 		}
 
-		/* encode */
+		logit(LOG_DEBUG, "Base64 encode %s for %s ...", buf, info->system->name);
 		rc2 = base64_encode((unsigned char *)encode, &dlen, (unsigned char *)buf, strlen(buf));
 		if (rc2 != 0) {
 			logit(LOG_WARNING, "Failed base64 encoding of user:pass for %s!", info->system->name);
@@ -487,18 +484,11 @@ static int get_encoded_user_passwd(void)
 		info = conf_info_iterator(0);
 	}
 
-	logit(LOG_DEBUG, "Freeing temp encoding buffer %p", buf);
 	free(buf);
 
 	return rc;
 }
 
-/**
-   Sets up the object.
-   - sets the IPs of the DYN DNS server
-   - if proxy server is set use it!
-   - ...
-*/
 static int init_context(ddns_t *ctx)
 {
 	ddns_info_t *info;

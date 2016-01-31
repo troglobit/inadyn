@@ -179,11 +179,13 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		str = "custom";
 	else
 		str = cfg_title(cfg);
+
 	system = plugin_find(str);
 	if (!system) {
 		logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
 		return 1;
 	}
+
 	info->system = system;
 
 	getserver(system->checkip_name, &info->checkip_name);
@@ -351,6 +353,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 
 	if (ret)
 		return NULL;
+
 	return cfg;
 }
 
