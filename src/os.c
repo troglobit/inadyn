@@ -39,6 +39,9 @@
 
 #define MAXSTRING 1024
 
+static void *param = NULL;
+
+
 static char *current_time(void)
 {
 	time_t now;
@@ -103,22 +106,28 @@ void os_printf(int prio, char *fmt, ...)
 	}
 }
 
-/* storage for the parameter needed by the handler */
-static void *param = NULL;
-
 /**
- * Execute command on successful update.
+ * Execute shell script on successful update.
+ * @cmd:  Full path to script or command to run
+ * @ip:   IP address to set as %INADYN_IP env. variable
+ * @name: String to set as %INADYN_HOSTNAME env. variable
+ *
+ * If inadyn has been started with the --iface=IFNAME command line
+ * option the IFNAME is sent to the script as %INADYN_IFACE.
+ *
+ * Returns:
+ * Posix %OK(0), or %RC_OS_FORK_FAILURE on vfork() failure
  */
-int os_shell_execute(char *cmd, char *ip, char *hostname)
+int os_shell_execute(char *cmd, char *ip, char *name)
 {
 	int rc = 0;
 	int child;
 
 	child = vfork();
 	switch (child) {
-	case 0:		/* child */
+	case 0:
 		setenv("INADYN_IP", ip, 1);
-		setenv("INADYN_HOSTNAME", hostname, 1);
+		setenv("INADYN_HOSTNAME", name, 1);
 		if (iface)
 			setenv("INADYN_IFACE", iface, 1);
 		execl("/bin/sh", "sh", "-c", cmd, (char *)0);
@@ -127,9 +136,7 @@ int os_shell_execute(char *cmd, char *ip, char *hostname)
 
 	case -1:
 		rc = RC_OS_FORK_FAILURE;
-		break;
-
-	default:		/* parent */
+	default:
 		break;
 	}
 

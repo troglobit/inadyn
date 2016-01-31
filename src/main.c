@@ -177,7 +177,7 @@ static int usage(int code)
 	fprintf (stderr, "\nUsage: %s [1chnsv] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		 " -1, --once                     Run once, then exit regardless of status\n"
 		 " -c, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
-		 " -e, --exec=/path/to/cmd        Script to run on IP update\n"
+		 " -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
 		 " -f, --config=FILE              Use FILE for config, default %s\n"
 		 " -h, --help                     Show summary of command line options and exit\n"
 		 " -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"

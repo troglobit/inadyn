@@ -128,9 +128,15 @@ given account.  Continuing could possibly lock you out of your account!
 .It Fl e, -exec=/path/to/cmd
 Full path to command, or script, to run after a successful DDNS update.
 The following environment variables are set: INADYN_IP, INADYN_HOSTNAME.
-The first environment variable contains teh new IP address, the second
-the host name alias.  The command is called for each listed host name
-that is successfully updated.
+The first environment variable contains the new IP address, the second
+the host name alias.  The
+.Nm cmd
+is called for each listed host name that is successfully updated.  If
+.Nm
+is started with the
+.Fl i Ar IFNAME
+command line option, the INADYN_IFACE environment variable is also
+set.
 .It Fl f, -config Ar FILE
 Use
 .Ar FILE
