@@ -174,12 +174,6 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 	return rc;
 }
 
-/*
-  Read in 4 integers the ip addr numbers.
-  construct then the IP address from those numbers.
-  Note:
-  it updates the flag: alias->ip_has_changed if the old address was different
-*/
 static int parse_my_ip_address(ddns_t *ctx)
 {
 	int found = 0;
@@ -252,15 +246,6 @@ static int time_to_check(ddns_t *ctx, ddns_alias_t *alias)
 		(past_time > ctx->forced_update_period_sec);
 }
 
-/*
-  Updates for every maintained name the property: 'update_required'.
-  The property will be checked in another function and updates performed.
-
-  Action:
-  Check if my IP address has changed. -> ALL names have to be updated.
-  Nothing else.
-  Note: In the update function the property will set to false if update was successful.
-*/
 static int check_alias_update_table(ddns_t *ctx)
 {
 	ddns_info_t *info;
@@ -529,16 +514,6 @@ static int init_context(ddns_t *ctx)
 	return 0;
 }
 
-/** the real action:
-    - increment the forced update times counter
-    - detect current IP
-    - connect to an HTTP server
-    - parse the response for IP addr
-
-    - for all the names that have to be maintained
-    - get the current DYN DNS address from DYN DNS server
-    - compare and update if neccessary
-*/
 static int check_address(ddns_t *ctx)
 {
 	if (!ctx)
@@ -568,9 +543,11 @@ static int check_address(ddns_t *ctx)
 	return 0;
 }
 
-/* Error filter.  Some errors are to be expected in a network
+/*
+ * Error filter.  Some errors are to be expected in a network
  * application, some we can recover from, wait a shorter while and try
- * again, whereas others are terminal, e.g., some OS errors. */
+ * again, whereas others are terminal, e.g., some OS errors.
+ */
 static int check_error(ddns_t *ctx, int rc)
 {
 	const char *errstr = "Error response from DDNS server";
@@ -610,14 +587,6 @@ static int check_error(ddns_t *ctx, int rc)
 	return 0;
 }
 
-/**
- * Main DDNS loop
- * Actions:
- *  - read the configuration options
- *  - perform various init actions as specified in the options
- *  - create and init dyn_dns object.
- *  - launch the IP update action loop
- */
 int ddns_main_loop(ddns_t *ctx)
 {
 	int rc = 0;
