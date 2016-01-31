@@ -295,7 +295,6 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;
-
 		return rc;
 	}
 
@@ -317,8 +316,8 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;
-
 		http_exit(client);
+
 		return rc;
 	}
 
