@@ -149,7 +149,6 @@ typedef struct {
 	int            cmd_check_period; /*time to wait for a command */
 	int            total_iterations;
 	int            num_iterations;
-	char          *bind_interface;
 	int            initialized;
 	int            change_persona;
 	int            force_addr_update;

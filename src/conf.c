@@ -25,7 +25,6 @@
 /*
  * period        = 600
  * forced-update = 604800
- * bind          = eth0
  *
  * provider default@freedns.afraid.org
  * {
@@ -271,7 +270,6 @@ void conf_info_cleanup(void)
 cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 {
 	int ret = 0;
-	char *str;
 	size_t i;
 	cfg_opt_t provider_opts[] = {
 		CFG_STR     ("username",     NULL, CFGF_NONE),
@@ -298,7 +296,6 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	};
 	cfg_opt_t opts[] = {
 		CFG_BOOL("fake-address",  cfg_false, CFGF_NONE),
-		CFG_STR ("bind",	  NULL, CFGF_NONE),
 		CFG_STR ("cache-dir",	  DEFAULT_CACHE_DIR, CFGF_NONE),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
@@ -337,8 +334,6 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
 
 	cache_dir                     = cfg_getstr(cfg, "cache-dir");
-	str                           = cfg_getstr(cfg, "bind");
-	ctx->bind_interface           = str ? strdup(str) : NULL;
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
 
 	for (i = 0; i < cfg_size(cfg, "provider"); i++)

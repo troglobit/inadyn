@@ -123,12 +123,6 @@ static void free_context(ddns_t *ctx)
 	}
 
 	conf_info_cleanup();
-
-	if (ctx->bind_interface) {
-		free(ctx->bind_interface);
-		ctx->bind_interface = NULL;
-	}
-
 	free(ctx);
 }
 
