@@ -51,7 +51,7 @@ AC_CHECK_LIB([confuse], [cfg_init], [],
 AC_CHECK_HEADERS([confuse.h])
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
-if test "$ac_enable_ssl" = "yes"; then
+if test "x$ac_enable_ssl" = "xyes"; then
    if test "$ac_enable_openssl" = "yes"; then
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
@@ -73,6 +73,7 @@ if test "$ac_enable_ssl" = "yes"; then
    fi
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
 fi
+AM_CONDITIONAL([ENABLE_SSL], test "x$ac_enable_ssl" = "xyes")
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

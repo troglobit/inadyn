@@ -288,9 +288,6 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	http_t        *client = &info->server;
 
 	client->ssl_enabled = info->ssl_enabled;
-	if (client->ssl_enabled) /* XXX: Fix this better, possibly in http_init() */
-		client->tcp.ip.port = 443;
-
 	rc = http_init(client, "Sending IP# update to DDNS server");
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */

@@ -68,9 +68,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		http_set_remote_name(&client, info->server_name.name);
 
 		client.ssl_enabled = info->ssl_enabled;
-		if (client.ssl_enabled)	/* XXX: Fix this better, possibly in http_init() */
-			client.tcp.ip.port = 443;
-
 		TRY(http_init(&client, "Sending update URL query"));
 
 		snprintf(buffer, sizeof(buffer), "%s|%s",

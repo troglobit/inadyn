@@ -2,9 +2,12 @@ AUTOMAKE_OPTIONS= subdir-objects
 sbin_PROGRAMS	= inadyn
 inadyn_SOURCES	= main.c	ddns.c		cache.c		\
 		  error.c	conf.c		os.c		\
-		  http.c	ssl.c		tcp.c		\
+		  http.c	plugin.c	tcp.c		\
 		  ip.c		sha1.c		base64.c	\
-		  md5.c		plugin.c
+		  md5.c
+if ENABLE_SSL
+inadyn_SOURCES += ssl.c
+endif
 
 ## Plugins are currently built-in, and built from this directory instead
 ## of where they reside.  They should be built by plugins/Makefile.am

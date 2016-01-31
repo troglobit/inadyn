@@ -22,8 +22,6 @@
 #include "debug.h"
 #include "http.h"
 
-
-#ifdef ENABLE_SSL
 /* SSL SNI support: tell the servername we want to speak to */
 static int set_server_name(SSL *ssl, const char *sn)
 {
@@ -39,15 +37,9 @@ static int set_server_name(SSL *ssl, const char *sn)
 
 	return rc;
 }
-#endif
 
 int ssl_init(http_t *client, char *msg)
 {
-#ifndef ENABLE_SSL
-	(void)client;
-	(void)msg;
-	return 0;
-#else
 	char buf[256];
 	const char *sn;
 #ifdef CONFIG_GNUTLS
@@ -55,8 +47,13 @@ int ssl_init(http_t *client, char *msg)
 #endif
 		X509 *cert;
 
-	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
+	if (!client->ssl_enabled)
+		return tcp_init(&client->tcp, msg);
 
+	tcp_set_port(&client->tcp, 443);
+	DO(tcp_init(&client->tcp, msg));
+
+	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
 	client->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
 	if (!client->ssl_ctx)
 		return RC_HTTPS_OUT_OF_MEMORY;
@@ -99,34 +96,24 @@ int ssl_init(http_t *client, char *msg)
 	X509_free(cert);
 
 	return 0;
-#endif
 }
 
 int ssl_exit(http_t *client)
 {
-#ifndef ENABLE_SSL
-	(void)client;
-	return 0;
-#else
-	/* SSL/TLS close_notify */
-	SSL_shutdown(client->ssl);
+	if (client->ssl_enabled) {
+		/* SSL/TLS close_notify */
+		SSL_shutdown(client->ssl);
 
-	/* Clean up. */
-	SSL_free(client->ssl);
-	SSL_CTX_free(client->ssl_ctx);
+		/* Clean up. */
+		SSL_free(client->ssl);
+		SSL_CTX_free(client->ssl_ctx);
+	}
 
-	return 0;
-#endif
+	return tcp_exit(&client->tcp);
 }
 
 int ssl_send(http_t *client, const char *buf, int len)
 {
-#ifndef ENABLE_SSL
-	(void)client;
-	(void)buf;
-	(void)len;
-	return RC_HTTPS_NO_SSL_SUPPORT;
-#else
 	int err = SSL_write(client->ssl, buf, len);
 
 	if (err <= 0)
@@ -134,19 +121,12 @@ int ssl_send(http_t *client, const char *buf, int len)
 		return RC_HTTPS_SEND_ERROR;
 
 	logit(LOG_DEBUG, "Successfully sent DDNS update using HTTPS!");
+
 	return 0;
-#endif
 }
 
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
-#ifndef ENABLE_SSL
-	(void)client;
-	(void)buf;
-	(void)buf_len;
-	(void)recv_len;
-	return RC_HTTPS_NO_SSL_SUPPORT;
-#else
 	int len, err;
 
 	/* Read HTTP header */
@@ -163,7 +143,6 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 	logit(LOG_DEBUG, "Successfully received DDNS update response (%d bytes) using HTTPS!", *recv_len);
 
 	return 0;
-#endif
 }
 
 /**
