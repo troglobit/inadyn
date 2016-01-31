@@ -6,7 +6,11 @@ inadyn_SOURCES	= main.c	ddns.c		cache.c		\
 		  ip.c		sha1.c		base64.c	\
 		  md5.c
 if ENABLE_SSL
-inadyn_SOURCES += ssl.c
+if ENABLE_OPENSSL
+inadyn_SOURCES += openssl.c
+else
+inadyn_SOURCES += gnutls.c
+endif
 endif
 
 ## Plugins are currently built-in, and built from this directory instead

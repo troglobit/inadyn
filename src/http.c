@@ -73,7 +73,7 @@ int http_init(http_t *client, char *msg)
 
 	do {
 		TRY(local_set_params(client));
-		TRY(ssl_init(client, msg));
+		TRY(ssl_open(client, msg));
 	}
 	while (0);
 
@@ -96,7 +96,7 @@ int http_exit(http_t *client)
 		return 0;
 
 	client->initialized = 0;
-	return ssl_exit(client);
+	return ssl_close(client);
 }
 
 static void http_response_parse(http_trans_t *trans)

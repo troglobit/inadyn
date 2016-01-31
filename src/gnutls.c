@@ -1,6 +1,6 @@
-/* Interface for optional HTTPS functions
+/* GnuTLS interface for optional HTTPS functions
  *
- * Copyright (C) 2014-2015  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,30 +22,22 @@
 #include "debug.h"
 #include "http.h"
 
-/* SSL SNI support: tell the servername we want to speak to */
-static int set_server_name(SSL *ssl, const char *sn)
+void ssl_init(void)
 {
-	int rc = 0;
-
-#if defined(CONFIG_OPENSSL)
-	/* api returns 1 for success */
-	rc = !SSL_set_tlsext_host_name(ssl, sn);
-#elif defined(CONFIG_GNUTLS)
-	/* api returns 0 for success */
-	rc = gnutls_server_name_set(ssl->gnutls_state, GNUTLS_NAME_DNS, sn, strlen(sn));
-#endif
-
-	return rc;
+	SSL_library_init();
+	SSL_load_error_strings();
 }
 
-int ssl_init(http_t *client, char *msg)
+void ssl_exit(void)
+{
+	ERR_free_strings();
+}
+
+int ssl_open(http_t *client, char *msg)
 {
 	char buf[256];
 	const char *sn;
-#ifdef CONFIG_GNUTLS
-	const
-#endif
-		X509 *cert;
+	const X509 *cert;
 
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
@@ -58,19 +50,13 @@ int ssl_init(http_t *client, char *msg)
 	if (!client->ssl_ctx)
 		return RC_HTTPS_OUT_OF_MEMORY;
 
-#if defined(CONFIG_OPENSSL)
-	/* POODLE, only allow TLSv1.x or later */
-	SSL_CTX_set_options(client->ssl_ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION);
-#else
-	/* GnuTLS already defaults to TLS 1.x */
-#endif
-
 	client->ssl = SSL_new(client->ssl_ctx);
 	if (!client->ssl)
 		return RC_HTTPS_OUT_OF_MEMORY;
 
+	/* SSL SNI support: tell the servername we want to speak to */
 	http_get_remote_name(client, &sn);
-	if (set_server_name(client->ssl, sn))
+	if (gnutls_server_name_set(client->ssl->gnutls_state, GNUTLS_NAME_DNS, sn, strlen(sn)))
 		return RC_HTTPS_SNI_ERROR;
 
 	SSL_set_fd(client->ssl, client->tcp.ip.socket);
@@ -98,7 +84,7 @@ int ssl_init(http_t *client, char *msg)
 	return 0;
 }
 
-int ssl_exit(http_t *client)
+int ssl_close(http_t *client)
 {
 	if (client->ssl_enabled) {
 		/* SSL/TLS close_notify */

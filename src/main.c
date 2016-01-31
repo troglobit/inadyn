@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "ddns.h"
 #include "error.h"
+#include "ssl.h"
 
 int    once = 0;
 int    loglevel = LOG_NOTICE;
@@ -287,16 +288,14 @@ int main(int argc, char *argv[])
 		return RC_OS_CHANGE_PERSONA_FAILURE;
 	}
 
-	if (!config)
-		config = strdup(DEFAULT_CONFIG_FILE);
-
 	/* "Hello!" Let user know we've started up OK */
 	logit(LOG_NOTICE, "%s", VERSION_STRING);
 
-#ifdef ENABLE_SSL
-	SSL_library_init();
-	SSL_load_error_strings();
-#endif
+	if (!config)
+		config = strdup(DEFAULT_CONFIG_FILE);
+
+	/* Prepare SSL library, if enabled */
+	ssl_init();
 
 	do {
 		restart = 0;
@@ -325,10 +324,7 @@ int main(int argc, char *argv[])
 	if (use_syslog)
 		closelog();
 	free(config);
-
-#ifdef ENABLE_SSL
-	ERR_free_strings();
-#endif
+	ssl_exit();
 
 	return rc;
 }
