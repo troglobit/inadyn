@@ -66,7 +66,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		http_set_port(&client, info->server_name.port);
 		http_set_remote_name(&client, info->server_name.name);
-		http_set_bind_iface(&client, ctx->bind_interface);
 
 		client.ssl_enabled = info->ssl_enabled;
 		if (client.ssl_enabled)	/* XXX: Fix this better, possibly in http_init() */

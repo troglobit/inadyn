@@ -89,9 +89,6 @@ int http_get_remote_name    (http_t *client, const char **name);
 int http_set_remote_timeout (http_t *client, int  timeout);
 int http_get_remote_timeout (http_t *client, int *timeout);
 
-int http_set_bind_iface     (http_t *client, char  *ifname);
-int http_get_bind_iface     (http_t *client, char **ifname);
-
 #endif /* INADYN_HTTP_H_ */
 
 /**

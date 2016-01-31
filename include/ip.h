@@ -38,12 +38,8 @@ enum {
 typedef struct {
 	int                 initialized;
 
-	char               *ifname;
-	int                 bound;		/* When bound to an interface */
-
 	int                 type;
 	int                 socket;
-	struct sockaddr_in  local_addr;
 	struct sockaddr     remote_addr;
 	socklen_t           remote_len;
 	const char         *p_remote_host_name;
@@ -69,9 +65,6 @@ int ip_get_remote_name    (ip_sock_t *ip, const char **name);
 
 int ip_set_remote_timeout (ip_sock_t *ip, int  timeout);
 int ip_get_remote_timeout (ip_sock_t *ip, int *timeout);
-
-int ip_set_bind_iface     (ip_sock_t *ip, char  *ifname);
-int ip_get_bind_iface     (ip_sock_t *ip, char **ifname);
 
 #endif /* INADYN_IP_H_ */
 

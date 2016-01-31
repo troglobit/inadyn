@@ -43,10 +43,8 @@ int ip_construct(ip_sock_t *ip)
 	memset(ip, 0, sizeof(ip_sock_t));
 
 	ip->initialized = 0;
-	ip->bound       = 0;
 	ip->socket      = -1; /* Initialize to 'error', not a possible socket id. */
 	ip->timeout     = IP_DEFAULT_TIMEOUT;
-	memset(&ip->local_addr,  0, sizeof(ip->local_addr));
 	memset(&ip->remote_addr, 0, sizeof(ip->remote_addr));
 
 	return 0;
@@ -67,8 +65,6 @@ int ip_destruct(ip_sock_t *ip)
 int ip_init(ip_sock_t *ip)
 {
 	int rc = 0;
-	struct ifreq ifr;
-	struct sockaddr_in *addrp = NULL;
 
 	ASSERT(ip);
 
@@ -76,34 +72,6 @@ int ip_init(ip_sock_t *ip)
 		return 0;
 
 	do {
-		/* local bind, to interface */
-		if (ip->ifname) {
-			int sd = socket(PF_INET, SOCK_DGRAM, 0);
-
-			if (sd < 0) {
-				logit(LOG_WARNING, "Failed opening network socket: %m");
-				rc = RC_IP_OS_SOCKET_INIT_FAILED;
-				break;
-			}
-
-			memset(&ifr, 0, sizeof(struct ifreq));
-			strlcpy(ifr.ifr_name, ip->ifname, IFNAMSIZ);
-			if (ioctl(sd, SIOCGIFADDR, &ifr) != -1) {
-				ip->local_addr.sin_family = AF_INET;
-				ip->local_addr.sin_port = htons(0);
-				addrp = (struct sockaddr_in *)&(ifr.ifr_addr);
-				ip->local_addr.sin_addr.s_addr = addrp->sin_addr.s_addr;
-				ip->bound = 1;
-
-				logit(LOG_INFO, "Bound to interface %s (IP# %s)",
-				      ip->ifname, inet_ntoa(ip->local_addr.sin_addr));
-			} else {
-				logit(LOG_ERR, "Failed reading IP address of interface %s: %m", ip->ifname);
-				ip->bound = 0;
-			}
-			close(sd);
-		}
-
 		/* remote address */
 		if (ip->p_remote_host_name) {
 			int s;
@@ -283,23 +251,6 @@ int ip_get_remote_timeout(ip_sock_t *ip, int *timeout)
 	ASSERT(ip);
 	ASSERT(timeout);
 	*timeout = ip->timeout;
-
-	return 0;
-}
-
-int ip_set_bind_iface(ip_sock_t *ip, char *ifname)
-{
-	ASSERT(ip);
-	ip->ifname = ifname;
-
-	return 0;
-}
-
-int ip_get_bind_iface(ip_sock_t *ip, char **ifname)
-{
-	ASSERT(ip);
-	ASSERT(ifname);
-	*ifname = ip->ifname;
 
 	return 0;
 }

@@ -528,9 +528,6 @@ static int init_context(ddns_t *ctx)
 			http_set_remote_name(update,  info->server_name.name);
 		}
 
-		http_set_bind_iface(update,  ctx->bind_interface);
-		http_set_bind_iface(checkip, ctx->bind_interface);
-
 		info = conf_info_iterator(0);
 	}
 

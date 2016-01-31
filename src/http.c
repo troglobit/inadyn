@@ -210,19 +210,6 @@ int http_get_remote_timeout(http_t *client, int *timeout)
 	return tcp_get_remote_timeout(&client->tcp, timeout);
 }
 
-int http_set_bind_iface(http_t *client, char *ifname)
-{
-	ASSERT(client);
-	return tcp_set_bind_iface(&client->tcp, ifname);
-}
-
-int http_get_bind_iface(http_t *client, char **ifname)
-{
-	ASSERT(client);
-	ASSERT(ifname);
-	return tcp_get_bind_iface(&client->tcp, ifname);
-}
-
 /**
  * Local Variables:
  *  version-control: t

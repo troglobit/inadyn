@@ -127,14 +127,6 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		tcp->ip.socket = sd;
 		tcp->initialized  = 1;
 
-		if (tcp->ip.bound == 1) {
-			if (bind(sd, (struct sockaddr *)&tcp->ip.local_addr, sizeof(struct sockaddr_in)) < 0) {
-				logit(LOG_WARNING, "Failed binding client socket to local address: %s", strerror(errno));
-				rc = RC_IP_SOCKET_BIND_ERROR;
-				break;
-			}
-		}
-
 		/* Attempt to set TCP timers, silently fall back to OS defaults */
 		sv.tv_sec  =  tcp->ip.timeout / 1000;
 		sv.tv_usec = (tcp->ip.timeout % 1000) * 1000;
@@ -240,21 +232,6 @@ int tcp_get_remote_timeout(tcp_sock_t *tcp, int *p)
 	ASSERT(tcp);
 
 	return ip_get_remote_timeout(&tcp->ip, p);
-}
-
-int tcp_set_bind_iface(tcp_sock_t *tcp, char *ifname)
-{
-	ASSERT(tcp);
-
-	return ip_set_bind_iface(&tcp->ip, ifname);
-}
-
-int tcp_get_bind_iface(tcp_sock_t *tcp, char **ifname)
-{
-	ASSERT(tcp);
-	ASSERT(ifname);
-
-	return ip_get_bind_iface(&tcp->ip, ifname);
 }
 
 /**

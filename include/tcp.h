@@ -52,9 +52,6 @@ int tcp_get_remote_name    (tcp_sock_t *tcp, const char **name);
 int tcp_set_remote_timeout (tcp_sock_t *tcp, int  timeout);
 int tcp_get_remote_timeout (tcp_sock_t *tcp, int *timeout);
 
-int tcp_set_bind_iface     (tcp_sock_t *tcp, char  *ifname);
-int tcp_get_bind_iface     (tcp_sock_t *tcp, char **ifname);
-
 #endif /* INADYN_TCP_H_ */
 
 /**

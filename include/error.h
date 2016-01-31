@@ -37,7 +37,6 @@
 #define RC_IP_RECV_ERROR                            15
 #define RC_IP_OBJECT_NOT_INITIALIZED                16
 #define RC_IP_OS_SOCKET_INIT_FAILED                 17
-#define RC_IP_SOCKET_BIND_ERROR                     18
 
 #define RC_TCP_OBJECT_NOT_INITIALIZED               20
 
