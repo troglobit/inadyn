@@ -74,6 +74,9 @@ examples.
 * <https://www.dtdns.com>
 * <http://giradns.com>
 * <https://www.duiadns.net>
+* <https://ddnss.de>
+* <http://dynv6.com>
+* <http://ipv4.dynv6.com>
 
 In-A-Dyn supports HTTPS for DDNS providers that support this, which you
 must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, and Loopia
@@ -122,6 +125,12 @@ how this can be done:
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
         alias       = 1234534245321           # tunnel-id
 	}
+
+    provider default@dynv6.com {
+        username = your_token
+        password = n/a
+        alias = { host1.dynv6.net, host2.dynv6.net }
+    }
 
 In this example only the DynDNS and Tunnelbroker accounts use SSL, the
 No-IP account will still use regular HTTP.  See below for more on SSL.
