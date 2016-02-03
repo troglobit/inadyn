@@ -1,4 +1,4 @@
-/* Plugin for dynv6.org
+/* Plugin for dynv6.com
  *
  * Copyright (C) 2016  Sven Hoefer <sven@svenhoefer.com>
  *
@@ -35,7 +35,7 @@ static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin = {
-	.name         = "default@dynv6.org",
+	.name         = "default@dynv6.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
