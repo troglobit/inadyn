@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,11 +21,13 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef _DEBUG_IF_INCLUDED
-#define _DEBUG_IF_INCLUDED
+#ifndef INADYN_DEBUG_H_
+#define INADYN_DEBUG_H_
 
 #include <stdio.h>
 #include "os.h"
+
+extern char *__progname;
 
 int loglvl(char *level);
 void os_printf(int prio, char *fmt, ...);
@@ -38,7 +40,7 @@ void os_printf(int prio, char *fmt, ...);
 #define logit(fmt, args...)
 #endif
 
-#endif				/* _DEBUG_IF_INCLUDED */
+#endif /* INADYN_DEBUG_H_ */
 
 /**
  * Local Variables:
