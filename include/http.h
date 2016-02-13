@@ -32,10 +32,7 @@
 #include <openssl/tls1.h>
 #include <openssl/err.h>
 #elif defined(CONFIG_GNUTLS)
-#include <gnutls/openssl.h>
-/* Missing OpenSSL wrappers */
-#define ERR_free_strings()
-#define OPENSSL_free(ptr)     free(ptr)
+#include <gnutls/gnutls.h>
 #endif
 
 #include "error.h"
@@ -50,8 +47,12 @@ typedef struct {
 
 	int        ssl_enabled;
 #ifdef ENABLE_SSL
+#ifdef CONFIG_OPENSSL
 	SSL       *ssl;
 	SSL_CTX   *ssl_ctx;
+#else
+	gnutls_session_t ssl;
+#endif
 #endif
 
 	int        initialized;
