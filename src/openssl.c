@@ -103,8 +103,12 @@ int ssl_close(http_t *client)
 
 int ssl_send(http_t *client, const char *buf, int len)
 {
-	int err = SSL_write(client->ssl, buf, len);
+	int err;
 
+	if (!client->ssl_enabled)
+		return tcp_send(&client->tcp, buf, len);
+
+	err = SSL_write(client->ssl, buf, len);
 	if (err <= 0)
 		/* XXX: TODO add SSL_get_error() to figure out why */
 		return RC_HTTPS_SEND_ERROR;
@@ -117,6 +121,9 @@ int ssl_send(http_t *client, const char *buf, int len)
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
 	int len, err;
+
+	if (!client->ssl_enabled)
+		return tcp_recv(&client->tcp, buf, buf_len, recv_len);
 
 	/* Read HTTP header */
 	len = err = SSL_read(client->ssl, buf, buf_len);

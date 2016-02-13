@@ -140,7 +140,7 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 {
 	int rc = 0;
-	http_t *http;
+	http_t *client;
 	http_trans_t *trans;
 
 	if (!provider) {
@@ -148,8 +148,9 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 		return RC_INVALID_POINTER;
 	}
 
-	http = &provider->checkip;
-	DO(http_init(http, "Checking for IP# change"));
+	client = &provider->checkip;
+	client->ssl_enabled = 0;
+	DO(http_init(client, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
 	memset(ctx->work_buf, 0, ctx->work_buflen);
@@ -164,11 +165,11 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	logit(LOG_DEBUG, "Querying DDNS checkip server for my public IP#: %s", ctx->request_buf);
 
-	rc = http_transaction(http, &ctx->http_transaction);
+	rc = http_transaction(client, &ctx->http_transaction);
 	if (trans->status != 200)
 		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
 
-	http_exit(http);
+	http_exit(client);
 	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
 
 	return rc;
