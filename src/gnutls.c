@@ -130,10 +130,25 @@ void ssl_exit(void)
 	gnutls_global_deinit();
 }
 
-int ssl_open(http_t * client, char *msg)
+void ssl_get_info(http_t *client)
+{
+#ifndef gnutls_session_get_desc
+	(void)client;
+#else
+	char *info;
+
+	/* Available since 3.1.10  */
+	info = gnutls_session_get_desc(client->ssl);
+	logit(LOG_INFO, "SSL connection using: %s", info);
+	gnutls_free(info);
+#endif
+}
+
+
+int ssl_open(http_t *client, char *msg)
 {
 	int ret;
-	char *info, buf[256];
+	char buf[256];
 	size_t len;
 	const char *sn, *err;
 	const gnutls_datum_t *cert_list;
@@ -169,8 +184,9 @@ int ssl_open(http_t * client, char *msg)
 	tcp_set_port(&client->tcp, 443);
 	DO(tcp_init(&client->tcp, msg));
 
-	/* Forward TCP socket to GnuTLS */
-	gnutls_transport_set_int(client->ssl, client->tcp.ip.socket);
+	/* Forward TCP socket to GnuTLS, the set_int() API is perhaps too new still ... since 3.1.9 */
+//	gnutls_transport_set_int(client->ssl, client->tcp.ip.socket);
+	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.ip.socket);
 
 	/* Perform the TLS handshake */
 	do {
@@ -184,9 +200,7 @@ int ssl_open(http_t * client, char *msg)
 		return RC_HTTPS_FAILED_CONNECT;
 	}
 
-	info = gnutls_session_get_desc(client->ssl);
-	logit(LOG_INFO, "SSL connection using: %s", info);
-	gnutls_free(info);
+	ssl_get_info(client);
 
 	/* Get server's certificate (note: beware of dynamic allocation) - opt */
 	cert_list = gnutls_certificate_get_peers(client->ssl, &cert_list_size);
@@ -212,7 +226,7 @@ int ssl_open(http_t * client, char *msg)
 	return 0;
 }
 
-int ssl_close(http_t * client)
+int ssl_close(http_t *client)
 {
 	if (client->ssl_enabled) {
 		gnutls_bye(client->ssl, GNUTLS_SHUT_WR);
@@ -222,7 +236,7 @@ int ssl_close(http_t * client)
 	return tcp_exit(&client->tcp);
 }
 
-int ssl_send(http_t * client, const char *buf, int len)
+int ssl_send(http_t *client, const char *buf, int len)
 {
 	int ret;
 
@@ -241,7 +255,7 @@ int ssl_send(http_t * client, const char *buf, int len)
 	return 0;
 }
 
-int ssl_recv(http_t * client, char *buf, int buf_len, int *recv_len)
+int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
 	int ret, len = buf_len;
 
