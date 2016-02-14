@@ -102,6 +102,8 @@ static int verify_certificate_callback(gnutls_session_t session)
 	gnutls_x509_crt_deinit(cert);
 
 	/* notify gnutls to continue handshake normally */
+	logit(LOG_DEBUG, "Certificate OK");
+
 	return 0;
 }
 
