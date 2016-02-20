@@ -1,8 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS         = src include man
-DIST_SUBDIRS   = libite src
-doc_DATA	= README AUTHORS COPYING NEWS ChangeLog
-DISTCLEANFILES	= *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
+DIST_SUBDIRS    = libite src
+doc_DATA        = README AUTHORS COPYING NEWS ChangeLog
+DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 
 ## Generate detached signature file (ascii-armored), like OpenVPN does
 GPG = gpg
