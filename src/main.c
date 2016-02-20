@@ -183,7 +183,8 @@ static int usage(int code)
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
-		"Bug report address: %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT);
+		"Bug report address: %s\n"
+		"Project homepage: %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT, PACKAGE_URL);
 
 	return code;
 }
