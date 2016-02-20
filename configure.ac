@@ -65,9 +65,6 @@ if test "x$ac_enable_ssl" = "xyes"; then
    else
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
-      AC_CHECK_LIB([gnutls-openssl], [SSL_library_init], [],
-                          AC_MSG_ERROR([*** Compat OpenSSL library (GnuTLS) not found!]))
-      AC_CHECK_HEADERS([gnutls/openssl.h])
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
    fi
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
