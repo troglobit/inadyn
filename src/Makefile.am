@@ -25,16 +25,17 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/dhis.c		../plugins/duckdns.c	\
 		  ../plugins/dtdns.c		../plugins/giradns.c	\
 		  ../plugins/duiadns.c
-inadyn_CPPFLAGS = -I../
-inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
-inadyn_LDFLAGS  = -L../libite/.libs/
-inadyn_LDADD	= -ldl -lite -lconfuse
-inadyn_DEPENDENCIES = ../libite/libite.la
+inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99 $(libite_CFLAGS)
+inadyn_LDADD    = -ldl $(libite_LIBS)
+inadyn_DEPENDENCIES=
+
+if BUILTIN_LITE
+inadyn_DEPENDENCIES += ../libite/libite.la
+endif
 
 # Slightly ugly hacks to prevent the build system from installing
-# libite, which it does if we list GIT submodules in SUBDIRS.
+# builtins, which it does if we list GIT submodules in SUBDIRS.
 $(inadyn_DEPENDENCIES):
-	@echo "making ... `dirname $@`"
 	@$(MAKE) -C `dirname $@` all
 
 clean-local:

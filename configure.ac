@@ -44,7 +44,19 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 AM_PROG_AR
 LT_INIT([disable-shared static])
 
-# Check for libConfuse
+# Check for required packages
+PKG_CHECK_MODULES([libite], [libite],[
+	AC_CHECK_HEADERS([lite.h])
+	AC_CHECK_LIB([ite], [strlcpy])
+	],[
+	AC_MSG_WARN([*** Cannot find libite (-lite) in system, using built-in version])
+	libite_CFLAGS="-I../"
+	libite_LIBS="-L../libite/ -lite"
+	check_builtins=yes
+])
+AM_CONDITIONAL([BUILTIN_LITE], test "x$pkg_failed" = "xyes")
+
+PKG_CHECK_MODULES([libConfuse], [libconfuse])
 AC_CHECK_LIB([confuse], [cfg_init], [],
              AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
 AC_CHECK_HEADERS([confuse.h])
@@ -52,6 +64,7 @@ AC_CHECK_HEADERS([confuse.h])
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
 if test "x$ac_enable_ssl" = "xyes"; then
    if test "x$ac_enable_openssl" = "xyes"; then
+      PKG_CHECK_MODULES([OpenSSL], [openssl])
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
@@ -63,6 +76,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
 			])
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL library])
    else
+      PKG_CHECK_MODULES([GnuTLS], [gnutls])
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
@@ -84,18 +98,20 @@ AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([atexit memset poll socket strerror])
 
 # Check if user has downloaded a GitHub ZIP file and attempt to fix it.
-AC_MSG_CHECKING([status of GIT submodules])
-if test ! -e libite/lite.h; then
-    AC_MSG_RESULT([Missing!])
-    AC_MSG_CHECKING([if we can update all submodules])
-    run=`git submodule update --init`
-    if test $? -ne 0; then
-       AC_MSG_RESULT([Failed!  No Internet access?])
-       exit 1
-    fi
-    AC_MSG_RESULT([Yes, all fixed!])
-else
-    AC_MSG_RESULT([OK])
-fi
+AS_IF([test "x$check_builtins" = "xyes"],[
+    AC_MSG_CHECKING([status of GIT submodules])
+    AS_IF([test ! -e libite/lite.h],[
+        AC_MSG_RESULT([Missing!])
+        AC_MSG_CHECKING([if we can update all submodules])
+        run=`git submodule update --init`
+        if test $? -ne 0; then
+           AC_MSG_RESULT([Failed!  No Internet access?])
+           exit 1
+        fi
+        AC_MSG_RESULT([Yes, all fixed!])
+    ],[
+        AC_MSG_RESULT([OK])
+    ])
+])
 
 AC_OUTPUT
