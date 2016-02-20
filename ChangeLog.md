@@ -1,4 +1,3 @@
-
 Change Log
 ==========
 
@@ -9,13 +8,34 @@ All notable changes to the project are documented in this file.
 -------------------------------
 
 ### Changes
+- Added support for multiple users of the same provider, idea from
+  Valery Frolov:
+
+        provider default@no-ip.com:1 {
+            username    = ian
+            password    = secret
+            alias       = flemming.no-ip.com
+        }
+    
+        provider default@no-ip.com:2 {
+            username    = james
+            password    = bond
+            alias       = spectre.no-ip.com
+        }
+
+- Added support for new DDNS providers: ddnss.de and dynv6.com,
+  contributed by Sven Hoefer
 - Simplify command line switches, .conf file now required to use Inadyn
 - New configuration file format using libConfuse
 - Refactored memory handling and privilige separation to simplify code
 - Refactored logging and backgrounding to simplify code
 - Massive overhaul of man pages `inadyn(8)` and `inadyn.conf(5)`
+- Removed old compatibility symlinks and other required GNU specific
+  files, we now distribute and install README.md and ChangeLog.md
+- Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 
 ### Fixes
+- Fix issue #67: Use GnuTLS native API for HTTPS
 - Fix DuckDNS plugin: duckdns now requires the 'www.' prefix on the
   server URL.  By Frank Aurich
 - Fix issue #110: Poodle `SSL_MODE_SEND_FALLBACK_SCSV` not needed
@@ -24,6 +44,7 @@ All notable changes to the project are documented in this file.
   to `/var/cache/inadyn`
 - Fix issue #113: --drop-privs does not work
 - Add actual permissions check to `os_check_perms()`
+- Fix issue #122: Only use HTTPS connection for DNS update, not checkip
 
 
 [1.99.15][] - 2015-09-09
