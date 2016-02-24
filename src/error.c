@@ -1,7 +1,7 @@
 /* Error code definitions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@ static const ERROR_NAME global_error_table[] = {
 	{RC_INVALID_POINTER, "RC_INVALID_POINTER"},
 	{RC_OUT_OF_MEMORY, "RC_OUT_OF_MEMORY"},
 	{RC_OUT_BUFFER_OVERFLOW, "RC_OUT_BUFFER_OVERFLOW"},
+	{RC_DDNS_PLUGIN_REQUEST_FAIL, "RC_DDNS_PLUGIN_REQUEST_FAIL"},
 
 	{RC_IP_SOCKET_CREATE_ERROR, "RC_IP_SOCKET_CREATE_ERROR"},
 	{RC_IP_BAD_PARAMETER, "RC_IP_BAD_PARAMETER"},

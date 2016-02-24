@@ -1,7 +1,7 @@
 /* Error code definitions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #define RC_INVALID_POINTER                          2
 #define RC_OUT_OF_MEMORY                            3
 #define RC_OUT_BUFFER_OVERFLOW                      4
+#define RC_DDNS_PLUGIN_REQUEST_FAIL                 5
 
 #define RC_IP_SOCKET_CREATE_ERROR                   10
 #define RC_IP_BAD_PARAMETER                         11

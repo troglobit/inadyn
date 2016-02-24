@@ -182,7 +182,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 
 	system = plugin_find(str);
 	if (!system) {
-		logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
+		logit(LOG_ERR, "Cannot find a DDNS plugin for provider '%s'", str);
 		return 1;
 	}
 
@@ -326,7 +326,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		return NULL;
 
 	case CFG_PARSE_ERROR:
-		logit(LOG_ERR, "Error parsing configuration file %s: %m", file);
+		logit(LOG_ERR, "Error parsing configuration file %s", file);
 		return NULL;
 
 	case CFG_SUCCESS:

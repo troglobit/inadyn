@@ -300,7 +300,14 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	memset(ctx->request_buf, 0, ctx->request_buflen);
 	memset(&trans, 0, sizeof(trans));
 
+	/* Here we call the DDNS provider plugin .request() function */
 	trans.req_len     = info->system->request(ctx, info, alias);
+	if (trans.req_len <= 0) {
+		logit(LOG_ERR, "Failed creating server request for %s", info->system->name);
+		rc = RC_DDNS_PLUGIN_REQUEST_FAIL;
+		goto error;
+	}
+
 	trans.p_req       = (char *)ctx->request_buf;
 	trans.p_rsp       = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
@@ -314,9 +321,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;
-		http_exit(client);
-
-		return rc;
+		goto error;
 	}
 
 	rc = info->system->response(&trans, info, alias);
@@ -337,8 +342,8 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 			(*changed)++;
 	}
 
+error:
 	http_exit(client);
-
 	return rc;
 }
 
