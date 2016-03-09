@@ -354,6 +354,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
 		CFG_INT ("forced-update", DDNS_FORCED_UPDATE_PERIOD, CFGF_NONE),
+		CFG_STR ("iface",         NULL, CFGF_NONE),
 		CFG_SEC ("provider",      provider_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_SEC ("custom",        custom_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_END()
@@ -395,6 +396,10 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 
 	cache_dir                     = cfg_getstr(cfg, "cache-dir");
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
+
+	/* Command line --iface=IFNAME takes precedence */
+	if (!iface)
+		iface                 = cfg_getstr(cfg, "iface");
 
 	for (i = 0; i < cfg_size(cfg, "provider"); i++)
 		ret |= create_provider(cfg_getnsec(cfg, "provider", i), 0);

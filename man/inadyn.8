@@ -159,9 +159,14 @@ command line option the external IP check is disabled and
 .Nm
 will report the IP address of
 .Ar IFNAME
-to the DDNS providers listed in the configuration file.  This can be
-very useful to set register LAN IP addresses, or to speed up the IP
-check if the DDNS provider's check-ip servers are slow to respond.
+to all DDNS providers listed in the configuration file.  This can be
+useful to register LAN IP addresses, or, when connected directly to a
+public IP address, to speed up the IP check if the DDNS provider's
+check-ip servers are slow to respond.
+.Pp
+This option can also be given as a configuration option in
+.Xr inadyn.conf 5 ,
+both serve a purpose, use whichever one works for you.
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,

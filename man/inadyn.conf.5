@@ -35,6 +35,24 @@ spec., but can be useful for people who very rarely, if ever, get an IP
 address change.  Because some DDNS service providers will not register
 even a forced update if the IP is the same.  As a result the user could
 be deregistered as an inactive user.
+.It Cm iface = IFNAME
+Use network interface
+.Nm IFNAME
+as source of IP address changes instead of querying an external server.
+With this option is enabled, the external IP check is disabled and
+.Nm inadyn
+will send DDNS updates using the IP address of the
+.Nm IFNAME
+network interface to
+.Em all
+DDNS providers listed in the configuration file.  This can be useful to
+register LAN IP addresses, or, when connected directly to a public IP
+address, to speed up the IP check if the DDNS provider's check-ip
+servers are slow to respond.
+.Pp
+This option can also be given as a command line option to
+.Xr inadyn 8 ,
+both serve a purpose, use whichever one works for you.
 .It Cm cache-dir = PATH
 Set directory for persistent cache files, defaults to
 .Pa /var/cache/inadyn
