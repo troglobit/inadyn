@@ -27,14 +27,14 @@ be used as an escape character.
 .Bl -tag -width TERM -compact
 .It Cm fake-address = <true | false>
 When using SIGUSR1, to do a forced update, this option can be used to
-fake an address update using the
+fake an address update with a
 .Dq random
-address 203.0.113.42 (example IP address from RFC5737) before updating
-with the actual IP address.  This is completely outside spec., but can
-be useful for people who very rarely, if ever, get an IP address change.
-Because some DDNS service providers will not register even a forced
-update if the IP is the same.  As a result the user will likely be
-deregistered as an inactive user.
+address in the 203.0.113.0/24 range, example address range from RFC5737,
+before updating with the actual IP address.  This is completely outside
+spec., but can be useful for people who very rarely, if ever, get an IP
+address change.  Because some DDNS service providers will not register
+even a forced update if the IP is the same.  As a result the user could
+be deregistered as an inactive user.
 .It Cm cache-dir = PATH
 Set directory for persistent cache files, defaults to
 .Pa /var/cache/inadyn

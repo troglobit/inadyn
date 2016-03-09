@@ -361,8 +361,8 @@ static int update_alias_table(ddns_t *ctx)
 
 				strlcpy(backup, alias->address, sizeof(backup));
 
-				/* TODO: Use random address in 203.0.113.0/24 instead */
-				snprintf(alias->address, sizeof(alias->address), "203.0.113.42");
+				/* Picking random address in 203.0.113.0/24 ... */
+				snprintf(alias->address, sizeof(alias->address), "203.0.113.%d", (rand() + 1) % 255);
 				TRY(send_update(ctx, info, alias, NULL));
 
 				strlcpy(alias->address, backup, sizeof(alias->address));
@@ -474,12 +474,17 @@ static int get_encoded_user_passwd(void)
 static int init_context(ddns_t *ctx)
 {
 	ddns_info_t *info;
+	struct timeval tv;
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
 	if (ctx->initialized == 1)
 		return 0;
+
+	/* Seed prng, used in silly IP randomizer */
+	gettimeofday(&tv, NULL);
+	srand((unsigned int)tv.tv_usec);
 
 	info = conf_info_iterator(1);
 	while (info) {
