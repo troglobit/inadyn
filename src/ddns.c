@@ -178,9 +178,14 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 static int parse_my_ip_address(ddns_t *ctx)
 {
 	int found = 0;
-	char *accept = "0123456789.";
+	char *accept_v4 = "0123456789.";
+	char *accept_v6 = "0123456789.abcdefABCDEF:";
 	char *needle, *haystack, *end;
-	struct in_addr addr;
+	union {
+		struct in_addr  v4;
+		struct in6_addr v6;
+	} addr;
+	char address[MAX_ADDRESS_LEN];
 
 	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
 		return RC_INVALID_POINTER;
@@ -189,28 +194,46 @@ static int parse_my_ip_address(ddns_t *ctx)
 	needle   = haystack;
 	end      = haystack + strlen(haystack) - 1;
 	while (needle && haystack < end) {
-		/* Try to find first decimal number (begin of IP) */
-		needle = strpbrk(haystack, accept);
+		needle = strpbrk(haystack, accept_v6);
 		if (needle) {
-			size_t len = strspn(needle, accept);
+			char ch;
+			size_t len4, len6;
 
-			if (len)
-				needle[len] = 0;
+			len6 = strspn(needle, accept_v6);
+			if (len6) {
+				ch = needle[len6];
+				needle[len6] = 0;
 
-			if (!inet_aton(needle, &addr)) {
-				haystack = needle + len + 1;
-				continue;
+				if (inet_pton(AF_INET6, needle, &addr) == 1) {
+					inet_ntop(AF_INET6, &addr, address, sizeof(address));
+					found = 1;
+					break;
+				}
+
+				needle[len6] = ch;
 			}
 
-			/* FIRST occurence of a valid IP found */
-			found = 1;
-			break;
+			len4 = strspn(needle, accept_v4);
+			if (len4) {
+				ch = needle[len4];
+				needle[len4] = 0;
+
+				if (inet_pton(AF_INET, needle, &addr) == 1) {
+					inet_ntop(AF_INET, &addr, address, sizeof(address));
+					found = 1;
+					break;
+				}
+
+				needle[len4] = ch;
+			}
+
+			/* nothing yet, skip to the nearest search point */
+			haystack = needle + (len4 ? len4 : len6) + 1;
 		}
 	}
 
 	if (found) {
 		int anychange = 0;
-		char *address = inet_ntoa(addr);
 		ddns_info_t *info;
 
 		info = conf_info_iterator(1);
