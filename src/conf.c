@@ -255,11 +255,6 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	if (custom) {
 		info->append_myip = cfg_getbool(cfg, "append-myip");
 
-		cfg_getserver(cfg, "checkip-server", &info->checkip_name);
-		str = cfg_getstr(cfg, "checkip-path");
-		if (str && strlen(str) <= sizeof(info->checkip_url))
-			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
-
 		cfg_getserver(cfg, "ddns-server", &info->server_name);
 		str = cfg_getstr(cfg, "ddns-path");
 		if (str && strlen(str) <= sizeof(info->server_url))
@@ -293,6 +288,12 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 			}
 		}
 	}
+
+	/* The check-ip server can be set for all provider types */
+	cfg_getserver(cfg, "checkip-server", &info->checkip_name);
+	str = cfg_getstr(cfg, "checkip-path");
+	if (str && strlen(str) <= sizeof(info->checkip_url))
+		strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 
 	return 0;
 
@@ -359,6 +360,8 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
+		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
+		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_END()
 	};
 	cfg_opt_t custom_opts[] = {
@@ -369,13 +372,13 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
+		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
+		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),
 		CFG_STR     ("ddns-path",      NULL, CFGF_NONE),
 		CFG_STR_LIST("ddns-response",  NULL, CFGF_NONE),
-		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
-		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_END()
 	};
 	cfg_opt_t opts[] = {
