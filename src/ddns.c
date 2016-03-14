@@ -69,62 +69,41 @@ static int wait_for_cmd(ddns_t *ctx)
 	return 0;
 }
 
-static int check_interface_address(void)
+static int shell_transaction(ddns_t *ctx, ddns_info_t *info, const char *cmd)
 {
-	int sd, result, anychange = 0;
-	char *address;
-	struct ifreq ifr;
-	in_addr_t addr;
-	ddns_info_t *info;
+	FILE *pipe;
+	int rc = 0;
 
-	logit(LOG_INFO, "Checking for IP# change, querying interface %s", iface);
+	snprintf(ctx->request_buf, ctx->request_buflen,
+		"INADYN_PROVIDER=\"%s\" INADYN_USER=\"%s\" %s",
+		info->system->name, info->creds.username, cmd);
 
-	sd = socket(PF_INET, SOCK_DGRAM, 0);
-	if (sd < 0) {
-		logit(LOG_WARNING, "Failed opening network socket: %m");
-		return RC_IP_OS_SOCKET_INIT_FAILED;
+	logit(LOG_DEBUG, "Starting command to get my public IP#: %s", ctx->request_buf);
+
+	pipe = popen(ctx->request_buf, "r");
+	if (!pipe) {
+		logit(LOG_ERR, "Cannot run '%s': %s", ctx->request_buf, strerror(errno));
+		return errno;
 	}
 
-	memset(&ifr, 0, sizeof(struct ifreq));
-	ifr.ifr_addr.sa_family = AF_INET;
-	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", iface);
-	result = ioctl(sd, SIOCGIFADDR, &ifr);
-	close(sd);
-
-	if (result < 0) {
-		logit(LOG_ERR, "Failed reading IP address of interface %s: %m", iface);
-		return RC_OS_INVALID_IP_ADDRESS;
+	/* TODO: timeout on fread */
+	rc = fread(ctx->work_buf, 1, ctx->work_buflen, pipe);
+	if (rc < 0) {
+		logit(LOG_ERR, "Error running '%s': %s", ctx->request_buf, strerror(errno));
+		ctx->work_buf[0] = 0;
+		rc = errno;
+	} else if (rc == 0) {
+		logit(LOG_ERR, "Error running '%s': 0 bytes read", ctx->request_buf);
+		ctx->work_buf[0] = 0;
+		rc = RC_INVALID_POINTER;
+	} else {
+		logit(LOG_DEBUG, "Command '%s' returns %d bytes", ctx->request_buf, rc);
+		ctx->work_buf[rc] = 0;
+		rc = 0;
 	}
+	fclose(pipe);
 
-	addr = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
-	address = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-
-	if (IN_ZERONET(addr)   || IN_LOOPBACK(addr)  ||
-	    IN_LINKLOCAL(addr) || IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr)) {
-		logit(LOG_WARNING, "Interface %s has invalid IP# %s", iface, address);
-
-		return RC_OS_INVALID_IP_ADDRESS;
-	}
-
-	info = conf_info_iterator(1);
-	while (info) {
-		for (size_t i = 0; i < info->alias_count; i++) {
-			ddns_alias_t *alias = &info->alias[i];
-
-			alias->ip_has_changed = strcmp(alias->address, address) != 0;
-			if (alias->ip_has_changed) {
-				anychange++;
-				strlcpy(alias->address, address, sizeof(alias->address));
-			}
-		}
-
-		info = conf_info_iterator(0);
-	}
-
-	if (!anychange)
-		logit(LOG_INFO, "No IP# change detected, still at %s", address);
-
-	return 0;
+	return rc;
 }
 
 static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
@@ -251,7 +230,7 @@ static int parse_ipv6_address(char *buffer, char *address, size_t len)
 	return found;
 }
 
-static int parse_my_ip_address(char *buffer, char *address, size_t len)
+static int parse_my_address(char *buffer, char *address, size_t len)
 {
 	if (parse_ipv6_address(buffer, address, len))
 		return 0;
@@ -259,36 +238,139 @@ static int parse_my_ip_address(char *buffer, char *address, size_t len)
 	return !parse_ipv4_address(buffer, address, len);
 }
 
+static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
+{
+	if (!info->server_url[0])
+		return 1;
+
+	DO(server_transaction(ctx, info));
+	logit(LOG_DEBUG, "IP server response:");
+	logit(LOG_DEBUG, "%s", ctx->work_buf);
+
+	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
+		return RC_INVALID_POINTER;
+
+	DO(parse_my_address(ctx->http_transaction.p_rsp_body, address, len));
+
+	return 0;
+}
+
+static int get_address_cmd(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
+{
+	if (!info->checkip_cmd || !info->checkip_cmd[0])
+		return 1;
+
+	DO(shell_transaction(ctx, info, info->checkip_cmd));
+	logit(LOG_DEBUG, "Command response:");
+	logit(LOG_DEBUG, "%s", ctx->work_buf);
+
+	DO(parse_my_address(ctx->work_buf, address, len));
+
+	return 0;
+}
+
+/* Note: Does not handle IPv6 addresses or multiple IP addresses */
+static int get_address_iface(const char *ifname, char *address, size_t len)
+{
+	int sd, result;
+	struct ifreq ifr;
+	in_addr_t addr;
+
+	if (!ifname || !ifname[0])
+		return 1;
+
+	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ifname);
+
+	sd = socket(PF_INET, SOCK_DGRAM, 0);
+	if (sd < 0) {
+		logit(LOG_WARNING, "Failed opening network socket: %m");
+		return 1;
 	}
 
-	if (found) {
+	memset(&ifr, 0, sizeof(struct ifreq));
+	ifr.ifr_addr.sa_family = AF_INET;
+	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
+	result = ioctl(sd, SIOCGIFADDR, &ifr);
+	close(sd);
+
+	if (result < 0) {
+		logit(LOG_ERR, "Failed reading IP address of interface %s: %m", ifname);
+		return 1;
+	}
+
+	addr = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
+	if (!inet_ntop(AF_INET, (struct sockaddr_in *)&ifr.ifr_addr, address, len))
+		return 1;
+
+	if (IN_ZERONET(addr) || IN_LOOPBACK(addr) || IN_LINKLOCAL(addr) ||
+	    IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr)) {
+		logit(LOG_WARNING, "Interface %s has an invalid IP# %s", ifname, address);
+		return 1;
+	}
+
+	return 0;
+}
+
+static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
+{
+	logit(LOG_DEBUG, "Get address for %s", info->system->name);
+	memset(address, 0, len);
+
+	if (!get_address_cmd   (ctx, info, address, len))
+		return 0;
+
+	if (!get_address_iface (iface,     address, len))
+		return 0;
+
+	if (!get_address_remote(ctx, info, address, len))
+		return 0;
+
+	logit(LOG_ERR, "Failed to get IP address for %s, giving up!", info->system->name);
+
+	return 1;
+}
+
+/*
+ * Fetch IP, using any of the backends for each DDNS provider,
+ * then check for address change.
+ */
+static int get_address(ddns_t *ctx)
+{
+	char address[MAX_ADDRESS_LEN];
+	ddns_info_t *info;
+
+	info = conf_info_iterator(1);
+	while (info) {
 		int anychange = 0;
-		ddns_info_t *info;
 
-		info = conf_info_iterator(1);
-		while (info) {
-			for (size_t i = 0; i < info->alias_count; i++) {
-				ddns_alias_t *alias = &info->alias[i];
+		if (get_address_backend(ctx, info, address, sizeof(address)))
+			goto next;
 
-				alias->ip_has_changed = strcmp(alias->address, address) != 0;
-				if (alias->ip_has_changed) {
-					anychange++;
-					strlcpy(alias->address, address, sizeof(alias->address));
-				}
+		for (size_t i = 0; i < info->alias_count; i++) {
+			ddns_alias_t *alias = &info->alias[i];
+
+			alias->ip_has_changed = strncmp(alias->address, address, sizeof(alias->address)) != 0;
+			if (alias->ip_has_changed) {
+				anychange++;
+				strlcpy(alias->address, address, sizeof(alias->address));
 			}
 
-			info = conf_info_iterator(0);
+#ifdef ENABLE_SIMULATION
+			logit(LOG_WARNING, "In simulation, forcing IP# change ...");
+			alias->ip_has_changed = 1;
+#endif
 		}
 
 		if (!anychange)
-			logit(LOG_INFO, "No IP# change detected, still at %s", address);
+			logit(LOG_INFO, "No IP# change detected for %s, still at %s", info->system->name, address);
 		else
-			logit(LOG_INFO, "Current public IP# %s", address);
+			logit(LOG_INFO, "Current IP# %s at %s", address, info->system->name);
 
-		return 0;
+	next:
+		info = conf_info_iterator(0);
 	}
 
-	return RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
+	return 0;
 }
 
 static int time_to_check(ddns_t *ctx, ddns_alias_t *alias)
@@ -365,6 +447,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	}
 
 #ifdef ENABLE_SIMULATION
+	logit(LOG_WARNING, "In simulation, skipping update to server ...");
 	goto exit;
 #endif
 
@@ -583,20 +666,8 @@ static int check_address(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	if (iface) {
-		/* Get the IP address from interface instead of external server */
-		DO(check_interface_address());
-	} else {
-		ddns_info_t *info = conf_info_iterator(1);
-
-		/* Ask IP server something so he will respond and give me my IP */
-		DO(server_transaction(ctx, info));
-		logit(LOG_DEBUG, "IP server response:");
-		logit(LOG_DEBUG, "%s", ctx->work_buf);
-
-		/* Extract our IP, check if different than previous one */
-		DO(parse_my_ip_address(ctx));
-	}
+	/* Get IP address from any of the different backends */
+	DO(get_address(ctx));
 
 	/* Step through aliases list, resolve them and check if they point to my IP */
 	DO(check_alias_update_table(ctx));

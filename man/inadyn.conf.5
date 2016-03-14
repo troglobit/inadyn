@@ -126,6 +126,25 @@ section it overrides the provider's default
 .Cm checkip-server .
 .It Cm checkip-path = "/some/checkip/url"
 Optional server path for check IP server, defaults to "/".
+.It Cm checkip-command = "/path/to/shell/command [optional args]"
+Shell command, or script, for IP address update checking.  The command
+must output a text with the IP address to its standard output.  The
+following environment variables are set:
+.Bl -tag -width TERM
+.It INADYN_PROVIDER
+contains the DDNS provider's full name in form email@ddns-service.tld
+.It INADYN_USER
+contains user's name
+.El
+.Pp
+.Pa Example:
+.Bd -unfilled -offset indent
+checkip-command = /sbin/ifconfig eth0 | grep 'inet addr'
+.Ed
+.Pp
+.Nm Inadyn
+will use the first occurrence in the command's output that looks like an
+address.  Both IPv4 and IPv6 addresses are supported.
 .It Cm hostname = HOSTNAME
 .It Cm hostname = { "HOSTNAME1.name.tld", "HOSTNAME2.name.tld" }
 Your hostname alias.  To list multiple names, use the second form.

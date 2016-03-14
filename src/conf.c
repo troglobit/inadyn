@@ -309,6 +309,11 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	if (str && strlen(str) <= sizeof(info->checkip_url))
 		strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 
+	/* The checkip-command overrides any default or custom checkip-server */
+	str = cfg_getstr(cfg, "checkip-command");
+	if (str && strlen(str) > 0)
+		info->checkip_cmd = strdup(str);
+
 	return 0;
 
 error:
@@ -358,6 +363,8 @@ void conf_info_cleanup(void)
 	LIST_FOREACH_SAFE(ptr, &info_list, link, tmp) {
 		if (ptr->creds.encoded_password)
 			free(ptr->creds.encoded_password);
+		if (ptr->checkip_cmd)
+			free(ptr->checkip_cmd);
 		LIST_REMOVE(ptr, link);
 		free(ptr);
 	}
@@ -376,6 +383,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		CFG_END()
 	};
 	cfg_opt_t custom_opts[] = {
@@ -388,6 +396,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),
