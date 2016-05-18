@@ -49,23 +49,27 @@ PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
 PKG_CHECK_MODULES([confuse], [libconfuse >= 2.7])
 
 LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
+CFLAGS="$CFLAGS $lite_CFLAGS $confuse_CFLAGS"
 AC_CHECK_LIB([ite], [strlcpy], [],
              AC_MSG_ERROR([*** Frog DNA library (libite, -lite) not found!]))
 AC_CHECK_LIB([confuse], [cfg_init], [],
              AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
-AC_CHECK_HEADERS([lite/lite.h, lite/queue.h, confuse.h])
+AC_CHECK_HEADERS([lite/lite.h lite/queue.h confuse.h], [],
+             AC_MSG_ERROR([*** Cannot find required header files!]))
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
 if test "x$ac_enable_ssl" = "xyes"; then
    if test "x$ac_enable_openssl" = "xyes"; then
       PKG_CHECK_MODULES([OpenSSL], [openssl])
       LDFLAGS="$LDFLAGS $OpenSSL_LIBS"
+      CFLAGS="$LDFLAGS $OpenSSL_CFLAGS"
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
                           AC_MSG_ERROR([*** SSL library (OpenSSL) not found!]))
       AC_CHECK_HEADERS([openssl/crypto.h openssl/x509.h openssl/pem.h openssl/ssl.h \
-                        openssl/tls1.h openssl/err.h], [], [],
+                        openssl/tls1.h openssl/err.h], [],
+			AC_MSG_ERROR([*** Cannot find required header files!]),
 			[
 			#include <openssl/conf.h>
 			])
@@ -73,8 +77,11 @@ if test "x$ac_enable_ssl" = "xyes"; then
    else
       PKG_CHECK_MODULES([GnuTLS], [gnutls])
       LDFLAGS="$LDFLAGS $GnuTLS_LIBS"
+      CFLAGS="$LDFLAGS $GnuTLS_CFLAGS"
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
+      AC_CHECK_HEADERS([gnutls/gnutls.h gnutls/x509.h], [],
+			  AC_MSG_ERROR([*** Cannot find required header files!]))
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
    fi
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
