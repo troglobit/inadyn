@@ -1,6 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS         = src include man
-DIST_SUBDIRS    = libite src
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md
 DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d

@@ -26,13 +26,12 @@
 #include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <lite/lite.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <stdio.h>
 
-#include "libite/lite.h"
 #include "debug.h"
 #include "ip.h"
 

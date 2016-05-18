@@ -5,7 +5,7 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
-AC_CONFIG_FILES([Makefile libite/Makefile src/Makefile include/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile man/Makefile])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_ARG_ENABLE(ssl,
@@ -44,22 +44,15 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 AM_PROG_AR
 LT_INIT([disable-shared static])
 
-# Check for required packages
-PKG_CHECK_MODULES([libite], [libite],[
-	AC_CHECK_HEADERS([lite.h])
-	AC_CHECK_LIB([ite], [strlcpy])
-	],[
-	AC_MSG_WARN([*** Cannot find libite (-lite) in system, using built-in version])
-	libite_CFLAGS="-I../"
-	libite_LIBS="-L../libite/ -lite"
-	check_builtins=yes
-])
-AM_CONDITIONAL([BUILTIN_LITE], test "x$pkg_failed" = "xyes")
+# Check for required packages, we should enforce Confuse v3.0
+PKG_CHECK_MODULES([lite],       [libite >= 1.5.0])
+PKG_CHECK_MODULES([libConfuse], [libconfuse >= 2.7])
 
-PKG_CHECK_MODULES([libConfuse], [libconfuse])
+AC_CHECK_LIB([ite], [strlcpy], [],
+             AC_MSG_ERROR([*** Frog DNA library (libite, -lite) not found!]))
 AC_CHECK_LIB([confuse], [cfg_init], [],
              AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
-AC_CHECK_HEADERS([confuse.h])
+AC_CHECK_HEADERS([lite/lite.h, lite/queue.h, confuse.h])
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
 if test "x$ac_enable_ssl" = "xyes"; then
@@ -96,22 +89,5 @@ AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([atexit memset poll socket strerror])
-
-# Check if user has downloaded a GitHub ZIP file and attempt to fix it.
-AS_IF([test "x$check_builtins" = "xyes"],[
-    AC_MSG_CHECKING([status of GIT submodules])
-    AS_IF([test ! -e libite/lite.h],[
-        AC_MSG_RESULT([Missing!])
-        AC_MSG_CHECKING([if we can update all submodules])
-        run=`git submodule update --init`
-        if test $? -ne 0; then
-           AC_MSG_RESULT([Failed!  No Internet access?])
-           exit 1
-        fi
-        AC_MSG_RESULT([Yes, all fixed!])
-    ],[
-        AC_MSG_RESULT([OK])
-    ])
-])
 
 AC_OUTPUT

@@ -24,14 +24,15 @@
 #ifndef DDNS_H_
 #define DDNS_H_
 
+#include <lite/lite.h>
+#include <lite/queue.h>
+
 #include "config.h"
 #include "os.h"
 #include "error.h"
 #include "http.h"
 #include "debug.h"
 #include "plugin.h"
-#include "libite/lite.h"
-#include "libite/queue.h"
 
 #define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
