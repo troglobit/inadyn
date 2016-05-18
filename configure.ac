@@ -45,9 +45,10 @@ AM_PROG_AR
 LT_INIT([disable-shared static])
 
 # Check for required packages, we should enforce Confuse v3.0
-PKG_CHECK_MODULES([lite],       [libite >= 1.5.0])
-PKG_CHECK_MODULES([libConfuse], [libconfuse >= 2.7])
+PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
+PKG_CHECK_MODULES([confuse], [libconfuse >= 2.7])
 
+LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
 AC_CHECK_LIB([ite], [strlcpy], [],
              AC_MSG_ERROR([*** Frog DNA library (libite, -lite) not found!]))
 AC_CHECK_LIB([confuse], [cfg_init], [],
@@ -58,6 +59,7 @@ AC_CHECK_HEADERS([lite/lite.h, lite/queue.h, confuse.h])
 if test "x$ac_enable_ssl" = "xyes"; then
    if test "x$ac_enable_openssl" = "xyes"; then
       PKG_CHECK_MODULES([OpenSSL], [openssl])
+      LDFLAGS="$LDFLAGS $OpenSSL_LIBS"
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
@@ -70,6 +72,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL library])
    else
       PKG_CHECK_MODULES([GnuTLS], [gnutls])
+      LDFLAGS="$LDFLAGS $GnuTLS_LIBS"
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
