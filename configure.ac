@@ -62,7 +62,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
    if test "x$ac_enable_openssl" = "xyes"; then
       PKG_CHECK_MODULES([OpenSSL], [openssl])
       LDFLAGS="$LDFLAGS $OpenSSL_LIBS"
-      CFLAGS="$LDFLAGS $OpenSSL_CFLAGS"
+      CFLAGS="$CFLAGS $OpenSSL_CFLAGS"
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
@@ -77,7 +77,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
    else
       PKG_CHECK_MODULES([GnuTLS], [gnutls])
       LDFLAGS="$LDFLAGS $GnuTLS_LIBS"
-      CFLAGS="$LDFLAGS $GnuTLS_CFLAGS"
+      CFLAGS="$CFLAGS $GnuTLS_CFLAGS"
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
       AC_CHECK_HEADERS([gnutls/gnutls.h gnutls/x509.h], [],
