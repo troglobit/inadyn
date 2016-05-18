@@ -138,6 +138,9 @@ static int getserver(const char *server, ddns_name_t *name)
 {
 	char *str, *ptr;
 
+	if (strlen(server) > sizeof(name->name))
+		return 1;
+
 	str = strdup(server);
 	if (!str)
 		return 1;
@@ -188,20 +191,31 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 
 	info->system = system;
 
-	getserver(system->checkip_name, &info->checkip_name);
+	if (getserver(system->checkip_name, &info->checkip_name))
+		goto error;
+	if (strlen(system->checkip_url) > sizeof(info->checkip_url))
+		goto error;
 	strlcpy(info->checkip_url, system->checkip_url, sizeof(info->checkip_url));
 
-	getserver(system->server_name, &info->server_name);
+	if (getserver(system->server_name, &info->server_name))
+		goto error;
+	if (strlen(system->server_url) > sizeof(info->server_url))
+		goto error;
 	strlcpy(info->server_url, system->server_url, sizeof(info->server_url));
 
 	info->wildcard = cfg_getbool(cfg, "wildcard");
 	info->ssl_enabled = cfg_getbool(cfg, "ssl");
-	strlcpy(info->creds.username, cfg_getstr(cfg, "username"), sizeof(info->creds.username));
-	strlcpy(info->creds.password, cfg_getstr(cfg, "password"), sizeof(info->creds.password));
+	str = cfg_getstr(cfg, "username");
+	if (str && strlen(str) <= sizeof(info->creds.username))
+		strlcpy(info->creds.username, str, sizeof(info->creds.username));
+	str = cfg_getstr(cfg, "password");
+	if (str && strlen(str) <= sizeof(info->creds.password))
+		strlcpy(info->creds.password, str, sizeof(info->creds.password));
 
 	for (j = 0; j < cfg_size(cfg, "alias"); j++) {
 		str = cfg_getnstr(cfg, "alias", j);
-
+		if (!str)
+			continue;
 		strlcpy(info->alias[j].name, str, sizeof(info->alias[j].name));
 		info->alias_count++;
 	}
@@ -211,16 +225,20 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 
 		cfg_getserver(cfg, "checkip-server", &info->checkip_name);
 		str = cfg_getstr(cfg, "checkip-path");
-		if (str)
+		if (str && strlen(str) <= sizeof(info->checkip_url))
 			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 
 		cfg_getserver(cfg, "ddns-server", &info->server_name);
 		str = cfg_getstr(cfg, "ddns-path");
-		if (str)
+		if (str && strlen(str) <= sizeof(info->server_url))
 			strlcpy(info->server_url, str, sizeof(info->server_url));
 	}
 
 	return 0;
+
+error:
+	logit(LOG_ERR, "Failed setting up %s DDNS provider, skipping.", str);
+	return 1;
 }
 
 static int create_provider(cfg_t *cfg, int custom)
