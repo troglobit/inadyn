@@ -84,19 +84,20 @@ static int validate_alias(cfg_t *cfg, const char *provider, cfg_opt_t *alias)
 	return 0;
 }
 
-static int validate_common(cfg_t *cfg, const char *provider)
+/* No need to validate username/password for custom providers */
+static int validate_common(cfg_t *cfg, const char *provider, int custom)
 {
 	if (!plugin_find(provider)) {
 		cfg_error(cfg, "Invalid DDNS provider %s", provider);
 		return -1;
 	}
 
-	if (!cfg_getstr(cfg, "username")) {
+	if (!custom && !cfg_getstr(cfg, "username")) {
 		cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
 		return -1;
 	}
 
-	if (!cfg_getstr(cfg, "password")) {
+	if (!custom && !cfg_getstr(cfg, "password")) {
 		cfg_error(cfg, "Missing password setting for DDNS provider %s", provider);
 		return -1;
 	}
@@ -116,7 +117,7 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 		return -1;
 	}
 
-	return validate_common(cfg, provider);
+	return validate_common(cfg, provider, 0);
 }
 
 static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
@@ -130,7 +131,7 @@ static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
 		return -1;
 	}
 
-	return validate_common(cfg, "custom");
+	return validate_common(cfg, "custom", 1);
 }
 
 /* server:port => server:80 if port is not given */
