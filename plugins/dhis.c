@@ -22,7 +22,10 @@
 
 #include "plugin.h"
 
-/* is.dhis.org specific update request format */
+/*
+ * is.dhis.org specific update request format
+ * https://dhis.org/WebEngine.ipo?context=dhis.website.updating
+ */
 #define DHIS_UPDATE_IP_REQUEST						\
 	"GET %s"							\
 	"hostname=%s&"							\
