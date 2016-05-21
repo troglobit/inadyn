@@ -126,7 +126,7 @@ char *cache_file(char *name, char *buf, size_t len)
  * DNS query. */
 int read_cache_file(ddns_t *ctx)
 {
-	int j;
+	size_t j;
 	ddns_info_t *info;
 
         /* Clear DNS cache before querying for the IP below, this to

@@ -129,7 +129,7 @@ typedef struct di {
 	ddns_name_t    proxy_server_name;
 
 	ddns_alias_t   alias[DDNS_MAX_ALIAS_NUMBER];
-	int            alias_count;
+	size_t         alias_count;
 
 	int            wildcard;
 

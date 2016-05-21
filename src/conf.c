@@ -214,10 +214,13 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		strlcpy(info->creds.password, str, sizeof(info->creds.password));
 
 	for (j = 0; j < cfg_size(cfg, "alias"); j++) {
+		size_t pos = info->alias_count;
+
 		str = cfg_getnstr(cfg, "alias", j);
 		if (!str)
 			continue;
-		strlcpy(info->alias[j].name, str, sizeof(info->alias[j].name));
+
+		strlcpy(info->alias[pos].name, str, sizeof(info->alias[pos].name));
 		info->alias_count++;
 	}
 
