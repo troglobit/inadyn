@@ -74,12 +74,19 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  *
  * Example: 'SUCCESS CODE='
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
 {
 	char *resp = trans->p_rsp_body;
+	size_t i;
 
 	DO(http_status_valid(trans->status));
 
+	for (i = 0; i < info->server_response_num; i++) {
+		if (strstr(resp, info->server_response[i]))
+		    return 0;
+	}
+
+	/* Default check, if no configured custom response string(s) */
 	if (strstr(resp, "OK") || strstr(resp, "good") || strstr(resp, "true") || strcasestr(resp, "updated"))
 		return 0;
 

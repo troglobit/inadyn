@@ -236,6 +236,23 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		str = cfg_getstr(cfg, "ddns-path");
 		if (str && strlen(str) <= sizeof(info->server_url))
 			strlcpy(info->server_url, str, sizeof(info->server_url));
+
+		for (j = 0; j < cfg_size(cfg, "ddns-response"); j++) {
+			size_t pos = info->server_response_num;
+
+			str = cfg_getnstr(cfg, "ddns-response", j);
+			if (!str)
+				continue;
+
+			if (info->server_response_num >= NELEMS(info->server_response)) {
+				logit(LOG_WARNING, "Skipping response '%s', only %d custom responses supported",
+				      str, NELEMS(info->server_response));
+				continue;
+			}
+
+			strlcpy(info->server_response[pos], str, sizeof(info->server_response[pos]));
+			info->server_response_num++;
+		}
 	}
 
 	return 0;
@@ -315,6 +332,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),
 		CFG_STR     ("ddns-path",      NULL, CFGF_NONE),
+		CFG_STR_LIST("ddns-response",  NULL, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_END()

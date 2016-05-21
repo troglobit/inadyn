@@ -236,8 +236,11 @@ figure out yourself.  For example using the `inadyn --debug` mode.
 	}
 
 When using the generic plugin you should first inspect the response from
-the DDNS provider.  In-A-Dyn looks for a `200 HTTP` response OK code and
-the strings `"good"`, `"OK"`, or `"true"` in the HTTP response body.
+the DDNS provider.  By default In-A-Dyn looks for a `200 HTTP` response
+OK code and the strings `"good"`, `"OK"`, `"true"`, or `"updated"` in
+the HTTP response body.  If the DDNS provider returns something else you
+can add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
+single `ddns-response = Cool`
 
 **Note:** the `alias` setting is required, even if you encode everything
 in the `ddns-path`!  The given alias is appended to the `ddns-path` used

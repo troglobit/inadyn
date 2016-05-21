@@ -78,6 +78,9 @@
 # define MAX_ADDRESS_LEN                  46
 #endif
 
+#define MAX_NUM_RESPONSES                 5
+#define MAX_RESPONSE_LEN                  32
+
 typedef enum {
 	NO_CMD = 0,
 	CMD_STOP,
@@ -120,6 +123,10 @@ typedef struct di {
 	ddns_name_t    server_name;
 	char           server_url[SERVER_URL_LEN];
 	http_t         server;
+
+	/* Possble "OK" responses from DDNS provider */
+	char           server_response[MAX_NUM_RESPONSES][MAX_RESPONSE_LEN];
+	size_t         server_response_num;
 
 	/* Address of "What's my IP" checker */
 	ddns_name_t    checkip_name;
