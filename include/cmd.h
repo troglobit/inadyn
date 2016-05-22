@@ -50,7 +50,6 @@ int cmd_add_val(cmd_data_t *cmd, char *val);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

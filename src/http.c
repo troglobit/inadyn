@@ -198,7 +198,6 @@ int http_get_remote_timeout(http_t *client, int *timeout)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

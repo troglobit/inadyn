@@ -143,7 +143,6 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

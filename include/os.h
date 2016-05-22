@@ -71,7 +71,6 @@ int os_shell_execute          (char *cmd, char *ip, char *hostname);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

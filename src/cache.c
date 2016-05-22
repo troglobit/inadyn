@@ -175,7 +175,6 @@ int write_cache_file(ddns_alias_t *alias)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

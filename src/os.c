@@ -252,7 +252,6 @@ int os_check_perms(void *UNUSED(arg))
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

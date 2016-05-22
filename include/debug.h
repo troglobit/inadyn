@@ -44,7 +44,6 @@ void os_printf(int prio, char *fmt, ...);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

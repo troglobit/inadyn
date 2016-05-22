@@ -256,7 +256,6 @@ int ip_get_remote_timeout(ip_sock_t *ip, int *timeout)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

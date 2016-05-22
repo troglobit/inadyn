@@ -56,7 +56,6 @@ int tcp_get_remote_timeout (tcp_sock_t *tcp, int *timeout);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

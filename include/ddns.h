@@ -193,7 +193,6 @@ int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

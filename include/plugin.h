@@ -70,7 +70,6 @@ ddns_system_t *plugin_find (const char *name);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

@@ -91,7 +91,6 @@ const char *errorcode_get_name(int rc);
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:

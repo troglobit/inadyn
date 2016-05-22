@@ -80,7 +80,6 @@ int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 
 /**
  * Local Variables:
- *  version-control: t
  *  indent-tabs-mode: t
  *  c-file-style: "linux"
  * End:
