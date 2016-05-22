@@ -38,6 +38,8 @@
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
 
+char *generic_responses[] = { "OK", "good", "true", "updated", NULL };
+
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
@@ -68,12 +70,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.encoded_password);
 }
 
-/*
- * generic response validator
- * parses a given string. If found is ok, returns OK (0)
- *
- * Example: 'SUCCESS CODE='
- */
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
 {
 	char *resp = trans->p_rsp_body;
@@ -82,13 +78,9 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED
 	DO(http_status_valid(trans->status));
 
 	for (i = 0; i < info->server_response_num; i++) {
-		if (strstr(resp, info->server_response[i]))
+		if (strcasestr(resp, info->server_response[i]))
 		    return 0;
 	}
-
-	/* Default check, if no configured custom response string(s) */
-	if (strstr(resp, "OK") || strstr(resp, "good") || strstr(resp, "true") || strcasestr(resp, "updated"))
-		return 0;
 
 	return RC_DYNDNS_RSP_NOTOK;
 }

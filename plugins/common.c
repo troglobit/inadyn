@@ -69,10 +69,10 @@ int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(body, "good") != NULL || strstr(body, "nochg"))
+	if (strstr(body, "good") || strstr(body, "nochg"))
 		return 0;
 
-	if (strstr(body, "dnserr") != NULL || strstr(body, "911"))
+	if (strstr(body, "dnserr") || strstr(body, "911"))
 		return RC_DYNDNS_RSP_RETRY_LATER;
 
 	return RC_DYNDNS_RSP_NOTOK;

@@ -240,7 +240,8 @@ the DDNS provider.  By default In-A-Dyn looks for a `200 HTTP` response
 OK code and the strings `"good"`, `"OK"`, `"true"`, or `"updated"` in
 the HTTP response body.  If the DDNS provider returns something else you
 can add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
-single `ddns-response = Cool`
+single `ddns-response = Cool` -- if your provider does give any response
+then use `ddns-response = ""`.
 
 **Note:** the `alias` setting is required, even if you encode everything
 in the `ddns-path`!  The given alias is appended to the `ddns-path` used
