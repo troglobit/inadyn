@@ -39,6 +39,8 @@
 #include "os.h"
 #include "tcp.h"
 
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
+
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */
 #define	HTTP_DEFAULT_PORT	80
 

@@ -26,11 +26,59 @@ void ssl_init(void)
 {
 	SSL_library_init();
 	SSL_load_error_strings();
+	OpenSSL_add_all_algorithms();
 }
 
 void ssl_exit(void)
 {
 	ERR_free_strings();
+	EVP_cleanup();
+}
+
+static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
+{
+	char    buf[256];
+	X509   *cert;
+	int     err, depth;
+
+	cert = X509_STORE_CTX_get_current_cert(ctx);
+	err = X509_STORE_CTX_get_error(ctx);
+	depth = X509_STORE_CTX_get_error_depth(ctx);
+
+	X509_NAME_oneline(X509_get_subject_name(cert), buf, sizeof(buf));
+
+	/*
+	 * Catch a too long certificate chain. The depth limit set using
+	 * SSL_CTX_set_verify_depth() is by purpose set to "limit+1" so
+	 * that whenever the "depth>verify_depth" condition is met, we
+	 * have violated the limit and want to log this error condition.
+	 * We must do it here, because the CHAIN_TOO_LONG error would not
+	 * be found explicitly; only errors introduced by cutting off the
+	 * additional certificates would be logged.
+	 */
+	if (depth > 100) {
+		preverify_ok = 0;
+		err = X509_V_ERR_CERT_CHAIN_TOO_LONG;
+		X509_STORE_CTX_set_error(ctx, err);
+	}
+
+	if (!preverify_ok)
+		logit(LOG_ERR, "Certificate verification error:num=%d:%s:depth=%d:%s",
+		      err, X509_verify_cert_error_string(err), depth, buf);
+
+	/*
+	 * At this point, err contains the last verification error. We can use
+	 * it for something special
+	 */
+	if (!preverify_ok && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT)) {
+		X509_NAME_oneline(X509_get_issuer_name(ctx->current_cert), buf, sizeof(buf));
+		logit(LOG_ERR, "issuer= %s", buf);
+	}
+
+	if (1) //always_continue)
+		return 1;
+
+	return preverify_ok;
 }
 
 int ssl_open(http_t *client, char *msg)
@@ -53,6 +101,10 @@ int ssl_open(http_t *client, char *msg)
 	/* POODLE, only allow TLSv1.x or later */
 	SSL_CTX_set_options(client->ssl_ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION);
 
+	SSL_CTX_set_verify(client->ssl_ctx, SSL_VERIFY_PEER, verify_callback);
+	SSL_CTX_set_verify_depth(client->ssl_ctx, 150);
+	SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE, NULL);
+
 	client->ssl = SSL_new(client->ssl_ctx);
 	if (!client->ssl)
 		return RC_HTTPS_OUT_OF_MEMORY;
@@ -68,20 +120,18 @@ int ssl_open(http_t *client, char *msg)
 
 	logit(LOG_INFO, "SSL connection using %s", SSL_get_cipher(client->ssl));
 
-	/* Get server's certificate (note: beware of dynamic allocation) - opt */
 	cert = SSL_get_peer_certificate(client->ssl);
 	if (!cert)
 		return RC_HTTPS_FAILED_GETTING_CERT;
 
-	/* Logging some cert details. Please note: X509_NAME_oneline doesn't
-	   work when giving NULL instead of a buffer. */
+	if (SSL_get_verify_result(client->ssl) == X509_V_OK)
+		logit(LOG_DEBUG, "Certificate OK");
+
 	X509_NAME_oneline(X509_get_subject_name(cert), buf, sizeof(buf));
 	logit(LOG_INFO, "SSL server cert subject: %s", buf);
 	X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf));
 	logit(LOG_INFO, "SSL server cert issuer: %s", buf);
 
-	/* We could do all sorts of certificate verification stuff here before
-	   deallocating the certificate. */
 	X509_free(cert);
 
 	return 0;

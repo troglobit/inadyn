@@ -23,9 +23,8 @@
 #include "http.h"
 #include <gnutls/x509.h>
 
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
-
 static gnutls_certificate_credentials_t xcred;
+
 
 /* This function will verify the peer's certificate, and check
  * if the hostname matches, as well as the activation, expiration dates.
@@ -220,8 +219,6 @@ int ssl_open(http_t *client, char *msg)
 		gnutls_x509_crt_get_issuer_dn(cert, buf, &len);
 		logit(LOG_INFO, "SSL server cert issuer: %s", buf);
 
-		/* We could do all sorts of certificate verification stuff here before
-		   deallocating the certificate. */
 		gnutls_x509_crt_deinit(cert);
 	}
 
