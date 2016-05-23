@@ -24,7 +24,7 @@ is configured using a simple configuration file.  The
 character marks start of a comment to end of line.  The \\ character can
 be used as an escape character.
 .Pp
-.Bl -tag -width TERM -compact
+.Bl -tag -width TERM
 .It Cm fake-address = <true | false>
 When using SIGUSR1, to do a forced update, this option can be used to
 fake an address update with a
@@ -86,7 +86,6 @@ How often the IP is checked, in seconds. Default: apx 1 minute. Max: 10 days.
 .It Cm forced-update = SEC
 How often the IP should be updated even if it is not changed. The time
 should be given in seconds.  Default is equal to 30 days.
-.Pp
 .It Cm custom randomUserID {}
 .It Cm provider email@ddns-service.tld[:ID] {}
 The custom{} and provider{} sections are very similar, except that the
@@ -119,7 +118,6 @@ when your IP changes.  Default: disabled.  For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
 .El
-.Pp
 .It Cm provider email@ddns-service.tld {}
 Can be one of:
 .Pp
@@ -169,7 +167,6 @@ by Hurricane Electric.
 .It Cm default@duiadns.net
 .Aq https://www.duiadns.net
 .El
-.Pp
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
 .Pp
