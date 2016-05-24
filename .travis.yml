@@ -34,6 +34,9 @@ install:
   - wget https://github.com/troglobit/libite/releases/download/v1.5.0/libite-1.5.0.tar.xz
   - tar xf libite-1.5.0.tar.xz
   - (cd libite-1.5.0 && ./configure --prefix=/tmp && make && make install-strip)
+  - wget https://github.com/martinh/libconfuse/releases/download/v3.0/confuse-3.0.tar.xz
+  - tar xf confuse-3.0.tar.xz
+  - (cd confuse-3.0 && ./configure --prefix=/tmp --disable-examples && make && make install-strip)
 
 script:
   - ./autogen.sh
