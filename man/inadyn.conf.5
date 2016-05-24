@@ -107,8 +107,8 @@ Use HTTPS to connect to this DDNS service provider, default HTTP (false).
 The username, if applicable.  This might be referred to as hash by some providers.
 .It Cm password = PASSWORD
 The password, if applicable.
-.It Cm alias = ALIAS
-.It Cm alias = { "ALIAS1.name.tld", "ALIAS2.name.tld" }
+.It Cm hostname = HOSTNAME
+.It Cm hostname = { "HOSTNAME1.name.tld", "HOSTNAME2.name.tld" }
 Your hostname alias.  To list multiple names, use the second form.
 .It Cm wildcard = true
 Enable domain name wildcarding of your domain name, for DDNS providers
@@ -174,12 +174,12 @@ Specific to the custom provider section are the following settings:
 .It Cm ddns-server = update.example.com
 DDNS server name, not the full URL.
 .It Cm ddns-path   = "/update?domain="
-DDNS server path.  By default each listed alias is appended to the path, unless
+DDNS server path.  By default the hostname is appended to the path,
+unless
 .Cm append-myip=true
 is set.
 .It Cm append-myip = true
-Append your current IP to the the DDNS server update path.  Default
-is 'false', which means each alias name is appended.
+Append your current IP to the the DDNS server update path.
 .It Cm checkip-server = checkip.example.com
 Server used to check for IP address updates.
 .It Cm checkip-path = "/"
@@ -203,7 +203,7 @@ provider default@dyndns.org {
 .br
     password   = secret1
 .br
-    alias      = { "my.example.com", "other.example.org" }
+    hostname   = { "my.example.com", "other.example.org" }
 .br
 }
 .Pp
@@ -215,7 +215,7 @@ provider default@no-ip.com:1 {
 .br
     password   = secret21
 .br
-    alias      = example.no-ip.com
+    hostname   = example.no-ip.com
 .br
 }
 .Pp
@@ -227,7 +227,7 @@ provider default@no-ip.com:2 {
 .br
     password   = secret22
 .br
-    alias      = another.no-ip.com
+    hostname   = another.no-ip.com
 .br
 }
 .Pp
@@ -243,7 +243,7 @@ provider default@loopia.com {
 .br
     password   = secret3
 .br
-    alias      = example.com
+    hostname   = example.com
 .br
 }
 .Pp
@@ -257,7 +257,7 @@ provider default@ddnss.de {
 .br
     password   = your_password
 .br
-    alias      = your_host.ddnss.de
+    hostname   = your_host.ddnss.de
 .br
 }
 .Pp
@@ -269,7 +269,7 @@ provider default@dynv6.com {
 .br
     password   = not_used
 .br
-    alias      = your_host.dynv6.net
+    hostname   = your_host.dynv6.net
 .br
 }
 .Pp
@@ -283,7 +283,7 @@ provider default@tunnelbroker.net {
 .br
     password   = update-key-in-advanced-tab
 .br
-    alias      = tunnel-id
+    hostname   = tunnel-id
 .br
 }
 .Pp
@@ -304,7 +304,7 @@ custom twoDNS.de {
 .br
     ddns-path      = "/update?hostname="
 .br
-    alias          = example.dd-dns.de
+    hostname       = example.dd-dns.de
 .br
 }
 .Pp
@@ -329,14 +329,14 @@ custom dyn.com {
 .br
     append-myip  = true
 .br
-    alias        = YOURHOST
+    hostname     = YOURHOST
 .br
 }
 .Pp
 Notice the use of
 .Nm append-myip
 which differs from above previous examples.  Without this option set the
-default (backwards compatible) behavior is to add the hostname alias.
+default (backwards compatible) behavior is to add the hostname.
 .Sh "SEE ALSO"
 .Xr inadyn 8
 .Pp

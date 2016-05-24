@@ -104,32 +104,32 @@ how this can be done:
 	    ssl         = true
         username    = charlie
         password    = snoopy
-        alias       = { "peanuts", "woodstock" }
+        hostname    = { "peanuts", "woodstock" }
 	}
     
     provider default@no-ip.com:1 {
         username    = ian
         password    = secret
-        alias       = flemming.no-ip.com
+        hostname    = flemming.no-ip.com
 	}
     
     provider default@no-ip.com:2 {
         username    = james
         password    = bond
-        alias       = spectre.no-ip.com
+        hostname    = spectre.no-ip.com
     }
     
     provider default@tunnelbroker.net {
         ssl         = true
         username    = futurekid
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
-        alias       = 1234534245321           # tunnel-id
+        hostname    = 1234534245321           # tunnel-id
 	}
 
     provider default@dynv6.com {
         username = your_token
         password = n/a
-        alias = { host1.dynv6.net, host2.dynv6.net }
+        hostname = { host1.dynv6.net, host2.dynv6.net }
     }
 
 In this example only the DynDNS and Tunnelbroker accounts use SSL, the
@@ -151,7 +151,7 @@ the command line option `--startup-delay=SEC`.  To tell `inadyn` it is
 OK to proceed before the `SEC` timeout, use `SIGUSR2`.
 
 The last system defined is the IPv6 <https://tunnelbroker.net> service
-provided by Hurricane Electric.  Here `alias` is set to the tunnel ID
+provided by Hurricane Electric.  Here `hostname` is set to the tunnel ID
 and password **must** be the *Update key* found in the *Advanced*
 configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
 
@@ -183,11 +183,11 @@ A DDNS provider like <http://twoDNS.de> can be setup like this:
         ssl            = true
         ddns-server    = update.twodns.de
         ddns-path      = "/update?hostname="
-        alias          = myalias.dd-dns.de
+        hostname       = myhostname.dd-dns.de
 	}
 
-For <https://www.namecheap.com> DDNS can look as follows.  Please notice
-how the alias syntax differs between these two DDNS providers.  You need
+For <https://www.namecheap.com> DDNS can look as follows.  Notice how
+the hostname syntax differs between these two DDNS providers.  You need
 to investigate details like this yourself when using the generic/custom
 DDNS plugin:
 
@@ -197,16 +197,19 @@ DDNS plugin:
         ssl         = true
         ddns-server = dynamicdns.park-your-domain.com
         ddns-path   = "/update?domain=YOURDOMAIN.TLD&password=mypass&host="
-        alias       = { "alpha", "beta", "gamma" }
+        hostname    = { "alpha", "beta", "gamma" }
 	}
 
-Here three subdomains are updated, one GET update request using the
-listed DDNS server and path is performed per alias.  Your DNS alias is
-automatically appended to the end of the `ddns-path`, as is customary,
-before it is communicated to the server.  Username is your Namecheap
-username, and password would be the one given to you in the Dynamic DNS
-panel from Namecheap.  Here is an alternative config to illustrate how
-the `alias` setting works:
+Here three subdomains are updated, one HTTP GET update request for every
+listed DDNS server and path is performed, for every listed hostname.
+Some providers, like FreeDNS, support setting up CNAME records to reduce
+the amount of records you need to update.
+
+Your hostname is automatically appended to the end of the `ddns-path`,
+as is customary, before it is communicated to the server.  Username is
+your Namecheap username, and password would be the one given to you in
+the Dynamic DNS panel from Namecheap.  Here is an alternative config to
+illustrate how the `hostname` setting works:
 
     custom kruskakli {
         username    = myuser
@@ -214,7 +217,7 @@ the `alias` setting works:
         ssl         = true
         ddns-server = dynamicdns.park-your-domain.com
         ddns-path   = "/update?password=mypass&domain="
-        alias       = YOURDOMAIN.TLD
+        hostname    = YOURDOMAIN.TLD
 	}
 
 The generic plugin can also be used with providers that require the
@@ -232,7 +235,7 @@ figure out yourself.  For example using the `inadyn --debug` mode.
         ddns-server = members.dyndns.org
         ddns-path   = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
         append-myip = true
-        alias       = YOURHOST
+        hostname    = YOURHOST
 	}
 
 When using the generic plugin you should first inspect the response from
@@ -243,10 +246,10 @@ can add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
 single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
 
-**Note:** the `alias` setting is required, even if you encode everything
-in the `ddns-path`!  The given alias is appended to the `ddns-path` used
-for updates, unless you use `append-myip` in which case your IP address
-will be appended instead.  When using `append-myip` you probably need to
+**Note:** `hostname` is required, even if everything is encoded in the
+`ddns-path`!  The given hostname is appended to the `ddns-path` used for
+updates, unless you use `append-myip` in which case your IP address will
+be appended instead.  When using `append-myip` you probably need to
 encode your DNS hostname in the `ddns-path` instead &mdash; as is done
 in the last example above.
 

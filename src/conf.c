@@ -44,6 +44,33 @@
  */
 static LIST_HEAD(head, di) info_list = LIST_HEAD_INITIALIZER(info_list);
 
+/*
+ * Convert deprecated 'alias' setting to new 'hostname',
+ * same functionality with new name.
+ */
+static int deprecate_alias(cfg_t *cfg)
+{
+	size_t i;
+	cfg_opt_t *alias, *hostname;
+
+	alias = cfg_getopt(cfg, "alias");
+	if (!alias || cfg_opt_size(alias) <= 0)
+		return 0;
+
+	hostname = cfg_getopt(cfg, "hostname");
+	if (cfg_opt_size(hostname) > 0) {
+		cfg_error(cfg, "Both 'hostname' and 'alias' set, cannot convert deprecated 'alias' to 'hostname'");
+		return -1;
+	}
+
+	cfg_error(cfg, "converting 'alias' to 'hostname'.");
+	for (i = 0; i < cfg_opt_size(alias); i++)
+		cfg_opt_setnstr(hostname, cfg_opt_getnstr(alias, i), i);
+
+	cfg_free_value(alias);
+
+	return 0;
+}
 
 static int validate_period(cfg_t *cfg, cfg_opt_t *opt)
 {
@@ -57,26 +84,26 @@ static int validate_period(cfg_t *cfg, cfg_opt_t *opt)
 	return 0;
 }
 
-static int validate_alias(cfg_t *cfg, const char *provider, cfg_opt_t *alias)
+static int validate_hostname(cfg_t *cfg, const char *provider, cfg_opt_t *hostname)
 {
 	size_t i;
 
-	if (!alias) {
-		cfg_error(cfg, "Missing DDNS alias setting in provider %s", provider);
+	if (!hostname) {
+		cfg_error(cfg, "DDNS hostname setting is missing in provider %s", provider);
 		return -1;
 	}
 
-	if (!cfg_opt_size(alias)) {
-		cfg_error(cfg, "No aliases listed in DDNS provider %s", provider);
+	if (!cfg_opt_size(hostname)) {
+		cfg_error(cfg, "No hostnames listed in DDNS provider %s", provider);
 		return -1;
 	}
 
-	for (i = 0; i < cfg_opt_size(alias); i++) {
-		char *name = cfg_opt_getnstr(alias, i);
+	for (i = 0; i < cfg_opt_size(hostname); i++) {
+		char *name = cfg_opt_getnstr(hostname, i);
 		ddns_info_t info;
 
 		if (sizeof(info.alias[0].name) < strlen(name)) {
-			cfg_error(cfg, "Too long DDNS alias (%s) in provider %s", name, provider);
+			cfg_error(cfg, "Too long DDNS hostname (%s) in provider %s", name, provider);
 			return -1;
 		}
 	}
@@ -102,7 +129,8 @@ static int validate_common(cfg_t *cfg, const char *provider, int custom)
 		return -1;
 	}
 
-	return validate_alias(cfg, provider, cfg_getopt(cfg, "alias"));
+	return deprecate_alias(cfg) ||
+		validate_hostname(cfg, provider, cfg_getopt(cfg, "hostname"));
 }
 
 static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
@@ -213,10 +241,10 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	if (str && strlen(str) <= sizeof(info->creds.password))
 		strlcpy(info->creds.password, str, sizeof(info->creds.password));
 
-	for (j = 0; j < cfg_size(cfg, "alias"); j++) {
+	for (j = 0; j < cfg_size(cfg, "hostname"); j++) {
 		size_t pos = info->alias_count;
 
-		str = cfg_getnstr(cfg, "alias", j);
+		str = cfg_getnstr(cfg, "hostname", j);
 		if (!str)
 			continue;
 
@@ -327,7 +355,8 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	cfg_opt_t provider_opts[] = {
 		CFG_STR     ("username",     NULL, CFGF_NONE),
 		CFG_STR     ("password",     NULL, CFGF_NONE),
-		CFG_STR_LIST("alias",        NULL, CFGF_NONE),
+		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
+		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_END()
@@ -336,7 +365,8 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		/* Same as a general provider */
 		CFG_STR     ("username",     NULL, CFGF_NONE),
 		CFG_STR     ("password",     NULL, CFGF_NONE),
-		CFG_STR_LIST("alias",        NULL, CFGF_NONE),
+		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
+		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		/* Custom settings */
@@ -361,7 +391,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	};
 	cfg_t *cfg;
 
-	cfg = cfg_init(opts, CFGF_NONE);
+	cfg = cfg_init(opts, CFGF_IGNORE_UNKNOWN);
 	if (!cfg) {
 		logit(LOG_ERR, "Failed initializing configuration file parser: %m");
 		return NULL;
