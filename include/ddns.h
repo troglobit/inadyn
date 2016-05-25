@@ -34,7 +34,7 @@
 #include "debug.h"
 #include "plugin.h"
 
-#define VERSION_STRING	"Inadyn version " VERSION " -- Dynamic DNS update client."
+#define VERSION_STRING	PACKAGE_NAME " version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
 #define SUPPORT_ADDR	PACKAGE_BUGREPORT
 
