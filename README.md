@@ -228,9 +228,9 @@ illustrate how the `hostname` setting works:
 The generic plugin can also be used with providers that require the
 client's new IP in the update request.  Here is an example of how this
 can be done if we *pretend* that <http://dyn.com> is not supported by
-inadyn.  Notice how `YOURHOST` must be listed twice for dyndns.org, the
-`ddns-path` often differs between providers and is something you must
-figure out yourself.  For example using the `inadyn --debug` mode.
+inadyn.  The `ddns-path` differs between providers and is something you
+must figure out.  The support pages sometimes list this under an API
+section, or similar.
 
     # This emulates default@dyndns.org
     custom randomhandle {
@@ -238,10 +238,12 @@ figure out yourself.  For example using the `inadyn --debug` mode.
         password    = DYNPASSWORD
         ssl         = true
         ddns-server = members.dyndns.org
-        ddns-path   = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
-        append-myip = true
-        hostname    = YOURHOST
+        ddns-path   = "/nic/update?hostname=%h.dyndns.org&myip=%i"
+        hostname    = { YOURHOST, alias }
 	}
+
+Here a fully custom `ddns-path` with format specifiers are used, see the
+inadyn.conf(5) man page for details on this.
 
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  By default In-A-Dyn looks for a `200 HTTP` response
