@@ -36,7 +36,7 @@ int    loglevel = LOG_NOTICE;
 int    background = 1;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
-int    use_syslog = 0;
+int    use_syslog = 1;
 char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
@@ -193,6 +193,7 @@ static int usage(int code)
 int main(int argc, char *argv[])
 {
 	int c, rc = 0, restart;
+	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
 		{ "continue-on-error", 0, 0, 'c' },
@@ -241,6 +242,7 @@ int main(int argc, char *argv[])
 
 		case 'n':	/* --foreground */
 			background = 0;
+			use_syslog--;
 			break;
 
 		case 100:	/* --pidfile=BASENAME */
@@ -252,7 +254,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 's':	/* --syslog */
-			use_syslog = 1;
+			use_syslog++;
 			break;
 
 		case 't':	/* --startup-delay=SEC */
@@ -276,13 +278,15 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "Failed daemonizing %s: %m\n", __progname);
 			return RC_OS_FORK_FAILURE;
 		}
-		use_syslog = 1;
 	}
 
-	if (use_syslog) {
-		openlog(NULL, LOG_PID, LOG_USER);
-		setlogmask(LOG_UPTO(loglevel));
-	}
+#ifdef LOG_PERROR
+	if (!background && use_syslog < 1)
+		log_opts |= LOG_PERROR;
+#endif
+
+	openlog(NULL, log_opts, LOG_USER);
+	setlogmask(LOG_UPTO(loglevel));
 
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));

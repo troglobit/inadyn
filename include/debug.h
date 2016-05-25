@@ -24,21 +24,12 @@
 #ifndef INADYN_DEBUG_H_
 #define INADYN_DEBUG_H_
 
-#include <stdio.h>
 #include "os.h"
 
 extern char *__progname;
 
-int loglvl(char *level);
-void os_printf(int prio, char *fmt, ...);
-
-#ifndef DBG_PRINT_DISABLED
-#ifndef logit
-#define logit(prio, fmt, args...) os_printf(prio, fmt, ##args)
-#endif
-#else
-#define logit(fmt, args...)
-#endif
+int  loglvl (char *level);
+void logit  (int prio, const char *fmt, ...);
 
 #endif /* INADYN_DEBUG_H_ */
 

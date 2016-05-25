@@ -37,34 +37,7 @@
 #include "ddns.h"
 #include "cache.h"
 
-#define MAXSTRING 1024
-
 static void *param = NULL;
-
-
-static char *current_time(void)
-{
-	time_t now;
-	struct tm *timeptr;
-	static const char wday_name[7][3] = {
-		"Sun", "Mon", "Tue", "Wed",
-		"Thu", "Fri", "Sat"
-	};
-	static const char mon_name[12][3] = {
-		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-	};
-	static char result[26];
-
-	time(&now);
-	timeptr = localtime(&now);
-
-	sprintf(result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d",
-		wday_name[timeptr->tm_wday], mon_name[timeptr->tm_mon],
-		timeptr->tm_mday, timeptr->tm_hour, timeptr->tm_min, timeptr->tm_sec, 1900 + timeptr->tm_year);
-
-	return result;
-}
 
 
 int loglvl(char *level)
@@ -77,33 +50,16 @@ int loglvl(char *level)
 	return atoi(level);
 }
 
-void os_printf(int prio, char *fmt, ...)
+void logit(int prio, const char *fmt, ...)
 {
-	size_t len;
 	va_list args;
-	char message[MAXSTRING + 1] = "";
 
 	if (loglevel == INTERNAL_NOPRI)
 		return;
 
-	message[MAXSTRING] = 0;
 	va_start(args, fmt);
-	vsnprintf(message, sizeof(message), fmt, args);
+	vsyslog(prio, fmt, args);
 	va_end(args);
-
-	len = strlen(message);
-	if (message[len - 1] == '\n')
-		message[len - 1] = 0;
-
-	if (use_syslog) {
-		syslog(prio, "%s", message);
-		return;
-	}
-
-	if (prio <= loglevel) {
-		printf("%s: %s\n", current_time(), message);
-		fflush(stdout);
-	}
 }
 
 /**
