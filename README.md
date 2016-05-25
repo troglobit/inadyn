@@ -155,17 +155,22 @@ provided by Hurricane Electric.  Here `hostname` is set to the tunnel ID
 and password **must** be the *Update key* found in the *Advanced*
 configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
 
-**NOTE:** In a multi-user setup, make sure to chmod your `.conf` to 600
-  (read-write only by you/root) to protect against other users reading
-  your DDNS server credentials.
+Sometimes the default `checkip-server` for a DDNS provider can be very
+slow to respond, to this end Inadyn now supports overriding this server
+with a custom one, like for custom DDNS provider.  See the man pages, or
+the below section, for more information.
+
+**NOTE:** In a multi-user server setup, make sure to chmod your `.conf`
+  to 600 (read-write only by you/root) to protect against other users
+  reading your DDNS server credentials.
 
 
-Generic DDNS Plugin
--------------------
+Custom DDNS Providers
+---------------------
 
-In addition to dedicated DDNS provider support inadyn also has a generic
-DDNS plugin.  Use `custom {}` in the configuration file, instead of the
-`provider {}` section used in examples above.
+In addition to the default DDNS providers supported by Inadyn, custom
+DDNS providers can be defined in the config file..  Use `custom {}` in
+instead of the `provider {}` section used in examples above.
 
 In-A-Dyn use HTTP basic authentication (base64 encoded) to communicate
 username and password to the server.  If you do not have a username
@@ -245,6 +250,13 @@ the HTTP response body.  If the DDNS provider returns something else you
 can add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
 single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
+
+If your DDNS provider does not provide you with a `checkip-server`, you
+can use other free services, like http://ipify.com
+
+    checkip-server = api.ipify.com
+
+This setting can also be used in standard `provider{}` section.
 
 **Note:** `hostname` is required, even if everything is encoded in the
 `ddns-path`!  The given hostname is appended to the `ddns-path` used for
