@@ -242,155 +242,115 @@ is given with format specifiers, in which case this setting is unused.
 .El
 .Sh EXAMPLES
 Notice how two different user accounts access the same DDNS provider, No-IP.com
-.Pp
+.Bd -unfilled -offset indent
 period         = 300
-.br
 cache-dir      = /etc/inadyn
-.Pp
+
 # Dyn.com
-.br
 provider default@dyndns.org {
-.br
     ssl        = true
-.br
     username   = account1
-.br
     password   = secret1
-.br
     hostname   = { "my.example.com", "other.example.org" }
-.br
 }
-.Pp
+
 # No-IP.com #1
-.br
 provider default@no-ip.com:1 {
-.br
     username   = account21
-.br
     password   = secret21
-.br
     hostname   = example.no-ip.com
-.br
 }
-.Pp
+
 # No-IP.com #2
-.br
 provider default@no-ip.com:2 {
-.br
     username   = account22
-.br
     password   = secret22
-.br
     hostname   = another.no-ip.com
-.br
 }
-.Pp
+
 # Loopia
-.br
 provider default@loopia.com {
-.br
     ssl        = true
-.br
     wildcard   = true
-.br
     username   = account3
-.br
     password   = secret3
-.br
     hostname   = example.com
-.br
 }
-.Pp
+
 # ddnss.de
-.br
 provider default@ddnss.de {
-.br
     ssl        = true
-.br
     username   = your_username
-.br
     password   = your_password
-.br
     hostname   = your_host.ddnss.de
-.br
 }
-.Pp
+
 # dynv6.com
-.br
 provider default@dynv6.com {
-.br
     username   = your_token
-.br
     password   = not_used
-.br
     hostname   = your_host.dynv6.net
-.br
 }
-.Pp
+
 # IPv6 account at https://tunnelbroker.net
-.br
 provider default@tunnelbroker.net {
-.br
     ssl        = true
-.br
     username   = xyzzy
-.br
     password   = update-key-in-advanced-tab
-.br
     hostname   = tunnel-id
-.br
 }
-.Pp
+
 # Generic example for twoDNS.de
-.br
 custom twoDNS.de {
-.br
     ssl            = true
-.br
     username       = account4
-.br
     password       = secret4
-.br
     checkip-server = checkip.two-dns.de
     checkip-path   = /
-.br
     ddns-server    = update.twodns.de
-.br
     ddns-path      = "/update?hostname="
-.br
     hostname       = example.dd-dns.de
-.br
 }
+.Ed
 .Pp
 As of Inadyn 1.99.14 the generic plugin can also be used with providers
 that require the client's IP in the update request, which for example
 .Aq http://dyn.com
 requires:
-.Pp
+.Bd -unfilled -offset indent
 # This emulates default@dyndns.org
-.br
 custom dyn.com {
-.br
     ssl          = true
-.br
     username     = DYNUSERNAME
-.br
     password     = DYNPASSWORD
-.br
     ddns-server  = members.dyndns.org
-.br
     ddns-path    = "/nic/update?hostname=YOURHOST.dyndns.org&myip="
-.br
     append-myip  = true
-.br
     hostname     = YOURHOST
-.br
 }
+.Ed
 .Pp
 Notice the use of
 .Nm append-myip
 which differs from above previous examples.  Without this option set the
-default (backwards compatible) behavior is to add the hostname.
+default (backwards compatible) behavior is to append the hostname.
+.Pp
+An alternative, and perhaps more intuituve approach introduced in Inadyn
+v2.0, is to use the
+.Xr printf 3
+like format specifiers mentioned previously.  The same example would then
+look like this:
+.Bd -unfilled -offset indent
+# This emulates default@dyndns.org
+custom dyn.com {
+    ssl          = true
+    username     = DYNUSERNAME
+    password     = DYNPASSWORD
+    ddns-server  = members.dyndns.org
+    ddns-path    = "/nic/update?hostname=%h.dyndns.org&myip=%i"
+    hostname     = YOURHOST
+}
+.Ed
 .Sh "SEE ALSO"
 .Xr inadyn 8
 .Pp
