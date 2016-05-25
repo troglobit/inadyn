@@ -50,15 +50,20 @@ int loglvl(char *level)
 	return atoi(level);
 }
 
+void vlogit(int prio, const char *fmt, va_list args)
+{
+	if (loglevel == INTERNAL_NOPRI)
+		return;
+
+	vsyslog(prio, fmt, args);
+}
+
 void logit(int prio, const char *fmt, ...)
 {
 	va_list args;
 
-	if (loglevel == INTERNAL_NOPRI)
-		return;
-
 	va_start(args, fmt);
-	vsyslog(prio, fmt, args);
+	vlogit(prio, fmt, args);
 	va_end(args);
 }
 

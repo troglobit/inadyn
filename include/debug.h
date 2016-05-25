@@ -30,6 +30,7 @@ extern char *__progname;
 
 int  loglvl (char *level);
 void logit  (int prio, const char *fmt, ...);
+void vlogit (int prio, const char *fmt, va_list args);
 
 #endif /* INADYN_DEBUG_H_ */
 
