@@ -100,7 +100,7 @@ unique.
 .Pp
 Common settings in custom{} and provider{} sections are:
 .Pp
-.Bl -tag -width TERM -compact
+.Bl -tag -width TERM
 .It Cm ssl = <true | false>
 Use HTTPS to connect to this DDNS service provider, default HTTP (false).
 .It Cm username = USERNAME.
@@ -189,16 +189,55 @@ by Hurricane Electric.
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
 .Pp
-.Bl -tag -width TERM -compact
+.Bl -tag -width TERM
 .It Cm ddns-server = update.example.com
 DDNS server name, not the full URL.
 .It Cm ddns-path   = "/update?domain="
 DDNS server path.  By default the hostname is appended to the path,
 unless
 .Cm append-myip=true
-is set.
+is set.  Alternatively,
+.Xr printf 3
+like format specifiers may be used for
+a fully customizable HTTP GET update request.  The following format
+specifiers are currently supported:
+.Pp
+.Bl -tag -width TERM -compact
+.It Cm %u
+username
+.It Cm %p
+password, if HTTP basic auth is not used
+.It Cm %h
+hostname
+.It Cm %i
+IP address
+.El
+.Pp
+With the following example:
+.Bd -unfilled -offset indent
+username  = myuser
+password  = mypass
+ddns-path = "/update?user=%u&password=%p&domain=%h&myip=%i"
+hostname  = YOURDOMAIN.TLD
+.Ed
+.Pp
+the resulting update URL would be expanded to
+.Bd -unfilled -offset indent
+/update?user=myuser&password=mypass&domain=YOURDOMAIN.TLD&myip=1.2.3.4
+.Ed
+.Pp
+However, the password is usually never sent in clear text in the HTTP
+GET URL.  Most DDNS providers instead rely on HTTP basic auth., which
+.Nm inadyn
+always relays to the server in the HTTP header of update requests.
+Remember to set the
+.Cm ssl = true
+setting if your DDNS provider supports HTTPS!
 .It Cm append-myip = true
-Append your current IP to the the DDNS server update path.
+Append your current IP to the the DDNS server update path.  By default
+this setting is false and the hostname is appended.  Unless the
+.Cm ddns-path
+is given with format specifiers, in which case this setting is unused.
 .El
 .El
 .Sh EXAMPLES
