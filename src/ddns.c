@@ -328,6 +328,13 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	trans.p_rsp       = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
+	if (trans.req_len < 0) {
+		logit(LOG_ERR, "Invalid HTTP GET request in %s provider, cannot update.", info->system->name);
+		rc = RC_ERROR;
+
+		goto exit;
+	}
+
 	ctx->request_buf[trans.req_len] = 0;
 	logit(LOG_DEBUG, "Sending alias table update to DDNS server: %s", ctx->request_buf);
 
@@ -337,9 +344,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;
-		http_exit(client);
-
-		return rc;
+		goto exit;
 	}
 
 	rc = info->system->response(&trans, info, alias);
@@ -360,6 +365,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 			(*changed)++;
 	}
 
+exit:
 	http_exit(client);
 
 	return rc;

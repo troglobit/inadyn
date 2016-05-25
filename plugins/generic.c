@@ -56,6 +56,61 @@ static ddns_system_t generic = {
 	.server_url   = ""
 };
 
+/* Replace %? with @str */
+static void replace_fmt(char *fmt, char *str, size_t fmtlen)
+{
+	char *src = fmt + fmtlen;
+	size_t len = strlen(str);
+
+	memmove(fmt + len, src, strlen(src));
+	memcpy(fmt, str, strlen(str));
+}
+
+/*
+ * Fully custom server URL, with % format specifiers
+ *
+ * %u - username
+ * %p - password, if HTTP basic auth is not used
+ * %h - hostname
+ * %i - IP address
+ */
+static int custom_server_url(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
+{
+	char *ptr;
+
+	strlcpy(ctx->request_buf, info->server_url, ctx->request_buflen);
+
+	while ((ptr = strchr(ctx->request_buf, '%'))) {
+		if (!strncmp(ptr, "%u", 2)) {
+			replace_fmt(ptr, info->creds.username, 2);
+			continue;
+		}
+		if (!strncmp(ptr, "%p", 2)) {
+			replace_fmt(ptr, info->creds.password, 2);
+			continue;
+		}
+		if (!strncmp(ptr, "%h", 2)) {
+			replace_fmt(ptr, alias->name, 2);
+			continue;
+		}
+		if (!strncmp(ptr, "%i", 2)) {
+			replace_fmt(ptr, alias->address, 2);
+			continue;
+		}
+
+		logit(LOG_ERR, "Unknown format specifier in ddns-path: '%c'", ptr[1]);
+		return -1;
+	}
+
+	return strlen(ctx->request_buf);
+}
+
+/*
+ * This function is called for every listed hostname alias in the
+ * custom{} section.  There is currently no way to only call it
+ * once, in case a DDNS provider supports many hostnames in the
+ * HTTP GET URL.
+ */
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *arg = alias->name; /* Backwards compat, default to append hostname */
@@ -63,11 +118,14 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	if (info->append_myip)	 /* New, append client's IP address instead. */
 		arg = alias->address;
 
-	return snprintf(ctx->request_buf, ctx->request_buflen,
-			GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
-			info->server_url, arg,
-			info->server_name.name,
-			info->creds.encoded_password);
+	if (!strchr(info->server_url, '%'))
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+				GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
+				info->server_url, arg,
+				info->server_name.name,
+				info->creds.encoded_password);
+
+	return custom_server_url(ctx, info, alias);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
