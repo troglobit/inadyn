@@ -44,6 +44,20 @@
  */
 static LIST_HEAD(head, di) info_list = LIST_HEAD_INITIALIZER(info_list);
 
+static void conf_errfunc(cfg_t *cfg, const char *format, va_list args)
+{
+	char fmt[80];
+
+	if (cfg && cfg->filename && cfg->line)
+		snprintf(fmt, sizeof(fmt), "%s:%d: %s", cfg->filename, cfg->line, format);
+	else if (cfg && cfg->filename)
+		snprintf(fmt, sizeof(fmt), "%s: %s", cfg->filename, format);
+	else
+		snprintf(fmt, sizeof(fmt), "%s", format);
+
+	vlogit(LOG_ERR, fmt, args);
+}
+
 /*
  * Convert deprecated 'alias' setting to new 'hostname',
  * same functionality with new name.
@@ -399,6 +413,9 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		logit(LOG_ERR, "Failed initializing configuration file parser: %m");
 		return NULL;
 	}
+
+	/* Custom logging, rather than default Confuse stderr logging */
+	cfg_set_error_function(cfg, conf_errfunc);
 
 	/* Validators */
 	cfg_set_validate_func(cfg, "period", validate_period);
