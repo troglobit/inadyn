@@ -335,6 +335,10 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		goto exit;
 	}
 
+#ifdef ENABLE_SIMULATION
+	goto exit;
+#endif
+
 	ctx->request_buf[trans.req_len] = 0;
 	logit(LOG_DEBUG, "Sending alias table update to DDNS server: %s", ctx->request_buf);
 

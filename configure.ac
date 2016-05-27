@@ -20,6 +20,13 @@ AC_ARG_ENABLE(openssl,
         [ac_enable_openssl="no"]
 )
 
+AC_ARG_ENABLE(simulation,
+        [AS_HELP_STRING([--enable-simulation], [Developer simulation mode, do not use!])],
+        [ac_enable_simulation="$enableval"],
+        [ac_enable_simulation="no"]
+)
+
+
 # Define necessary build flags
 AC_GNU_SOURCE
 AC_USE_SYSTEM_EXTENSIONS
@@ -86,8 +93,13 @@ if test "x$ac_enable_ssl" = "xyes"; then
    fi
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
 fi
+
 AM_CONDITIONAL([ENABLE_SSL], test "x$ac_enable_ssl" = "xyes")
 AM_CONDITIONAL([ENABLE_OPENSSL], test "x$ac_enable_openssl" = "xyes")
+
+if test "x$ac_enable_simulation" = "xyes"; then
+   AC_DEFINE([ENABLE_SIMULATION], [], [Enable developer-only simulation mode])
+fi
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
