@@ -183,6 +183,7 @@ extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
 extern char *iface;
+extern char *script_cmd;
 extern char *script_exec;
 extern char *pidfile_name;
 extern char *generic_responses[];

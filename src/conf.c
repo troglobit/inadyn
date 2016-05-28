@@ -313,6 +313,8 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	str = cfg_getstr(cfg, "checkip-command");
 	if (str && strlen(str) > 0)
 		info->checkip_cmd = strdup(str);
+	else if (script_cmd)
+		info->checkip_cmd = strdup(script_cmd);
 
 	return 0;
 

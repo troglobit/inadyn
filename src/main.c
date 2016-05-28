@@ -40,6 +40,7 @@ int    use_syslog = 1;
 char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
+char  *script_cmd = NULL;
 char  *script_exec = NULL;
 char  *pidfile_name = NULL;
 uid_t  uid = 0;
@@ -169,9 +170,10 @@ static void parse_privs(char *user)
 
 static int usage(int code)
 {
-	fprintf(stderr, "\nUsage: %s [1chnsv] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
+	fprintf(stderr, "\nUsage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		" -1, --once                     Run once, then exit regardless of status\n"
-		" -c, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
+		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
+		"     --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
 		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
 		" -f, --config=FILE              Use FILE for config, default %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
@@ -196,7 +198,8 @@ int main(int argc, char *argv[])
 	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
-		{ "continue-on-error", 0, 0, 'c' },
+		{ "cmd",               1, 0, 'c' },
+		{ "continue-on-error", 0, 0, 'C' },
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
 		{ "iface",             1, 0, 'i' },
@@ -212,13 +215,17 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	while ((c = getopt_long(argc, argv, "1ce:f:h?i:l:np:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:l:np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
 			break;
 
-		case 'c':	/* --continue-on-error */
+		case 'c':	/* --cmd=CMD */
+			script_cmd = strdup(optarg);
+			break;
+
+		case 'C':	/* --continue-on-error */
 			ignore_errors = 1;
 			break;
 

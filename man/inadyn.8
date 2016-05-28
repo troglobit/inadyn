@@ -18,7 +18,8 @@
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl 1, -once
-.Op Fl c, -continue-on-error
+.Op Fl c, -cmd=/path/to/cmd
+.Op Fl -continue-on-error
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
@@ -123,7 +124,18 @@ configuration file format.
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
-.It Fl c, -continue-on-error
+.It Fl c, -cmd=/path/to/cmd
+Full path to command, or script, to run to check for IP address change.
+This is the same as the configuration file option
+.Ar checkip-command
+but will apply to
+.Sy all
+providers.  This command line option is only provided for convenence, it
+is recommended to instead use the configuration file.  For more details,
+see the
+.Xr inadyn.conf 5
+man page.
+.It Fl -continue-on-error
 Ignore errors from DDNS provider and try again later.  This command line
 option tells
 .Nm
