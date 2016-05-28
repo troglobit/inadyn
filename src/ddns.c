@@ -175,61 +175,90 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 	return rc;
 }
 
-static int parse_my_ip_address(ddns_t *ctx)
+static int parse_ipv4_address(char *buffer, char *address, size_t len)
 {
 	int found = 0;
-	char *accept_v4 = "0123456789.";
-	char *accept_v6 = "0123456789.abcdefABCDEF:";
+	char *accept = "0123456789.";
 	char *needle, *haystack, *end;
-	union {
-		struct in_addr  v4;
-		struct in6_addr v6;
-	} addr;
-	char address[MAX_ADDRESS_LEN];
+	struct in_addr  addr;
 
-	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
-		return RC_INVALID_POINTER;
-
-	haystack = ctx->http_transaction.p_rsp_body;
+	haystack = buffer;
 	needle   = haystack;
 	end      = haystack + strlen(haystack) - 1;
 	while (needle && haystack < end) {
-		needle = strpbrk(haystack, accept_v6);
+		char ch;
+		size_t num = 0;
+
+		needle = strpbrk(haystack, accept);
 		if (needle) {
-			char ch;
-			size_t len4, len6;
-
-			len6 = strspn(needle, accept_v6);
-			if (len6) {
-				ch = needle[len6];
-				needle[len6] = 0;
-
-				if (inet_pton(AF_INET6, needle, &addr) == 1) {
-					inet_ntop(AF_INET6, &addr, address, sizeof(address));
-					found = 1;
-					break;
-				}
-
-				needle[len6] = ch;
-			}
-
-			len4 = strspn(needle, accept_v4);
-			if (len4) {
-				ch = needle[len4];
-				needle[len4] = 0;
+			num = strspn(needle, accept);
+			if (num) {
+				ch = needle[num];
+				needle[num] = 0;
 
 				if (inet_pton(AF_INET, needle, &addr) == 1) {
-					inet_ntop(AF_INET, &addr, address, sizeof(address));
+					inet_ntop(AF_INET, &addr, address, len);
 					found = 1;
 					break;
 				}
 
-				needle[len4] = ch;
+				needle[num] = ch;
 			}
-
-			/* nothing yet, skip to the nearest search point */
-			haystack = needle + (len4 ? len4 : len6) + 1;
 		}
+
+		/* nothing yet, skip to next search point */
+		haystack = needle + num + 1;
+	}
+
+	return found;
+}
+
+static int parse_ipv6_address(char *buffer, char *address, size_t len)
+{
+	int found = 0;
+	char *accept = "0123456789abcdefABCDEF:";
+	char *needle, *haystack, *end;
+	struct in6_addr addr;
+
+	haystack = buffer;
+	needle   = haystack;
+	end      = haystack + strlen(haystack) - 1;
+	while (needle && haystack < end) {
+		char ch;
+		size_t num = 0;
+
+		needle = strpbrk(haystack, accept);
+		if (needle) {
+			num = strspn(needle, accept);
+			if (num) {
+				ch = needle[num];
+				needle[num] = 0;
+
+				if (inet_pton(AF_INET6, needle, &addr) == 1) {
+					inet_ntop(AF_INET6, &addr, address, len);
+					found = 1;
+					break;
+				}
+
+				needle[num] = ch;
+			}
+		}
+
+		/* nothing yet, skip to next search point */
+		haystack = needle + num + 1;
+	}
+
+	return found;
+}
+
+static int parse_my_ip_address(char *buffer, char *address, size_t len)
+{
+	if (parse_ipv6_address(buffer, address, len))
+		return 0;
+
+	return !parse_ipv4_address(buffer, address, len);
+}
+
 	}
 
 	if (found) {
