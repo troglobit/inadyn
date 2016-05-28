@@ -98,7 +98,6 @@ how this can be done:
 
     # In-A-Dyn v2.0 configuration file format
     period          = 300
-    cache-dir       = "/mnt/ddns"
     
     provider default@dyndns.org {
 	    ssl         = true
@@ -114,9 +113,17 @@ how this can be done:
 	}
     
     provider default@no-ip.com:2 {
-        username    = james
-        password    = bond
-        hostname    = spectre.no-ip.com
+        username       = james
+        password       = bond
+        hostname       = spectre.no-ip.com
+        checkip-server = api.ipify.org
+    }
+    
+    provider default@no-ip.com:3 {
+        username        = spaceman
+        password        = bowie
+        hostname        = spaceman.no-ip.com
+        checkip-command = /sbin/ifconfig eth0 | grep 'inet6 addr'
     }
     
     provider default@tunnelbroker.net {
@@ -157,8 +164,8 @@ configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
 
 Sometimes the default `checkip-server` for a DDNS provider can be very
 slow to respond, to this end Inadyn now supports overriding this server
-with a custom one, like for custom DDNS provider.  See the man pages, or
-the below section, for more information.
+with a custom one, like for custom DDNS provider, or even a custom
+command.  See the man pages, or the below section, for more information.
 
 **NOTE:** In a multi-user server setup, make sure to chmod your `.conf`
   to 600 (read-write only by you/root) to protect against other users
@@ -258,7 +265,11 @@ can use other free services, like http://ipify.com
 
     checkip-server = api.ipify.com
 
-This setting can also be used in standard `provider{}` section.
+or even use a script or command:
+
+    checkip-command = /sbin/ifconfig eth0 | grep 'inet addr'
+
+These two settings can also be used in standard `provider{}` sections.
 
 **Note:** `hostname` is required, even if everything is encoded in the
 `ddns-path`!  The given hostname is appended to the `ddns-path` used for
