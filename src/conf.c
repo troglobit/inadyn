@@ -335,8 +335,10 @@ static int create_provider(cfg_t *cfg, int custom)
 
 	http_construct(&info->checkip);
 	http_construct(&info->server);
-	if (set_provider_opts(cfg, info, custom))
+	if (set_provider_opts(cfg, info, custom)) {
+		free(info);
 		return 1;
+	}
 
 	LIST_INSERT_HEAD(&info_list, info, link);
 	return 0;
