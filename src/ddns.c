@@ -244,11 +244,11 @@ static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, siz
 		return 1;
 
 	DO(server_transaction(ctx, info));
-	logit(LOG_DEBUG, "IP server response:");
-	logit(LOG_DEBUG, "%s", ctx->work_buf);
-
 	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
 		return RC_INVALID_POINTER;
+
+	logit(LOG_DEBUG, "IP server response:");
+	logit(LOG_DEBUG, "%s", ctx->work_buf);
 
 	DO(parse_my_address(ctx->http_transaction.p_rsp_body, address, len));
 
