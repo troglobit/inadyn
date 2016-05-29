@@ -101,7 +101,7 @@ static int shell_transaction(ddns_t *ctx, ddns_info_t *info, const char *cmd)
 		ctx->work_buf[rc] = 0;
 		rc = 0;
 	}
-	fclose(pipe);
+	pclose(pipe);
 
 	return rc;
 }
