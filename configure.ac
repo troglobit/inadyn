@@ -51,9 +51,9 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 AM_PROG_AR
 LT_INIT([disable-shared static])
 
-# Check for required packages, we should enforce Confuse v3.0
+# Check for required packages
 PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
-PKG_CHECK_MODULES([confuse], [libconfuse >= 2.7])
+PKG_CHECK_MODULES([confuse], [libconfuse >= 3.0])
 
 LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
 CPPFLAGS="$CPPFLAGS $lite_CFLAGS $confuse_CFLAGS"
