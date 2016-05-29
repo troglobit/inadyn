@@ -124,7 +124,7 @@ configuration file format.
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
-.It Fl c, -cmd=/path/to/cmd
+.It Fl c, -cmd=/path/to/cmd Op optional args or pipe
 Full path to command, or script, to run to check for IP address change.
 This is the same as the configuration file option
 .Ar checkip-command
@@ -134,7 +134,8 @@ providers.  This command line option is only provided for convenence, it
 is recommended to instead use the configuration file.  For more details,
 see the
 .Xr inadyn.conf 5
-man page.
+man page.  You will need to quote the complete command if any arguments,
+or pipe, is given.
 .It Fl -continue-on-error
 Ignore errors from DDNS provider and try again later.  This command line
 option tells
@@ -143,7 +144,7 @@ to not exit on errors from a DDNS provider and instead try again later.
 Please do not use this, it usually indicates that we are sending a
 malformed request, e.g. wrong username, password or DNS alias for the
 given account.  Continuing could possibly lock you out of your account!
-.It Fl e, -exec=/path/to/cmd
+.It Fl e, -exec=/path/to/cmd Op optional args
 Full path to command, or script, to run after a successful DDNS update.
 The following environment variables are set: INADYN_IP, INADYN_HOSTNAME.
 The first environment variable contains the new IP address, the second
@@ -153,8 +154,9 @@ is called for each listed host name that is successfully updated.  If
 .Nm
 is started with the
 .Fl i Ar IFNAME
-command line option, the INADYN_IFACE environment variable is also
-set.
+command line option, the INADYN_IFACE environment variable is also set.
+You will need to quote the complete command if any arguments, or pipe,
+is given.
 .It Fl f, -config Ar FILE
 Use
 .Ar FILE
