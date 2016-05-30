@@ -29,4 +29,4 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
 inadyn_CFLAGS  += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
 inadyn_CFLAGS  +=      $(lite_CFLAGS) $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
-inadyn_LDADD    = -ldl $(lite_LIBS)   $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
+inadyn_LDADD    = $(lite_LIBS)   $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
