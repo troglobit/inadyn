@@ -217,8 +217,10 @@ static int parse_ipv4_address(char *buffer, char *address, size_t len)
 
 				if (inet_pton(AF_INET, needle, &addr) == 1) {
 					inet_ntop(AF_INET, &addr, address, len);
-					found = 1;
-					break;
+					if (is_address_valid(AF_INET, address)) {
+						found = 1;
+						break;
+					}
 				}
 
 				needle[num] = ch;
@@ -255,8 +257,10 @@ static int parse_ipv6_address(char *buffer, char *address, size_t len)
 
 				if (inet_pton(AF_INET6, needle, &addr) == 1) {
 					inet_ntop(AF_INET6, &addr, address, len);
-					found = 1;
-					break;
+					if (is_address_valid(AF_INET6, address)) {
+						found = 1;
+						break;
+					}
 				}
 
 				needle[num] = ch;
