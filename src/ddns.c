@@ -30,6 +30,7 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <ifaddrs.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -154,6 +155,45 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 	return rc;
 }
 
+/*
+ * IP address validator, discards empty, local, loopback and other
+ * globally invalid addresses
+ */
+static int is_address_valid(int family, const char *host)
+{
+	if (family == AF_INET) {
+		in_addr_t addr;
+		struct in_addr address;
+
+		logit(LOG_DEBUG, "Checking IPv4 address %s ...", host);
+		if (!inet_pton(family, host, &address))
+			return 0;
+
+		addr = address.s_addr;
+		if (IN_ZERONET(addr)   || IN_LOOPBACK(addr) || IN_LINKLOCAL(addr) ||
+		    IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr))
+			return 0;
+
+		return 1;
+	}
+
+	if (family == AF_INET6) {
+		struct in6_addr address, *addr = &address;
+
+		logit(LOG_DEBUG, "Checking IPv6 address %s ...", host);
+		if (!inet_pton(family, host, &address))
+			return 0;
+
+		if (IN6_IS_ADDR_UNSPECIFIED(addr) || IN6_IS_ADDR_LOOPBACK(addr) ||
+		    IN6_IS_ADDR_LINKLOCAL(addr)   || IN6_IS_ADDR_SITELOCAL(addr))
+			return 0;
+
+		return 1;
+	}
+
+	return 0;
+}
+
 static int parse_ipv4_address(char *buffer, char *address, size_t len)
 {
 	int found = 0;
@@ -269,17 +309,10 @@ static int get_address_cmd(ddns_t *ctx, ddns_info_t *info, char *address, size_t
 	return 0;
 }
 
-/* Note: Does not handle IPv6 addresses or multiple IP addresses */
-static int get_address_iface(const char *ifname, char *address, size_t len)
+static int get_ipv4_address_iface(const char *ifname, char *address, size_t len)
 {
 	int sd, result;
 	struct ifreq ifr;
-	in_addr_t addr;
-
-	if (!ifname || !ifname[0])
-		return 1;
-
-	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ifname);
 
 	sd = socket(PF_INET, SOCK_DGRAM, 0);
 	if (sd < 0) {
@@ -287,6 +320,7 @@ static int get_address_iface(const char *ifname, char *address, size_t len)
 		return 1;
 	}
 
+	logit(LOG_DEBUG, "Reading IPv4 address of %s using SIOCGIFADDR ...", ifname);
 	memset(&ifr, 0, sizeof(struct ifreq));
 	ifr.ifr_addr.sa_family = AF_INET;
 	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
@@ -298,15 +332,73 @@ static int get_address_iface(const char *ifname, char *address, size_t len)
 		return 1;
 	}
 
-	addr = ntohl(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr.s_addr);
-	if (!inet_ntop(AF_INET, (struct sockaddr_in *)&ifr.ifr_addr, address, len))
+	if (!inet_ntop(AF_INET, &((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr, address, len))
 		return 1;
 
-	if (IN_ZERONET(addr) || IN_LOOPBACK(addr) || IN_LINKLOCAL(addr) ||
-	    IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr)) {
-		logit(LOG_WARNING, "Interface %s has an invalid IP# %s", ifname, address);
+	if (!is_address_valid(AF_INET, address)) {
+		logit(LOG_INFO, "Interface %s has an invalid/local IP# %s", ifname, address);
 		return 1;
 	}
+
+	return 0;
+}
+
+static int get_address_iface(ddns_t *ctx, const char *ifname, char *address, size_t len)
+{
+	char *ptr, trailer[IFNAMSIZ + 2];
+	struct ifaddrs *ifaddr, *ifa;
+
+	if (!ifname || !ifname[0])
+		return 1;
+
+	/* Trailer to strip, if set by getnameinfo() */
+	snprintf(trailer, sizeof(trailer), "%%%s", ifname);
+
+	logit(LOG_INFO, "Checking for IP# change, querying interface %s", ifname);
+	if (getifaddrs(&ifaddr))
+		return get_ipv4_address_iface(ifname, address, len);
+
+	memset(ctx->work_buf, 0, ctx->work_buflen);
+	for (ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
+		int result, family;
+		char host[NI_MAXHOST] = "";
+		size_t pos;
+
+		if (!ifa->ifa_addr)
+			continue;
+
+		if (!string_compare(ifa->ifa_name, ifname))
+			continue;
+
+		pos = strlen(ctx->work_buf);
+		family = ifa->ifa_addr->sa_family;
+		if (family == AF_INET || family == AF_INET6) {
+			result = getnameinfo(ifa->ifa_addr, ((family == AF_INET)
+							     ? sizeof(struct sockaddr_in)
+							     : sizeof(struct sockaddr_in6)),
+					     host, NI_MAXHOST,
+					     NULL, 0, NI_NUMERICHOST);
+
+			if (result) {
+				logit(LOG_ERR, "getnameinfo() failed: %s", gai_strerror(result));
+				continue;
+			}
+
+			ptr = strstr(host, trailer);
+			if (ptr)
+				*ptr = 0;
+
+			if (!is_address_valid(family, host)) {
+				logit(LOG_INFO, "Invalid/local address %s for %s, skipping ...", host, ifname);
+				continue;
+			}
+
+			snprintf(&ctx->work_buf[pos], ctx->work_buflen - pos, "%s\n", host);
+		}
+	}
+
+	freeifaddrs(ifaddr);
+	DO(parse_my_address(ctx->work_buf, address, len));
 
 	return 0;
 }
@@ -319,7 +411,7 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 	if (!get_address_cmd   (ctx, info, address, len))
 		return 0;
 
-	if (!get_address_iface (iface,     address, len))
+	if (!get_address_iface (ctx, iface,address, len))
 		return 0;
 
 	if (!get_address_remote(ctx, info, address, len))
