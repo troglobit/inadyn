@@ -52,6 +52,9 @@ static ddns_system_t plugin = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
+#ifdef ENABLE_SIMULATION
+	char         *hash = "<NIL>";
+#else
 	int           i, rc = 0;
 	http_t        client;
 	http_trans_t  trans;
@@ -116,6 +119,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		logit(LOG_INFO, "Update URL query failed");
 		return 0;
 	}
+#endif /* ENABLE_SIMULATION */
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 		       FREEDNS_UPDATE_IP_REQUEST,
