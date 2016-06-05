@@ -182,6 +182,7 @@ extern int loglevel;
 extern int ignore_errors;
 extern int startup_delay;
 extern int use_syslog;
+extern int allow_ipv6;
 extern char *iface;
 extern char *script_cmd;
 extern char *script_exec;

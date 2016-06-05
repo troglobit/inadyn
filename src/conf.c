@@ -410,6 +410,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	};
 	cfg_opt_t opts[] = {
 		CFG_BOOL("fake-address",  cfg_false, CFGF_NONE),
+		CFG_BOOL("allow-ipv6",    cfg_false, CFGF_NONE),
 		CFG_STR ("cache-dir",	  DEFAULT_CACHE_DIR, CFGF_NONE),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
@@ -463,6 +464,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	/* Command line --iface=IFNAME takes precedence */
 	if (!iface)
 		iface                 = cfg_getstr(cfg, "iface");
+	allow_ipv6                    = cfg_getbool(cfg, "allow-ipv6");
 
 	for (i = 0; i < cfg_size(cfg, "provider"); i++)
 		ret |= create_provider(cfg_getnsec(cfg, "provider", i), 0);

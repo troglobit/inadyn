@@ -35,6 +35,13 @@ spec., but can be useful for people who very rarely, if ever, get an IP
 address change.  Because some DDNS service providers will not register
 even a forced update if the IP is the same.  As a result the user could
 be deregistered as an inactive user.
+.It Cm allow-ipv6 = <true | false>
+.Nm Inadyn
+can get an IPv6 address from an interface, or with an external checkip
+script.  This option controls if IPv6 addresses should be allowed or
+discarded.  By default this option is
+.Ar false ,
+i.e. IPv6 addresses are discarded.
 .It Cm iface = IFNAME
 Use network interface
 .Nm IFNAME

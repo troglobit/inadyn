@@ -177,6 +177,11 @@ static int is_address_valid(int family, const char *host)
 		return 1;
 	}
 
+	if (!allow_ipv6) {
+		logit(LOG_DEBUG, "IPv6 address disallowed, enable with 'allow-ipv6 = true'");
+		return 0;
+	}
+
 	if (family == AF_INET6) {
 		struct in6_addr address, *addr = &address;
 
