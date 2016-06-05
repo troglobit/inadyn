@@ -26,7 +26,7 @@ addons:
       name: "troglobit/inadyn"
       description: "Inadyn | Small and Simple DDNS Client"
     notification_email: troglobit@gmail.com
-    build_command_prepend: "./autogen.sh && PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure"
+    build_command_prepend: "./autogen.sh && PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --enable-openssl"
     build_command:   "make clean all"
     branch_pattern: dev
 
