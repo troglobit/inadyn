@@ -8,8 +8,9 @@ All notable changes to the project are documented in this file.
 -------------------------------
 
 ### Changes
-- Added support for multiple users of the same provider, idea from
-  Valery Frolov:
+- Support for reading address from interface, including IPv6 addresses
+- Support for calling an external script to get the IP address.
+- Support for multiple users @ same provider, idea from Valery Frolov:
 
         provider default@no-ip.com:1 {
             username    = ian
@@ -23,9 +24,9 @@ All notable changes to the project are documented in this file.
             alias       = spectre.no-ip.com
         }
 
-- Added support for new DDNS providers: ddnss.de and dynv6.com,
-  contributed by Sven Hoefer
-- Simplify command line switches, .conf file now required to use Inadyn
+- Support for new DDNS providers: ddnss.de and dynv6.com, contributed by
+  Sven Hoefer
+- Simplified command line, a .conf file is now required to use Inadyn
 - New configuration file format using libConfuse
 - Refactored memory handling and privilige separation to simplify code
 - Refactored logging and backgrounding to simplify code
@@ -35,6 +36,7 @@ All notable changes to the project are documented in this file.
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 
 ### Fixes
+- Fix issue #61: Add HTTPS certificate validation for OpenSSL/LibreSSL
 - Fix issue #67: Use GnuTLS native API for HTTPS
 - Fix DuckDNS plugin: duckdns now requires the 'www.' prefix on the
   server URL.  By Frank Aurich
@@ -42,8 +44,9 @@ All notable changes to the project are documented in this file.
 - Fix issue #101: Remove support for custom pidfile
 - Fix issue #102: Move default Inadyn cache files from `/var/run/inadyn`
   to `/var/cache/inadyn`
-- Fix issue #113: --drop-privs does not work
+- Fix issue #113: `--drop-privs` does not work
 - Add actual permissions check to `os_check_perms()`
+- Fix issue #121: Support for fully customizable update URL
 - Fix issue #122: Only use HTTPS connection for DNS update, not checkip
 
 
