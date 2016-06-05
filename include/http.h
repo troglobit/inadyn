@@ -74,6 +74,8 @@ typedef struct {
 	char  status_desc[256];
 } http_trans_t;
 
+extern int secure_ssl;
+
 int http_construct          (http_t *client);
 int http_destruct           (http_t *client, int num);
 

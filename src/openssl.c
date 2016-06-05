@@ -75,10 +75,10 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 		logit(LOG_ERR, "issuer= %s", buf);
 	}
 
-	if (1) //always_continue)
-		return 1;
+	if (secure_ssl)
+		return preverify_ok;
 
-	return preverify_ok;
+	return 1;
 }
 
 int ssl_open(http_t *client, char *msg)

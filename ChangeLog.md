@@ -34,6 +34,8 @@ All notable changes to the project are documented in this file.
 - Removed old compatibility symlinks and other required GNU specific
   files, we now distribute and install README.md and ChangeLog.md
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
+- Strict HTTPS certificate validation is now default.  To disable this
+  use `strict-ssl = false` in the .conf file.
 
 ### Fixes
 - Fix issue #61: Add HTTPS certificate validation for OpenSSL/LibreSSL

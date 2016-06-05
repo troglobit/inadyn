@@ -93,6 +93,16 @@ How often the IP is checked, in seconds. Default: apx 1 minute. Max: 10 days.
 .It Cm forced-update = SEC
 How often the IP should be updated even if it is not changed. The time
 should be given in seconds.  Default is equal to 30 days.
+.It Cm secure-ssl = < true | false >
+If the HTTPS certificate validation fails for a provider
+.Nm inadyn
+aborts the DDNS update before sending any credentials.  When this
+setting is disabled, i.e.
+.Ar false ,
+then
+.Nm inadyn
+will only issue a warning.  By default this setting is enabled, because
+security matters.
 .It Cm custom randomUserID {}
 .It Cm provider email@ddns-service.tld[:ID] {}
 The custom{} and provider{} sections are very similar, except that the

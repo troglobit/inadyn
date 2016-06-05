@@ -47,7 +47,7 @@ static int verify_certificate_callback(gnutls_session_t session)
 	ret = gnutls_certificate_verify_peers2(session, &status);
 	if (ret < 0) {
 		logit(LOG_ERR, "Failed verifying certificate peers.");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
@@ -64,7 +64,7 @@ static int verify_certificate_callback(gnutls_session_t session)
 
 	if (status & GNUTLS_CERT_INVALID) {
 		logit(LOG_ERR, "The certificate is not trusted.");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	/* Up to here the process is the same for X.509 certificates and
@@ -73,35 +73,40 @@ static int verify_certificate_callback(gnutls_session_t session)
 	 */
 	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509) {
 		logit(LOG_ERR, "Not a valid X.509 certificate");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	if (gnutls_x509_crt_init(&cert) < 0) {
 		logit(LOG_ERR, "Failed init of X.509 cert engine");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 	if (cert_list == NULL) {
 		logit(LOG_ERR, "No certificate was found!");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	if (gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0) {
 		logit(LOG_ERR, "Error while parsing certificate.");
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 
 	if (!gnutls_x509_crt_check_hostname(cert, hostname)) {
 		logit(LOG_ERR, "The certificate's owner does not match the hostname '%s'", hostname);
-		return GNUTLS_E_CERTIFICATE_ERROR;
+		goto error;
 	}
 
 	gnutls_x509_crt_deinit(cert);
 
 	/* notify gnutls to continue handshake normally */
 	logit(LOG_DEBUG, "Certificate OK");
+	return 0;
+
+error:
+	if (secure_ssl)
+		return GNUTLS_E_CERTIFICATE_ERROR;
 
 	return 0;
 }

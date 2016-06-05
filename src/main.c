@@ -38,6 +38,7 @@ int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    use_syslog = 1;
 int    allow_ipv6 = 0;
+int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
