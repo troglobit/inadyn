@@ -24,6 +24,7 @@
 #ifndef INADYN_DEBUG_H_
 #define INADYN_DEBUG_H_
 
+#include <stdarg.h>
 #include "os.h"
 
 extern char *__progname;
