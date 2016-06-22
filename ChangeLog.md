@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.0][UNRELEASED] - 2016-XX-YY
+[v2.0][UNRELEASED] - 2016-06-YY
 -------------------------------
 
 New configuration file format and changed command line options.
@@ -29,6 +29,7 @@ New configuration file format and changed command line options.
         }
 
 - Support for ddnss.de and dynv6.com, contributed by Sven Hoefer
+- Support for spdyn.de, on request from Frank Röhm
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 - Strict HTTPS certificate validation is now default.  To disable this
   use `strict-ssl = false` in the .conf file.
