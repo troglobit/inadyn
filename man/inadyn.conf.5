@@ -103,10 +103,23 @@ then
 .Nm inadyn
 will only issue a warning.  By default this setting is enabled, because
 security matters.
-.It Cm custom randomUserID {}
+.It Cm custom foobar {}
+The
+.Cm custom{}
+and
+.Cm provider{}
+sections are very similar, except that the custom section allows
+customizing the DDNS update server details.  For more details, see the
+description for
+.Cm provider{} ,
+below.
 .It Cm provider email@ddns-service.tld[:ID] {}
-The custom{} and provider{} sections are very similar, except that the
-custom section allows specifying checkip-server and ddns-server details.
+The
+.Cm custom{}
+and
+.Cm provider{}
+sections are very similar, except that the custom section allows
+customizing the DDNS update server details.
 .Pp
 To support multiple users of the same DDNS provider, append
 .Pa [:ID]
@@ -219,8 +232,22 @@ by Hurricane Electric.
 .Aq http://duckdns.org
 .It Cm default@loopia.com
 .Aq https://www.loopia.com
+.It Cm default@domains.google.com
+.Aq https://domains.google.com
+.It Cm default@ovh.com
+.Aq https://www.ovh.com
+.It Cm default@dtdns.com
+.Aq https://www.dtdns.com
+.It Cm default@gira.de
+.Aq http://giradns.com
 .It Cm default@duiadns.net
 .Aq https://www.duiadns.net
+.It Cm default@ddnss.de
+.Aq https://ddnss.de
+.It Cm default@dynv6.com
+.Aq http://dynv6.com
+.It Cm default@ipv4.dynv6.com
+.Aq http://ipv4.dynv6.com
 .It Cm default@spdyn.de
 .Aq https://spdyn.de
 .It Cm default@strato.com
@@ -394,8 +421,8 @@ default (backwards compatible) behavior is to append the hostname.
 An alternative, and perhaps more intuituve approach introduced in Inadyn
 v2.0, is to use the
 .Xr printf 3
-like format specifiers mentioned previously.  The same example would then
-look like this:
+like format specifiers mentioned previously.  The same example look like
+this:
 .Bd -unfilled -offset indent
 # This emulates default@dyndns.org
 custom dyn.com {
