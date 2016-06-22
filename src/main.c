@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 		log_opts |= LOG_PERROR;
 #endif
 
-	openlog(NULL, log_opts, LOG_USER);
+	openlog(__progname, log_opts, LOG_USER);
 	setlogmask(LOG_UPTO(loglevel));
 
 	if (drop_privs()) {
