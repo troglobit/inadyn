@@ -284,6 +284,18 @@ in the last example above.
 Build & Install
 ---------------
 
+In-A-Dyn require a few libraries to build, although the HTTPS (SSL/TLS)
+support can be disabled:
+
+* [libite][],
+* [libConfuse][]
+* [LibreSSL][], [OpenSSL][], or [GnuTLS][]
+
+The latter two (SSL library + libConfuse) are available from most UNIX
+distributions as pre-built packages, whereas [libite][] is currently
+only available as a source tarball.  Make sure to install the `-dev` or
+`-devel` package of the distribution packages when building Inadyn.
+
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
 provide OpenSSL as a system library.  However, when OpenSSL is available
@@ -299,12 +311,6 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 
 * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
 * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
-
-In-A-Dyn v2.0 and later requires two additonal libraries, [libite][] and
-[libConfuse][], the latter is available from most UNIX distributions as
-a pre-built package, the former is however currently only available as a
-source tarball.  Make sure to install the `-dev` or `-devel` package of
-libConfuse when building Inadyn.
 
 
 Origin & References
@@ -322,6 +328,9 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [Joachim Nilsson]:  http://troglobit.com
 [libite]:           https://github.com/troglobit/libite
 [libConfuse]:       https://github.com/martinh/libconfuse
+[LibreSSL]:         http://www.libressl.org/
+[OpenSSL]:          https://www.openssl.org/
+[GnuTLS]:           http://www.gnutls.org/
 [GitHub]:           https://github.com/troglobit/inadyn
 [releases]:         https://github.com/troglobit/inadyn/releases
 [Travis]:           https://travis-ci.org/troglobit/inadyn
