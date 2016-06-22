@@ -7,7 +7,11 @@ All notable changes to the project are documented in this file.
 [v2.0][UNRELEASED] - 2016-XX-YY
 -------------------------------
 
+New configuration file format and changed command line options.
+
 ### Changes
+- New configuration file format using libConfuse
+- Radically simplified command line, a .conf file is now required
 - Support for reading address from interface, including IPv6 addresses
 - Support for calling an external script to get the IP address.
 - Support for multiple users @ same provider, idea from Valery Frolov:
@@ -24,28 +28,23 @@ All notable changes to the project are documented in this file.
             alias       = spectre.no-ip.com
         }
 
-- Support for new DDNS providers: ddnss.de and dynv6.com, contributed by
-  Sven Hoefer
-- Simplified command line, a .conf file is now required to use Inadyn
-- New configuration file format using libConfuse
-- Refactored memory handling and privilige separation to simplify code
-- Refactored logging and backgrounding to simplify code
-- Massive overhaul of man pages `inadyn(8)` and `inadyn.conf(5)`
-- Removed old compatibility symlinks and other required GNU specific
-  files, we now distribute and install README.md and ChangeLog.md
+- Support for ddnss.de and dynv6.com, contributed by Sven Hoefer
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 - Strict HTTPS certificate validation is now default.  To disable this
   use `strict-ssl = false` in the .conf file.
+- Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
+- Refactored memory handling and privilige separation to simplify code
+- Refactored logging and backgrounding to simplify code
+- Removed old compatibility symlinks and other required GNU specific
+  files, we now distribute and install README.md and ChangeLog.md
 
 ### Fixes
 - Fix issue #61: Add HTTPS certificate validation for OpenSSL/LibreSSL
 - Fix issue #67: Use GnuTLS native API for HTTPS
-- Fix DuckDNS plugin: duckdns now requires the 'www.' prefix on the
-  server URL.  By Frank Aurich
+- Fix DuckDNS: now requires 'www.' prefix in server URL.  By Frank Aurich
 - Fix issue #110: Poodle `SSL_MODE_SEND_FALLBACK_SCSV` not needed
 - Fix issue #101: Remove support for custom pidfile
-- Fix issue #102: Move default Inadyn cache files from `/var/run/inadyn`
-  to `/var/cache/inadyn`
+- Fix issue #102: Relocate cache files `/var/run/inadyn` to `/var/cache/inadyn`
 - Fix issue #113: `--drop-privs` does not work
 - Add actual permissions check to `os_check_perms()`
 - Fix issue #121: Support for fully customizable update URL
