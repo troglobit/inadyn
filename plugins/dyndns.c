@@ -10,10 +10,11 @@
  *   - Loopia, and
  *   - nsupdate.info
  *   - Google Domains
+ *   - SPDYN
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -134,6 +135,22 @@ static ddns_system_t tunnelbroker = {
 	.server_url   = "/nic/update"
 };
 
+/*
+ * Securepoint DDNS service (SPDYN)
+ * http://wiki.securepoint.de/index.php/SPDNS_FAQ
+ */
+static ddns_system_t spdyn = {
+	.name         = "default@spdyn.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "checkip4.spdyn.de",
+	.checkip_url  = "/",
+
+	.server_name  = "update.spdyn.de",
+	.server_url   = "/nic/update"
+};
 
 /* Note: below is IPv4 only. ipv6.nsupdate.info would work IPv6 only. */
 static ddns_system_t nsupdate_info_ipv4 = {
@@ -198,6 +215,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&_3322);
 	plugin_register(&henet);
 	plugin_register(&tunnelbroker);
+	plugin_register(&spdyn);
 	plugin_register(&nsupdate_info_ipv4);
 	plugin_register(&loopia);
 	plugin_register(&googledomains);
@@ -212,6 +230,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&_3322);
 	plugin_unregister(&henet);
 	plugin_unregister(&tunnelbroker);
+	plugin_unregister(&spdyn);
 	plugin_unregister(&nsupdate_info_ipv4);
 	plugin_unregister(&loopia);
 	plugin_unregister(&googledomains);

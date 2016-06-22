@@ -221,6 +221,8 @@ by Hurricane Electric.
 .Aq https://www.loopia.com
 .It Cm default@duiadns.net
 .Aq https://www.duiadns.net
+.It Cm default@spdyn.de
+.Aq https://spdyn.de
 .El
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
@@ -319,6 +321,14 @@ provider default@ddnss.de {
     username   = your_username
     password   = your_password
     hostname   = your_host.ddnss.de
+}
+
+# spdyn.de
+provider default@spdyn.de {
+    ssl        = true
+    username   = your_username
+    password   = your_password
+    hostname   = your_host.spdyn.de
 }
 
 # dynv6.com

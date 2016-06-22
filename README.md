@@ -80,10 +80,11 @@ examples.
 * <https://ddnss.de>
 * <http://dynv6.com>
 * <http://ipv4.dynv6.com>
+* <https://spdyn.de>
 
 In-A-Dyn supports HTTPS for DDNS providers that support this, which you
-must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, and Loopia
-have been verified to support HTTPS.
+must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, Loopia, and
+SPDYN, have been verified to support HTTPS.
 
 *HTTPS is strongly recommended* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.
