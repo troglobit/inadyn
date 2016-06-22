@@ -1,5 +1,5 @@
-In-a-Dyn - Internet Dynamic DNS Client
-======================================
+In-a-Dyn v2 - Internet Dynamic DNS Client
+=========================================
 [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
@@ -22,7 +22,9 @@ support.  It is commonly available in many GNU/Linux distributions, used
 in off the shelf routers and Internet gateways to automate the task of
 keeping your DNS record up to date with any IP address changes from your
 [ISP][].  It can also be used in installations with redundant (backup)
-connections to the Internet.
+connections to the Internet.  This README details `inadyn` v2 and later,
+for documentation on [earlier releases][releases], see their respective
+README and man pages.
 
 Most people are unaware that they share a pool of Internet addresses
 with other users of the same Internet Service Provider (ISP).  Protocols
@@ -32,7 +34,7 @@ you.  If you want to run an Internet server on such a connection you
 risk losing your IP address every time you reconnect, or in DHCP even
 when the lease is renegotiated.
 
-By using a DDNS client such as inadyn you can register an Internet name
+By using a DDNS client like `inadyn` you can register an Internet name
 at certain providers that the DDNS client updates, periodically and/or
 on demand when your IP changes.  In-A-Dyn can maintain multiple host
 names with the same IP address, and has a web based IP detection which
@@ -321,6 +323,7 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [libite]:           https://github.com/troglobit/libite
 [libConfuse]:       https://github.com/martinh/libconfuse
 [GitHub]:           https://github.com/troglobit/inadyn
+[releases]:         https://github.com/troglobit/inadyn/releases
 [Travis]:           https://travis-ci.org/troglobit/inadyn
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
