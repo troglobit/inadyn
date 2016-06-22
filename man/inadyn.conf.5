@@ -103,7 +103,7 @@ then
 .Nm inadyn
 will only issue a warning.  By default this setting is enabled, because
 security matters.
-.It Cm custom foobar {}
+.It Cm custom some@identifier {}
 The
 .Cm custom{}
 and
@@ -119,7 +119,10 @@ The
 and
 .Cm provider{}
 sections are very similar, except that the custom section allows
-customizing the DDNS update server details.
+customizing the DDNS update server details.  See below list for
+supported DDNS providers and their
+.Cm email@ddns-service.tld
+identifiers.
 .Pp
 To support multiple users of the same DDNS provider, append
 .Pa [:ID]
@@ -162,7 +165,8 @@ must output a text with the IP address to its standard output.  The
 following environment variables are set:
 .Bl -tag -width TERM
 .It INADYN_PROVIDER
-contains the DDNS provider's full name in form email@ddns-service.tld
+contains the DDNS provider's full name in form
+.Cm email@ddns-service.tld
 .It INADYN_USER
 contains user's name
 .El
