@@ -223,6 +223,8 @@ by Hurricane Electric.
 .Aq https://www.duiadns.net
 .It Cm default@spdyn.de
 .Aq https://spdyn.de
+.It Cm default@strato.com
+.Aq https://www.strato.com
 .El
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
@@ -329,6 +331,14 @@ provider default@spdyn.de {
     username   = your_username
     password   = your_password
     hostname   = your_host.spdyn.de
+}
+
+# www.strato.com
+provider default@strato.com {
+    ssl        = true
+    username   = your_username
+    password   = your_password
+    hostname   = example.com
 }
 
 # dynv6.com
