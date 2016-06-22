@@ -60,8 +60,8 @@ examples.
 * <http://www.tzo.com>
 * <http://www.3322.org>
 * <http://www.dnsomatic.com>
-* <http://www.tunnelbroker.net>
 * <http://dns.he.net/>
+* <http://www.tunnelbroker.net>
 * <http://www.dynsip.org>
 * <http://www.sitelutions.com>
 * <http://www.dnsexit.com>
