@@ -12,6 +12,10 @@ New configuration file format and changed command line options.
 ### Changes
 - New configuration file format using libConfuse
 - Radically simplified command line, a .conf file is now required
+- Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
+- Strict HTTPS certificate validation is now default.  To disable this
+  use `strict-ssl = false` in the .conf file.
+- Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
 - Support for reading address from interface, including IPv6 addresses
 - Support for calling an external script to get the IP address.
 - Support for multiple users @ same provider, idea from Valery Frolov:
@@ -30,10 +34,7 @@ New configuration file format and changed command line options.
 
 - Support for ddnss.de and dynv6.com, contributed by Sven Hoefer
 - Support for spdyn.de, on request from Frank Röhm
-- Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
-- Strict HTTPS certificate validation is now default.  To disable this
-  use `strict-ssl = false` in the .conf file.
-- Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
+- Support for strato.com, contributed by Duncan Overbruck
 - Refactored memory handling and privilige separation to simplify code
 - Refactored logging and backgrounding to simplify code
 - Removed old compatibility symlinks and other required GNU specific
@@ -50,6 +51,7 @@ New configuration file format and changed command line options.
 - Add actual permissions check to `os_check_perms()`
 - Fix issue #121: Support for fully customizable update URL
 - Fix issue #122: Only use HTTPS connection for DNS update, not checkip
+- Fix issue #131: Use FreeDNS' own checkip server instead of DYN.com's
 
 
 [1.99.15][] - 2015-09-09
