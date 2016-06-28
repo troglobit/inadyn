@@ -43,8 +43,8 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_name = "freedns.afraid.org",
+	.checkip_url  = "/dynamic/check.php",
 
 	.server_name  = "freedns.afraid.org",
 	.server_url   = "/dynamic/update.php"
