@@ -36,10 +36,12 @@ risk losing your IP address every time you reconnect, or in DHCP even
 when the lease is renegotiated.
 
 By using a DDNS client like `inadyn` you can register an Internet name
-at certain providers that the DDNS client updates, periodically and/or
-on demand when your IP changes.  In-A-Dyn can maintain multiple host
-names with the same IP address, and has a web based IP detection which
-runs well behind a NAT router.
+with a DDNS provider the DDNS client updates, periodically and/or on
+demand when your IP address changes.  Inadyn can maintain multiple host
+records with the same IP address, or use a combination of a script, read
+the address from an Internet-facing interface, or use the default IP
+address change detector of each DDNS provider.  The latter works well
+behind an Internet gateway.
 
 
 Supported Providers
@@ -151,10 +153,10 @@ provider -- this is achieved by appending a `:ID` to the provider name.
 
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
-your IP as reported to each provider.  In-A-Dyn use this to ensure you
-are not locked out of your account for excessive updates, which may
-happen if your device Internet gateway running inadyn gets stuck in a
-reboot loop, or similar.
+your IP address as reported to each provider.  In-A-Dyn use this to
+ensure you are not locked out of your account for excessive updates,
+which may happen if your device Internet gateway running inadyn gets
+stuck in a reboot loop, or similar.
 
 However, for the caching mechanism to be 100% foolproof the system clock
 must be set correctly -- if you have issues with the system clock not
@@ -238,10 +240,10 @@ illustrate how the `hostname` setting works:
 	}
 
 The generic plugin can also be used with providers that require the
-client's new IP in the update request.  Here is an example of how this
-can be done if we *pretend* that <http://dyn.com> is not supported by
-inadyn.  The `ddns-path` differs between providers and is something you
-must figure out.  The support pages sometimes list this under an API
+client's new IP addres in the update request.  Here is an example of how
+this can be done if we *pretend* that <http://dyn.com> is not supported
+by inadyn.  The `ddns-path` differs between providers and is something
+you must figure out.  The support pages sometimes list this under an API
 section, or similar.
 
     # This emulates default@dyndns.org
