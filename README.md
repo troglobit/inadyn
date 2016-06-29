@@ -18,14 +18,14 @@ Table of Contents
 Introduction
 ------------
 
-In-a-Dyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
-support.  It is commonly available in many GNU/Linux distributions, used
-in off the shelf routers and Internet gateways to automate the task of
-keeping your DNS record up to date with any IP address changes from your
-[ISP][].  It can also be used in installations with redundant (backup)
-connections to the Internet.  This README details `inadyn` v2 and later,
-for documentation on [earlier releases][releases], see their respective
-README and man pages.
+In-a-Dyn, or Inadyn, is a small and simple Dynamic DNS, [DDNS][], client
+with HTTPS support.  It is commonly available in many GNU/Linux
+distributions, used in off the shelf routers and Internet gateways to
+automate the task of keeping your DNS record up to date with any IP
+address changes from your [ISP][].  It can also be used in installations
+with redundant (backup) connections to the Internet.  This README
+details `inadyn` v2 and later, for documentation on
+[earlier releases][releases], see their respective README and man pages.
 
 Most people are unaware that they share a pool of Internet addresses
 with other users of the same Internet Service Provider (ISP).  Protocols
@@ -153,10 +153,10 @@ provider -- this is achieved by appending a `:ID` to the provider name.
 
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
-your IP address as reported to each provider.  In-A-Dyn use this to
-ensure you are not locked out of your account for excessive updates,
-which may happen if your device Internet gateway running inadyn gets
-stuck in a reboot loop, or similar.
+your IP address as reported to each provider.  Inadyn use this to ensure
+you are not locked out of your account for excessive updates, which may
+happen if your device Internet gateway running inadyn gets stuck in a
+reboot loop, or similar.
 
 However, for the caching mechanism to be 100% foolproof the system clock
 must be set correctly -- if you have issues with the system clock not
@@ -260,10 +260,10 @@ Here a fully custom `ddns-path` with format specifiers are used, see the
 inadyn.conf(5) man page for details on this.
 
 When using the generic plugin you should first inspect the response from
-the DDNS provider.  By default In-A-Dyn looks for a `200 HTTP` response
-OK code and the strings `"good"`, `"OK"`, `"true"`, or `"updated"` in
-the HTTP response body.  If the DDNS provider returns something else you
-can add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
+the DDNS provider.  By default Inadyn looks for a `200 HTTP` response OK
+code and the strings `"good"`, `"OK"`, `"true"`, or `"updated"` in the
+HTTP response body.  If the DDNS provider returns something else you can
+add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
 single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
 
