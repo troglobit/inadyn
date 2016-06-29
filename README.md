@@ -18,30 +18,31 @@ Table of Contents
 Introduction
 ------------
 
-In-a-Dyn, or Inadyn, is a small and simple Dynamic DNS, [DDNS][], client
-with HTTPS support.  It is commonly available in many GNU/Linux
-distributions, used in off the shelf routers and Internet gateways to
-automate the task of keeping your DNS record up to date with any IP
-address changes from your [ISP][].  It can also be used in installations
-with redundant (backup) connections to the Internet.  This README
-details `inadyn` v2 and later, for documentation on
-[earlier releases][releases], see their respective README and man pages.
+Inadyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
+support.  Commonly available in many GNU/Linux distributions, and used
+in off the shelf routers and Internet gateways to automate the task of
+keeping your DNS record up to date with any IP address changes from your
+[ISP][].  It can also be used in installations with redundant (backup)
+connections to the Internet.  This README details `inadyn` v2 and later,
+for documentation on [earlier releases][releases], see their respective
+README and man pages.
 
 Most people are unaware that they share a pool of Internet addresses
 with other users of the same Internet Service Provider (ISP).  Protocols
 like DHCP, PPPoE, or PPPoA are used to give you an address and a way to
 connect to the Internet, but usually not a way for others to connect to
 you.  If you want to run an Internet server on such a connection you
-risk losing your IP address every time you reconnect, or in DHCP even
-when the lease is renegotiated.
+risk losing your IP address every time you reconnect, or as in the case
+of DHCP even when the lease is renegotiated.
 
-By using a DDNS client like `inadyn` you can register an Internet name
-with a DDNS provider the DDNS client updates, periodically and/or on
-demand when your IP address changes.  Inadyn can maintain multiple host
-records with the same IP address, or use a combination of a script, read
-the address from an Internet-facing interface, or use the default IP
-address change detector of each DDNS provider.  The latter works well
-behind an Internet gateway.
+By using a DDNS client like `inadyn` you can register an Internet DNS
+name with a DDNS provider.  The DDNS client will then make sure to
+update your DNS record periodically and/or on demand when your IP
+address changes.  Inadyn can maintain multiple host records with the
+same IP address, or use a combination of a script, read the address from
+an Internet-facing interface, or use the default IP address change
+detector of each DDNS provider.  The latter works well behind an
+Internet gateway.
 
 
 Supported Providers
