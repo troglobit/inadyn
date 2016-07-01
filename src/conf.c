@@ -304,10 +304,13 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	}
 
 	/* The check-ip server can be set for all provider types */
-	cfg_getserver(cfg, "checkip-server", &info->checkip_name);
-	str = cfg_getstr(cfg, "checkip-path");
-	if (str && strlen(str) <= sizeof(info->checkip_url))
-		strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
+	if (!cfg_getserver(cfg, "checkip-server", &info->checkip_name)) {
+		str = cfg_getstr(cfg, "checkip-path");
+		if (str && strlen(str) <= sizeof(info->checkip_url))
+			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
+		else
+			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+	}
 
 	/* The checkip-command overrides any default or custom checkip-server */
 	str = cfg_getstr(cfg, "checkip-command");
