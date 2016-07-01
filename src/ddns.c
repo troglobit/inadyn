@@ -167,18 +167,19 @@ static int is_address_valid(int family, const char *host)
 
 		logit(LOG_DEBUG, "Checking IPv4 address %s ...", host);
 		if (!inet_pton(family, host, &address))
-			return 0;
+			goto error;
 
 		addr = ntohl(address.s_addr);
 		if (IN_ZERONET(addr)   || IN_LOOPBACK(addr) || IN_LINKLOCAL(addr) ||
 		    IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr))
-			return 0;
+			goto error;
 
+		logit(LOG_DEBUG, "IPv4 address %s is valid.", host);
 		return 1;
 	}
 
 	if (!allow_ipv6) {
-		logit(LOG_DEBUG, "IPv6 address disallowed, enable with 'allow-ipv6 = true'");
+		logit(LOG_INFO, "IPv6 address disallowed, enable with 'allow-ipv6 = true'");
 		return 0;
 	}
 
@@ -187,15 +188,19 @@ static int is_address_valid(int family, const char *host)
 
 		logit(LOG_DEBUG, "Checking IPv6 address %s ...", host);
 		if (!inet_pton(family, host, &address))
-			return 0;
+			goto error;
 
 		if (IN6_IS_ADDR_UNSPECIFIED(addr) || IN6_IS_ADDR_LOOPBACK(addr) ||
 		    IN6_IS_ADDR_LINKLOCAL(addr)   || IN6_IS_ADDR_SITELOCAL(addr))
-			return 0;
+			goto error;
 
+		logit(LOG_DEBUG, "IPv6 address %s is valid.", host);
 		return 1;
 	}
 
+error:
+	logit(LOG_WARNING, "IP%s address %s is not a valid Internet address.",
+	      family == AF_INET ? "v4" : family == AF_INET6 ? "v6" : "", host);
 	return 0;
 }
 
