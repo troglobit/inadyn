@@ -161,6 +161,11 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
  */
 static int is_address_valid(int family, const char *host)
 {
+	if (!verify_addr) {
+		logit(LOG_DEBUG, "IP address validation disabled, %s is thus valid.", host);
+		return 1;
+	}
+
 	if (family == AF_INET) {
 		in_addr_t addr;
 		struct in_addr address;

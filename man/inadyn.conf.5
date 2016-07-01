@@ -25,6 +25,16 @@ character marks start of a comment to end of line.  The \\ character can
 be used as an escape character.
 .Pp
 .Bl -tag -width TERM
+.It Cm verify-address = <true | false>
+By default
+.Nm inadyn
+verifies both IPv4 and IPv6 addresses, making sure the address is a
+valid Internet address.  Invalid addresses are, e.g., link local,
+loopback, multicast and known experimental addresses.  For more
+information, see RFC3330.
+.Pp
+IP address validation can be disabled by setting this option to
+.Cm false .
 .It Cm fake-address = <true | false>
 When using SIGUSR1, to do a forced update, this option can be used to
 fake an address update with a

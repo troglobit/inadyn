@@ -412,6 +412,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_END()
 	};
 	cfg_opt_t opts[] = {
+		CFG_BOOL("verify-address", cfg_true, CFGF_NONE),
 		CFG_BOOL("fake-address",  cfg_false, CFGF_NONE),
 		CFG_BOOL("allow-ipv6",    cfg_false, CFGF_NONE),
 		CFG_BOOL("secure-ssl",    cfg_true, CFGF_NONE),
@@ -463,6 +464,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
 
 	cache_dir                     = cfg_getstr(cfg, "cache-dir");
+	verify_addr                   = cfg_getbool(cfg, "verify-address");
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
 
 	/* Command line --iface=IFNAME takes precedence */
