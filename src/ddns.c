@@ -169,7 +169,7 @@ static int is_address_valid(int family, const char *host)
 		if (!inet_pton(family, host, &address))
 			return 0;
 
-		addr = address.s_addr;
+		addr = ntohl(address.s_addr);
 		if (IN_ZERONET(addr)   || IN_LOOPBACK(addr) || IN_LINKLOCAL(addr) ||
 		    IN_MULTICAST(addr) || IN_EXPERIMENTAL(addr))
 			return 0;
