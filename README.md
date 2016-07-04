@@ -223,7 +223,10 @@ DDNS plugin:
 Here three subdomains are updated, one HTTP GET update request for every
 listed DDNS server and path is performed, for every listed hostname.
 Some providers, like FreeDNS, support setting up CNAME records to reduce
-the amount of records you need to update.
+the amount of records you need to update.  Some providers, like FreeDNS,
+default to link multiple records to the same update, which may be very
+confusing if you want each DNS record to be updated from a unique IP
+address -- make sure to *check your settings at the provider*!
 
 Your hostname is automatically appended to the end of the `ddns-path`,
 as is customary, before it is communicated to the server.  Username is
