@@ -335,6 +335,15 @@ provider default@dyndns.org {
     hostname   = { "my.example.com", "other.example.org" }
 }
 
+# FreeDNS. Remember the username must be in lower case
+# and password (max 16 chars) is case sensitive.
+provider default@freedns.afraid.org {
+    ssl        = true
+    username   = lower-case-username
+    password   = case-sensitive-pwd
+    hostname   = some.example.com
+}
+
 # No-IP.com #1
 provider default@no-ip.com:1 {
     username   = account21
