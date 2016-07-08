@@ -194,14 +194,13 @@ int ssl_open(http_t *client, char *msg)
 //	gnutls_transport_set_int(client->ssl, client->tcp.ip.socket);
 	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.ip.socket);
 
-	/* Perform the TLS handshake */
+	/* Perform the TLS handshake, ignore non-fatal errors. */
 	do {
 		ret = gnutls_handshake(client->ssl);
 	}
-	while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-	/* Note that DTLS may also receive GNUTLS_E_LARGE_PACKET */
+	while (ret != 0 && !gnutls_error_is_fatal(ret));
 
-	if (ret < 0) {
+	if (gnutls_error_is_fatal(ret)) {
 		logit(LOG_ERR, "SSL handshake with %s failed: %s", sn, gnutls_strerror(ret));
 		return RC_HTTPS_FAILED_CONNECT;
 	}
