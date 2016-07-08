@@ -53,6 +53,7 @@ New configuration file format and changed command line options.
 - Fix issue #121: Support for fully customizable update URL
 - Fix issue #122: Only use HTTPS connection for DNS update, not checkip
 - Fix issue #131: Use FreeDNS' own checkip server instead of DYN.com's
+- Fix issue #134: Support wildcard cert with GnuTLS backend
 
 
 [1.99.15][] - 2015-09-09
