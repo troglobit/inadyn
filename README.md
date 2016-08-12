@@ -109,12 +109,14 @@ how this can be done:
         hostname    = { "peanuts", "woodstock" }
 	}
     
+    # With multiple usernames at the same provider, index with :#
     provider default@no-ip.com:1 {
         username    = ian
         password    = secret
         hostname    = flemming.no-ip.com
 	}
     
+    # With multiple usernames at the same provider, index with :#
     provider default@no-ip.com:2 {
         username       = james
         password       = bond
@@ -122,6 +124,7 @@ how this can be done:
         checkip-server = api.ipify.org
     }
     
+    # With multiple usernames at the same provider, index with :#
     provider default@no-ip.com:3 {
         username        = spaceman
         password        = bowie
@@ -129,6 +132,7 @@ how this can be done:
         checkip-command = /sbin/ifconfig eth0 | grep 'inet6 addr'
     }
     
+    # Note: hostname == update-key from Advanved tab in the Web UI
     provider default@tunnelbroker.net {
         ssl         = true
         username    = futurekid
