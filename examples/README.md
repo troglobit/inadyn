@@ -18,7 +18,10 @@ your hostname, username, and password and then start Inadyn.
 Example
 -------
 
-    user@example:~$ cp freedns.conf /etc/inadyn.conf
+    user@example:~$ sudo cp freedns.conf /etc/inadyn.conf
+    user@example:~$ sudo chmod 600 /etc/inadyn.conf
+    user@example:~$ sudo vim /etc/inadyn.conf
+    [Change username, password and hostname]
     user@example:~$ sudo inadyn
     user@example:~$
 
