@@ -303,6 +303,9 @@ The latter two (SSL library + libConfuse) are available from most UNIX
 distributions as pre-built packages, whereas [libite][] is currently
 only available as a source tarball.  Make sure to install the `-dev` or
 `-devel` package of the distribution packages when building Inadyn.
+Also, make sure to install the `ca-certificates` package on your system,
+otherwise Inadyn will not be able to validate the DDNS provider's HTTPS
+certificates.
 
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
@@ -319,6 +322,24 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 
 * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
 * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
+
+### RedHat, Fedora, CentOS
+
+On some systems the default configure installation path, `/usr/local`,
+is disabled and not searched by tools like `ldconfig` and `pkg-config`.
+So if configure fails to find the libite or libConfuse libraries, or the
+`.pc` files, create the file `/etc/ld.so.conf.d/local.conf` with this
+content:
+
+    /usr/local/lib
+
+update the linker cache:
+
+    sudo ldconfig -v |egrep '(libite|libconfuse)'
+
+and run the Inadyn configure script like this:
+
+    PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure
 
 
 Building from GIT
