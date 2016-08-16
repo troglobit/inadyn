@@ -111,7 +111,23 @@ error:
 	return 0;
 }
 
-void ssl_init(void)
+static int ssl_set_ca_location(void)
+{
+	int num;
+
+	num = gnutls_certificate_set_x509_system_trust(xcred);
+	if (num <= 0)
+		num = gnutls_certificate_set_x509_trust_file(xcred, CAFILE1, GNUTLS_X509_FMT_PEM);
+	if (num <= 0)
+		num = gnutls_certificate_set_x509_trust_file(xcred, CAFILE2, GNUTLS_X509_FMT_PEM);
+
+	if (num <= 0)
+		return 1;
+
+	return 0;
+}
+
+int ssl_init(void)
 {
 	if (!gnutls_check_version("3.1.4")) {
 		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", __progname);
@@ -124,9 +140,13 @@ void ssl_init(void)
 	/* X509 stuff */
 	gnutls_certificate_allocate_credentials(&xcred);
 
-	/* sets the trusted cas file */
-	gnutls_certificate_set_x509_trust_file(xcred, CAFILE, GNUTLS_X509_FMT_PEM);
+	/* Try to figure out location of trusted CA certs on system */
+	if (ssl_set_ca_location())
+		return RC_HTTPS_NO_TRUSTED_CA_STORE;
+
 	gnutls_certificate_set_verify_function(xcred, verify_certificate_callback);
+
+	return 0;
 }
 
 

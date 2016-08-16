@@ -27,7 +27,7 @@
 #include "tcp.h"
 
 #ifdef ENABLE_SSL
-void    ssl_init(void);
+int     ssl_init(void);
 void    ssl_exit(void);
 
 int     ssl_open(http_t *client, char *msg);
@@ -37,7 +37,7 @@ int     ssl_send(http_t *client, const char *buf, int     len);
 int     ssl_recv(http_t *client,       char *buf, int buf_len, int *recv_len);
 
 #else
-#define ssl_init()
+#define ssl_init()  0
 #define ssl_exit()
 
 #define ssl_open(client, msg)                    tcp_init(&client->tcp, msg)

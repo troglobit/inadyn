@@ -22,11 +22,13 @@
 #include "debug.h"
 #include "http.h"
 
-void ssl_init(void)
+int ssl_init(void)
 {
 	SSL_library_init();
 	SSL_load_error_strings();
 	OpenSSL_add_all_algorithms();
+
+	return 0;
 }
 
 void ssl_exit(void)
@@ -81,6 +83,22 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 	return 1;
 }
 
+static int ssl_set_ca_location(http_t *client)
+{
+	int ret;
+
+	ret = SSL_CTX_set_default_verify_paths(client->ssl_ctx);
+	if (ret < 1)
+		ret = SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE1, NULL);
+	if (ret < 1)
+		ret = SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE2, NULL);
+
+	if (ret < 1)
+		return 1;
+
+	return 0;
+}
+
 int ssl_open(http_t *client, char *msg)
 {
 	char buf[256];
@@ -103,7 +121,10 @@ int ssl_open(http_t *client, char *msg)
 
 	SSL_CTX_set_verify(client->ssl_ctx, SSL_VERIFY_PEER, verify_callback);
 	SSL_CTX_set_verify_depth(client->ssl_ctx, 150);
-	SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE, NULL);
+
+	/* Try to figure out location of trusted CA certs on system */
+	if (ssl_set_ca_location(client))
+		return RC_HTTPS_NO_TRUSTED_CA_STORE;
 
 	client->ssl = SSL_new(client->ssl_ctx);
 	if (!client->ssl)

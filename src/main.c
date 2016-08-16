@@ -310,7 +310,9 @@ int main(int argc, char *argv[])
 		config = strdup(DEFAULT_CONFIG_FILE);
 
 	/* Prepare SSL library, if enabled */
-	ssl_init();
+	rc = ssl_init();
+	if (rc)
+		return rc;
 
 	do {
 		restart = 0;

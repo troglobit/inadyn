@@ -39,7 +39,16 @@
 #include "os.h"
 #include "tcp.h"
 
-#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
+/*
+ * By default we rely on the built-in locations of Open/LibreSSL and
+ * GnuTLS, on error we fall back to these two locations, used by Debian
+ * and RedHat.  TODO: Add configurable support for both file and dir
+ *
+ * For more excellent information on the topic, see this blog post
+ * https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
+ */
+#define CAFILE1 "/etc/ssl/certs/ca-certificates.crt"
+#define CAFILE2 "/etc/pki/tls/certs/ca-bundle.trust.crt"
 
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */
 #define	HTTP_DEFAULT_PORT	80
