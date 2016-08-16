@@ -5,7 +5,7 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile inadyn.service src/Makefile include/Makefile man/Makefile])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_ARG_ENABLE(ssl,
@@ -26,6 +26,10 @@ AC_ARG_ENABLE(simulation,
         [ac_enable_simulation="no"]
 )
 
+AC_ARG_WITH([systemd],
+     [AS_HELP_STRING([--with-systemd=DIR], [Directory for systemd service files])],,
+     [with_systemd=auto]
+)
 
 # Define necessary build flags
 AC_GNU_SOURCE
@@ -52,6 +56,7 @@ AM_PROG_AR
 LT_INIT([disable-shared static])
 
 # Check for required packages
+PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
 PKG_CHECK_MODULES([confuse], [libconfuse >= 3.0])
 
@@ -101,6 +106,18 @@ if test "x$ac_enable_simulation" = "xyes"; then
    AC_DEFINE([ENABLE_SIMULATION], [], [Enable developer-only simulation mode])
 fi
 
+# Check where to install the systemd .service file
+AS_IF([test "x$with_systemd" = "xyes" -o "x$with_systemd" = "xauto"], [
+     def_systemd=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)
+     AS_IF([test "x$def_systemd" = "x"],
+         [AS_IF([test "x$with_systemd" = "xyes"],
+	     [AC_MSG_ERROR([systemd support requested but pkg-config unable to query systemd package])])
+	     with_systemd=no], [with_systemd="$def_systemd"])]
+)
+AS_IF([test "x$with_systemd" != "xno"],
+     [AC_SUBST([systemddir], [$with_systemd])])
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemd" != "xno"])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
@@ -114,5 +131,30 @@ AC_CHECK_FUNCS([atexit memset poll socket strerror])
 AC_SEARCH_LIBS([dlopen], [dl dld], [], [
   AC_MSG_ERROR([unable to find the dlopen() function])
 ])
+
+# Expand variables early, for systemd unit file and others
+test "x$prefix" = "xNONE" && prefix=$ac_default_prefix
+test "x$exec_prefix" = "xNONE" && exec_prefix=$ac_default_prefix
+
+BINDIR=`eval echo $bindir`
+AC_SUBST(BINDIR)
+
+SBINDIR=`eval echo $sbindir`
+AC_SUBST(SBINDIR)
+
+LIBEXEC=`eval echo $libexec`
+AC_SUBST(LIBEXEC)
+
+LIBDIR=`eval echo $libdir`
+AC_SUBST(LIBDIR)
+
+SHAREDIR=`eval echo $prefix/share`
+AC_SUBST(SHAREDIR)
+
+RUNDIR="/var/run"
+AC_SUBST(RUNDIR)
+
+CONFIG_DIR="/etc"
+AC_SUBST(CONFIG_DIR)
 
 AC_OUTPUT

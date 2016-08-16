@@ -1,8 +1,14 @@
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS           = -I m4
+DISTCHECK_CONFIGURE_FLAGS = --with-systemd=$$dc_install_base/$(systemd)
+
 SUBDIRS         = src include man
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md
 DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
+
+if HAVE_SYSTEMD
+systemd_DATA    = inadyn.service
+endif
 
 ## Generate detached signature file (ascii-armored), like OpenVPN does
 GPG = gpg
