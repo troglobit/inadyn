@@ -132,29 +132,13 @@ AC_SEARCH_LIBS([dlopen], [dl dld], [], [
   AC_MSG_ERROR([unable to find the dlopen() function])
 ])
 
-# Expand variables early, for systemd unit file and others
-test "x$prefix" = "xNONE" && prefix=$ac_default_prefix
-test "x$exec_prefix" = "xNONE" && exec_prefix=$ac_default_prefix
-
-BINDIR=`eval echo $bindir`
-AC_SUBST(BINDIR)
-
+# Expand $sbindir early, into $SBINDIR, for systemd unit file
+# NOTE: This does *not* take prefix/exec_prefix override at "make
+#       install" into account, unfortunately.
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 SBINDIR=`eval echo $sbindir`
+SBINDIR=`eval echo $SBINDIR`
 AC_SUBST(SBINDIR)
-
-LIBEXEC=`eval echo $libexec`
-AC_SUBST(LIBEXEC)
-
-LIBDIR=`eval echo $libdir`
-AC_SUBST(LIBDIR)
-
-SHAREDIR=`eval echo $prefix/share`
-AC_SUBST(SHAREDIR)
-
-RUNDIR="/var/run"
-AC_SUBST(RUNDIR)
-
-CONFIG_DIR="/etc"
-AC_SUBST(CONFIG_DIR)
 
 AC_OUTPUT
