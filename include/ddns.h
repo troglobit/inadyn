@@ -39,21 +39,13 @@
 #define SUPPORT_ADDR	PACKAGE_BUGREPORT
 
 /* Test values */
+/* Some default configurations */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"
 
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"
 
-#define DEFAULT_DNS_SYSTEM	"default@dyndns.org"
-
-/* Conversation with the checkip server */
-#define DYNDNS_CHECKIP_HTTP_REQUEST  					\
-	"GET %s HTTP/1.0\r\n"						\
-	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
-
-/* Some default configurations */
 #define DDNS_DEFAULT_STARTUP_SLEEP        0       /* sec */
 #define DDNS_DEFAULT_PERIOD               120     /* sec */
 #define DDNS_MIN_PERIOD                   30      /* sec */

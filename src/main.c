@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <pwd.h>		/* getpwnam() */
 #include <grp.h>		/* getgrnam() */
+#include <unistd.h>
 #include <confuse.h>
 
 #include "debug.h"

@@ -42,6 +42,12 @@
 #include "sha1.h"
 #include "cmd.h"
 
+/* Conversation with the checkip server */
+#define DYNDNS_CHECKIP_HTTP_REQUEST  					\
+	"GET %s HTTP/1.0\r\n"						\
+	"Host: %s\r\n"							\
+	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+
 /* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_num_iterations = 0;
 extern ddns_info_t *conf_info_iterator(int first);
