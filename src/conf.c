@@ -31,7 +31,7 @@
  *   wildcard = false
  *   username = example
  *   password = secret
- *   alias    = { "example.homenet.org", "example.afraid.org" }
+ *   hostname = { "example.homenet.org", "example.afraid.org" }
  * }
  *
  * provider default@dyndns.org
@@ -39,7 +39,7 @@
  *   ssl      = true
  *   username = admin
  *   password = supersecret
- *   alias    = example.dyndns.org
+ *   hostname = example.dyndns.org
  * }
  */
 static LIST_HEAD(head, di) info_list = LIST_HEAD_INITIALIZER(info_list);
