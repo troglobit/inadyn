@@ -29,13 +29,19 @@
 /*
  * By default we rely on the built-in locations of Open/LibreSSL and
  * GnuTLS, on error we fall back to these two locations, used by Debian
- * and RedHat.  TODO: Add configurable support for both file and dir
+ * and RedHat.
  *
  * For more excellent information on the topic, see this blog post
  * https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
  */
 #define CAFILE1 "/etc/ssl/certs/ca-certificates.crt"
 #define CAFILE2 "/etc/pki/tls/certs/ca-bundle.trust.crt"
+
+/* User can supply local CA PEM bundle in .conf file */
+extern char *ca_trust_file;
+
+/* Cert validation is enabled by default, user can disable in .conf file */
+extern int secure_ssl;
 
 #ifdef ENABLE_SSL
 int     ssl_init(void);

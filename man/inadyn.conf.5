@@ -113,6 +113,18 @@ then
 .Nm inadyn
 will only issue a warning.  By default this setting is enabled, because
 security matters.
+.It Cm ca-trust-file = FILE
+By default
+.Nm inadyn
+uses the built-in path to the system's trusted CA certificates, both
+GnuTLS and Open/LibreSSL support this.  As a fall-back, in case the
+API's to load CA certificates from the built-in path fails,
+.Nm inadyn
+also supports common default paths to Debian and RedHat CA bundles.
+.Pp
+This setting overrides the built-in paths and fallback locations and
+provides a way to specify the path to a trusted set of CA certificates,
+in PEM format, bundled into one file.
 .It Cm custom some@identifier {}
 The
 .Cm custom{}

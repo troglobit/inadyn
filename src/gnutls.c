@@ -117,6 +117,12 @@ static int ssl_set_ca_location(void)
 {
 	int num = 0;
 
+	/* A user defined CA PEM bundle overrides any built-ins or fall-backs */
+	if (ca_trust_file) {
+		num = gnutls_certificate_set_x509_trust_file(xcred, ca_trust_file, GNUTLS_X509_FMT_PEM);
+		goto done;
+	}
+
 #ifdef gnutls_certificate_set_x509_system_trust /* Since 3.0.20 */
 	num = gnutls_certificate_set_x509_system_trust(xcred);
 #endif
@@ -124,7 +130,7 @@ static int ssl_set_ca_location(void)
 		num = gnutls_certificate_set_x509_trust_file(xcred, CAFILE1, GNUTLS_X509_FMT_PEM);
 	if (num <= 0)
 		num = gnutls_certificate_set_x509_trust_file(xcred, CAFILE2, GNUTLS_X509_FMT_PEM);
-
+done:
 	if (num <= 0)
 		return 1;
 

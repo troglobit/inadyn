@@ -21,6 +21,7 @@
 
 #include "cache.h"
 #include "ddns.h"
+#include "ssl.h"
 
 /*
  * period        = 600
@@ -416,6 +417,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL("fake-address",  cfg_false, CFGF_NONE),
 		CFG_BOOL("allow-ipv6",    cfg_false, CFGF_NONE),
 		CFG_BOOL("secure-ssl",    cfg_true, CFGF_NONE),
+		CFG_STR ("ca-trust-file", NULL, CFGF_NONE),
 		CFG_STR ("cache-dir",	  DEFAULT_CACHE_DIR, CFGF_NONE),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
@@ -472,6 +474,11 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		iface                 = cfg_getstr(cfg, "iface");
 	allow_ipv6                    = cfg_getbool(cfg, "allow-ipv6");
 	secure_ssl                    = cfg_getbool(cfg, "secure-ssl");
+	ca_trust_file                 = cfg_getstr(cfg, "ca-trust-file");
+	if (ca_trust_file && !fexist(ca_trust_file)) {
+		logit(LOG_ERR, "Cannot find CA trust file %s", ca_trust_file);
+		return NULL;
+	}
 
 	for (i = 0; i < cfg_size(cfg, "provider"); i++)
 		ret |= create_provider(cfg_getnsec(cfg, "provider", i), 0);

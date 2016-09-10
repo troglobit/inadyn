@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.0][UNRELEASED] - 2016-07-YY
+[v2.0][UNRELEASED] - 2016-09-YY
 -------------------------------
 
 New configuration file format and changed command line options.
@@ -15,6 +15,10 @@ New configuration file format and changed command line options.
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 - Strict HTTPS certificate validation is now default.  To disable this
   use `strict-ssl = false` in the .conf file.
+- Certificate validation uses trusted CA certificates from the system
+  with fall-backs to certain known locations.  To override this default
+  handling a `ca-trust-file = FILE` setting in `inadyn.conf` can be used
+  to provide the path to another CA cert bundle, in PEM format.
 - Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
 - Support for reading address from interface, including IPv6 addresses
 - Support for calling an external script to get the IP address.

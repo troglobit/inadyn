@@ -88,12 +88,18 @@ static int ssl_set_ca_location(http_t *client)
 {
 	int ret;
 
+	/* A user defined CA PEM bundle overrides any built-ins or fall-backs */
+	if (ca_trust_file) {
+		ret = SSL_CTX_load_verify_locations(client->ssl_ctx, ca_trust_file, NULL);
+		goto done;
+	}
+
 	ret = SSL_CTX_set_default_verify_paths(client->ssl_ctx);
 	if (ret < 1)
 		ret = SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE1, NULL);
 	if (ret < 1)
 		ret = SSL_CTX_load_verify_locations(client->ssl_ctx, CAFILE2, NULL);
-
+done:
 	if (ret < 1)
 		return 1;
 
