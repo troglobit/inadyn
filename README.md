@@ -88,9 +88,6 @@ and SPDYN, have been verified to support HTTPS.
 *HTTPS is strongly recommended* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.
 
-**Note:** Currently no HTTPS certificate validation is performed,
-  patches welcome!
-
 
 Example Configuration
 ---------------------
