@@ -1,5 +1,5 @@
-In-a-Dyn v2 - Internet Dynamic DNS Client
-=========================================
+Internet Automated Dynamic DNS Client
+=====================================
 [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
