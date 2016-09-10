@@ -292,8 +292,8 @@ in the last example above.
 Build & Install
 ---------------
 
-In-A-Dyn require a few libraries to build, although the HTTPS (SSL/TLS)
-support can be disabled:
+In-A-Dyn requires a few libraries to build.  The build system searches
+for them, in their required versions, using the `pkg-config` tool:
 
 * [libite][],
 * [libConfuse][]
@@ -303,9 +303,10 @@ The latter two (SSL library + libConfuse) are available from most UNIX
 distributions as pre-built packages, whereas [libite][] is currently
 only available as a source tarball.  Make sure to install the `-dev` or
 `-devel` package of the distribution packages when building Inadyn.
-Also, make sure to install the `ca-certificates` package on your system,
-otherwise Inadyn will not be able to validate the DDNS provider's HTTPS
-certificates.
+
+When building with HTTPS (SSL/TLS) support, make sure to also install
+the `ca-certificates` package on your system, otherwise Inadyn will not
+be able to validate the DDNS provider's HTTPS certificates.
 
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
