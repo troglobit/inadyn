@@ -21,6 +21,7 @@
 
 #include "debug.h"
 #include "http.h"
+#include "ssl.h"
 
 int ssl_init(void)
 {

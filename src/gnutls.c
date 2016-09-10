@@ -19,9 +19,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include <gnutls/x509.h>
+
 #include "debug.h"
 #include "http.h"
-#include <gnutls/x509.h>
+#include "ssl.h"
 
 static gnutls_certificate_credentials_t xcred;
 
