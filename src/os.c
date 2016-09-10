@@ -43,7 +43,7 @@ static void *param = NULL;
 int loglvl(char *level)
 {
 	for (int i = 0; prioritynames[i].c_name; i++) {
-		if (string_match(prioritynames[i].c_name, level))
+		if (level && !strncmp(prioritynames[i].c_name, level, strlen(level)))
 			return prioritynames[i].c_val;
 	}
 
@@ -185,6 +185,31 @@ int os_install_signal_handler(void *ctx)
 
 	param = ctx;
 	return 0;
+}
+
+/**
+ * mkpath - Create all components of the specified directory.
+ * @dir:  Directory to created, relative or absolute
+ * @mode: A &mode_t mode to create @dir with
+ *
+ * Returns:
+ * POSIX OK(0) on success, otherwise -1 with @errno set.
+ */
+int mkpath(char *dir, mode_t mode)
+{
+	struct stat sb;
+
+	if (!dir) {
+		errno = EINVAL;
+		return 1;
+	}
+
+	if (!stat(dir, &sb))
+		return 0;
+
+	mkpath(dirname(strdupa(dir)), mode);
+
+	return mkdir(dir, mode);
 }
 
 /*

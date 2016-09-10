@@ -392,7 +392,7 @@ static int get_address_iface(ddns_t *ctx, const char *ifname, char *address, siz
 		if (!ifa->ifa_addr)
 			continue;
 
-		if (!string_compare(ifa->ifa_name, ifname))
+		if (strcmp(ifa->ifa_name, ifname))
 			continue;
 
 		pos = strlen(ctx->work_buf);

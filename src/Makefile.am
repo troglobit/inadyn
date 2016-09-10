@@ -5,6 +5,7 @@ inadyn_SOURCES	= main.c	ddns.c		cache.c		\
 		  http.c	plugin.c	tcp.c		\
 		  ip.c		sha1.c		base64.c	\
 		  md5.c
+inadyn_SOURCES += pidfile.c	strlcat.c	strlcpy.c
 
 if ENABLE_SSL
 if ENABLE_OPENSSL
@@ -30,5 +31,5 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 inadyn_CPPFLAGS = -I$(top_srcdir)/include
 inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
 inadyn_CFLAGS  += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
-inadyn_CFLAGS  += $(lite_CFLAGS) $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
-inadyn_LDADD    = $(lite_LIBS)   $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
+inadyn_CFLAGS  += $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
+inadyn_LDADD    = $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)

@@ -191,7 +191,7 @@ static int getserver(const char *server, ddns_name_t *name)
 	ptr = strchr(str, ':');
 	if (ptr) {
 		*ptr++ = 0;
-		name->port = atonum(ptr);
+		name->port = atoi(ptr);
 		if (-1 == name->port)
 			name->port = HTTP_DEFAULT_PORT;
 	} else {

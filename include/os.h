@@ -63,6 +63,16 @@ typedef struct {
 	gid_t gid;
 } ddns_user_t;
 
+#ifndef strlcpy
+size_t  strlcpy    (char *dst, const char *src, size_t siz);
+#endif
+#ifndef strlcat
+size_t  strlcat    (char *dst, const char *src, size_t siz);
+#endif
+#ifndef pidfile
+int     pidfile   (const char *basename);
+#endif
+
 int os_install_signal_handler (void *ctx);
 int os_check_perms            (void *arg);
 int os_shell_execute          (char *cmd, char *ip, char *hostname);

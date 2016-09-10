@@ -24,21 +24,27 @@
 #ifndef DDNS_H_
 #define DDNS_H_
 
-#include <lite/lite.h>
-#include <lite/queue.h>
-
 #include "config.h"
 #include "os.h"
 #include "error.h"
 #include "http.h"
 #include "debug.h"
 #include "plugin.h"
+#include "queue.h"
 
 #define VERSION_STRING	PACKAGE_NAME " version " VERSION " -- Dynamic DNS update client."
 #define AGENT_NAME	"inadyn/" VERSION
 #define SUPPORT_ADDR	PACKAGE_BUGREPORT
 
-/* Test values */
+#ifndef UNUSED
+#define UNUSED(x) x __attribute__ ((unused))
+#endif
+
+/* From The Practice of Programming, by Kernighan and Pike */
+#ifndef NELEMS
+#define NELEMS(array) (sizeof(array) / sizeof(array[0]))
+#endif
+
 /* Some default configurations */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"

@@ -57,16 +57,13 @@ LT_INIT([disable-shared static])
 
 # Check for required packages
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
 PKG_CHECK_MODULES([confuse], [libconfuse >= 3.0])
 
-LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
-CPPFLAGS="$CPPFLAGS $lite_CFLAGS $confuse_CFLAGS"
-AC_CHECK_LIB([ite], [strlcpy], [],
-             AC_MSG_ERROR([*** Frog DNA library (libite, -lite) not found!]))
+LDFLAGS="$LDFLAGS $confuse_LIBS"
+CPPFLAGS="$CPPFLAGS $confuse_CFLAGS"
 AC_CHECK_LIB([confuse], [cfg_init], [],
              AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
-AC_CHECK_HEADERS([lite/lite.h lite/queue.h confuse.h], [],
+AC_CHECK_HEADERS([confuse.h], [],
              AC_MSG_ERROR([*** Cannot find required header files!]))
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
