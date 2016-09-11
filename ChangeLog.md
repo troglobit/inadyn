@@ -4,13 +4,15 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.0][UNRELEASED] - 2016-09-YY
--------------------------------
+[v2.0][] - 2016-09-12
+---------------------
 
-New configuration file format and changed command line options.
+New configuration file format, changed command line options, improved
+HTTPS support using GnuTLS and Open/LibreSSL.  Inadyn now comes with
+certificate validation enabled by default.
 
 ### Changes
-- New configuration file format using libConfuse
+- New configuration file format using [libConfuse][]
 - Radically simplified command line, a .conf file is now required
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 - Strict HTTPS certificate validation is now default.  To disable this
@@ -21,7 +23,7 @@ New configuration file format and changed command line options.
   to provide the path to another CA cert bundle, in PEM format.
 - Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
 - Support for reading address from interface, including IPv6 addresses
-- Support for calling an external script to get the IP address.
+- Support for calling an external script to get the IP address
 - Support for multiple users @ same provider, idea from Valery Frolov:
 
         provider default@no-ip.com:1 {
@@ -613,7 +615,7 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.15...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.0...HEAD
 [v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
@@ -640,6 +642,7 @@ First stable version.
 [1.97.0]: https://github.com/troglobit/inadyn/compare/1.96.2...1.97.0
 [libite]: https://github.com/troglobit/libite
 [README.md]: https://github.com/troglobit/inadyn/blob/master/README.md
+[libConfuse]: https://github.com/martinh/libconfuse
 
 <!--
   -- Local Variables:

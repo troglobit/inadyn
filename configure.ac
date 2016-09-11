@@ -1,5 +1,5 @@
 AC_PREREQ(2.61)
-AC_INIT(In-a-dyn, 2.0-rc2, https://github.com/troglobit/inadyn/issues, inadyn, http://troglobit.com/inadyn.html)
+AC_INIT(In-a-dyn, 2.0, https://github.com/troglobit/inadyn/issues, inadyn, http://troglobit.com/inadyn.html)
 AM_INIT_AUTOMAKE([1.11 foreign no-dist-gzip dist-xz])
 AM_SILENT_RULES([yes])
 
