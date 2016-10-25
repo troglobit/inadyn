@@ -21,7 +21,7 @@ Introduction
 Inadyn is a small and simple Dynamic DNS, [DDNS][], client with HTTPS
 support.  Commonly available in many GNU/Linux distributions, used in
 off the shelf routers and Internet gateways to automate the task of
-keeping your Internet name in sync with your IP address.
+keeping your Internet name in sync with your public¹ IP address.
 
 Most people are unaware they share a pool of Internet addresses with
 other users of the same Internet Service Provider (ISP).  Protocols like
@@ -38,6 +38,9 @@ your IP address changes.  Inadyn can maintain multiple host records with
 the same IP address, use a combination of a script, the address from an
 Internet-facing interface, or default to using the IP address change
 detector of the DDNS provider.
+
+__  
+¹ Public IP address is the default, private addresses can also be used.
 
 
 Supported Providers
