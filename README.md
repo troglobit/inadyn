@@ -295,8 +295,8 @@ Build & Install
 In-A-Dyn requires a few libraries to build.  The build system searches
 for them, in their required versions, using the `pkg-config` tool:
 
-* [libite][],
-* [libConfuse][]
+* [libite][] (1.5.0+),
+* [libConfuse][] (3.0+)
 * [LibreSSL][], [OpenSSL][], or [GnuTLS][]
 
 The latter two (SSL library + libConfuse) are available from most UNIX
