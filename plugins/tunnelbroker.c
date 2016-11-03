@@ -47,6 +47,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "checkip.dns.he.net",
 	.checkip_url  = "/",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "ipv4.tunnelbroker.net",
 	.server_url   = "/ipv4_end.php"

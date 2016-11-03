@@ -47,6 +47,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "echo.tzo.com",
 	.checkip_url  = "/",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "rh.tzo.com",
 	.server_url   = "/webclient/tzoperl.html"
