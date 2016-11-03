@@ -256,6 +256,13 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	if (str && strlen(str) <= sizeof(info->creds.password))
 		strlcpy(info->creds.password, str, sizeof(info->creds.password));
 
+	/* Preset SSL mode for checkip-server:
+	 * IF SSL enabled and provider's checkip-server supports SSL
+	 * OR provider's checkip-server requires SSL */
+	info->checkip_ssl =
+		(info->ssl_enabled && system->checkip_ssl) ||
+		system->checkip_ssl == DDNS_CHECKIP_SSL_REQUIRED;
+
 	for (j = 0; j < cfg_size(cfg, "hostname"); j++) {
 		size_t pos = info->alias_count;
 
@@ -311,6 +318,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 		else
 			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+		info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
 	}
 
 	/* The checkip-command overrides any default or custom checkip-server */
@@ -391,6 +399,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_BOOL    ("checkip-ssl",    cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		CFG_END()
 	};
@@ -404,6 +413,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_BOOL    ("checkip-ssl",    cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),

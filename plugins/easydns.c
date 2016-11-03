@@ -48,6 +48,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "members.easydns.com",
 	.server_url   = "/dyn/dyndns.php"

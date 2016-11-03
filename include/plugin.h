@@ -51,6 +51,13 @@ typedef struct ddns_system {
 
 	const char    *checkip_name;
 	const char    *checkip_url;
+	/* SSL support status in plugin definition
+	 * ddns.h:
+	 * #define DDNS_CHECKIP_SSL_NOT_SUPPORTED    0       // SSL not supported by checkip-server (default)
+	 * #define DDNS_CHECKIP_SSL_SUPPORTED        1       // SSL supported by checip-server
+	 * #define DDNS_CHECKIP_SSL_REQUIRED         3       // SSL required for checip-server
+	 */
+	int            checkip_ssl; /* checkip server ssl mode */
 
 	const char    *server_name;
 	const char    *server_url;

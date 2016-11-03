@@ -157,7 +157,8 @@ Common settings in custom{} and provider{} sections are:
 .Pp
 .Bl -tag -width TERM
 .It Cm ssl = <true | false>
-Use HTTPS to connect to this DDNS service provider, default HTTP (false).
+Use HTTPS to connect to this DDNS service provider and to the default checkip-server
+(if it is supported by checkip-server), default to use HTTP (false).
 .It Cm username = USERNAME.
 The username, if applicable.  This might be referred to as hash by some providers.
 .It Cm password = PASSWORD
@@ -181,6 +182,9 @@ section it overrides the provider's default
 .Cm checkip-server .
 .It Cm checkip-path = "/some/checkip/url"
 Optional server path for check IP server, defaults to "/".
+.It Cm checkip-ssl = <true | false>
+Forced to use HTTPS to connect to checkip-server (if it is explicitly set with
+"checkip-server" keyword). Default to use HTTP (false).
 .It Cm checkip-command = "/path/to/shell/command [optional args]"
 Shell command, or script, for IP address update checking.  The command
 must output a text with the IP address to its standard output.  The
@@ -358,6 +362,9 @@ provider default@freedns.afraid.org {
 
 # No-IP.com #1
 provider default@no-ip.com:1 {
+    checkip-server = "dynamic.zoneedit.com"
+    checkip-path   = "/checkip.html"
+    checkip-ssl    = true
     username   = account21
     password   = secret21
     hostname   = example.no-ip.com
