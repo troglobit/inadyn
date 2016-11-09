@@ -53,8 +53,8 @@ uid_t  uid = 0;
 gid_t  gid = 0;
 cfg_t *cfg;
 
-extern cfg_t *conf_parse_file(char *file, ddns_t *ctx);
-extern void conf_info_cleanup(void);
+extern cfg_t *conf_parse_file   (char *file, ddns_t *ctx);
+extern void   conf_info_cleanup (void);
 
 
 static int alloc_context(ddns_t **pctx)
