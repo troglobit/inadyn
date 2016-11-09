@@ -188,24 +188,22 @@ This option can also be given as a configuration option in
 both serve a purpose, use whichever one works for you.
 .It Fl I, Fl -ident=NAME
 Specify program identity (name) to be used for PID file and syslog
-messages.  The PID filename is still possible to explicitly override
-using its
-.Fl -pidfile
-option.  Although this one may be more useful in multi-daemon setups.
+messages.  Useful with multiple instances of
+.Nm ,
+or to simply replace the
+.Nm
+name with something more generic, e.g. "DDNS", without renaming the
+binary.  Note, this option only changes the base name of the PID file,
+not the location, which is system specific.  Usually
+.Pa /var/run/inadyn.pid
+or
+.Pa /run/inadyn.pid .
+
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,
 debug
 .It Fl n, -forground
-.It Fl -pidfile Ar NAME
-Override basename of default PID file.  Useful if running multiple
-instances of
-.Nm .
-With this option you can change the base name of the PID file, not the
-location, which is system specific.  Usually
-.Pa /var/run/inadyn.pid ,
-or
-.Pa /run/inadyn.pid .
 Run in foreground, default is to daemonize and continue in the
 background.  This option is usually required when running under process
 supervisors like systemd and Finit.  Remember to also give the

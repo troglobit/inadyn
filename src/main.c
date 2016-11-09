@@ -184,10 +184,9 @@ static int usage(int code)
 		" -f, --config=FILE              Use FILE for config, default %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
-		" -I, --ident=NAME               Identity, tag syslog messages with NAME\n"
+		" -I, --ident=NAME               Identity for PID file and syslog message tagging\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
-		"     --pidfile=NAME             Override basename of default pidfile\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
@@ -226,7 +225,7 @@ int main(int argc, char *argv[])
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
-		{ "pidfile",           1, 0, 100 },
+		{ "pidfile",           1, 0, 100 }, /* Compat, but do not advertise in usage() */
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
 		{ "startup-delay",     1, 0, 't' },
