@@ -42,7 +42,7 @@ int    allow_ipv6 = 0;
 int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
-char  *prognm = PACKAGE_NAME;
+char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
@@ -184,6 +184,7 @@ static int usage(int code)
 		" -f, --config=FILE              Use FILE for config, default %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
+		" -I, --ident=NAME               Identity, tag syslog messages with NAME\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
 		"     --pidfile=NAME             Override basename of default pidfile\n"
@@ -221,6 +222,7 @@ int main(int argc, char *argv[])
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
 		{ "iface",             1, 0, 'i' },
+		{ "ident",             1, 0, 'I' },
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
@@ -233,8 +235,8 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	prognm = progname(argv[0]);
-	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:l:np:st:v", opt, NULL)) != EOF) {
+	ident = progname(argv[0]);
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -258,6 +260,10 @@ int main(int argc, char *argv[])
 
 		case 'i':	/* --iface=IFNAME */
 			iface = strdup(optarg);
+			break;
+
+		case 'I':	/* --ident=NAME */
+			ident = optarg;
 			break;
 
 		case 'l':	/* --loglevel=LEVEL */
@@ -301,17 +307,20 @@ int main(int argc, char *argv[])
 
 	if (background) {
 		if (daemon(0, 0) < 0) {
-			fprintf(stderr, "Failed daemonizing %s: %m\n", prognm);
+			fprintf(stderr, "Failed daemonizing %s: %m\n", ident);
 			return RC_OS_FORK_FAILURE;
 		}
 	}
+
+	if (!pidfile_name)
+		pidfile_name = ident;
 
 #ifdef LOG_PERROR
 	if (!background && use_syslog < 1)
 		log_opts |= LOG_PERROR;
 #endif
 
-	openlog(prognm, log_opts, LOG_USER);
+	openlog(ident, log_opts, LOG_USER);
 	setlogmask(LOG_UPTO(loglevel));
 
 	if (drop_privs()) {

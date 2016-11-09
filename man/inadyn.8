@@ -24,6 +24,7 @@
 .Op Fl f, -config=FILE
 .Op Fl h, -help
 .Op Fl i, -iface=IFNAME
+.Op Fl I, -ident=NAME
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
 .Op Fl --pidfile=NAME
@@ -185,6 +186,12 @@ check-ip servers are slow to respond.
 This option can also be given as a configuration option in
 .Xr inadyn.conf 5 ,
 both serve a purpose, use whichever one works for you.
+.It Fl I, Fl -ident=NAME
+Specify program identity (name) to be used for PID file and syslog
+messages.  The PID filename is still possible to explicitly override
+using its
+.Fl -pidfile
+option.  Although this one may be more useful in multi-daemon setups.
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,
