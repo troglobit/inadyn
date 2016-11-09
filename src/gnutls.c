@@ -140,7 +140,7 @@ done:
 int ssl_init(void)
 {
 	if (!gnutls_check_version("3.1.4")) {
-		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", __progname);
+		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", prognm);
 		exit(1);
 	}
 

@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include "os.h"
 
-extern char *__progname;
+extern char *prognm;
 
 int  loglvl (char *level);
 void logit  (int prio, const char *fmt, ...);

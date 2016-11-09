@@ -1,7 +1,7 @@
 /* Inadyn is a small and simple dynamic DNS (DDNS) client
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2015  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +42,7 @@ int    allow_ipv6 = 0;
 int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
+char  *prognm = PACKAGE_NAME;
 char  *iface = NULL;
 char  *config = NULL;
 char  *cache_dir = NULL;
@@ -191,11 +192,23 @@ static int usage(int code)
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
 		"Bug report address: %s\n"
-		"Project homepage: %s\n\n", __progname, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT, PACKAGE_URL);
+		"Project homepage: %s\n\n", PACKAGE_NAME, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT, PACKAGE_URL);
 
 	return code;
 }
 
+static char *progname(char *arg0)
+{
+       char *nm;
+
+       nm = strrchr(arg0, '/');
+       if (nm)
+	       nm++;
+       else
+	       nm = arg0;
+
+       return nm;
+}
 
 int main(int argc, char *argv[])
 {
@@ -220,6 +233,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
+	prognm = progname(argv[0]);
 	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:l:np:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
@@ -287,7 +301,7 @@ int main(int argc, char *argv[])
 
 	if (background) {
 		if (daemon(0, 0) < 0) {
-			fprintf(stderr, "Failed daemonizing %s: %m\n", __progname);
+			fprintf(stderr, "Failed daemonizing %s: %m\n", prognm);
 			return RC_OS_FORK_FAILURE;
 		}
 	}
@@ -297,7 +311,7 @@ int main(int argc, char *argv[])
 		log_opts |= LOG_PERROR;
 #endif
 
-	openlog(__progname, log_opts, LOG_USER);
+	openlog(prognm, log_opts, LOG_USER);
 	setlogmask(LOG_UPTO(loglevel));
 
 	if (drop_privs()) {
