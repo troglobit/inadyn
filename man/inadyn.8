@@ -197,7 +197,6 @@ Set log level: none, err, info,
 .Ar notice ,
 debug
 .It Fl n, -forground
-Run in foreground, default is to daemonize and background.
 .It Fl -pidfile Ar NAME
 Override basename of default PID file.  Useful if running multiple
 instances of
@@ -207,6 +206,11 @@ location, which is system specific.  Usually
 .Pa /var/run/inadyn.pid ,
 or
 .Pa /run/inadyn.pid .
+Run in foreground, default is to daemonize and continue in the
+background.  This option is usually required when running under process
+supervisors like systemd and Finit.  Remember to also give the
+.Fl s
+option to get log messages to the syslog.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
 .It Fl s, -syslog
