@@ -41,6 +41,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "myip.dtdns.com",
 	.checkip_url  = "/",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "www.dtdns.com",
 	.server_url   = "/api/autodns.cfm"

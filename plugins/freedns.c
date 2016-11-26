@@ -45,6 +45,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "freedns.afraid.org",
 	.checkip_url  = "/dynamic/check.php",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "freedns.afraid.org",
 	.server_url   = "/dynamic/update.php"

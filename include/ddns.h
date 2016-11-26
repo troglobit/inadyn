@@ -59,6 +59,11 @@
 #define DDNS_MAX_ALIAS_NUMBER             10      /* maximum number of aliases per server that can be maintained */
 #define DDNS_MAX_SERVER_NUMBER            5       /* maximum number of servers that can be maintained */
 
+/* SSL support status in plugin definition */
+#define DDNS_CHECKIP_SSL_NOT_SUPPORTED    0       /* SSL not supported by checkip-server (default) */
+#define DDNS_CHECKIP_SSL_SUPPORTED        1       /* SSL supported by checip-server */
+#define DDNS_CHECKIP_SSL_REQUIRED         3       /* SSL required for checip-server */
+
 /* local configs */
 #define USERNAME_LEN                      50      /* chars */
 #define PASSWORD_LEN                      50      /* chars */
@@ -123,6 +128,7 @@ typedef struct di {
 	/* Address of "What's my IP" checker */
 	ddns_name_t    checkip_name;
 	char           checkip_url[SERVER_URL_LEN];
+	int            checkip_ssl; /* checkip server ssl mode */
 	http_t         checkip;
 
 	/* Shell command for "What's my IP" checker */

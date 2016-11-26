@@ -135,7 +135,7 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 	}
 
 	client = &provider->checkip;
-	client->ssl_enabled = 0;
+	client->ssl_enabled = provider->checkip_ssl;
 	DO(http_init(client, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
