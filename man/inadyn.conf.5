@@ -158,7 +158,7 @@ Common settings in custom{} and provider{} sections are:
 .Bl -tag -width TERM
 .It Cm ssl = <true | false>
 Use HTTPS, both when checking for IP changes and updating the DNS
-record.  Default is to use HTTP (false).
+record.  Default is to use HTTPS (true).
 .It Cm username = USERNAME.
 The username, if applicable.  This might be referred to as hash by some providers.
 .It Cm password = PASSWORD
@@ -338,9 +338,9 @@ However, the password is usually never sent in clear text in the HTTP
 GET URL.  Most DDNS providers instead rely on HTTP basic auth., which
 .Nm inadyn
 always relays to the server in the HTTP header of update requests.
-Remember to set the
-.Cm ssl = true
-setting if your DDNS provider supports HTTPS!
+.Nm
+v2.1 and later defaults to HTTPS to protect your credentials, but some
+providers still do not support HTTPS.
 .It Cm append-myip = true
 Append your current IP to the the DDNS server update path.  By default
 this setting is false and the hostname is appended.  Unless the
@@ -356,7 +356,6 @@ cache-dir      = /etc/inadyn
 
 # Dyn.com
 provider default@dyndns.org {
-    ssl        = true
     username   = account1
     password   = secret1
     hostname   = { "my.example.com", "other.example.org" }
@@ -365,7 +364,6 @@ provider default@dyndns.org {
 # FreeDNS. Remember the username must be in lower case
 # and password (max 16 chars) is case sensitive.
 provider default@freedns.afraid.org {
-    ssl        = true
     username   = lower-case-username
     password   = case-sensitive-pwd
     hostname   = some.example.com
@@ -375,9 +373,10 @@ provider default@freedns.afraid.org {
 provider default@no-ip.com:1 {
     checkip-server = "dynamic.zoneedit.com"
     checkip-path   = "/checkip.html"
-    username   = account21
-    password   = secret21
-    hostname   = example.no-ip.com
+    checkip-ssl    = false
+    username       = account21
+    password       = secret21
+    hostname       = example.no-ip.com
 }
 
 # No-IP.com #2
@@ -389,7 +388,6 @@ provider default@no-ip.com:2 {
 
 # Loopia
 provider default@loopia.com {
-    ssl        = true
     wildcard   = true
     username   = account3
     password   = secret3
@@ -398,7 +396,6 @@ provider default@loopia.com {
 
 # ddnss.de
 provider default@ddnss.de {
-    ssl        = true
     username   = your_username
     password   = your_password
     hostname   = your_host.ddnss.de
@@ -406,7 +403,6 @@ provider default@ddnss.de {
 
 # spdyn.de
 provider default@spdyn.de {
-    ssl        = true
     username   = your_username
     password   = your_password
     hostname   = your_host.spdyn.de
@@ -414,7 +410,6 @@ provider default@spdyn.de {
 
 # www.strato.com
 provider default@strato.com {
-    ssl        = true
     username   = your_username
     password   = your_password
     hostname   = example.com
@@ -429,7 +424,6 @@ provider default@dynv6.com {
 
 # IPv6 account at https://tunnelbroker.net
 provider default@tunnelbroker.net {
-    ssl        = true
     username   = xyzzy
     password   = update-key-in-advanced-tab
     hostname   = tunnel-id
@@ -437,11 +431,11 @@ provider default@tunnelbroker.net {
 
 # Generic example for twoDNS.de
 custom twoDNS.de {
-    ssl            = true
     username       = account4
     password       = secret4
     checkip-server = checkip.two-dns.de
     checkip-path   = /
+    checkip-ssl    = false
     ddns-server    = update.twodns.de
     ddns-path      = "/update?hostname="
     hostname       = example.dd-dns.de
@@ -455,7 +449,6 @@ requires:
 .Bd -unfilled -offset indent
 # This emulates default@dyndns.org
 custom dyn.com {
-    ssl          = true
     username     = DYNUSERNAME
     password     = DYNPASSWORD
     ddns-server  = members.dyndns.org
@@ -478,7 +471,7 @@ this:
 .Bd -unfilled -offset indent
 # This emulates default@dyndns.org
 custom dyn.com {
-    ssl          = true
+    ssl          = false
     username     = DYNUSERNAME
     password     = DYNPASSWORD
     ddns-server  = members.dyndns.org

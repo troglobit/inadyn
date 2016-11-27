@@ -86,11 +86,10 @@ examples.
 * <https://spdyn.de>
 * <https://www.strato.com>
 
-In-A-Dyn supports HTTPS for DDNS providers that support this, which you
-must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, Loopia,
-strato and SPDYN, have been verified to support HTTPS.
+In-A-Dyn defaults to HTTPS, but not all providers may support this, so
+try disabling SSL in case you run into problems.
 
-*HTTPS is strongly recommended* since it protects your credentials from
+*HTTPS is enabled by default* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.
 
 
@@ -105,7 +104,7 @@ how this can be done:
     period          = 300
     
     provider default@dyndns.org {
-	    ssl         = true
+	    ssl         = false
         username    = charlie
         password    = snoopy
         hostname    = { "peanuts", "woodstock" }
@@ -123,6 +122,7 @@ how this can be done:
         username       = james
         password       = bond
         hostname       = spectre.no-ip.com
+		checkip-ssl    = false
         checkip-server = api.ipify.org
     }
     
@@ -136,7 +136,6 @@ how this can be done:
     
     # Note: hostname == update-key from Advanved tab in the Web UI
     provider default@tunnelbroker.net {
-        ssl         = true
         username    = futurekid
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
         hostname    = 1234534245321           # tunnel-id
@@ -148,8 +147,6 @@ how this can be done:
         hostname = { host1.dynv6.net, host2.dynv6.net }
     }
 
-In this example only the DynDNS and Tunnelbroker accounts use SSL, the
-No-IP account will still use regular HTTP.  See below for more on SSL.
 Notice how this configuration file has two different users of the No-IP
 provider -- this is achieved by appending a `:ID` to the provider name.
 
@@ -169,7 +166,7 @@ OK to proceed before the `SEC` timeout, use `SIGUSR2`.
 The last system defined is the IPv6 <https://tunnelbroker.net> service
 provided by Hurricane Electric.  Here `hostname` is set to the tunnel ID
 and password **must** be the *Update key* found in the *Advanced*
-configuration tab.  Also, `default@tunnelbroker.net` requires SSL!
+configuration tab.
 
 Sometimes the default `checkip-server` for a DDNS provider can be very
 slow to respond, to this end Inadyn now supports overriding this server
@@ -201,7 +198,6 @@ A DDNS provider like <http://twoDNS.de> can be setup like this:
         password       = mypass
         checkip-server = checkip.two-dns.de
         checkip-path   = /
-        ssl            = true
         ddns-server    = update.twodns.de
         ddns-path      = "/update?hostname="
         hostname       = myhostname.dd-dns.de
@@ -215,7 +211,6 @@ DDNS plugin:
     custom namecheap {
         username    = myuser
         password    = mypass
-        ssl         = true
         ddns-server = dynamicdns.park-your-domain.com
         ddns-path   = "/update?domain=YOURDOMAIN.TLD&password=mypass&host="
         hostname    = { "alpha", "beta", "gamma" }
@@ -238,7 +233,6 @@ illustrate how the `hostname` setting works:
     custom kruskakli {
         username    = myuser
         password    = mypass
-        ssl         = true
         ddns-server = dynamicdns.park-your-domain.com
         ddns-path   = "/update?password=mypass&domain="
         hostname    = YOURDOMAIN.TLD
@@ -255,7 +249,6 @@ section, or similar.
     custom randomhandle {
         username    = DYNUSERNAME
         password    = DYNPASSWORD
-        ssl         = true
         ddns-server = members.dyndns.org
         ddns-path   = "/nic/update?hostname=%h.dyndns.org&myip=%i"
         hostname    = { YOURHOST, alias }

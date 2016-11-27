@@ -43,10 +43,13 @@ Common DDNS service providers supported by
 .Nm
 are listed below.  Some of these services are free of charge for
 non-commercial use, others take a small fee, but also provide more
-domain names to choose from.  Providers known to support SSL updates are
-listed as
-.Sy https
-below:
+domain names to choose from.
+.Pp
+.Nm
+defaults to HTTPS for all providers, some may however not support this
+so try disabling SSL for your provider in case of problems.  Providers
+known to support SSL updates are listed below with
+.Sy https :
 .Pp
 .Bl -bullet -compact
 .It
