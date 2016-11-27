@@ -4,6 +4,24 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.1][UNRELEASED] - 2016-XX-YY
+-------------------------------
+
+### Changes
+- Use HTTPS instead of HTTP by default
+- Support for disabling HTTPS for `checkip-server`, per provider.
+  Idea from Valery Frolov
+- Add `-I,--ident=NAME` option for syslog+pidfile name
+- Deprecate `--pidfile=NAME` option in favor of `--ident=NAME`
+
+### Fixes
+- Fix issue #144: Clarify use of public vs private IP.  It is possible
+  to register private IP addresses in a public DNS
+- Clarify `--foreground` option in manpage
+- Document minium required versions of libite and libConfuse
+- Portability fixes, replace `__progname` with a small function
+
+
 [v2.0][] - 2016-09-12
 ---------------------
 
