@@ -41,7 +41,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "checkip.zerigo.com",
 	.checkip_url  = "/",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "update.zerigo.com",
 	.server_url   = "/dynamic?host="

@@ -43,7 +43,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "dynamic.zoneedit.com",
 	.checkip_url  = "/checkip.html",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "dynamic.zoneedit.com",
 	.server_url   = "/auth/dynamic.html"

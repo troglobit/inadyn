@@ -55,15 +55,15 @@ DDNS providers not supported natively like <http://twoDNS.de>, can be
 enabled using the generic DDNS plugin.  See below for configuration
 examples.
 
-* <http://www.dyndns.org>
-* <http://freedns.afraid.org>
-* <http://www.zoneedit.com>
+* <http://www.dyndns.org>, <http://www.dyn.com>
+* <https://freedns.afraid.org>
+* <https://www.zoneedit.com>
 * <http://www.no-ip.com>
 * <http://www.easydns.com>
 * <http://www.tzo.com>
 * <http://www.3322.org>
 * <http://www.dnsomatic.com>
-* <http://dns.he.net/>
+* <http://dns.he.net>
 * <http://www.tunnelbroker.net>
 * <http://www.dynsip.org>
 * <http://www.sitelutions.com>
@@ -72,7 +72,7 @@ examples.
 * <http://www.zerigo.com>
 * <http://www.dhis.org>
 * <https://nsupdate.info>
-* <http://duckdns.org>
+* <https://duckdns.org>
 * <https://www.loopia.com>
 * <https://www.namecheap.com>
 * <https://domains.google.com>
@@ -87,8 +87,8 @@ examples.
 * <https://www.strato.com>
 
 In-A-Dyn supports HTTPS for DDNS providers that support this, which you
-must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, Loopia, strato
-and SPDYN, have been verified to support HTTPS.
+must check yourself.  So far DynDNS, FreeDNS, nsupdate.info, Loopia,
+strato and SPDYN, have been verified to support HTTPS.
 
 *HTTPS is strongly recommended* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.

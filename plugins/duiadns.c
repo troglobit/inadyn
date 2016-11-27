@@ -41,7 +41,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "ipv4.duia.ro",
 	.checkip_url  = "/",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "ipv4.duia.ro",
 	.server_url   = "/dynamic.duia"

@@ -44,7 +44,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "ip.changeip.com",
 	.checkip_url  = "/",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "nic.changeip.com",
 	.server_url   = "/nic/update"
@@ -58,7 +57,6 @@ static ddns_system_t ovh = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "www.ovh.com",
 	.server_url   = "/nic/update"

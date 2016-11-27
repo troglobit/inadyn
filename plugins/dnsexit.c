@@ -44,7 +44,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "ip.dnsexit.com",
 	.checkip_url  = "/",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_NOT_SUPPORTED,
 
 	.server_name  = "update.dnsexit.com",
 	.server_url   = "/RemoteUpdate.sv"

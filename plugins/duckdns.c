@@ -46,7 +46,6 @@ static ddns_system_t plugin = {
 
 	.checkip_name = "ipv4.wtfismyip.com",
 	.checkip_url  = "/text",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "www.duckdns.org",
 	.server_url   = "/update"
