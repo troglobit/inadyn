@@ -66,6 +66,19 @@ static void replace_fmt(char *fmt, char *str, size_t fmtlen)
 	memcpy(fmt, str, strlen(str));
 }
 
+/* Skip %? if it has not been specified */
+static void skip_fmt(char *fmt, int skipNum)
+{
+	int i;
+	char *src = fmt + skipNum;
+	fmt = memmove(fmt, src, strlen(src));
+
+	/* clean up the char array and terminate the string */
+	for(i = 0; i < skipNum; i++ )
+		fmt[strlen(fmt)-1] = '\0';
+}
+
+
 /*
  * Fully custom server URL, with % format specifiers
  *
@@ -74,25 +87,39 @@ static void replace_fmt(char *fmt, char *str, size_t fmtlen)
  * %h - hostname
  * %i - IP address
  */
-static int custom_server_url(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
+static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *ptr;
 
-	strlcpy(ctx->request_buf, info->server_url, ctx->request_buflen);
+	while ((ptr = strchr(info->server_url, '%'))) {
 
-	while ((ptr = strchr(ctx->request_buf, '%'))) {
 		if (!strncmp(ptr, "%u", 2)) {
-			replace_fmt(ptr, info->creds.username, 2);
+			if ( strnlen(info->creds.username, USERNAME_LEN) <= 0 ) {
+				logit(LOG_ERR, "Format specifier in ddns-path used: '%%u', but 'username' configuration option has not been specified!");
+				skip_fmt(ptr,2);
+			} else {
+				replace_fmt(ptr, info->creds.username, 2);
+			}
+			
 			continue;
 		}
+
 		if (!strncmp(ptr, "%p", 2)) {
-			replace_fmt(ptr, info->creds.password, 2);
+			if ( strnlen(info->creds.password, PASSWORD_LEN) <= 0 ) {
+				logit(LOG_ERR, "Format specifier in ddns-path used: '%%p', but 'password' configuration option has not been specified!");
+				skip_fmt(ptr,2);
+			} else {
+				replace_fmt(ptr, info->creds.password, 2);
+			}
+			
 			continue;
 		}
+
 		if (!strncmp(ptr, "%h", 2)) {
 			replace_fmt(ptr, alias->name, 2);
 			continue;
 		}
+		
 		if (!strncmp(ptr, "%i", 2)) {
 			replace_fmt(ptr, alias->address, 2);
 			continue;
@@ -102,8 +129,9 @@ static int custom_server_url(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias
 		return -1;
 	}
 
-	return strlen(ctx->request_buf);
+	return strlen(info->server_url);
 }
+
 
 /*
  * This function is called for every listed hostname alias in the
@@ -113,19 +141,28 @@ static int custom_server_url(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias
  */
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *arg = alias->name; /* Backwards compat, default to append hostname */
+	char *arg = "";
 
-	if (info->append_myip)	 /* New, append client's IP address instead. */
-		arg = alias->address;
+	/*
+	 * if the user has specified modifiers, then he is probably 
+	 * aware of how to append his hostname or IP, otherwise just
+	 * append the hostname or ip (depending on the append_myip option)
+	 */
+	if (strchr(info->server_url, '%')) {
+		if ( custom_server_url(info, alias) <= 0 )
+			logit(LOG_ERR, "Invalid server URL: %s", info->server_url );
+	} else {
+		arg = alias->name; /* Backwards compat, default to append hostname */
 
-	if (!strchr(info->server_url, '%'))
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-				GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
-				info->server_url, arg,
-				info->server_name.name,
-				info->creds.encoded_password);
+		if (info->append_myip)	 /* New, append client's IP address instead. */
+			arg = alias->address;
+	}
 
-	return custom_server_url(ctx, info, alias);
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+						 GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
+						 info->server_url, arg,
+						 info->server_name.name,
+						 info->creds.encoded_password);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
