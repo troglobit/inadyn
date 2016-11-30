@@ -62,21 +62,16 @@ static void replace_fmt(char *fmt, char *str, size_t fmtlen)
 	char *src = fmt + fmtlen;
 	size_t len = strlen(str);
 
-	memmove(fmt + len, src, strlen(src));
+	memmove(fmt + len, src, strlen(src) + 1);
 	memcpy(fmt, str, strlen(str));
 }
 
 /* Skip %? if it has not been specified */
 static void skip_fmt(char *fmt, size_t len)
 {
-	int i;
 	char *src = fmt + len;
 
-	fmt = memmove(fmt, src, strlen(src));
-
-	/* clean up the char array and terminate the string */
-	for(i = 0; i < skipNum; i++ )
-		fmt[strlen(fmt)-1] = '\0';
+	memmove(fmt, src, strlen(src) + 1);
 }
 
 
