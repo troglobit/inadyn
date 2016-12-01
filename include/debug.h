@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 #include "os.h"
+#include <stdarg.h>
 
 extern char *ident;
 
