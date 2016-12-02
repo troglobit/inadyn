@@ -78,7 +78,8 @@ if test "x$ac_enable_ssl" = "xyes"; then
       AC_CHECK_LIB([crypto], [EVP_EncryptInit], [],
                           AC_MSG_ERROR([*** Crypto library (OpenSSL) not found!]))
       AC_CHECK_LIB([ssl], [SSL_library_init], [],
-                          AC_MSG_ERROR([*** SSL library (OpenSSL) not found!]))
+                          AC_CHECK_LIB([ssl], [OPENSSL_init_ssl], [],
+                                              AC_MSG_ERROR([*** SSL library (OpenSSL) not found!])))
       AC_CHECK_HEADERS([openssl/crypto.h openssl/x509.h openssl/pem.h openssl/ssl.h \
                         openssl/tls1.h openssl/err.h], [],
 			AC_MSG_ERROR([*** Cannot find required header files!]),
