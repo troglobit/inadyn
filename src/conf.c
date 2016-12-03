@@ -447,7 +447,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 
 	cfg = cfg_init(opts, CFGF_NONE);
 	if (!cfg) {
-		logit(LOG_ERR, "Failed initializing configuration file parser: %m");
+		logit(LOG_ERR, "Failed initializing configuration file parser: %s", strerror(errno));
 		return NULL;
 	}
 

@@ -141,7 +141,7 @@ int ip_send(ip_sock_t *ip, const char *buf, int len)
 		return RC_IP_OBJECT_NOT_INITIALIZED;
 
 	if (send(ip->socket, buf, len, 0) == -1) {
-		logit(LOG_WARNING, "Network error while sending query/update: %m");
+		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(errno));
 		return RC_IP_SEND_ERROR;
 	}
 
@@ -178,7 +178,7 @@ int ip_recv(ip_sock_t *ip, char *buf, int len, int *recv_len)
 
 		bytes = recv(ip->socket, buf + total_bytes, chunk_size, 0);
 		if (bytes < 0) {
-			logit(LOG_WARNING, "Network error while waiting for reply: %m");
+			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(errno));
 			rc = RC_IP_RECV_ERROR;
 			break;
 		}

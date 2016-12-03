@@ -341,7 +341,7 @@ static int get_ipv4_address_iface(const char *ifname, char *address, size_t len)
 
 	sd = socket(PF_INET, SOCK_DGRAM, 0);
 	if (sd < 0) {
-		logit(LOG_WARNING, "Failed opening network socket: %m");
+		logit(LOG_WARNING, "Failed opening network socket: %s", strerror(errno));
 		return 1;
 	}
 
@@ -353,7 +353,7 @@ static int get_ipv4_address_iface(const char *ifname, char *address, size_t len)
 	close(sd);
 
 	if (result < 0) {
-		logit(LOG_ERR, "Failed reading IP address of interface %s: %m", ifname);
+		logit(LOG_ERR, "Failed reading IP address of interface %s: %s", ifname, strerror(errno));
 		return 1;
 	}
 
@@ -890,7 +890,7 @@ int ddns_main_loop(ddns_t *ctx)
 
 	/* Initialization done, create pidfile to indicate we are ready to communicate */
 	if (pidfile(pidfile_name))
-		logit(LOG_WARNING, "Failed creating pidfile: %m");
+		logit(LOG_WARNING, "Failed creating pidfile: %s", strerror(errno));
 
 	/* DDNS client main loop */
 	while (1) {
