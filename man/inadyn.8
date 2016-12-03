@@ -208,7 +208,10 @@ or
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,
-debug
+debug.  The default is
+.Ar notice ,
+but you might want to set this to
+.Fl l Ar warning .
 .It Fl n, -forground
 Run in foreground, default is to daemonize and continue in the
 background.  This option is usually required when running under process
