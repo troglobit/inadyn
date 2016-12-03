@@ -41,6 +41,7 @@
 
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */
 #define	HTTP_DEFAULT_PORT	80
+#define	HTTPS_DEFAULT_PORT	443
 
 typedef struct {
 	tcp_sock_t tcp;

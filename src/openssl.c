@@ -115,7 +115,7 @@ int ssl_open(http_t *client, char *msg)
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
 
-	tcp_set_port(&client->tcp, 443);
+	tcp_set_port(&client->tcp, HTTPS_DEFAULT_PORT);
 	DO(tcp_init(&client->tcp, msg));
 
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);

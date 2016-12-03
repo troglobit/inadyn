@@ -217,7 +217,7 @@ int ssl_open(http_t *client, char *msg)
 	gnutls_credentials_set(client->ssl, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	/* connect to the peer */
-	tcp_set_port(&client->tcp, 443);
+	tcp_set_port(&client->tcp, HTTPS_DEFAULT_PORT);
 	DO(tcp_init(&client->tcp, msg));
 
 	/* Forward TCP socket to GnuTLS, the set_int() API is perhaps too new still ... since 3.1.9 */
