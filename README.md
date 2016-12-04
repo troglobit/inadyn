@@ -134,7 +134,7 @@ how this can be done:
         checkip-command = /sbin/ifconfig eth0 | grep 'inet6 addr'
     }
     
-    # Note: hostname == update-key from Advanved tab in the Web UI
+    # Note: hostname == update-key from Advanced tab in the Web UI
     provider default@tunnelbroker.net {
         username    = futurekid
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
@@ -239,11 +239,11 @@ illustrate how the `hostname` setting works:
 	}
 
 The generic plugin can also be used with providers that require the
-client's new IP addres in the update request.  Here is an example of how
-this can be done if we *pretend* that <http://dyn.com> is not supported
-by inadyn.  The `ddns-path` differs between providers and is something
-you must figure out.  The support pages sometimes list this under an API
-section, or similar.
+client's new IP address in the update request.  Here is an example of
+how this can be done if we *pretend* that <http://dyn.com> is not
+supported by inadyn.  The `ddns-path` differs between providers and is
+something you must figure out.  The support pages sometimes list this
+under an API section, or similar.
 
     # This emulates default@dyndns.org
     custom randomhandle {
