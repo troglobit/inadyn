@@ -99,7 +99,8 @@ Set the number of DNS updates. The default is
 .Ar 0 ,
 which means infinity.
 .It Cm period = SEC
-How often the IP is checked, in seconds. Default: apx 1 minute. Max: 10 days.
+How often the IP is checked, in seconds. Default: apxrox. 1 minute. Max:
+10 days.
 .It Cm forced-update = SEC
 How often the IP should be updated even if it is not changed. The time
 should be given in seconds.  Default is equal to 30 days.
@@ -463,7 +464,7 @@ Notice the use of
 which differs from above previous examples.  Without this option set the
 default (backwards compatible) behavior is to append the hostname.
 .Pp
-An alternative, and perhaps more intuituve approach introduced in Inadyn
+An alternative, and perhaps more intuitive approach introduced in Inadyn
 v2.0, is to use the
 .Xr printf 3
 like format specifiers mentioned previously.  The same example look like

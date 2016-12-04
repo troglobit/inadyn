@@ -107,7 +107,7 @@ a.k.a.
 .It
 .Aq https://ddnss.de
 .It
-.Aq http://.dynv6.com
+.Aq http://dynv6.com
 .It
 .Aq http://ipv4.dynv6.com
 .It
@@ -128,20 +128,20 @@ supported more command line options, from v2.0
 .Nm
 has been greatly simplified.  See
 .Xr inadyn.conf 5
-for defails of the
+for details of the
 .Pa /etc/inadyn.conf
 configuration file format.
 .Pp
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
-.It Fl c, -cmd=/path/to/cmd Op optional args or pipe
+.It Fl c, -cmd=/path/to/cmd Op optional args
 Full path to command, or script, to run to check for IP address change.
 This is the same as the configuration file option
 .Ar checkip-command
 but will apply to
 .Sy all
-providers.  This command line option is only provided for convenence, it
+providers.  This command line option is only provided for convenience, it
 is recommended to instead use the configuration file.  For more details,
 see the
 .Xr inadyn.conf 5
@@ -212,7 +212,7 @@ debug.  The default is
 .Ar notice ,
 but you might want to set this to
 .Fl l Ar warning .
-.It Fl n, -forground
+.It Fl n, -foreground
 Run in foreground, default is to daemonize and continue in the
 background.  This option is usually required when running under process
 supervisors like systemd and Finit.  Remember to also give the
