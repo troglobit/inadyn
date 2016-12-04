@@ -4,8 +4,8 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.1][UNRELEASED] - 2016-XX-YY
--------------------------------
+[v2.1][] - 2016-12-04
+---------------------
 
 ### Changes
 - Use HTTPS instead of HTTP by default
@@ -15,11 +15,14 @@ All notable changes to the project are documented in this file.
 - Deprecate `--pidfile=NAME` option in favor of `--ident=NAME`
 
 ### Fixes
-- Fix issue #144: Clarify use of public vs private IP.  It is possible
+- Issue #150: Custom update URL parser fixes
+- Issue #151: Support for detecting OpenSSL v1.1
+- Issue #144: Clarify use of public vs private IP.  It is possible
   to register private IP addresses in a public DNS
-- Clarify `--foreground` option in manpage
-- Document minium required versions of libite and libConfuse
-- Portability fixes, replace `__progname` with a small function
+- Clarify `--foreground` option in man page
+- Document minimum required versions of libite and libConfuse
+- Portability fixes, replace `__progname` with a small function,
+  replace `%m` with `%s` and `strerror(errno)`.
 
 
 [v2.0][] - 2016-09-12
@@ -633,7 +636,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.0...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.1...HEAD
+[v2.1]: https://github.com/troglobit/inadyn/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
