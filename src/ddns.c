@@ -889,7 +889,7 @@ int ddns_main_loop(ddns_t *ctx)
 		ctx->force_addr_update = 1;
 
 	/* Initialization done, create pidfile to indicate we are ready to communicate */
-	if (pidfile(pidfile_name))
+	if (once == 0 && pidfile(pidfile_name))
 		logit(LOG_WARNING, "Failed creating pidfile: %s", strerror(errno));
 
 	/* DDNS client main loop */
