@@ -122,6 +122,12 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 			continue;
 		}
 
+		/* NOTE: This should be the last one */
+		if (!strncmp(ptr, "%%", 2)) {
+			replace_fmt(ptr, "%", 2);
+			continue;
+		}
+
 		logit(LOG_ERR, "Unknown format specifier in ddns-path: '%c'", ptr[1]);
 		return -1;
 	}
