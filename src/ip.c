@@ -72,7 +72,7 @@ int ip_init(ip_sock_t *ip)
 
 	do {
 		/* remote address */
-		if (ip->p_remote_host_name) {
+		if (ip->remote_host) {
 			int s;
 			char port[10];
 			struct addrinfo hints, *result;
@@ -86,10 +86,10 @@ int ip_init(ip_sock_t *ip)
 			hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
 			snprintf(port, sizeof(port), "%d", ip->port);
 
-			s = getaddrinfo(ip->p_remote_host_name, port, &hints, &result);
+			s = getaddrinfo(ip->remote_host, port, &hints, &result);
 			if (s != 0 || !result) {
 				logit(LOG_WARNING, "Failed resolving hostname %s: %s",
-				      ip->p_remote_host_name, gai_strerror(s));
+				      ip->remote_host, gai_strerror(s));
 				rc = RC_IP_INVALID_REMOTE_ADDR;
 				break;
 			}
@@ -223,7 +223,7 @@ int ip_get_port(ip_sock_t *ip, int *port)
 int ip_set_remote_name(ip_sock_t *ip, const char *name)
 {
 	ASSERT(ip);
-	ip->p_remote_host_name = name;
+	ip->remote_host = name;
 
 	return 0;
 }
@@ -232,7 +232,7 @@ int ip_get_remote_name(ip_sock_t *ip, const char **name)
 {
 	ASSERT(ip);
 	ASSERT(name);
-	*name = ip->p_remote_host_name;
+	*name = ip->remote_host;
 
 	return 0;
 }

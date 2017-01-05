@@ -42,7 +42,7 @@ typedef struct {
 	int                 socket;
 	struct sockaddr     remote_addr;
 	socklen_t           remote_len;
-	const char         *p_remote_host_name;
+	const char         *remote_host;
 
 	unsigned short      port;
 	int                 timeout;
