@@ -4,6 +4,25 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.2][] - 2017-01-XX
+---------------------
+
+### Changes
+- Use HTTP by default for DYN.com checkip server, used by many DDNS
+  providers that do not have their own.  This change is far more user
+  friendly since you no longer have to explicitly set `checkip-ssl =
+  false` for the most common use-case.
+- Some DDNS providers have multiple IP addresses registered for the same
+  service, as of this release Inadyn immediately tries to connect to the
+  next listed addresses on connection problems.
+- Support `%%` format specifier in custom server URL's, as mentioned in
+  issue #152.
+
+### Fixes
+- Issue #152: Do not attempt to create PID file in oneshot mode (`-1`)
+- Issue #152: 
+
+
 [v2.1][] - 2016-12-04
 ---------------------
 
@@ -637,6 +656,7 @@ First stable version.
 
 
 [UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.1...HEAD
+[v2.2]: https://github.com/troglobit/inadyn/compare/v2.1...v2.2
 [v2.1]: https://github.com/troglobit/inadyn/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
