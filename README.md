@@ -87,7 +87,8 @@ examples.
 * <https://www.strato.com>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
-try disabling SSL in case you run into problems.
+try disabling SSL for the update (`ssl = false`) or the checkip phase
+(`checkip-ssl = false`) in case you run into problems.
 
 *HTTPS is enabled by default* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.
@@ -354,7 +355,7 @@ To build from GIT you first need to clone the repository and run the
 installed on your system.
 
     git clone https://github.com/troglobit/inadyn.git
-    cd inadyn
+    cd inadyn/
     ./autogen.sh
     ./configure && make
 
