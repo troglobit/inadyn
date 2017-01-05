@@ -117,7 +117,7 @@ int ip_init(ip_sock_t *ip, char *msg)
 		return 0;
 
 	do {
-		int s, sd;
+		int s, sd, tries = 0;
 		char port[10];
 		char host[NI_MAXHOST];
 		struct addrinfo hints, *servinfo, *ai;
@@ -161,18 +161,21 @@ int ip_init(ip_sock_t *ip, char *msg)
 			sa  = ai->ai_addr;
 			len = ai->ai_addrlen;
 
-			if (!getnameinfo(sa, len, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
-				logit(LOG_INFO, "%s, connecting to %s(%s:%d)", msg, ip->remote_host, host, ip->port);
-			else
-				logit(LOG_ERR, "%s, failed resolving %s!", msg, ip->remote_host);
+			if (getnameinfo(sa, len, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+				goto next;
 
+			logit(LOG_INFO, "%s, %sconnecting to %s(%s:%d)", msg, tries ? "re" : "", ip->remote_host, host, ip->port);
 			if (connect(sd, sa, len)) {
+				tries++;
+
 				if (!check_error(sd, ip->timeout))
 					break; /* OK */
-
+			next:
 				ai = ai->ai_next;
 				if (ai) {
-					logit(LOG_INFO, "Failed connecting to %s (retrying): %s", ip->remote_host, strerror(errno));
+					logit(LOG_INFO, "Failed connecting to that server: %s",
+					      errno != EINPROGRESS ? strerror(errno) : "retrying ...");
+
 					close(sd);
 					continue;
 				}
