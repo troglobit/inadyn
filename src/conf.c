@@ -456,6 +456,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
 		CFG_INT ("forced-update", DDNS_FORCED_UPDATE_PERIOD, CFGF_NONE),
 		CFG_STR ("iface",         NULL, CFGF_NONE),
+		CFG_STR ("user-agent",    NULL, CFGF_NONE),
 		CFG_SEC ("provider",      provider_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_SEC ("custom",        custom_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_END()
@@ -505,6 +506,9 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	/* Command line --iface=IFNAME takes precedence */
 	if (!iface)
 		iface                 = cfg_getstr(cfg, "iface");
+	user_agent                    = cfg_getstr(cfg, "user-agent");
+	if (!user_agent)
+		user_agent = DDNS_USER_AGENT;
 	allow_ipv6                    = cfg_getbool(cfg, "allow-ipv6");
 	secure_ssl                    = cfg_getbool(cfg, "secure-ssl");
 	ca_trust_file                 = cfg_getstr(cfg, "ca-trust-file");

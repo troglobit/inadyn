@@ -126,6 +126,13 @@ also supports common default paths to Debian and RedHat CA bundles.
 This setting overrides the built-in paths and fallback locations and
 provides a way to specify the path to a trusted set of CA certificates,
 in PEM format, bundled into one file.
+.It Cm user-agent = STRING
+Specify the User-Agent string to send to the DDNS provider on checkip
+and update requests.  Some providers require this field to be set to a
+specific string, some may be OK with "Mozilla/4.0".  The default is to
+send "inadyn/VERSION SUPPORTURL", where VERSION is the current
+.Nm inadyn
+version, and SUPPORTURL is the upstream support URL.
 .It Cm custom some@identifier {}
 The
 .Cm custom{}
