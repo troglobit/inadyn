@@ -15,12 +15,12 @@ All notable changes to the project are documented in this file.
 - Some DDNS providers have multiple IP addresses registered for the same
   service, as of this release Inadyn immediately tries to connect to the
   next listed addresses on connection problems.
-- Support `%%` format specifier in custom server URL's, as mentioned in
-  issue #152.
+- Added support for the `%%` format specifier in custom server URL's, as
+  mentioned in issue #152.
 
 ### Fixes
 - Issue #152: Do not attempt to create PID file in oneshot mode (`-1`)
-- Issue #152: 
+- Issue #152: Must URL encode custom server URL's
 
 
 [v2.1][] - 2016-12-04
