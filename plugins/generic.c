@@ -21,6 +21,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
+#include <ctype.h>
 #include "plugin.h"
 
 /*
@@ -136,6 +137,56 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 	return strlen(info->server_url);
 }
 
+static char tohex(char code)
+{
+	static char hex[] = "0123456789abcdef";
+
+	return hex[code & 15];
+}
+
+/* Used to check if user already URL encoded */
+static int ishex(char *str)
+{
+	if (strlen(str) < 3)
+		return 0;
+
+	if (str[0] == '%' && isxdigit(str[1]) && isxdigit(str[2]))
+		return 1;
+
+	return 0;
+}
+
+static char *url_encode(char *str)
+{
+	char *buf, *ptr;
+
+	buf = calloc(strlen(str) * 3 + 1, sizeof(char));
+	if (!buf)
+		return NULL;
+	ptr = buf;
+	
+	while (str[0]) {
+		char ch = str[0];
+
+		if (ishex(str)) {
+			*ptr++ = *str++;
+			*ptr++ = *str++;
+			*ptr++ = *str++;
+			continue;
+		}
+
+		if (isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')
+			*ptr++ = ch;
+		else if (ch == ' ')
+			*ptr++ = '+';
+		else
+			*ptr++ = '%', *ptr++ = tohex(ch >> 4), *ptr++ = tohex(ch & 15);
+		str++;
+	}
+	*ptr = '\0';
+
+	return buf;
+}
 
 /*
  * This function is called for every listed hostname alias in the
@@ -145,6 +196,8 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
  */
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
+	int ret;
+	char *url;
 	char *arg = "";
 
 	/*
@@ -162,11 +215,18 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			arg = alias->address;
 	}
 
-	return snprintf(ctx->request_buf, ctx->request_buflen,
-			GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
-			info->server_url, arg,
-			info->server_name.name,
-			info->creds.encoded_password);
+	url = url_encode(info->server_url);
+	if (!url)
+		return 0;
+	
+	ret = snprintf(ctx->request_buf, ctx->request_buflen,
+		       GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
+		       url, arg,
+		       info->server_name.name,
+		       info->creds.encoded_password);
+	free(url);
+
+	return ret;
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
