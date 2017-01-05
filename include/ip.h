@@ -34,8 +34,6 @@ typedef struct {
 	int                 initialized;
 
 	int                 socket;
-	struct sockaddr     remote_addr;
-	socklen_t           remote_len;
 	const char         *remote_host;
 
 	unsigned short      port;
@@ -45,7 +43,7 @@ typedef struct {
 int ip_construct          (ip_sock_t *ip);
 int ip_destruct           (ip_sock_t *ip);
 
-int ip_init               (ip_sock_t *ip);
+int ip_init               (ip_sock_t *ip, char *msg);
 int ip_exit               (ip_sock_t *ip);
 
 int ip_send               (ip_sock_t *ip, const char *buf, int len);

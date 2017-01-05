@@ -20,7 +20,6 @@
  * Boston, MA  02110-1301, USA.
 */
 
-#include <poll.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -63,91 +62,17 @@ static int local_set_params(tcp_sock_t *tcp)
 	return 0;
 }
 
-/* Check for socket error */
-static int soerror(int sd)
-{
-	int code = 0;
-	socklen_t len = sizeof(code);
-
-	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, &code, &len))
-		return 1;
-
-	errno = code;
-
-	return code;
-}
-
-/* In the wonderful world of network programming the manual states that
- * EINPROGRESS is only a possible error on non-blocking sockets.  Real world
- * experience, however, suggests otherwise.  Simply poll() for completion and
- * then continue. --Joachim */
-static int check_error(int sd, int msec)
-{
-	struct pollfd pfd = { sd, POLLOUT, 0 };
-
-	if (EINPROGRESS == errno) {
-		logit(LOG_INFO, "Waiting (%d sec) for three-way handshake to complete ...", msec / 1000);
-		if (poll (&pfd, 1, msec) > 0 && !soerror(sd)) {
-			logit(LOG_INFO, "Connected.");
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
 /* On error tcp_exit() is called by upper layers. */
 int tcp_init(tcp_sock_t *tcp, char *msg)
 {
 	int rc = 0;
-	char host[NI_MAXHOST];
-	struct timeval sv;
-	struct sockaddr sa;
-	socklen_t salen;
 
 	ASSERT(tcp);
 
 	do {
-		int sd;
-
 		TRY(local_set_params(tcp));
-		TRY(ip_init(&tcp->ip));
-
-		sd = socket(AF_INET, SOCK_STREAM, 0);
-		if (sd == -1) {
-			logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));
-			rc = RC_IP_SOCKET_CREATE_ERROR;
-			break;
-		}
-
-		/* Call to socket() OK, allow tcp_exit() to run to
-		 * prevent socket leak if any of the below calls fail. */
-		tcp->ip.socket = sd;
+		TRY(ip_init(&tcp->ip, msg));
 		tcp->initialized  = 1;
-
-		/* Attempt to set TCP timers, silently fall back to OS defaults */
-		sv.tv_sec  =  tcp->ip.timeout / 1000;
-		sv.tv_usec = (tcp->ip.timeout % 1000) * 1000;
-		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv)))
-			logit(LOG_INFO, "Failed setting receive timeout socket option: %s", strerror(errno));
-		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv)))
-			logit(LOG_INFO, "Failed setting send timeout socket option: %s", strerror(errno));
-
-		sa    = tcp->ip.remote_addr;
-		salen = tcp->ip.remote_len;
-		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
-			logit(LOG_INFO, "%s, connecting to %s(%s:%d)", msg, tcp->ip.remote_host, host, tcp->ip.port);
-		else
-			logit(LOG_ERR, "%s, failed resolving %s!", msg, host);
-
-		if (connect(sd, &sa, salen)) {
-			if (!check_error(sd, tcp->ip.timeout))
-				break; /* OK */
-
-			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(errno));
-			rc = RC_IP_CONNECT_FAILED;
-			break;
-		}
 	} while (0);
 
 	if (rc) {
