@@ -51,6 +51,7 @@ static ddns_system_t generic = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "",
 	.server_url   = ""

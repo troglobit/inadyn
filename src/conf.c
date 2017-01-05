@@ -305,14 +305,31 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	}
 
 	/*
-	 * Follows the ssl setting bu default, but may be disabled by
-	 * user.  See below for exeception to this rule.
+	 * Follows the ssl setting by default, except for providers
+	 * known to NOT support HTTPS for their checkip servers.
+	 *
+	 * This setting may only be disabled by the user, with the
+	 * custom provider section being the exeception to the rule.
 	 */
 	info->checkip_ssl = info->ssl_enabled;
-	if (!cfg_getbool(cfg, "checkip-ssl"))
-	    info->checkip_ssl = 0;
 
-	/* The check-ip server can be set for all provider types */
+	/* Check known status of checkip server for provider */
+	switch (system->checkip_ssl) {
+	case DDNS_CHECKIP_SSL_UNSUPPORTED:
+		info->checkip_ssl = 0;
+		break;
+
+	case DDNS_CHECKIP_SSL_REQUIRED:
+		info->checkip_ssl = 1;
+		break;
+
+	default:
+	case DDNS_CHECKIP_SSL_SUPPORTED:
+		if (!cfg_getbool(cfg, "checkip-ssl"))
+			info->checkip_ssl = 0;
+	}
+
+	/* The checkip server can be set for all provider types */
 	if (!cfg_getserver(cfg, "checkip-server", &info->checkip_name)) {
 		str = cfg_getstr(cfg, "checkip-path");
 		if (str && strlen(str) <= sizeof(info->checkip_url))
@@ -322,7 +339,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 
 		/*
 		 * If a custom checkip server is defined, the
-		 * checkip-ssl setting is honored.
+		 * checkip-ssl setting is fully honored.
 		 */
 		info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
 	}

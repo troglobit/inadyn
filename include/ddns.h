@@ -38,14 +38,15 @@
 #define AGENT_NAME	"inadyn/" VERSION
 #define SUPPORT_ADDR	PACKAGE_BUGREPORT
 
-/* Test values */
-/* Some default configurations */
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"
 
+/* 2017-01-05: Dyn.com does NOT support HTTPS for checkip */
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"
+#define DYNDNS_MY_IP_SSL        DDNS_CHECKIP_SSL_UNSUPPORTED
 
+/* Some default settings */
 #define DDNS_DEFAULT_STARTUP_SLEEP        0       /* sec */
 #define DDNS_DEFAULT_PERIOD               120     /* sec */
 #define DDNS_MIN_PERIOD                   30      /* sec */
@@ -60,9 +61,9 @@
 #define DDNS_MAX_SERVER_NUMBER            5       /* maximum number of servers that can be maintained */
 
 /* SSL support status in plugin definition */
-#define DDNS_CHECKIP_SSL_NOT_SUPPORTED    0       /* SSL not supported by checkip-server (default) */
-#define DDNS_CHECKIP_SSL_SUPPORTED        1       /* SSL supported by checip-server */
-#define DDNS_CHECKIP_SSL_REQUIRED         3       /* SSL required for checip-server */
+#define DDNS_CHECKIP_SSL_UNSUPPORTED     -1       /* HTTPS not supported by checkip-server (default) */
+#define DDNS_CHECKIP_SSL_SUPPORTED        1       /* HTTPS supported by checkip-server */
+#define DDNS_CHECKIP_SSL_REQUIRED         3       /* HTTPS required for checkip-server */
 
 /* local configs */
 #define USERNAME_LEN                      50      /* chars */

@@ -51,6 +51,7 @@ typedef struct ddns_system {
 
 	const char    *checkip_name;
 	const char    *checkip_url;
+	const int      checkip_ssl;
 
 	const char    *server_name;
 	const char    *server_url;

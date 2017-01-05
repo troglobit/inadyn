@@ -46,6 +46,7 @@ static ddns_system_t dyndns = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "members.dyndns.org",
 	.server_url   = "/nic/update"
@@ -73,6 +74,7 @@ static ddns_system_t dynsip = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dynsip.org",
 	.server_url   = "/nic/update"
@@ -86,6 +88,7 @@ static ddns_system_t noip = {
 
 	.checkip_name = "ip1.dynupdate.no-ip.com",
 	.checkip_url  = "/",
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dynupdate.no-ip.com",
 	.server_url   = "/nic/update"
@@ -130,6 +133,7 @@ static ddns_system_t tunnelbroker = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ipv4.tunnelbroker.net",
 	.server_url   = "/nic/update"
@@ -191,6 +195,7 @@ static ddns_system_t googledomains = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "domains.google.com",
 	.server_url   = "/nic/update"
