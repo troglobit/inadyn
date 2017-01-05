@@ -1,0 +1,71 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: inadyn - simple and small DynDNS client written in the C language
+Upstream-Contact: Joachim Nilsson <troglobit@gmail.com>
+Source: http://github.com/troglobit/inadyn
+
+Files: *
+Copyright: 2004 Narcis Ilisei <inarcis2002@hotpop.com>
+	   2006 Steve Horbachuk
+	   2009 Christoph Brill <egore911@egore911.de>
+	   2010 Joachim Nilsson <troglobit@gmail.com>
+	   2010 Timur Birsh <taem@linukz.org>
+License: GPL-2+
+
+Files: src/base64utils.c
+Copyright: 2001 Marc Niegowski
+License: other
+    This file comes from
+    http://www.marcsweb.com/downloads/base64.tar.gz
+    and according to the included README file it has this copyright and license:
+    .
+    Distribution and use:
+    ---------------------
+    This software may be freely used and distributed as long as the author is
+    credited where ever it is used or distributed, including, but not limited to,
+    educational facilities.
+    .
+    Copyright (c) 1994 - 2001
+    Marc Niegowski
+    Connectivity, Inc.
+    All rights reserved.
+
+Files: include/base64.h
+Copyright: 2001 Marc Niegowski
+License: other
+    This file has this copyright and license:
+    .
+    Copyright (c) 1994 - 2003
+    Marc Niegowski
+    Connectivity, Inc.
+    All rights reserved.
+    .    
+    Licensing: this file is basically free to use in any way as long the above
+    copyright notice is kept.
+
+Files: src/md5.c include/md5.h
+Copyright: 1995 Ulrich Drepper <drepper@gnu.ai.mit.edu>
+License: GPL-2+
+
+Files: debian/*
+Copyright: 2005 Shaul Karl <shaul@debian.org>
+	   2010-2013 Timur Birsh <taem@linukz.org>
+License: GPL-2+
+
+License: GPL-2+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+    .
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    .
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+    .
+    On Debian systems, the full text of the GNU General Public
+    License version 2 can be found in the file
+    `/usr/share/common-licenses/GPL-2'.

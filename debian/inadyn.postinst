@@ -1,0 +1,90 @@
+#!/bin/sh
+
+set -e
+
+NAME=inadyn
+RUNDIR=/run/$NAME
+LOGDIR=/var/log/$NAME
+CONF=/etc/$NAME.conf
+
+if [ "$1" = "configure" ]
+then
+	# Create debian-inadyn group if it isn't already there
+	if ! getent group debian-inadyn >/dev/null
+	then
+		# Add system group: debian-inadyn
+		addgroup --system debian-inadyn >/dev/null
+	fi
+
+	# Create debian-inadyn user if it isn't already there
+	if ! getent passwd debian-inadyn >/dev/null
+	then
+		# Add system user: debian-inadyn
+		adduser \
+		 --system \
+		 --ingroup debian-inadyn \
+		 --home $RUNDIR \
+		 --no-create-home \
+		 --gecos "inadyn dyndns client" \
+		 --shell /bin/false \
+		 --disabled-login \
+		 --disabled-password \
+		 debian-inadyn >/dev/null
+	fi
+
+        own=`stat --printf="%u" "$CONF" 2>/dev/null`
+        grp=`stat --printf="%g" "$CONF" 2>/dev/null`
+        if [ "$own" = "0" -a "$grp" = "0" ]
+        then
+                if ! dpkg-statoverride --list $CONF >/dev/null 2>&1
+                then
+                        dpkg-statoverride --update --add root debian-inadyn 640 $CONF
+                fi
+        fi
+
+        own=`stat --printf="%u" "$LOGDIR" 2>/dev/null`
+        grp=`stat --printf="%g" "$LOGDIR" 2>/dev/null`
+        if [ "$own" = "0" -a "$grp" = "0" ]
+        then
+                if ! dpkg-statoverride --list $LOGDIR >/dev/null 2>&1
+                then
+                        dpkg-statoverride --update --add \
+                            debian-inadyn debian-inadyn 755 $LOGDIR
+                fi
+        fi
+
+        for item in $LOGDIR/*
+        do
+                [ "$item" = "$LOGDIR/*" ] && continue
+
+                own=`stat --printf="%u" "$item" 2>/dev/null`
+                grp=`stat --printf="%g" "$item" 2>/dev/null`
+
+                if [ "$own" = "0" -a "$grp" = "0" ]
+                then
+                        chown debian-inadyn "$item"
+                        chgrp debian-inadyn "$item"
+                fi
+        done
+
+        if [ -d $RUNDIR ]
+        then
+                for item in $RUNDIR $RUNDIR/*
+                do
+                        [ "$item" = "$RUNDIR/*" ] && continue
+
+                        own=`stat --printf="%u" "$item" 2>/dev/null`
+                        grp=`stat --printf="%g" "$item" 2>/dev/null`
+
+                        if [ "$own" = "0" -a "$grp" = "0" ]
+                        then
+                                chown debian-inadyn "$item"
+                                chgrp debian-inadyn "$item"
+                        fi
+                done
+        fi
+fi
+
+#DEBHELPER#
+
+exit 0

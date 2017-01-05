@@ -1,0 +1,2 @@
+version=3
+https://github.com/troglobit/inadyn/tags .*/v?(\d[\d\.]+)\.tar\.gz

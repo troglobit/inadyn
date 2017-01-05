@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+#-*- makefile -*-
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build -- V=1
+
+override_dh_auto_install:
+	dh_install
+
+override_dh_installchangelogs:
+	dh_installchangelogs NEWS

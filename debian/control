@@ -1,0 +1,42 @@
+Source: inadyn
+Section: net
+Priority: optional
+Maintainer: Timur Birsh <taem@linukz.org>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.4
+Homepage: http://github.com/troglobit/inadyn
+Vcs-Git: git://github.com/taem/inadyn.git -b debian
+Vcs-Browser: http://github.com/taem/inadyn
+
+Package: inadyn
+Architecture: any
+Pre-Depends: adduser
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Provides: dyndns-client
+Description: Simple and small DynDNS client written in the C language
+ With this package the user can have an Internet name for his host 
+ even though he might not have a name server or a static IP. It works
+ by being a client of a supposedly open name server and updating the 
+ server's records when the need arise. A list of the servers that are
+ supported is:
+   * http://www.dyndns.org
+   * http://freedns.afraid.org
+   * http:// www.zoneedit.com
+   * http://www.no-ip.com
+   * http://www.easydns.com
+   * http://www.tzo.com
+   * http://www.3322.org
+   * http://www.dnsomatic.com
+   * http://www.tunnelbroker.net
+   * http://dns.he.net
+   * http://www.dynsip.org
+   * http://www.sitelutions.com
+   * http://www.dnsexit.com
+   * http://www.changeip.com
+ .
+ Some of the services of these servers are free of charge.
+ .
+ This is a command line tool that is written in portable ANSI C with a 
+ little OS abstraction layer. It can maintain multiple host names with
+ the same IP address, and has a web based IP detection which runs well
+ behind a NAT router.
