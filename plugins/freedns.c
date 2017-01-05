@@ -82,8 +82,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&sha=%s", digeststr);
 		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen,
 					     GENERIC_HTTP_REQUEST, buffer, info->server_name.name);
-		trans.p_req       = ctx->request_buf;
-		trans.p_rsp       = ctx->work_buf;
+		trans.req         = ctx->request_buf;
+		trans.rsp         = ctx->work_buf;
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
 		rc  = http_transaction(&client, &trans);
@@ -96,7 +96,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		TRY(http_status_valid(trans.status));
 
-		tmp = buf = strdup(trans.p_rsp_body);
+		tmp = buf = strdup(trans.rsp_body);
 		for (line = strsep(&tmp, "\n"); line; line = strsep(&tmp, "\n")) {
 			int num;
 
@@ -135,7 +135,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 */
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
 {
-	char *resp = trans->p_rsp_body;
+	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 

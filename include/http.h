@@ -60,14 +60,14 @@ typedef struct {
 } http_t;
 
 typedef struct {
-	char *p_req;
+	char *req;
 	int   req_len;
 
-	char *p_rsp;
-	int   max_rsp_len;
+	char *rsp;
 	int   rsp_len;
+	int   max_rsp_len;
 
-	char *p_rsp_body;
+	char *rsp_body;
 
 	int   status;
 	char  status_desc[256];

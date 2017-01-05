@@ -68,7 +68,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 
 	DO(http_status_valid(trans->status));
 
-	tmp = strstr(trans->p_rsp_body, "\n");
+	tmp = strstr(trans->rsp_body, "\n");
 	if (tmp)
 		sscanf(++tmp, "%4d=", &code);
 

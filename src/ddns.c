@@ -145,8 +145,8 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	trans              = &ctx->http_transaction;
 	trans->req_len     = get_req_for_ip_server(ctx, provider);
-	trans->p_req       = ctx->request_buf;
-	trans->p_rsp       = ctx->work_buf;
+	trans->req         = ctx->request_buf;
+	trans->rsp         = ctx->work_buf;
 	trans->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
 
 	logit(LOG_DEBUG, "Querying DDNS checkip server for my public IP#: %s", ctx->request_buf);
@@ -309,13 +309,13 @@ static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, siz
 		return 1;
 
 	DO(server_transaction(ctx, info));
-	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
+	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.rsp)
 		return RC_INVALID_POINTER;
 
 	logit(LOG_DEBUG, "IP server response:");
 	logit(LOG_DEBUG, "%s", ctx->work_buf);
 
-	DO(parse_my_address(ctx->http_transaction.p_rsp_body, address, len));
+	DO(parse_my_address(ctx->http_transaction.rsp_body, address, len));
 
 	return 0;
 }
@@ -552,8 +552,8 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	memset(&trans, 0, sizeof(trans));
 
 	trans.req_len     = info->system->request(ctx, info, alias);
-	trans.p_req       = (char *)ctx->request_buf;
-	trans.p_rsp       = (char *)ctx->work_buf;
+	trans.req         = (char *)ctx->request_buf;
+	trans.rsp         = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
 	if (trans.req_len < 0) {
@@ -572,7 +572,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	logit(LOG_DEBUG, "Sending alias table update to DDNS server: %s", ctx->request_buf);
 
 	rc = http_transaction(client, &trans);
-	logit(LOG_DEBUG, "DDNS server response: %s", trans.p_rsp);
+	logit(LOG_DEBUG, "DDNS server response: %s", trans.rsp);
 
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
@@ -585,7 +585,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		logit(LOG_WARNING, "%s error in DDNS server response:",
 		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
 		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
-		      trans.p_rsp_body != trans.p_rsp ? trans.p_rsp_body : "");
+		      trans.rsp_body != trans.rsp ? trans.rsp_body : "");
 
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;

@@ -102,7 +102,7 @@ int http_exit(http_t *client)
 static void http_response_parse(http_trans_t *trans)
 {
 	char *body;
-	char *rsp = trans->p_rsp_body = trans->p_rsp;
+	char *rsp = trans->rsp_body = trans->rsp;
 	int status = trans->status = 0;
 	const char sep[] = "\r\n\r\n";
 
@@ -110,14 +110,14 @@ static void http_response_parse(http_trans_t *trans)
 
 	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
 		body += strlen(sep);
-		trans->p_rsp_body = body;
+		trans->rsp_body = body;
 	}
 
 	/* %*c         : HTTP/1.0, 1.1 etc, discard read value
 	 * %4d         : HTTP status code, e.g. 200
 	 * %255[^\r\n] : HTTP status text, e.g. OK -- Reads max 255 bytes, including \0, not \r or \n
 	 */
-	if (sscanf(trans->p_rsp, "HTTP/1.%*c %4d %255[^\r\n]", &status, trans->status_desc) == 2)
+	if (sscanf(trans->rsp, "HTTP/1.%*c %4d %255[^\r\n]", &status, trans->status_desc) == 2)
 		trans->status = status;
 }
 
@@ -134,12 +134,12 @@ int http_transaction(http_t *client, http_trans_t *trans)
 
 	trans->rsp_len = 0;
 	do {
-		TRY(ssl_send(client, trans->p_req, trans->req_len));
-		TRY(ssl_recv(client, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		TRY(ssl_send(client, trans->req, trans->req_len));
+		TRY(ssl_recv(client, trans->rsp, trans->max_rsp_len, &trans->rsp_len));
 	}
 	while (0);
 
-	trans->p_rsp[trans->rsp_len] = 0;
+	trans->rsp[trans->rsp_len] = 0;
 	http_response_parse(trans);
 
 	return rc;

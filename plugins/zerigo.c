@@ -71,7 +71,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  */
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
 {
-	char *ptr, *rsp = trans->p_rsp_body;
+	char *ptr, *rsp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
