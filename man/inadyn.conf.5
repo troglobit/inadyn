@@ -133,6 +133,9 @@ specific string, some may be OK with "Mozilla/4.0".  The default is to
 send "inadyn/VERSION SUPPORTURL", where VERSION is the current
 .Nm inadyn
 version, and SUPPORTURL is the upstream support URL.
+.Pp
+This can also be set on a per-provider basis, see below custom and
+provider section description.
 .It Cm custom some@identifier {}
 The
 .Cm custom{}
@@ -227,6 +230,11 @@ address.  Both IPv4 and IPv6 addresses are supported.
 .It Cm hostname = HOSTNAME
 .It Cm hostname = { "HOSTNAME1.name.tld", "HOSTNAME2.name.tld" }
 Your hostname alias.  To list multiple names, use the second form.
+.It Cm user-agent = STRING
+Same as the global setting, but only for this provider.  If omitted it
+defaults to the global setting, which if unset uses the default
+.Nm inadyn
+user agent string.  For more information, see above.
 .It Cm wildcard = true
 Enable domain name wildcarding of your domain name, for DDNS providers
 that support this, e.g. easydns.com and loopia.com.  This means that

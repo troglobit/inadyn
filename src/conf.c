@@ -351,6 +351,11 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	else if (script_cmd)
 		info->checkip_cmd = strdup(script_cmd);
 
+	/* The per-provider user-agent setting, defaults to the global setting */
+	info->user_agent = cfg_getstr(cfg, "user-agent");
+	if (!info->user_agent)
+		info->user_agent = user_agent;
+
 	return 0;
 
 error:
@@ -424,6 +429,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
 		CFG_END()
 	};
 	cfg_opt_t custom_opts[] = {
@@ -438,6 +444,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),

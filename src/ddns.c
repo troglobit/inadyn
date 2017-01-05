@@ -117,7 +117,7 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			DYNDNS_CHECKIP_HTTP_REQUEST, info->checkip_url,
-			info->checkip_name.name, user_agent);
+			info->checkip_name.name, info->user_agent);
 }
 
 /*

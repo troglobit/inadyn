@@ -116,6 +116,9 @@ typedef struct di {
 	ddns_creds_t   creds;
 	ddns_system_t *system;
 
+	/* Per provider custom user agent */
+	char          *user_agent;
+
 	/* Address of DDNS update service */
 	ddns_name_t    server_name;
 	char           server_url[SERVER_URL_LEN];

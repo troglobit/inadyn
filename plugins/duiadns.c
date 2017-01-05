@@ -49,13 +49,13 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-					DUIADNS_UPDATE_IP_HTTP_REQUEST,
-					info->server_url,
-					alias->name,
-					alias->address,
-					info->server_name.name,
-					info->creds.encoded_password,
-			user_agent);
+			DUIADNS_UPDATE_IP_HTTP_REQUEST,
+			info->server_url,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))

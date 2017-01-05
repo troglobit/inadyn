@@ -69,7 +69,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			digeststr,
 			alias->name,
-			info->server_name.name, user_agent);
+			info->server_name.name,
+			info->user_agent);
 }
 
 /*

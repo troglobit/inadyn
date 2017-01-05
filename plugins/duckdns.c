@@ -74,7 +74,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			name,
 			info->creds.username,
 			alias->address,
-			info->server_name.name, user_agent);
+			info->server_name.name,
+			info->user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))

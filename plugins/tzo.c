@@ -61,7 +61,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			info->creds.password,
 			alias->address,
-			info->server_name.name, user_agent);
+			info->server_name.name,
+			info->user_agent);
 }
 
 /* TZO specific response validator. */

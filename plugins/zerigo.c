@@ -55,7 +55,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			info->server_name.name,
 			info->creds.encoded_password,
-			user_agent);
+			info->user_agent);
 }
 
 /*
