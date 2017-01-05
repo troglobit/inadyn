@@ -113,9 +113,6 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		TRY(local_set_params(tcp));
 		TRY(ip_init(&tcp->ip));
 
-		if (tcp->ip.type != TYPE_TCP)
-			return RC_IP_BAD_PARAMETER;
-
 		sd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sd == -1) {
 			logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));

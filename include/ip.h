@@ -30,15 +30,9 @@
 #define IP_SOCKET_MAX_PORT		65535
 #define IP_DEFAULT_READ_CHUNK_SIZE	100
 
-enum {
-	TYPE_TCP = 0,
-	TYPE_UDP
-};
-
 typedef struct {
 	int                 initialized;
 
-	int                 type;
 	int                 socket;
 	struct sockaddr     remote_addr;
 	socklen_t           remote_len;
