@@ -15,7 +15,10 @@ All notable changes to the project are documented in this file.
 - Some DDNS providers have multiple IP addresses registered for the same
   service, as of this release Inadyn immediately tries to connect to the
   next listed addresses on connection problems.
-- Added support for the `%%` format specifier in custom server URL's, as
+- Issue #153: Support for custom HTTP User Agent.  Useful with providers
+  that require using a specific brower.  Set to, e.g. "Mozilla/4.0", or
+  rely on the default "inadyn/VERSION" user agent.
+- Support for the `%%` format specifier in custom server URL's, as
   mentioned in issue #152.
 
 ### Fixes
