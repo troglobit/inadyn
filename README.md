@@ -88,7 +88,8 @@ examples.
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
-(`checkip-ssl = false`) in case you run into problems.
+(`checkip-ssl = false`) in the `provider` section, in case you run into
+problems.
 
 *HTTPS is enabled by default* since it protects your credentials from
 being snooped and reduces the risk of someone hijacking your account.
@@ -103,12 +104,14 @@ how this can be done:
 
     # In-A-Dyn v2.0 configuration file format
     period          = 300
-    
+    user-agent      = Mozilla/5.0
+
     provider default@dyndns.org {
 	    ssl         = false
         username    = charlie
         password    = snoopy
         hostname    = { "peanuts", "woodstock" }
+		user-agent  = Mozilla/4.0
 	}
     
     # With multiple usernames at the same provider, index with :#
@@ -116,6 +119,7 @@ how this can be done:
         username    = ian
         password    = secret
         hostname    = flemming.no-ip.com
+		user-agent  = inadyn/2.2
 	}
     
     # With multiple usernames at the same provider, index with :#
@@ -173,6 +177,10 @@ Sometimes the default `checkip-server` for a DDNS provider can be very
 slow to respond, to this end Inadyn now supports overriding this server
 with a custom one, like for custom DDNS provider, or even a custom
 command.  See the man pages, or the below section, for more information.
+
+Some providers require using a specific browser to send updates, this
+can be worked around using the `user-agent = STRING` setting, as shown
+above.  It is available both on a global and on a per-provider level.
 
 **NOTE:** In a multi-user server setup, make sure to chmod your `.conf`
   to 600 (read-write only by you/root) to protect against other users
