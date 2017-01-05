@@ -37,7 +37,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 /*
  * DynDNS request composer -- common to many other DDNS providers as well
@@ -56,7 +56,8 @@ int common_request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			wildcard,
 			info->server_name.name,
-			info->creds.encoded_password);
+			info->creds.encoded_password,
+			user_agent);
 }
 
 /*

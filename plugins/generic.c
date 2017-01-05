@@ -37,7 +37,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 char *generic_responses[] = { "OK", "good", "true", "updated", NULL };
 
@@ -223,7 +223,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		       GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
 		       url, arg,
 		       info->server_name.name,
-		       info->creds.encoded_password);
+		       info->creds.encoded_password,
+		       user_agent);
 	free(url);
 
 	return ret;

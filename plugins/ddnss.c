@@ -29,7 +29,7 @@
 	" "								\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -56,7 +56,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			info->creds.password,
 			alias->name,
-			info->server_name.name);
+			info->server_name.name, user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))

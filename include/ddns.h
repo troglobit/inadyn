@@ -35,8 +35,7 @@
 #include "plugin.h"
 
 #define VERSION_STRING	PACKAGE_NAME " version " VERSION " -- Dynamic DNS update client."
-#define AGENT_NAME	"inadyn/" VERSION
-#define SUPPORT_ADDR	PACKAGE_BUGREPORT
+#define DDNS_USER_AGENT "inadyn/" VERSION " " PACKAGE_BUGREPORT
 
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
 #define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"
@@ -184,6 +183,7 @@ extern int use_syslog;
 extern int allow_ipv6;
 extern int verify_addr;
 extern char *iface;
+extern char *user_agent;
 extern char *script_cmd;
 extern char *script_exec;
 extern char *pidfile_name;

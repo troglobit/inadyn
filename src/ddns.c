@@ -46,7 +46,7 @@
 #define DYNDNS_CHECKIP_HTTP_REQUEST  					\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 /* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_num_iterations = 0;
@@ -117,7 +117,7 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			DYNDNS_CHECKIP_HTTP_REQUEST, info->checkip_url,
-			info->checkip_name.name);
+			info->checkip_name.name, user_agent);
 }
 
 /*

@@ -33,7 +33,7 @@
 	"tid=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 #define MD5_DIGEST_BYTES  16
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
@@ -69,7 +69,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			digeststr,
 			alias->name,
-			info->server_name.name);
+			info->server_name.name, user_agent);
 }
 
 /*

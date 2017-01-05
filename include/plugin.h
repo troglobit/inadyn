@@ -29,7 +29,7 @@
 #define GENERIC_HTTP_REQUEST                                      	\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 #define PLUGIN_INIT(x) static void __attribute__ ((constructor)) x(void)
 #define PLUGIN_EXIT(x) static void __attribute__ ((destructor))  x(void)

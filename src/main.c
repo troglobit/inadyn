@@ -44,6 +44,7 @@ char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
 char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
+char  *user_agent = DDNS_USER_AGENT;
 char  *config = NULL;
 char  *cache_dir = NULL;
 char  *script_cmd = NULL;

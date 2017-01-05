@@ -31,7 +31,7 @@
 	"address=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 #define SHA1_DIGEST_BYTES 20
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
@@ -81,7 +81,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&sha=%s", digeststr);
 		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen,
-					     GENERIC_HTTP_REQUEST, buffer, info->server_name.name);
+					     GENERIC_HTTP_REQUEST, buffer, info->server_name.name, user_agent);
 		trans.req         = ctx->request_buf;
 		trans.rsp         = ctx->work_buf;
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
@@ -125,7 +125,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		       FREEDNS_UPDATE_IP_REQUEST,
 		       info->server_url,
 		       hash, alias->address,
-		       info->server_name.name);
+		       info->server_name.name, user_agent);
 }
 
 /* Freedns afraid.org.specific response validator.
