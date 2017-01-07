@@ -1,6 +1,10 @@
 inadyn (1.99.9-1) UNRELEASED; urgency=medium
 
-  * New upstream release.
+  * New upstream release:
+    - Error code fixes on exit, closes: #759278.
+  * Packaging fixes:
+    - Fix package description. Closes: #785397.
+    - Add SysV init script. Closes: #781899.
 
  -- Timur Birsh <taem@linukz.org>  Sat, 19 Jul 2014 18:55:35 +0600
 
