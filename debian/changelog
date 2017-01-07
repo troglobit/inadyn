@@ -1,3 +1,13 @@
+inadyn (2.2-1) unstable; urgency=low
+
+  * New upstream release:
+    - Silent death likely fixed between v1.96.2 and v2.2. Closes: #781898.
+    - HTTPS support added, using GnuTLS. Closes: #411334.
+    - New release. Closes: #846935.
+  * New maintainer (upstream)
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Fri, 06 Jan 2017 01:03:00 +0100
+
 inadyn (1.99.9-1) UNRELEASED; urgency=medium
 
   * New upstream release:
