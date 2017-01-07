@@ -4,7 +4,6 @@ set -e
 
 NAME=inadyn
 RUNDIR=/run/$NAME
-LOGDIR=/var/log/$NAME
 CACHEDIR=/var/cache/$NAME
 CONF=/etc/$NAME.conf
 
@@ -43,7 +42,7 @@ then
                 fi
         fi
 
-        for item in $LOGDIR $CACHEDIR
+        for item in $CACHEDIR
 	do
 		own=`stat --printf="%u" "$item" 2>/dev/null`
 		grp=`stat --printf="%g" "$item" 2>/dev/null`
@@ -57,9 +56,8 @@ then
 		fi
 	done
 
-        for item in $LOGDIR/* $CACHEDIR/*
+        for item in $CACHEDIR/*
         do
-                [ "$item" = "$LOGDIR/*" ] && continue
                 [ "$item" = "$CACHEDIR/*" ] && continue
 
                 own=`stat --printf="%u" "$item" 2>/dev/null`
