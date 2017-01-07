@@ -2,11 +2,11 @@ Source: inadyn
 Section: net
 Priority: optional
 Maintainer: Timur Birsh <taem@linukz.org>
-Build-Depends: debhelper (>= 9), libgnutls28-dev, automake1.11
+Build-Depends: debhelper (>= 9), libgnutls-dev, libite-dev
 Standards-Version: 3.9.6
-Homepage: http://github.com/troglobit/inadyn
-Vcs-Git: git://github.com/taem/inadyn.git -b debian
-Vcs-Browser: http://github.com/taem/inadyn
+Homepage: http://troglobit.com/inadyn.html
+Vcs-Git: git://github.com/troglobit/inadyn.git
+Vcs-Browser: http://github.com/troglobit/inadyn
 
 Package: inadyn
 Architecture: any
