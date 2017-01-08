@@ -57,7 +57,7 @@ LT_INIT([disable-shared static])
 
 # Check for required packages
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([lite],    [libite >= 1.5.0])
+PKG_CHECK_MODULES([lite],    [libite >= 1.8.3])
 PKG_CHECK_MODULES([confuse], [libconfuse >= 3.0])
 
 LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
