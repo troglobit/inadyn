@@ -29,6 +29,7 @@
 #define RC_OUT_OF_MEMORY                            3
 #define RC_OUT_BUFFER_OVERFLOW                      4
 #define RC_HTTPS_NO_TRUSTED_CA_STORE                5
+#define RC_PIDFILE_EXISTS_ALREADY                   6
 
 #define RC_IP_SOCKET_CREATE_ERROR                   10
 #define RC_IP_BAD_PARAMETER                         11

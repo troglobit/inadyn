@@ -211,6 +211,28 @@ int os_check_perms(void)
 		return RC_FILE_IO_ACCESS_ERROR;
 	}
 
+	if (pidfile_name && pidfile_name[0] == '/') {
+		char *pidfile_dir;
+
+		if (!access(pidfile_name, F_OK)) {
+			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, ident);
+			return RC_PIDFILE_EXISTS_ALREADY;
+		}
+
+		pidfile_dir = dirname(pidfile_name);
+		if (access(pidfile_dir, F_OK)) {
+			if (mkpath(pidfile_dir, 0755) && errno != EEXIST) {
+				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
+				return RC_FILE_IO_ACCESS_ERROR;
+			}
+
+			if (chown(pidfile_dir, uid, gid)) {
+				logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", pidfile_dir);
+				return RC_FILE_IO_ACCESS_ERROR;
+			}
+		}
+	}
+
 	return 0;
 }
 
