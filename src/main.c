@@ -189,6 +189,7 @@ static int usage(int code)
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
+		" -P, --pidfile=FILE             Defaults to using ident, /var/run/NAME.pid\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
@@ -226,7 +227,7 @@ int main(int argc, char *argv[])
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
-		{ "pidfile",           1, 0, 100 }, /* Compat, but do not advertise in usage() */
+		{ "pidfile",           1, 0, 'P' },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
 		{ "startup-delay",     1, 0, 't' },
@@ -236,7 +237,7 @@ int main(int argc, char *argv[])
 	ddns_t *ctx = NULL;
 
 	ident = progname(argv[0]);
-	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:P:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -277,7 +278,7 @@ int main(int argc, char *argv[])
 			use_syslog--;
 			break;
 
-		case 100:	/* --pidfile=BASENAME */
+		case 'P':	/* --pidfile=NAME */
 			pidfile_name = strdup(optarg);
 			break;
 

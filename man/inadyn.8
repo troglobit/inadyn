@@ -27,7 +27,7 @@
 .Op Fl I, -ident=NAME
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
-.Op Fl --pidfile=NAME
+.Op Fl P, -pidfile=FILE
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
 .Op Fl t, -startup-delay=SEC
@@ -219,6 +219,16 @@ supervisors like systemd and Finit.  Remember to also give the
 option to get log messages to the syslog.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
+.It Fl P, -pidfile=FILE
+Set PID file name and location, defaults to
+.Pa /run/inadyn.pid ,
+which is derived from
+.Fl -ident=NAME ,
+which is strongly recommended to change over this option.  However, some
+users want to keep application runtime files in separate directories,
+usally in combination with
+.Fl -drop-privs ,
+for such cases this is the option to use.
 .It Fl s, -syslog
 Use
 .Xr syslog 3
@@ -297,7 +307,7 @@ writes its process ID to
 .Sh FILES
 .Bl -tag -width /var/cache/inadyn/freedns.afraid.org.cache -compact
 .It Pa /etc/inadyn.conf
-.It Pa /var/run/inadyn.pid
+.It Pa /run/inadyn.pid
 .It Pa /var/cache/inadyn/dyndns.org.cache
 .It Pa /var/cache/inadyn/freedns.afraid.org.cache
 .It Pa ... one .cache file per DDNS provider
