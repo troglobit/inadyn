@@ -37,8 +37,6 @@
 #define VERSION_STRING	PACKAGE_NAME " version " VERSION " -- Dynamic DNS update client."
 #define DDNS_USER_AGENT "inadyn/" VERSION " " PACKAGE_BUGREPORT
 
-#define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
-
 /* 2017-01-05: Dyn.com does NOT support HTTPS for checkip */
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"
 #define DYNDNS_MY_CHECKIP_URL	"/"

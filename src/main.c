@@ -42,6 +42,7 @@ int    allow_ipv6 = 0;
 int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
+char  *prognm = NULL;
 char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
 char  *user_agent = DDNS_USER_AGENT;
@@ -179,23 +180,34 @@ static int usage(int code)
 {
 	fprintf(stderr, "\nUsage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		" -1, --once                     Run once, then exit regardless of status\n"
-		"     --cache-dir=PATH           Persistent cache dir, default /var/cache/NAME\n"
+		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
+		"                                Default use ident NAME: %s/cache/%s/\n"
 		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
-		" -C, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
+		" -C, --continue-on-error        Ignore errors from DDNS provider\n"
 		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
-		" -f, --config=FILE              Use FILE for config, default %s\n"
+		" -f, --config=FILE              Use FILE name for configuration, default uses\n"
+		"                                ident NAME: %s/%s.conf\n"
 		" -h, --help                     Show summary of command line options and exit\n"
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
-		" -I, --ident=NAME               Identity for PID file, cache dir, and syslog\n"
+		" -I, --ident=NAME               Identity for config file, PID file, cache dir,\n"
+		"                                and syslog messages.  Defaults to: %s\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
-		" -P, --pidfile=FILE             Defaults to using ident, /var/run/NAME.pid\n"
+		" -P, --pidfile=FILE             File to store process ID for signaling %s\n"
+		"                                Default uses ident NAME: %s/run/%s.pid\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
 		"Bug report address: %s\n"
-		"Project homepage: %s\n\n", PACKAGE_NAME, DEFAULT_CONFIG_FILE, PACKAGE_BUGREPORT, PACKAGE_URL);
+		"Project homepage: %s\n\n",
+		prognm,
+		LOCALSTATEDIR, ident,
+		SYSCONFDIR, ident,
+		prognm,
+		prognm, LOCALSTATEDIR, ident,
+		PACKAGE_BUGREPORT,
+		PACKAGE_URL);
 
 	return code;
 }
@@ -238,7 +250,7 @@ int main(int argc, char *argv[])
 	};
 	ddns_t *ctx = NULL;
 
-	ident = progname(argv[0]);
+	prognm = ident = progname(argv[0]);
 	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:P:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
@@ -319,14 +331,32 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* Default .conf file path: "/etc" + '/' + "inadyn" + ".conf" */
+	if (!config) {
+		size_t len = strlen(SYSCONFDIR) + strlen(ident) + 7;
+
+		config = malloc(len);
+		if (!config) {
+			logit(LOG_ERR, "Failed allocating memory, exiting.");
+			return RC_OUT_OF_MEMORY;
+		}
+		snprintf(config, len, "%s/%s.conf", SYSCONFDIR, ident);
+	}
+
+	/* Default is to let pidfile() API construct PID file from ident */
 	if (!pidfile_name)
 		pidfile_name = ident;
 
+	/* Default cache dir: "/var" + "/cache/" + "inadyn" */
 	if (!cache_dir) {
-		size_t len = strlen(_PATH_VARCACHE) + strlen(ident) + 1;
+		size_t len = strlen(LOCALSTATEDIR) + strlen(ident) + 8;
 
 		cache_dir = malloc(len);
-		snprintf(cache_dir, len, "%s%s", _PATH_VARCACHE, ident);
+		if (!cache_dir) {
+			logit(LOG_ERR, "Failed allocating memory, exiting.");
+			return RC_OUT_OF_MEMORY;
+		}
+		snprintf(cache_dir, len, "%s/cache/%s", LOCALSTATEDIR, ident);
 	}
 
 #ifdef LOG_PERROR
@@ -348,9 +378,6 @@ int main(int argc, char *argv[])
 
 	/* "Hello!" Let user know we've started up OK */
 	logit(LOG_NOTICE, "%s", VERSION_STRING);
-
-	if (!config)
-		config = strdup(DEFAULT_CONFIG_FILE);
 
 	/* Prepare SSL library, if enabled */
 	rc = ssl_init();
