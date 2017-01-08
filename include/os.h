@@ -58,11 +58,6 @@
 
 #include "error.h"
 
-typedef struct {
-	uid_t uid;
-	gid_t gid;
-} ddns_user_t;
-
 int os_install_signal_handler (void *ctx);
 int os_check_perms            (void);
 int os_shell_execute          (char *cmd, char *ip, char *hostname);

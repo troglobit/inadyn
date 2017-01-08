@@ -174,8 +174,6 @@ typedef struct {
 
 	char          *request_buf; /* for HTTP requests */
 	int            request_buflen;
-
-	ddns_user_t    sys_usr_info; /* info about the current account running inadyn */
 } ddns_t;
 
 extern int once;
