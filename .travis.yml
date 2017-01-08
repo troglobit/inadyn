@@ -40,6 +40,9 @@ install:
 
 script:
   - ./autogen.sh
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp --disable-ssl
+  - make clean
+  - make V=1 -j5
   - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp
   - make clean
   - make V=1 -j5
