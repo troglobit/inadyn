@@ -62,7 +62,7 @@ examples.
 * <http://www.easydns.com>
 * <http://www.tzo.com>
 * <http://www.3322.org>
-* <http://www.dnsomatic.com>
+* <https://www.dnsomatic.com>
 * <http://dns.he.net>
 * <http://www.tunnelbroker.net>
 * <http://www.dynsip.org>
