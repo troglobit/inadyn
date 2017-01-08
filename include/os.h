@@ -64,7 +64,7 @@ typedef struct {
 } ddns_user_t;
 
 int os_install_signal_handler (void *ctx);
-int os_check_perms            (void *arg);
+int os_check_perms            (void);
 int os_shell_execute          (char *cmd, char *ip, char *hostname);
 
 #endif /* INADYN_OS_H_ */

@@ -323,6 +323,9 @@ int main(int argc, char *argv[])
 	openlog(ident, log_opts, LOG_USER);
 	setlogmask(LOG_UPTO(loglevel));
 
+	if (!once)
+		DO(os_check_perms());
+
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		return RC_OS_CHANGE_PERSONA_FAILURE;

@@ -191,6 +191,8 @@ extern char *script_cmd;
 extern char *script_exec;
 extern char *pidfile_name;
 extern char *generic_responses[];
+extern uid_t uid;
+extern gid_t gid;
 
 int ddns_main_loop (ddns_t *ctx);
 

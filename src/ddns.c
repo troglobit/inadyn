@@ -847,9 +847,6 @@ int ddns_main_loop(ddns_t *ctx)
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
-	if (!once)
-		DO(os_check_perms(ctx));
-
 	/* On first startup only, optionally wait for network and any NTP daemon
 	 * to set system time correctly.  Intended for devices without battery
 	 * backed real time clocks as initialization of time since last update

@@ -195,7 +195,7 @@ int os_install_signal_handler(void *ctx)
  * the IP -- and the user will be locked-out of their DDNS server provider
  * for excessive updates.
  */
-int os_check_perms(void *UNUSED(arg))
+int os_check_perms(void)
 {
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
@@ -203,13 +203,16 @@ int os_check_perms(void *UNUSED(arg))
 	if ((mkpath(cache_dir, 0755) && errno != EEXIST) || access(cache_dir, W_OK)) {
 		logit(LOG_ERR, "No write permission to %s, aborting.", cache_dir);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
+		return RC_FILE_IO_ACCESS_ERROR;
+	}
 
+	if (chown(cache_dir, uid, gid)) {
+		logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", cache_dir);
 		return RC_FILE_IO_ACCESS_ERROR;
 	}
 
 	return 0;
 }
-
 
 /**
  * Local Variables:
