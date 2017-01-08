@@ -110,7 +110,7 @@ how this can be done:
 	    ssl         = false
         username    = charlie
         password    = snoopy
-        hostname    = { "peanuts", "woodstock" }
+        hostname    = { peanuts, woodstock }
 		user-agent  = Mozilla/4.0
 	}
     
