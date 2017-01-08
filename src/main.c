@@ -176,17 +176,58 @@ static void parse_privs(char *user)
 	}
 }
 
+static int compose_paths(void)
+{
+	/* Default .conf file path: "/etc" + '/' + "inadyn" + ".conf" */
+	if (!config) {
+		size_t len = strlen(SYSCONFDIR) + strlen(ident) + 7;
+
+		config = malloc(len);
+		if (!config) {
+			logit(LOG_ERR, "Failed allocating memory, exiting.");
+			return RC_OUT_OF_MEMORY;
+		}
+		snprintf(config, len, "%s/%s.conf", SYSCONFDIR, ident);
+	}
+
+	/* Default is to let pidfile() API construct PID file from ident */
+	if (!pidfile_name)
+		pidfile_name = strdup(ident);
+
+	/* Default cache dir: "/var" + "/cache/" + "inadyn" */
+	if (!cache_dir) {
+		size_t len = strlen(LOCALSTATEDIR) + strlen(ident) + 8;
+
+		cache_dir = malloc(len);
+		if (!cache_dir) {
+			logit(LOG_ERR, "Failed allocating memory, exiting.");
+			return RC_OUT_OF_MEMORY;
+		}
+		snprintf(cache_dir, len, "%s/cache/%s", LOCALSTATEDIR, ident);
+	}
+
+	return 0;
+}
+
 static int usage(int code)
 {
+        char pidfn[80];
+
+	DO(compose_paths());
+	if (pidfile_name[0] != '/')
+		snprintf(pidfn, sizeof(pidfn), "%s/run/%s.pid", LOCALSTATEDIR, pidfile_name);
+	else
+		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
+
 	fprintf(stderr, "\nUsage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		" -1, --once                     Run once, then exit regardless of status\n"
 		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
-		"                                Default use ident NAME: %s/cache/%s/\n"
+		"                                Default use ident NAME: %s/\n"
 		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
 		" -C, --continue-on-error        Ignore errors from DDNS provider\n"
 		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
 		" -f, --config=FILE              Use FILE name for configuration, default uses\n"
-		"                                ident NAME: %s/%s.conf\n"
+		"                                ident NAME: %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
 		" -I, --ident=NAME               Identity for config file, PID file, cache dir,\n"
@@ -195,17 +236,14 @@ static int usage(int code)
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
 		" -P, --pidfile=FILE             File to store process ID for signaling %s\n"
-		"                                Default uses ident NAME: %s/run/%s.pid\n"
+		"                                Default uses ident NAME: %s\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
 		"Bug report address: %s\n"
 		"Project homepage: %s\n\n",
-		prognm,
-		LOCALSTATEDIR, ident,
-		SYSCONFDIR, ident,
-		prognm,
-		prognm, LOCALSTATEDIR, ident,
+		prognm, cache_dir, config,
+		prognm, prognm, pidfn,
 		PACKAGE_BUGREPORT,
 		PACKAGE_URL);
 
@@ -331,33 +369,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* Default .conf file path: "/etc" + '/' + "inadyn" + ".conf" */
-	if (!config) {
-		size_t len = strlen(SYSCONFDIR) + strlen(ident) + 7;
-
-		config = malloc(len);
-		if (!config) {
-			logit(LOG_ERR, "Failed allocating memory, exiting.");
-			return RC_OUT_OF_MEMORY;
-		}
-		snprintf(config, len, "%s/%s.conf", SYSCONFDIR, ident);
-	}
-
-	/* Default is to let pidfile() API construct PID file from ident */
-	if (!pidfile_name)
-		pidfile_name = ident;
-
-	/* Default cache dir: "/var" + "/cache/" + "inadyn" */
-	if (!cache_dir) {
-		size_t len = strlen(LOCALSTATEDIR) + strlen(ident) + 8;
-
-		cache_dir = malloc(len);
-		if (!cache_dir) {
-			logit(LOG_ERR, "Failed allocating memory, exiting.");
-			return RC_OUT_OF_MEMORY;
-		}
-		snprintf(cache_dir, len, "%s/cache/%s", LOCALSTATEDIR, ident);
-	}
+	/* Figure out .conf file, cache directory, and PID file name */
+	DO(compose_paths());
 
 #ifdef LOG_PERROR
 	if (!background && use_syslog < 1)
