@@ -38,7 +38,6 @@
 #define DDNS_USER_AGENT "inadyn/" VERSION " " PACKAGE_BUGREPORT
 
 #define DEFAULT_CONFIG_FILE	"/etc/inadyn.conf"
-#define DEFAULT_CACHE_DIR       "/var/cache/inadyn/"
 
 /* 2017-01-05: Dyn.com does NOT support HTTPS for checkip */
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.org"

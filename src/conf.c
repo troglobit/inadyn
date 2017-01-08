@@ -458,7 +458,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL("allow-ipv6",    cfg_false, CFGF_NONE),
 		CFG_BOOL("secure-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR ("ca-trust-file", NULL, CFGF_NONE),
-		CFG_STR ("cache-dir",	  DEFAULT_CACHE_DIR, CFGF_NONE),
+		CFG_STR ("cache-dir",	  NULL, CFGF_DEPRECATED | CFGF_DROP),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
 		CFG_INT ("forced-update", DDNS_FORCED_UPDATE_PERIOD, CFGF_NONE),
@@ -506,7 +506,6 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	else
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
 
-	cache_dir                     = cfg_getstr(cfg, "cache-dir");
 	verify_addr                   = cfg_getbool(cfg, "verify-address");
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
 

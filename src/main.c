@@ -179,13 +179,14 @@ static int usage(int code)
 {
 	fprintf(stderr, "\nUsage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		" -1, --once                     Run once, then exit regardless of status\n"
+		"     --cache-dir=PATH           Persistent cache dir, default /var/cache/NAME\n"
 		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
-		"     --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
+		" -C, --continue-on-error        Ignore errors from DDNS provider (DO NOT USE)\n"
 		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
 		" -f, --config=FILE              Use FILE for config, default %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
-		" -I, --ident=NAME               Identity for PID file and syslog message tagging\n"
+		" -I, --ident=NAME               Identity for PID file, cache dir, and syslog\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground, useful when run from finit\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
@@ -218,6 +219,7 @@ int main(int argc, char *argv[])
 	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
+		{ "cache-dir",         1, 0, 100 },
 		{ "cmd",               1, 0, 'c' },
 		{ "continue-on-error", 0, 0, 'C' },
 		{ "exec",              1, 0, 'e' },
@@ -241,6 +243,10 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
+			break;
+
+		case 100:	/* --cache-dir=PATH */
+			cache_dir = strdup(optarg);
 			break;
 
 		case 'c':	/* --cmd=CMD */
@@ -316,6 +322,13 @@ int main(int argc, char *argv[])
 	if (!pidfile_name)
 		pidfile_name = ident;
 
+	if (!cache_dir) {
+		size_t len = strlen(_PATH_VARCACHE) + strlen(ident) + 1;
+
+		cache_dir = malloc(len);
+		snprintf(cache_dir, len, "%s%s", _PATH_VARCACHE, ident);
+	}
+
 #ifdef LOG_PERROR
 	if (!background && use_syslog < 1)
 		log_opts |= LOG_PERROR;
@@ -324,6 +337,7 @@ int main(int argc, char *argv[])
 	openlog(ident, log_opts, LOG_USER);
 	setlogmask(LOG_UPTO(loglevel));
 
+	/* Check permission to write PID and cache files */
 	if (!once)
 		DO(os_check_perms());
 

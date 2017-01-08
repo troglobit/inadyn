@@ -56,6 +56,10 @@
 #define IN_ZERONET(addr) ((addr & IN_CLASSA_NET) == 0)
 #endif
 
+#ifndef _PATH_VARCACHE
+#define _PATH_VARCACHE "/var/cache/"
+#endif
+
 #include "error.h"
 
 int os_install_signal_handler (void *ctx);

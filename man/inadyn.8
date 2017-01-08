@@ -18,8 +18,9 @@
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl 1, -once
+.Op Fl -cache-dir=PATH
 .Op Fl c, -cmd=/path/to/cmd
-.Op Fl -continue-on-error
+.Op Fl C, -continue-on-error
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
@@ -135,6 +136,30 @@ configuration file format.
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
+.It Fl -cache-dir=PATH
+Set directory for persistent cache files, defaults to
+.Pa /var/cache/inadyn
+.Pp
+The cache files are used to keep track of which addresses have been
+successfully sent to their respective DDNS provider and when.  The
+latter 'when' is important to prevent
+.Nm
+from banning you for excessive updates.
+.Pp
+When restarting
+.Nm
+or rebooting your server, or embedded device,
+.Nm
+reads the cache files to seed its internal data structures with the last
+sent IP address and when the update was performed.  It is therefore very
+important to both have a cache file and for it to have the correct time
+stamp.  The absence of a cache file will currently cause a forced
+update.
+.Pp
+On an embedded device with no RTC, or no battery backed RTC, it is
+strongly recommended to pair this setting with the
+.Fl -startup-delay=SEC
+command line option.
 .It Fl c, -cmd=/path/to/cmd Op optional args
 Full path to command, or script, to run to check for IP address change.
 This is the same as the configuration file option
