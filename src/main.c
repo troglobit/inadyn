@@ -386,7 +386,8 @@ int main(int argc, char *argv[])
 
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
-		return RC_OS_CHANGE_PERSONA_FAILURE;
+		rc = RC_OS_CHANGE_PERSONA_FAILURE;
+		goto leave;
 	}
 
 	/* "Hello!" Let user know we've started up OK */
@@ -395,7 +396,7 @@ int main(int argc, char *argv[])
 	/* Prepare SSL library, if enabled */
 	rc = ssl_init();
 	if (rc)
-		return rc;
+		goto leave;
 
 	do {
 		restart = 0;
@@ -421,10 +422,19 @@ int main(int argc, char *argv[])
 		cfg_free(cfg);
 	} while (restart);
 
+	ssl_exit();
+leave:
 	if (use_syslog)
 		closelog();
 	free(config);
-	ssl_exit();
+	free(pidfile_name);
+	free(cache_dir);
+	if (script_cmd)
+		free(script_cmd);
+	if (script_exec)
+		free(script_exec);
+	if (iface)
+		free(iface);
 
 	return rc;
 }
