@@ -77,26 +77,26 @@ static int nslookup(ddns_alias_t *alias)
 static void read_one(ddns_alias_t *alias, int nonslookup)
 {
 	FILE *fp;
-        char path[256];
+	char path[256];
 
-        alias->last_update = 0;
-        memset(alias->address, 0, sizeof(alias->address));
+	alias->last_update = 0;
+	memset(alias->address, 0, sizeof(alias->address));
 
 	cache_file(alias->name, path, sizeof(path));
 	fp = fopen(path, "r");
 	if (!fp) {
-                if (nonslookup)
-                        return;
+		if (nonslookup)
+			return;
 
 		/* Try a DNS lookup of our last known IP#. */
-                nslookup(alias);
+		nslookup(alias);
 	} else {
 		struct stat st;
 		char address[MAX_ADDRESS_LEN];
 
 		if (fgets(address, sizeof(address), fp)) {
 			logit(LOG_INFO, "Cached IP# %s for %s from previous invocation.", address, alias->name);
-                        strlcpy(alias->address, address, sizeof(alias->address));
+			strlcpy(alias->address, address, sizeof(alias->address));
 		}
 
 		/* Initialize time since last update from modification time of cache file. */
@@ -119,46 +119,52 @@ char *cache_file(char *name, char *buf, size_t len)
 	return buf;
 }
 
-/* At boot, or when restarting inadyn at runtime, the memory struct holding our
+/*
+ * At boot, or when restarting inadyn at runtime, the memory struct holding our
  * current IP# is empty.  We want to avoid unnecessary updates of our DDNS server
  * record, since we might get locked out for abuse, so we "seed" each of the DDNS
  * records of our struct with the cached IP# from our cache file, or from a regular
- * DNS query. */
+ * DNS query.
+ */
 int read_cache_file(ddns_t *ctx)
 {
 	size_t j;
 	ddns_info_t *info;
 
-        /* Clear DNS cache before querying for the IP below, this to
-         * prevent any artefacts from, e.g., nscd, which is a known
-         * problem with DDNS clients. */
-        res_init();
+	/*
+	 * Clear DNS cache before querying for the IP below, this to
+	 * prevent any artefacts from, e.g., nscd, which is a known
+	 * problem with DDNS clients.
+	 */
+	res_init();
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
 
 	info = conf_info_iterator(1);
 	while (info) {
-                int nonslookup;
+		int nonslookup;
 
-                /* Exception for tunnelbroker.net - no name to lookup */
-                nonslookup = !strcmp(info->system->name, "ipv6tb@he.net");
+		/* Exception for tunnelbroker.net - no name to lookup */
+		nonslookup = !strcmp(info->system->name, "ipv6tb@he.net");
 // XXX: TODO better plugin identifiction here
-                for (j = 0; j < info->alias_count; j++)
-                        read_one(&info->alias[j], nonslookup);
+		for (j = 0; j < info->alias_count; j++)
+			read_one(&info->alias[j], nonslookup);
 
 		info = conf_info_iterator(0);
-        }
-        
+	}
+
 	return 0;
 }
 
-/* Update cache with new IP 
- *  /var/run/inadyn/my.server.name.cache { LAST-IPADDR } MTIME */
+/*
+ * Update cache with new IP
+ * /var/cache/inadyn/my.server.name.cache { LAST-IPADDR } MTIME
+ */
 int write_cache_file(ddns_alias_t *alias)
 {
 	FILE *fp;
-        char path[256];
+	char path[256];
 
 	cache_file(alias->name, path, sizeof(path));
 	fp = fopen(path, "w");
