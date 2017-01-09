@@ -35,7 +35,6 @@
 #include <sys/time.h>		/* utimensat() on *BSD */
 #include <sys/types.h>
 #include <errno.h>
-#include <paths.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -45,7 +44,7 @@ static pid_t pidfile_pid  = 0;
 
 static void pidfile_cleanup(void);
 
-const  char *__pidfile_path = _PATH_VARRUN; /* Note: includes trailing slash '/' */
+const  char *__pidfile_path = LOCALSTATEDIR "/run";
 const  char *__pidfile_name = NULL;
 extern char *__progname;
 
@@ -75,7 +74,7 @@ pidfile(const char *basename)
 	}
 
 	if (basename[0] != '/') {
-		if (asprintf(&pidfile_path, "%s%s.pid", __pidfile_path, basename) == -1)
+		if (asprintf(&pidfile_path, "%s/%s.pid", __pidfile_path, basename) == -1)
 			return (-1);
 	} else {
 		if (asprintf(&pidfile_path, "%s", basename) == -1)
