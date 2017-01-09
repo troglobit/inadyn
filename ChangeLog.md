@@ -20,6 +20,9 @@ All notable changes to the project are documented in this file.
   rely on the default "inadyn/VERSION" user agent.
 - Support for the `%%` format specifier in custom server URL's, as
   mentioned in issue #152.
+- Remove libite dependency by importing all its used files into inadyn.
+  This should ease adoption by distributions and end users.  All code
+  is under free licenses: BSD, ISC.
 
 ### Fixes
 - Issue #152: Do not attempt to create PID file in oneshot mode (`-1`)

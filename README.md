@@ -299,14 +299,12 @@ Build & Install
 In-A-Dyn requires a few libraries to build.  The build system searches
 for them, in their required versions, using the `pkg-config` tool:
 
-* [libite][] (1.5.0+),
 * [libConfuse][] (3.0+)
 * [LibreSSL][], [OpenSSL][], or [GnuTLS][]
 
-The latter two (SSL library + libConfuse) are available from most UNIX
-distributions as pre-built packages, whereas [libite][] is currently
-only available as a source tarball.  Make sure to install the `-dev` or
-`-devel` package of the distribution packages when building Inadyn.
+They are available from most UNIX distributions as pre-built packages.
+Make sure to install the `-dev` or `-devel` package of the distribution
+packages when building Inadyn.
 
 When building with HTTPS (SSL/TLS) support, make sure to also install
 the `ca-certificates` package on your system, otherwise Inadyn will not
@@ -332,15 +330,14 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 
 On some systems the default configure installation path, `/usr/local`,
 is disabled and not searched by tools like `ldconfig` and `pkg-config`.
-So if configure fails to find the libite or libConfuse libraries, or the
-`.pc` files, create the file `/etc/ld.so.conf.d/local.conf` with this
-content:
+So if configure fails to find the libConfuse libraries, or the `.pc`
+files, create the file `/etc/ld.so.conf.d/local.conf` with this content:
 
     /usr/local/lib
 
 update the linker cache:
 
-    sudo ldconfig -v |egrep '(libite|libconfuse)'
+    sudo ldconfig -v |egrep libconfuse
 
 and run the Inadyn configure script like this:
 
@@ -384,7 +381,6 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [tunnelbroker]:     https://tunnelbroker.net/
 [Christian Eyrich]: http://eyrich-net.org/programmiertes.html
 [Joachim Nilsson]:  http://troglobit.com
-[libite]:           https://github.com/troglobit/libite
 [libConfuse]:       https://github.com/martinh/libconfuse
 [LibreSSL]:         http://www.libressl.org/
 [OpenSSL]:          https://www.openssl.org/

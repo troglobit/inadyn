@@ -51,22 +51,36 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 		  #endif
 ])
 
+AC_CHECK_FUNC([pidfile], has_pidfile=yes, has_pidfile=no)
+AC_CHECK_FUNC([strlcpy], has_strlcpy=yes, has_strlcpy=no)
+AC_CHECK_FUNC([strlcat], has_strlcat=yes, has_strlcat=no)
+AC_CHECK_FUNC([strtonum], has_strtonum=yes, has_strtonum=no)
+
+AS_IF([test "x$has_strlcpy" = xno],
+	AC_SEARCH_LIBS([strlcpy], [util],
+		has_strlcpy=yes
+		has_strlcat=yes
+		has_strtonum=yes
+		libutil=yes))
+
+AM_CONDITIONAL(NO_PIDFILE, [test "x$has_pidfile"  = "xno"])
+AM_CONDITIONAL(NO_STRLCPY, [test "x$has_strlcpy"  = "xno"])
+AM_CONDITIONAL(NO_STRLCAT, [test "x$has_strlcat"  = "xno"])
+AM_CONDITIONAL(NO_STRTONUM, [test "x$has_strtonum" = "xno"])
+
 # Needed for the libraries
 AM_PROG_AR
 LT_INIT([disable-shared static])
 
 # Check for required packages
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([lite],    [libite >= 1.8.3])
 PKG_CHECK_MODULES([confuse], [libconfuse >= 3.0])
 
-LDFLAGS="$LDFLAGS $lite_LIBS $confuse_LIBS"
-CPPFLAGS="$CPPFLAGS $lite_CFLAGS $confuse_CFLAGS"
-AC_CHECK_LIB([ite], [strlcpy], [],
-             AC_MSG_ERROR([*** Frog DNA library (libite, -lite) not found!]))
+LDFLAGS="$LDFLAGS $confuse_LIBS"
+CPPFLAGS="$CPPFLAGS $confuse_CFLAGS"
 AC_CHECK_LIB([confuse], [cfg_init], [],
              AC_MSG_ERROR([*** Configuration file parser library (libConfuse) not found!]))
-AC_CHECK_HEADERS([lite/lite.h lite/queue.h confuse.h], [],
+AC_CHECK_HEADERS([confuse.h], [],
              AC_MSG_ERROR([*** Cannot find required header files!]))
 
 # If HTTPS is enabled we check for either OpenSSL or GnuTLS libs+headers
@@ -141,5 +155,9 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 SBINDIR=`eval echo $sbindir`
 SBINDIR=`eval echo $SBINDIR`
 AC_SUBST(SBINDIR)
+
+LIBUTIL=
+AS_IF([test "x$libutil" = "yes"], [LIBUTIL=-lutil])
+AC_SUBST(LIBUTIL)
 
 AC_OUTPUT

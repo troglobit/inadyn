@@ -24,15 +24,14 @@
 #ifndef DDNS_H_
 #define DDNS_H_
 
-#include <lite/lite.h>
-#include <lite/queue.h>
-
 #include "config.h"
+#include "compat.h"
 #include "os.h"
 #include "error.h"
 #include "http.h"
 #include "debug.h"
 #include "plugin.h"
+#include "queue.h"		/* BSD sys/queue.h API */
 
 #define VERSION_STRING	PACKAGE_NAME " version " VERSION " -- Dynamic DNS update client."
 #define DDNS_USER_AGENT "inadyn/" VERSION " " PACKAGE_BUGREPORT
