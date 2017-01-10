@@ -226,6 +226,7 @@ static int usage(int code)
 		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
 		" -C, --continue-on-error        Ignore errors from DDNS provider\n"
 		" -e, --exec=/path/to/cmd        Script to run on successful DDNS update\n"
+		"     --check-config             Verify syntax of configuration file and exit\n"
 		" -f, --config=FILE              Use FILE name for configuration, default uses\n"
 		"                                ident NAME: %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
@@ -265,15 +266,16 @@ static char *progname(char *arg0)
 
 int main(int argc, char *argv[])
 {
-	int c, rc = 0, restart;
+	int c, rc = 0, check_config = 0, restart;
 	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
-		{ "cache-dir",         1, 0, 100 },
+		{ "cache-dir",         1, 0, 128 },
 		{ "cmd",               1, 0, 'c' },
 		{ "continue-on-error", 0, 0, 'C' },
 		{ "exec",              1, 0, 'e' },
 		{ "config",            1, 0, 'f' },
+		{ "check-config",      0, 0, 129 },
 		{ "iface",             1, 0, 'i' },
 		{ "ident",             1, 0, 'I' },
 		{ "loglevel",          1, 0, 'l' },
@@ -295,7 +297,7 @@ int main(int argc, char *argv[])
 			once = 1;
 			break;
 
-		case 100:	/* --cache-dir=PATH */
+		case 128:	/* --cache-dir=PATH */
 			cache_dir = strdup(optarg);
 			break;
 
@@ -313,6 +315,11 @@ int main(int argc, char *argv[])
 
 		case 'f':	/* --config=FILE */
 			config = strdup(optarg);
+			break;
+
+		case 129:	/* --check-config */
+			background = 0;
+			check_config = 1;
 			break;
 
 		case 'i':	/* --iface=IFNAME */
@@ -371,6 +378,28 @@ int main(int argc, char *argv[])
 
 	/* Figure out .conf file, cache directory, and PID file name */
 	DO(compose_paths());
+
+	if (check_config) {
+		rc = alloc_context(&ctx);
+		if (rc) {
+			fprintf(stderr, "Failed allocating memory, cannot check configuration file.\n");
+			return rc;
+		}
+
+		printf("Checking configuration file %s\n", config);
+		cfg = conf_parse_file(config, ctx);
+		if (!cfg) {
+			fprintf(stderr, "Configuration file error.\n");
+			free_context(ctx);
+			return RC_ERROR;
+		}
+
+		printf("Configuration file OK\n");
+		free_context(ctx);
+		cfg_free(cfg);
+
+		return RC_OK;
+	}
 
 #ifdef LOG_PERROR
 	if (!background && use_syslog < 1)
