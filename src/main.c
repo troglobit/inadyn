@@ -318,8 +318,10 @@ int main(int argc, char *argv[])
 			break;
 
 		case 129:	/* --check-config */
-			background = 0;
 			check_config = 1;
+			background = 0;
+			use_syslog--;
+			log_opts &= ~LOG_PID;
 			break;
 
 		case 'i':	/* --iface=IFNAME */
@@ -376,6 +378,14 @@ int main(int argc, char *argv[])
 		}
 	}
 
+#ifdef LOG_PERROR
+	if (!background && use_syslog < 1)
+		log_opts |= LOG_PERROR;
+#endif
+
+	openlog(ident, log_opts, LOG_USER);
+	setlogmask(LOG_UPTO(loglevel));
+
 	/* Figure out .conf file, cache directory, and PID file name */
 	DO(compose_paths());
 
@@ -387,38 +397,29 @@ int main(int argc, char *argv[])
 		else
 			snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
-		printf("config    : %s\n", config);
-		printf("pidfile   : %s\n", pidfn);
-		printf("cache-dir : %s\n", cache_dir);
+		logit(LOG_DEBUG, "config    : %s", config);
+		logit(LOG_DEBUG, "pidfile   : %s", pidfn);
+		logit(LOG_DEBUG, "cache-dir : %s", cache_dir);
 
 		rc = alloc_context(&ctx);
 		if (rc) {
-			fprintf(stderr, "Failed allocating memory, cannot check configuration file.\n");
+			logit(LOG_ERR, "Failed allocating memory, cannot check configuration file.");
 			return rc;
 		}
 
-		printf("Checking configuration file %s\n", config);
+		logit(LOG_DEBUG, "Checking configuration file %s", config);
 		cfg = conf_parse_file(config, ctx);
 		if (!cfg) {
-			fprintf(stderr, "Configuration file error.\n");
 			free_context(ctx);
 			return RC_ERROR;
 		}
 
-		printf("Configuration file OK\n");
+		logit(LOG_DEBUG, "Configuration file OK");
 		free_context(ctx);
 		cfg_free(cfg);
 
 		return RC_OK;
 	}
-
-#ifdef LOG_PERROR
-	if (!background && use_syslog < 1)
-		log_opts |= LOG_PERROR;
-#endif
-
-	openlog(ident, log_opts, LOG_USER);
-	setlogmask(LOG_UPTO(loglevel));
 
 	/* Check permission to write PID and cache files */
 	if (!once)
