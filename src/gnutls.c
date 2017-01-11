@@ -21,7 +21,7 @@
 
 #include <gnutls/x509.h>
 
-#include "debug.h"
+#include "log.h"
 #include "http.h"
 #include "ssl.h"
 

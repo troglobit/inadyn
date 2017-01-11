@@ -29,7 +29,7 @@
 #include "os.h"
 #include "error.h"
 #include "http.h"
-#include "debug.h"
+#include "log.h"
 #include "plugin.h"
 #include "queue.h"		/* BSD sys/queue.h API */
 
@@ -173,10 +173,8 @@ typedef struct {
 } ddns_t;
 
 extern int once;
-extern int loglevel;
 extern int ignore_errors;
 extern int startup_delay;
-extern int use_syslog;
 extern int allow_ipv6;
 extern int verify_addr;
 extern char *iface;

@@ -27,23 +27,20 @@
 #include <unistd.h>
 #include <confuse.h>
 
-#include "debug.h"
+#include "log.h"
 #include "ddns.h"
 #include "error.h"
 #include "ssl.h"
 
 int    once = 0;
-int    loglevel = LOG_NOTICE;
 int    background = 1;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
-int    use_syslog = 1;
 int    allow_ipv6 = 0;
 int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
 char  *prognm = NULL;
-char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
 char  *user_agent = DDNS_USER_AGENT;
 char  *config = NULL;

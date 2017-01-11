@@ -33,7 +33,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
-#include "debug.h"
+#include "log.h"
 #include "ip.h"
 
 int ip_construct(ip_sock_t *ip)
