@@ -21,10 +21,11 @@
 
 #include <gnutls/x509.h>
 
-#include "debug.h"
+#include "log.h"
 #include "http.h"
 #include "ssl.h"
 
+extern char *prognm;
 static gnutls_certificate_credentials_t xcred;
 
 
@@ -140,7 +141,7 @@ done:
 int ssl_init(void)
 {
 	if (!gnutls_check_version("3.1.4")) {
-		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", ident);
+		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", prognm);
 		exit(1);
 	}
 

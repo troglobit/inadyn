@@ -36,7 +36,7 @@
 
 #include "ddns.h"
 #include "cache.h"
-#include "debug.h"
+#include "log.h"
 #include "base64.h"
 #include "md5.h"
 #include "sha1.h"

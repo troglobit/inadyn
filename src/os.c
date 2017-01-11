@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2003-2004  Narcis Ilisei
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,51 +21,12 @@
  */
 
 #include <libgen.h>		/* dirname() */
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
-
-#define SYSLOG_NAMES
-#include <syslog.h>
-
-#include "os.h"
-#include "debug.h"
-#include "ddns.h"
+#include "log.h"
 #include "cache.h"
 
 static void *param = NULL;
 
-
-int loglvl(char *level)
-{
-	for (int i = 0; prioritynames[i].c_name; i++) {
-		if (string_match(prioritynames[i].c_name, level))
-			return prioritynames[i].c_val;
-	}
-
-	return atoi(level);
-}
-
-void vlogit(int prio, const char *fmt, va_list args)
-{
-	if (loglevel == INTERNAL_NOPRI)
-		return;
-
-	vsyslog(prio, fmt, args);
-}
-
-void logit(int prio, const char *fmt, ...)
-{
-	va_list args;
-
-	va_start(args, fmt);
-	vlogit(prio, fmt, args);
-	va_end(args);
-}
 
 /**
  * Execute shell script on successful update.
@@ -215,7 +176,7 @@ int os_check_perms(void)
 		char *pidfile_dir;
 
 		if (!access(pidfile_name, F_OK)) {
-			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, ident);
+			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, prognm);
 			return RC_PIDFILE_EXISTS_ALREADY;
 		}
 

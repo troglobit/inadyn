@@ -1,7 +1,5 @@
 /* Custom error logging system
  *
- * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2006       Steve Horbachuk
  * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -21,19 +19,21 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef INADYN_DEBUG_H_
-#define INADYN_DEBUG_H_
+#ifndef INADYN_LOG_H_
+#define INADYN_LOG_H_
 
 #include <stdarg.h>
 #include "os.h"
 
-extern char *ident;
+void log_init  (char *ident, int log, int bg);
+void log_exit  (void);
 
-int  loglvl (char *level);
-void logit  (int prio, const char *fmt, ...);
-void vlogit (int prio, const char *fmt, va_list args);
+int  log_level (char *level);
 
-#endif /* INADYN_DEBUG_H_ */
+void logit     (int prio, const char *fmt, ...);
+void vlogit    (int prio, const char *fmt, va_list args);
+
+#endif /* INADYN_LOG_H_ */
 
 /**
  * Local Variables:
