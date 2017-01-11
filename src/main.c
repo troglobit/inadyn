@@ -369,6 +369,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* Figure out .conf file, cache directory, and PID file name */
+	DO(compose_paths());
+
 	if (check_config) {
 		char pidfn[80];
 
@@ -410,9 +413,6 @@ int main(int argc, char *argv[])
 
 	/* Enable syslog or console debugging */
 	log_init(ident, use_syslog < 1 ? 0 : 1, background);
-
-	/* Figure out .conf file, cache directory, and PID file name */
-	DO(compose_paths());
 
 	/* Check permission to write PID and cache files */
 	if (!once)
