@@ -82,7 +82,10 @@ void logit(int prio, const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vlogit(prio, fmt, args);
+	if (enabled)
+		vlogit(prio, fmt, args);
+	else if (prio <= level)
+		vfprintf(stderr, fmt, args), fprintf(stderr, "\n");
 	va_end(args);
 }
 
