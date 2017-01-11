@@ -33,7 +33,6 @@
 #include "ssl.h"
 
 int    once = 0;
-int    background = 1;
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    allow_ipv6 = 0;
@@ -264,8 +263,10 @@ static char *progname(char *arg0)
 
 int main(int argc, char *argv[])
 {
-	int c, rc = 0, check_config = 0, restart;
-	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
+	int c, restart, rc = 0;
+	int use_syslog = 1;
+	int check_config = 0;
+	int background = 1;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
 		{ "cache-dir",         1, 0, 128 },
@@ -319,7 +320,6 @@ int main(int argc, char *argv[])
 			check_config = 1;
 			background = 0;
 			use_syslog--;
-			log_opts &= ~LOG_PID;
 			break;
 
 		case 'i':	/* --iface=IFNAME */
@@ -331,8 +331,8 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'l':	/* --loglevel=LEVEL */
-			loglevel = loglvl(optarg);
-			if (-1 == loglevel)
+			rc = log_level(optarg);
+			if (-1 == rc)
 				return usage(1);
 			break;
 
@@ -369,24 +369,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (background) {
-		if (daemon(0, 0) < 0) {
-			fprintf(stderr, "Failed daemonizing %s: %s\n", ident, strerror(errno));
-			return RC_OS_FORK_FAILURE;
-		}
-	}
-
-#ifdef LOG_PERROR
-	if (!background && use_syslog < 1)
-		log_opts |= LOG_PERROR;
-#endif
-
-	openlog(ident, log_opts, LOG_USER);
-	setlogmask(LOG_UPTO(loglevel));
-
-	/* Figure out .conf file, cache directory, and PID file name */
-	DO(compose_paths());
-
 	if (check_config) {
 		char pidfn[80];
 
@@ -418,6 +400,19 @@ int main(int argc, char *argv[])
 
 		return RC_OK;
 	}
+
+	if (background) {
+		if (daemon(0, 0) < 0) {
+			fprintf(stderr, "Failed daemonizing %s: %s\n", ident, strerror(errno));
+			return RC_OS_FORK_FAILURE;
+		}
+	}
+
+	/* Enable syslog or console debugging */
+	log_init(ident, use_syslog < 1 ? 0 : 1, background);
+
+	/* Figure out .conf file, cache directory, and PID file name */
+	DO(compose_paths());
 
 	/* Check permission to write PID and cache files */
 	if (!once)
@@ -463,8 +458,7 @@ int main(int argc, char *argv[])
 
 	ssl_exit();
 leave:
-	if (use_syslog)
-		closelog();
+	log_exit();
 	free(config);
 	free(pidfile_name);
 	free(cache_dir);
