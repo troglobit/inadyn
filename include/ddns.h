@@ -177,6 +177,8 @@ extern int ignore_errors;
 extern int startup_delay;
 extern int allow_ipv6;
 extern int verify_addr;
+extern char *ident;
+extern char *prognm;
 extern char *iface;
 extern char *user_agent;
 extern char *script_cmd;

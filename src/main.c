@@ -41,6 +41,7 @@ int    secure_ssl = 1;		/* Strict cert validation by default */
 char  *ca_trust_file = NULL;	/* Custom CA trust file/bundle PEM format */
 int    verify_addr = 1;
 char  *prognm = NULL;
+char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
 char  *user_agent = DDNS_USER_AGENT;
 char  *config = NULL;

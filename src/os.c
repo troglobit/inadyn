@@ -176,7 +176,7 @@ int os_check_perms(void)
 		char *pidfile_dir;
 
 		if (!access(pidfile_name, F_OK)) {
-			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, ident);
+			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, prognm);
 			return RC_PIDFILE_EXISTS_ALREADY;
 		}
 
