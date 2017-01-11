@@ -380,6 +380,17 @@ int main(int argc, char *argv[])
 	DO(compose_paths());
 
 	if (check_config) {
+		char pidfn[80];
+
+		if (pidfile_name[0] != '/')
+			snprintf(pidfn, sizeof(pidfn), "%s/run/%s.pid", LOCALSTATEDIR, pidfile_name);
+		else
+			snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
+
+		printf("config    : %s\n", config);
+		printf("pidfile   : %s\n", pidfn);
+		printf("cache-dir : %s\n", cache_dir);
+
 		rc = alloc_context(&ctx);
 		if (rc) {
 			fprintf(stderr, "Failed allocating memory, cannot check configuration file.\n");
