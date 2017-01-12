@@ -95,12 +95,21 @@ problems.
 being snooped and reduces the risk of someone hijacking your account.
 
 
-Example Configuration
----------------------
+Configuration
+-------------
 
 In-A-Dyn supports updating several DDNS servers, several accounts even on
 different DDNS providers.  The following `/etc/inadyn.conf` example show
-how this can be done:
+how this can be done.  To verify your configuration, without starting the
+daemon, use:
+
+    inadyn --check-config
+
+This looks for the default `.conf` file, to check any file, use:
+
+    inadyn --check-config -f /path/to/file.conf
+
+### Example
 
     # In-A-Dyn v2.0 configuration file format
     period          = 300
