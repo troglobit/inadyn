@@ -200,7 +200,7 @@ Custom DDNS Providers
 ---------------------
 
 In addition to the default DDNS providers supported by Inadyn, custom
-DDNS providers can be defined in the config file..  Use `custom {}` in
+DDNS providers can be defined in the config file.  Use `custom {}` in
 instead of the `provider {}` section used in examples above.
 
 In-A-Dyn use HTTP basic authentication (base64 encoded) to communicate
@@ -234,7 +234,7 @@ DDNS plugin:
         hostname    = { "alpha", "beta", "gamma" }
 	}
 
-Here three subdomains are updated, one HTTP GET update request for every
+Here three hostnames are updated, one HTTP GET update request for every
 listed DDNS server and path is performed, for every listed hostname.
 Some providers, like FreeDNS, support setting up CNAME records to reduce
 the amount of records you need to update.  Some providers, like FreeDNS,
@@ -264,7 +264,7 @@ something you must figure out.  The support pages sometimes list this
 under an API section, or similar.
 
     # This emulates default@dyndns.org
-    custom randomhandle {
+    custom dyn {
         username    = DYNUSERNAME
         password    = DYNPASSWORD
         ddns-server = members.dyndns.org
@@ -273,7 +273,7 @@ under an API section, or similar.
 	}
 
 Here a fully custom `ddns-path` with format specifiers are used, see the
-inadyn.conf(5) man page for details on this.
+`inadyn.conf(5)` man page for details on this.
 
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  By default Inadyn looks for a `200 HTTP` response OK
@@ -298,8 +298,8 @@ These two settings can also be used in standard `provider{}` sections.
 `ddns-path`!  The given hostname is appended to the `ddns-path` used for
 updates, unless you use `append-myip` in which case your IP address will
 be appended instead.  When using `append-myip` you probably need to
-encode your DNS hostname in the `ddns-path` instead &mdash; as is done
-in the last example above.
+encode your DNS hostname in the `ddns-path` instead, as is done in the
+last example above.
 
 
 Build & Install
