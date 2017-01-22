@@ -20,7 +20,7 @@ All notable changes to the project are documented in this file.
   rely on the default "inadyn/VERSION" user agent.
 - Support for the `%%` format specifier in custom server URL's, as
   mentioned in issue #152.
-- Add support for a `.conf` syntax checker
+- Add support for a `.conf` syntax checker: `inadyn --check-config`
 - Add support for logging to `stderr` when running in foreground or
   without syslog enabled
 - Remove libite dependency by importing all its used files into inadyn.
