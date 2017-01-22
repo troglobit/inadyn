@@ -1,5 +1,5 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: inadyn - simple and small DynDNS client with HTTPS support
+Upstream-Name: inadyn - Dynamic DNS client with SSL/TLS support
 Upstream-Contact: Joachim Nilsson <troglobit@gmail.com>
 Source: http://github.com/troglobit/inadyn
 
@@ -7,7 +7,7 @@ Files: *
 Copyright: 2004 Narcis Ilisei <inarcis2002@hotpop.com>
 	   2006 Steve Horbachuk
 	   2009 Christoph Brill <egore911@egore911.de>
-	   2010 Joachim Nilsson <troglobit@gmail.com>
+	   2017 Joachim Nilsson <troglobit@gmail.com>
 	   2010 Timur Birsh <taem@linukz.org>
 License: GPL-2+
 
@@ -15,13 +15,29 @@ Files: src/base64.c src/md5.c src/sha1.c include/base64.h include/md5.h include/
 Copyright: 2006-2010 Brainspark B.V.
 License: GPL-2+
 
-Files: src/strlcat.c src/strlcpy.c
-Copyright: 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+Files: src/makepath.c
+Copyright: 2013-2016  Joachim Nilsson <troglobit@gmail.com>
 License: ISC
 
-Files: include/strlfun.h
-Copyright: 2014 Joachim Nilsson <troglobit@gmail.com>
+Files: src/pidfile.c
+Copyright: 1999 The NetBSD Foundation, Inc.
+License: BSD-2-clause
+
+Files: src/strlcat.c src/strlcpy.c
+Copyright: 1998, 2015 Todd C. Miller <Todd.Miller@courtesan.com>
 License: ISC
+
+Files: src/strtonum.c
+Copyright: 2004 Ted Unangst and Todd Miller
+License: ISC
+
+Files: include/strdupa.h
+Copyright: 2009 William Ahern
+License: Expat
+
+Files: include/queue.h
+Copyright: 1991, 1993 The Regents of the University of California
+License: BSD-3-clause
 
 Files: debian/*
 Copyright: 2005 Shaul Karl <shaul@debian.org>
@@ -59,3 +75,23 @@ License: ISC
     WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
     ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+License: Expat
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to permit
+    persons to whom the Software is furnished to do so, subject to the
+    following conditions:
+    .
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+    .
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+    USE OR OTHER DEALINGS IN THE SOFTWARE.
