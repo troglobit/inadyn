@@ -46,7 +46,7 @@ static void pidfile_cleanup(void);
 
 const  char *__pidfile_path = LOCALSTATEDIR "/run";
 const  char *__pidfile_name = NULL;
-extern char *__progname;
+extern char *prognm;
 
 int
 pidfile(const char *basename)
@@ -57,7 +57,7 @@ pidfile(const char *basename)
 	FILE *f;
 
 	if (basename == NULL)
-		basename = __progname;
+		basename = prognm;
 
 	pid = getpid();
 	atexit_already = 0;
