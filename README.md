@@ -114,7 +114,15 @@ This looks for the default `.conf` file, to check any file, use:
     # In-A-Dyn v2.0 configuration file format
     period          = 300
     user-agent      = Mozilla/5.0
-
+    
+    # The FreeDNS username must be in lower case, the
+    # password (max 16 chars) is case sensitive.
+    provider default@freedns.afraid.org {
+        username   = lower-case-username
+        password   = case-sensitive-pwd
+        hostname   = some.example.com
+    }
+    
     provider default@dyndns.org {
 	    ssl         = false
         username    = charlie
@@ -235,12 +243,12 @@ DDNS plugin:
 	}
 
 Here three hostnames are updated, one HTTP GET update request for every
-listed DDNS server and path is performed, for every listed hostname.
-Some providers, like FreeDNS, support setting up CNAME records to reduce
-the amount of records you need to update.  Some providers, like FreeDNS,
-default to link multiple records to the same update, which may be very
-confusing if you want each DNS record to be updated from a unique IP
-address -- make sure to *check your settings at the provider*!
+DDNS provider is performed, for every listed hostname.  Some providers,
+like FreeDNS, support setting up CNAME records (aliases) to reduce the
+amount of records you need to update.  FreeDNS even default to linking
+multiple records to the same update, which may be very confusing if you
+want each DNS record to be updated from a unique IP address -- make sure
+to *check your settings at the DDNS provider*!
 
 Your hostname is automatically appended to the end of the `ddns-path`,
 as is customary, before it is communicated to the server.  Username is
