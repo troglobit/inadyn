@@ -1,6 +1,6 @@
 /* Plugin for FreeMyIP
  *
- * Copyright (C) 2017  Cadence
+ * Copyright (C) 2017  Tomasz 'Cadence' Grabowski
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
