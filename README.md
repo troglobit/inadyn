@@ -85,6 +85,7 @@ examples.
 * <http://ipv4.dynv6.com>
 * <https://spdyn.de>
 * <https://www.strato.com>
+* <https://freemyip.com>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
