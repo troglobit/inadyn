@@ -98,7 +98,7 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 			} else {
 				replace_fmt(ptr, info->creds.username, 2);
 			}
-			
+
 			continue;
 		}
 
@@ -110,7 +110,7 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 			} else {
 				replace_fmt(ptr, info->creds.password, 2);
 			}
-			
+
 			continue;
 		}
 
@@ -118,7 +118,7 @@ static int custom_server_url(ddns_info_t *info, ddns_alias_t *alias)
 			replace_fmt(ptr, alias->name, 2);
 			continue;
 		}
-		
+
 		if (!strncmp(ptr, "%i", 2)) {
 			replace_fmt(ptr, alias->address, 2);
 			continue;
@@ -164,7 +164,7 @@ static char *url_encode(char *str)
 	if (!buf)
 		return NULL;
 	ptr = buf;
-	
+
 	while (str[0]) {
 		char ch = str[0];
 
@@ -201,7 +201,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	char *arg = "";
 
 	/*
-	 * if the user has specified modifiers, then he is probably 
+	 * if the user has specified modifiers, then he is probably
 	 * aware of how to append his hostname or IP, otherwise just
 	 * append the hostname or ip (depending on the append_myip option)
 	 */
@@ -209,16 +209,17 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		if (custom_server_url(info, alias) <= 0)
 			logit(LOG_ERR, "Invalid server URL: %s", info->server_url);
 	} else {
-		arg = alias->name; /* Backwards compat, default to append hostname */
+		/* Backwards compat, default to append hostname */
+		arg = alias->name;
 
-		if (info->append_myip) /* New, append client's IP address instead */
+		if (info->append_myip)
 			arg = alias->address;
 	}
 
 	url = url_encode(info->server_url);
 	if (!url)
 		return 0;
-	
+
 	ret = snprintf(ctx->request_buf, ctx->request_buflen,
 		       GENERIC_BASIC_AUTH_UPDATE_IP_REQUEST,
 		       url, arg,
