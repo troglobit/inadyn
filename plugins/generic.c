@@ -156,6 +156,11 @@ static int ishex(char *str)
 	return 0;
 }
 
+/*
+ * Simple URL encoder, with exceptions for /, ?, and &, which should
+ * usually be encoded as well, but are here exposed raw to advanced
+ * end-users.
+ */
 static char *url_encode(char *str)
 {
 	char *buf, *ptr;
@@ -176,6 +181,8 @@ static char *url_encode(char *str)
 		}
 
 		if (isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')
+			*ptr++ = ch;
+		else if (ch == '/' || ch == '?' || ch == '&')
 			*ptr++ = ch;
 		else if (ch == ' ')
 			*ptr++ = '+';
