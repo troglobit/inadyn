@@ -129,21 +129,24 @@ static int validate_hostname(cfg_t *cfg, const char *provider, cfg_opt_t *hostna
 /* No need to validate username/password for custom providers */
 static int validate_common(cfg_t *cfg, const char *provider, int custom)
 {
-	if (!plugin_find(provider)) {
+	ddns_system_t *ds;
+
+	ds = plugin_find(provider);
+	if (!ds) {
 		cfg_error(cfg, "Invalid DDNS provider %s", provider);
 		return -1;
 	}
 
-	if (!custom && !cfg_getstr(cfg, "username")) {
-		if (strcmp(provider, "default@freemyip.com") != 0) {	
+	if (!custom) {
+		if (!ds->nousername && !cfg_getstr(cfg, "username")) {
 			cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
 			return -1;
 		}
-	}
 
-	if (!custom && !cfg_getstr(cfg, "password")) {
-		cfg_error(cfg, "Missing password setting for DDNS provider %s", provider);
-		return -1;
+		if (!cfg_getstr(cfg, "password")) {
+			cfg_error(cfg, "Missing password setting for DDNS provider %s", provider);
+			return -1;
+		}
 	}
 
 	return deprecate_alias(cfg) ||

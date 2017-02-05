@@ -38,6 +38,8 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
+	.nousername   = 1,	/* Provider does not require username */
+
         .checkip_name = "ipv4.wtfismyip.com",
         .checkip_url  = "/text",
 
