@@ -285,6 +285,8 @@ by Hurricane Electric.
 .Aq https://spdyn.de
 .It Cm default@strato.com
 .Aq https://www.strato.com
+.It Cm default@freemyip.com
+.Aq https://freemyip.com
 .El
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
@@ -418,6 +420,12 @@ provider default@tunnelbroker.net {
     username   = xyzzy
     password   = update-key-in-advanced-tab
     hostname   = tunnel-id
+}
+
+# www.freemyip.com
+provider default@freemyip.com {
+        password = your_token
+        hostname = your_hostname.freemyip.com
 }
 
 # Generic example for twoDNS.de

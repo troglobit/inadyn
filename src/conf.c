@@ -135,8 +135,10 @@ static int validate_common(cfg_t *cfg, const char *provider, int custom)
 	}
 
 	if (!custom && !cfg_getstr(cfg, "username")) {
-		cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
-		return -1;
+		if (strcmp(provider, "default@freemyip.com") != 0) {	
+			cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
+			return -1;
+		}
 	}
 
 	if (!custom && !cfg_getstr(cfg, "password")) {
