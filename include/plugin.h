@@ -64,7 +64,7 @@ int plugin_register   (ddns_system_t *system);
 int plugin_unregister (ddns_system_t *system);
 
 /* Helper API */
-ddns_system_t *plugin_find (const char *name);
+ddns_system_t *plugin_find (const char *name, int loose);
 
 /* Looks ugly, placed here due to deps. and to make it easier for plugin devs */
 #include "ddns.h"

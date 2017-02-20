@@ -68,7 +68,7 @@ int plugin_register(ddns_system_t *plugin)
 	}
 
 	/* Already registered? */
-	if (plugin_find(plugin->name)) {
+	if (plugin_find(plugin->name, 0)) {
 		logit(LOG_DEBUG, "... %s already loaded.", plugin->name);
 		return 0;
 	}
@@ -87,9 +87,18 @@ int plugin_unregister(ddns_system_t *plugin)
 	return 0;
 }
 
-static ddns_system_t *search_plugin(const char *name)
+static ddns_system_t *search_plugin(const char *name, int loose)
 {
 	ddns_system_t *p, *tmp;
+
+	if (loose) {
+		PLUGIN_ITERATOR(p, tmp) {
+			if (strstr(p->name, name))
+				return p;
+		}
+
+		return NULL;
+	}
 
 	PLUGIN_ITERATOR(p, tmp) {
 		if (!strcmp(p->name, name))
@@ -103,6 +112,7 @@ static ddns_system_t *search_plugin(const char *name)
 /**
  * plugin_find - Find a plugin by name
  * @name: With or without path, or .so extension
+ * @loose: Use substring match when looking for plugin
  *
  * This function uses an opporunistic search for a suitable plugin and
  * returns the first match.  Albeit with at least some measure of
@@ -117,7 +127,7 @@ static ddns_system_t *search_plugin(const char *name)
  * On success the pointer to the matching &ddns_system_t is returned,
  * otherwise %NULL is returned.
  */
-ddns_system_t *plugin_find(const char *name)
+ddns_system_t *plugin_find(const char *name, int loose)
 {
 	char *tmp, *ptr;
 	ddns_system_t *p;
@@ -137,7 +147,7 @@ ddns_system_t *plugin_find(const char *name)
 		*ptr = 0;
 	name = tmp;
 
-	p = search_plugin(name);
+	p = search_plugin(name, loose);
 	if (p) {
 		free(tmp);
 		return p;
@@ -159,7 +169,7 @@ ddns_system_t *plugin_find(const char *name)
 			 plugpath[strlen(plugpath) - 1] == '/' ? "" : "/",
 			 name, noext ? ".so" : "");
 
-		p = search_plugin(path);
+		p = search_plugin(path, loose);
 		free(path);
 		if (p) {
 			free(tmp);

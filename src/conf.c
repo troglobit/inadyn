@@ -131,10 +131,13 @@ static int validate_common(cfg_t *cfg, const char *provider, int custom)
 {
 	ddns_system_t *ds;
 
-	ds = plugin_find(provider);
+	ds = plugin_find(provider, 0);
 	if (!ds) {
-		cfg_error(cfg, "Invalid DDNS provider %s", provider);
-		return -1;
+		ds = plugin_find(provider, 0);
+		if (!ds) {
+			cfg_error(cfg, "Invalid DDNS provider %s", provider);
+			return -1;
+		}
 	}
 
 	if (!custom) {
@@ -232,10 +235,14 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	else
 		str = cfg_title(cfg);
 
-	system = plugin_find(str);
+	system = plugin_find(str, 0);
 	if (!system) {
-		logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
-		return 1;
+		system = plugin_find(str, 1);
+		if (!system) {
+			logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
+			return 1;
+		}
+		logit(LOG_WARNING, "Guessing DDNS plugin '%s' from '%'", system->name, str);
 	}
 
 	info->system = system;
