@@ -219,8 +219,9 @@ when your IP changes.  Default: disabled.  For
 .Nm inadyn
 < 1.96.3 wildcarding was enabled by default.
 .El
-.It Cm provider email@ddns-service.tld {}
-Can be one of:
+.It Cm provider [email@]ddns-service[.tld] {}
+Either a unique substring matching the provider, or or one of the exact
+matches to the following unique provider names:
 .Pp
 .Bl -tag -width TERM -compact
 .It Cm default@dyndns.org
@@ -343,12 +344,13 @@ is given with format specifiers, in which case this setting is unused.
 .El
 .El
 .Sh EXAMPLES
-Notice how two different user accounts access the same DDNS provider, No-IP.com
+Worth noting below is how two different user accounts can use the same
+DDNS provider, No-IP.com, by using the concept of instances ':N'.
 .Bd -unfilled -offset indent
 period         = 300
 
 # Dyn.com
-provider default@dyndns.org {
+provider dyndns.org {
     username   = account1
     password   = secret1
     hostname   = { "my.example.com", "other.example.org" }
@@ -356,14 +358,14 @@ provider default@dyndns.org {
 
 # FreeDNS. Remember the username must be in lower case
 # and password (max 16 chars) is case sensitive.
-provider default@freedns.afraid.org {
+provider freedns {
     username   = lower-case-username
     password   = case-sensitive-pwd
     hostname   = some.example.com
 }
 
 # No-IP.com #1
-provider default@no-ip.com:1 {
+provider no-ip.com:1 {
     checkip-server = "dynamic.zoneedit.com"
     checkip-path   = "/checkip.html"
     checkip-ssl    = false
@@ -373,14 +375,14 @@ provider default@no-ip.com:1 {
 }
 
 # No-IP.com #2
-provider default@no-ip.com:2 {
+provider no-ip.com:2 {
     username   = account22
     password   = secret22
     hostname   = another.no-ip.com
 }
 
 # Loopia
-provider default@loopia.com {
+provider loopia.com {
     wildcard   = true
     username   = account3
     password   = secret3
@@ -388,42 +390,42 @@ provider default@loopia.com {
 }
 
 # ddnss.de
-provider default@ddnss.de {
+provider ddnss.de {
     username   = your_username
     password   = your_password
     hostname   = your_host.ddnss.de
 }
 
 # spdyn.de
-provider default@spdyn.de {
+provider spdyn.de {
     username   = your_username
     password   = your_password
     hostname   = your_host.spdyn.de
 }
 
 # www.strato.com
-provider default@strato.com {
+provider strato.com {
     username   = your_username
     password   = your_password
     hostname   = example.com
 }
 
 # dynv6.com
-provider default@dynv6.com {
+provider dynv6.com {
     username   = your_token
     password   = not_used
     hostname   = your_host.dynv6.net
 }
 
 # IPv6 account at https://tunnelbroker.net
-provider default@tunnelbroker.net {
+provider tunnelbroker.net {
     username   = xyzzy
     password   = update-key-in-advanced-tab
     hostname   = tunnel-id
 }
 
 # www.freemyip.com
-provider default@freemyip.com {
+provider freemyip.com {
         password = your_token
         hostname = your_hostname.freemyip.com
 }
@@ -446,7 +448,7 @@ that require the client's IP in the update request, which for example
 .Aq http://dyn.com
 requires:
 .Bd -unfilled -offset indent
-# This emulates default@dyndns.org
+# This emulates dyndns.org
 custom dyn.com {
     username     = DYNUSERNAME
     password     = DYNPASSWORD
@@ -468,7 +470,7 @@ v2.0, is to use the
 like format specifiers mentioned previously.  The same example look like
 this:
 .Bd -unfilled -offset indent
-# This emulates default@dyndns.org
+# This emulates dyndns.org
 custom dyn.com {
     ssl          = false
     username     = DYNUSERNAME
