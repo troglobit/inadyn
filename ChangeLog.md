@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.2][] - 2017-01-XX
+[v2.2][] - 2017-02-XX
 ---------------------
 
 ### Changes
@@ -23,6 +23,8 @@ All notable changes to the project are documented in this file.
 - Add support for a `.conf` syntax checker: `inadyn --check-config`
 - Add support for logging to `stderr` when running in foreground or
   without syslog enabled
+- Simplified provider name lookup in `.conf` file.  Now substring match
+  is used, resulting in support for `provider Dyn { ... }`.
 - Remove libite dependency by importing all its used files into inadyn.
   This should ease adoption by distributions and end users.  All code
   is under free licenses: BSD, ISC.
