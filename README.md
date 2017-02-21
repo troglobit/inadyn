@@ -124,7 +124,7 @@ This looks for the default `.conf` file, to check any file, use:
         hostname   = some.example.com
     }
     
-    provider dyndns.org {
+    provider dyn {
 	    ssl         = false
         username    = charlie
         password    = snoopy
