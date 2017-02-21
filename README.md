@@ -118,13 +118,13 @@ This looks for the default `.conf` file, to check any file, use:
     
     # The FreeDNS username must be in lower case, the
     # password (max 16 chars) is case sensitive.
-    provider default@freedns.afraid.org {
+    provider freedns.afraid.org {
         username   = lower-case-username
         password   = case-sensitive-pwd
         hostname   = some.example.com
     }
     
-    provider default@dyndns.org {
+    provider dyndns.org {
 	    ssl         = false
         username    = charlie
         password    = snoopy
@@ -133,7 +133,7 @@ This looks for the default `.conf` file, to check any file, use:
 	}
     
     # With multiple usernames at the same provider, index with :#
-    provider default@no-ip.com:1 {
+    provider no-ip.com:1 {
         username    = ian
         password    = secret
         hostname    = flemming.no-ip.com
@@ -141,7 +141,7 @@ This looks for the default `.conf` file, to check any file, use:
 	}
     
     # With multiple usernames at the same provider, index with :#
-    provider default@no-ip.com:2 {
+    provider no-ip.com:2 {
         username       = james
         password       = bond
         hostname       = spectre.no-ip.com
@@ -150,7 +150,7 @@ This looks for the default `.conf` file, to check any file, use:
     }
     
     # With multiple usernames at the same provider, index with :#
-    provider default@no-ip.com:3 {
+    provider no-ip.com:3 {
         username        = spaceman
         password        = bowie
         hostname        = spaceman.no-ip.com
@@ -158,13 +158,13 @@ This looks for the default `.conf` file, to check any file, use:
     }
     
     # Note: hostname == update-key from Advanced tab in the Web UI
-    provider default@tunnelbroker.net {
+    provider tunnelbroker.net {
         username    = futurekid
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
         hostname    = 1234534245321           # tunnel-id
 	}
 
-    provider default@dynv6.com {
+    provider dynv6.com {
         username = your_token
         password = n/a
         hostname = { host1.dynv6.net, host2.dynv6.net }
@@ -272,7 +272,7 @@ supported by inadyn.  The `ddns-path` differs between providers and is
 something you must figure out.  The support pages sometimes list this
 under an API section, or similar.
 
-    # This emulates default@dyndns.org
+    # This emulates dyndns.org
     custom dyn {
         username    = DYNUSERNAME
         password    = DYNPASSWORD
