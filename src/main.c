@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'c':	/* --cmd=CMD */
-			script_cmd = strdup(optarg);
+			script_cmd = optarg;
 			break;
 
 		case 'C':	/* --continue-on-error */
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'e':	/* --exec=CMD */
-			script_exec = strdup(optarg);
+			script_exec = optarg;
 			break;
 
 		case 'f':	/* --config=FILE */
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'i':	/* --iface=IFNAME */
-			iface = strdup(optarg);
+			iface = optarg;
 			break;
 
 		case 'I':	/* --ident=NAME */
@@ -462,12 +462,6 @@ leave:
 	free(config);
 	free(pidfile_name);
 	free(cache_dir);
-	if (script_cmd)
-		free(script_cmd);
-	if (script_exec)
-		free(script_exec);
-	if (iface)
-		free(iface);
 
 	return rc;
 }
