@@ -19,8 +19,13 @@ issue or pull request with this project:
 
 3. Coding Style
 
-   We use the Linux coding style, like GIT it is becoming a de facto
-   standard for C programming
+   Lines are allowed to be longer than 72 characters these days, there
+   is no enforced max. length. 
+   
+> **Tip:** Always submit code that follows the style of surrounding code!
+
+   The coding style itself is strictly Linux [KNF][], like GIT it is
+   becoming a de facto standard for C programming
 
    https://www.kernel.org/doc/Documentation/CodingStyle
 
@@ -36,6 +41,13 @@ issue or pull request with this project:
 
 5. Commit messages
 
+   Commit messages exist to track *why* a change was made.  Try to be as
+   clear and concise as possible in your commit messages, and always, be
+   proud of your work and set up a proper GIT identity for your commits:
+
+        git config --global user.name "Jane Doe"
+        git config --global user.email jane.doe@example.com
+
    See this helpful guide for how to write simple, readable commit
    messages, or have at least a look at the below example.
    
@@ -44,6 +56,9 @@ issue or pull request with this project:
 
 Example
 -------
+
+Example commit message from the [Pro Git][gitbook] online book, notice
+how `git commit -s` is used to automatically add a `Signed-off-by`:
 
     Capitalized, short (50 chars or less) summary
     
@@ -67,10 +82,11 @@ Example
     
     - Use a hanging indent
     
-    Signed-off-by: Some Namesson <user@example.org>
+    Signed-off-by: Jane Doe <jane.doe@example.com>
 
 
 [1]: http://www.gnu.org/philosophy/free-sw.en.html
+[KNF]: https://en.wikipedia.org/wiki/Kernel_Normal_Form
 
 <!--
   -- Local Variables:
