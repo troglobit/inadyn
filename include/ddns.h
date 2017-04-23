@@ -133,7 +133,8 @@ typedef struct di {
 	/* Shell command for "What's my IP" checker */
 	char          *checkip_cmd;
 
-	ddns_name_t    proxy_server_name;
+	/* Optional local proxy server for this DDNS provider */
+	ddns_name_t    proxy_name;
 
 	ddns_alias_t   alias[DDNS_MAX_ALIAS_NUMBER];
 	size_t         alias_count;
