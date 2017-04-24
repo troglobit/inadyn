@@ -28,25 +28,25 @@
 
 /* cloudxns.net specific update request format */
 #define CLOUDXNS_UPDATE_IP_REQUEST		\
-	"PUT %s/%u "						\
-	"HTTP/1.0\r\n"						\
-	"Host: %s\r\n"						\
-	"User-Agent: %s\r\n"				\
-	"API-KEY: %s\r\n"					\
-	"API-REQUEST-DATE: %s\r\n"			\
-	"API-HMAC: %s\r\n"					\
+	"PUT %s/%u "				\
+	"HTTP/1.0\r\n"				\
+	"Host: %s\r\n"				\
+	"User-Agent: %s\r\n"			\
+	"API-KEY: %s\r\n"			\
+	"API-REQUEST-DATE: %s\r\n"		\
+	"API-HMAC: %s\r\n"			\
 	"Content-Length: %u\r\n\r\n"		\
 	"%s"
 #define CLOUDXNS_GET_REQUEST			\
-	"GET %s HTTP/1.0\r\n"				\
-	"Host: %s\r\n"						\
-	"User-Agent: %s\r\n"				\
-	"API-KEY: %s\r\n"					\
-	"API-REQUEST-DATE: %s\r\n"			\
+	"GET %s HTTP/1.0\r\n"			\
+	"Host: %s\r\n"				\
+	"User-Agent: %s\r\n"			\
+	"API-KEY: %s\r\n"			\
+	"API-REQUEST-DATE: %s\r\n"		\
 	"API-HMAC: %s\r\n\r\n"
 #define CLOUDXNS_UPDATE_PARAM_BODY		\
-	"{\"domain_id\":\"%u\","			\
-	"\"host\":\"%s\","					\
+	"{\"domain_id\":\"%u\","		\
+	"\"host\":\"%s\","			\
 	"\"value\":\"%s\"}"
 #define MD5_DIGEST_BYTES  16
 
@@ -67,16 +67,21 @@ static ddns_system_t plugin = {
 	.server_url   = "/api2/record"
 };
 
-// http://stackoverflow.com/a/744822 TODO: Move to a separate file.
+/* http://stackoverflow.com/a/744822 TODO: Move to a separate file */
 static int string_endswith(const char *str, const char *suffix)
 {
-    if (!str || !suffix)
-        return 0;
-    size_t lenstr = strlen(str);
-    size_t lensuffix = strlen(suffix);
-    if (lensuffix >  lenstr)
-        return 0;
-    return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
+	size_t lenstr;
+	size_t lensuffix;
+
+	if (!str || !suffix)
+		return 0;
+
+	lenstr = strlen(str);
+	lensuffix = strlen(suffix);
+	if (lensuffix > lenstr)
+		return 0;
+
+	return strncmp(str + lenstr - lensuffix, suffix, lensuffix) == 0;
 }
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
@@ -92,8 +97,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	int           domain_id = 0, record_id = 0;
 	size_t        hostlen, domainlen, len, paramlen;
 
-	// API_KEY = info->creds.username
-	// SECRET_KEY = info->creds.password
+	/*
+	 * API_KEY = info->creds.username
+	 * SECRET_KEY = info->creds.password
+	 */
 	do {
 		TRY(http_construct(&client));
 
@@ -101,24 +108,27 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		http_set_remote_name(&client, info->server_name.name);
 
 		client.ssl_enabled = info->ssl_enabled;
-		TRY(http_init(&client, "Sending domains list query"));
+		TRY(http_init(&client, "Sending domain list query"));
 
 		time(&rawtime);
 		date = ctime(&rawtime);
 		date = strdup(date);
-		date[strlen(date) - 1] = 0; // Remove the ending '\n'.
+		if (!date)
+			break;
+		date[strlen(date) - 1] = 0; /* Remove trailing \n */
 
-		// HMAC=md5(API_KEY+URL+DATE+SECRET_KEY)
-		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/domain%s%s", info->creds.username, info->ssl_enabled ? "s" : "", date, info->creds.password);
+		/* HMAC=md5(API_KEY+URL+DATE+SECRET_KEY) */
+		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/domain%s%s",
+			       info->creds.username, info->ssl_enabled ? "s" : "", date, info->creds.password);
 		md5((unsigned char *)buffer, len, digestbuf);
 		for (i = 0; i < MD5_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
-		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen, CLOUDXNS_GET_REQUEST,
-							"/api2/domain", info->server_name.name, info->user_agent, info->creds.username, date, digeststr);
+		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen, CLOUDXNS_GET_REQUEST, "/api2/domain",
+					     info->server_name.name, info->user_agent, info->creds.username, date, digeststr);
 		trans.req         = ctx->request_buf;
 		trans.rsp         = ctx->work_buf;
-		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
+		trans.max_rsp_len = ctx->work_buflen - 1; /* Save place for a \0 at the end */
 
 		free(date);
 
@@ -130,24 +140,38 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		if (rc)
 			break;
 
-		// TODO: Check & log errors.
+		/* TODO: Check & log errors */
 		TRY(http_status_valid(trans.status));
 
-		// {"code":1,"message":"Operate successfully","total":"1","data":[{"id":"12345","domain":"example.com.","status":"ok","level":"3","take_over_status":"Taken over","create_time":"2017-04-04 07:58:56","update_time":"2017-04-08 18:43:57","ttl":"600"}]}
+		/*
+		 * Example: with added whitespace and line breaks for clarity
+		 * { "code":1, "message":"Operate successfully", "total":"1",
+		 *   "data": [{
+		 *              "id":"12345", "domain":"example.com.", "status":"ok",
+		 *              "level":"3", "take_over_status":"Taken over",
+		 *              "create_time":"2017-04-04 07:58:56",
+		 *              "update_time":"2017-04-08 18:43:57",
+		 *              "ttl":"600"
+		 *    }]
+		 * }
+		 */
 		tmp = buf = strdup(trans.rsp_body);
-		tmp = strchr(tmp, '[');
+		if (!buf)
+			break;
 
+		tmp = strchr(tmp, '[');
 		if (!tmp) {
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
 		}
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
-			item++;
 			int num, id;
+
+			item++;
 			num = sscanf(item, "{\"id\":\"%u\",\"domain\":\"%255[^\"]", &id, domain);
 			if (num == 2 && *domain) {
-				domain[strlen(domain) - 1] = 0; // Remove the ending dot.
+				domain[strlen(domain) - 1] = 0;  /* Remove trailing dot */
 				if (string_endswith(alias->name, domain)) {
 					domain_id = id;
 					break;
@@ -157,11 +181,11 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		free(buf);
 
 		if (domain_id == 0) {
-			logit(LOG_ERR, "Hostname '%s' not found in domains list!\n", alias->name);
+			logit(LOG_ERR, "Hostname '%s' not found in domains list!", alias->name);
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
 		}
-		logit(LOG_INFO, "CloudXNS Domain: '%s' ID: %u\n", domain, domain_id);
+		logit(LOG_DEBUG, "CloudXNS Domain: '%s' ID: %u", domain, domain_id);
 
 
 		TRY(http_construct(&client));
@@ -175,17 +199,20 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		time(&rawtime);
 		date = ctime(&rawtime);
 		date = strdup(date);
-		date[strlen(date) - 1] = 0; // Remove the ending '\n'.
+		if (!date)
+			break;
+		date[strlen(date) - 1] = 0;  /* Remove trailing \n */
 
-		// HMAC=md5(API_KEY+URL+DATE+SECRET_KEY)
-		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/record/%u%s%s", info->creds.username, info->ssl_enabled ? "s" : "", domain_id, date, info->creds.password);
+		/* HMAC=md5(API_KEY+URL+DATE+SECRET_KEY) */
+		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/record/%u%s%s",
+			       info->creds.username, info->ssl_enabled ? "s" : "", domain_id, date, info->creds.password);
 		md5((unsigned char *)buffer, len, digestbuf);
 		for (i = 0; i < MD5_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
 		snprintf(buffer, sizeof(buffer), "/api2/record/%u", domain_id);
 		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen, CLOUDXNS_GET_REQUEST,
-							buffer, info->server_name.name, info->user_agent, info->creds.username, date, digeststr);
+					     buffer, info->server_name.name, info->user_agent, info->creds.username, date, digeststr);
 		trans.req         = ctx->request_buf;
 		trans.rsp         = ctx->work_buf;
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
@@ -200,12 +227,14 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		if (rc)
 			break;
 
-		// TODO: Check & log errors.
+		/* TODO: Check & log errors. */
 		TRY(http_status_valid(trans.status));
 
 		tmp = buf = strdup(trans.rsp_body);
-		tmp = strchr(tmp, '[');
+		if (!buf)
+			break;
 
+		tmp = strchr(tmp, '[');
 		if (!tmp) {
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
@@ -222,9 +251,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		}
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
-			item++;
 			int num, id;
 			char _prefix[64];
+
+			item++;
 			num = sscanf(item, "{\"record_id\":\"%u\",\"host_id\":\"%*d\",\"host\":\"%63[^\"]", &id, _prefix);
 			if (num == 2 && *_prefix) {
 				if (string_compare(prefix, _prefix)) {
@@ -236,35 +266,37 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		free(buf);
 
 		if (record_id == 0) {
-			logit(LOG_ERR, "Record '%s' not found in records list!\n", prefix);
+			logit(LOG_ERR, "Record '%s' not found in records list!", prefix);
 			rc = RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
 			break;
 		}
-		logit(LOG_INFO, "CloudXNS Record: '%s' ID: %u\n", prefix, record_id);
+		logit(LOG_DEBUG, "CloudXNS Record: '%s' ID: %u", prefix, record_id);
 
 
 		time(&rawtime);
 		date = ctime(&rawtime);
 		date = strdup(date);
-		date[strlen(date) - 1] = 0; // Remove the ending '\n'.
+		if (!date)
+			break;
+		date[strlen(date) - 1] = 0; /* Remove trailing \n */
 
 		paramlen = snprintf(param, sizeof(param), CLOUDXNS_UPDATE_PARAM_BODY, domain_id, prefix, alias->address);
 
-		// HMAC=md5(API_KEY+URL+PARAM_BODY+DATE+SECRET_KEY)
-		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/record/%u%s%s%s", info->creds.username, info->ssl_enabled ? "s" : "", record_id, param, date, info->creds.password);
+		/* HMAC=md5(API_KEY+URL+PARAM_BODY+DATE+SECRET_KEY) */
+		len = snprintf(buffer, sizeof(buffer), "%shttp%s://www.cloudxns.net/api2/record/%u%s%s%s",
+			       info->creds.username, info->ssl_enabled ? "s" : "", record_id, param, date, info->creds.password);
 		md5((unsigned char *)buffer, len, digestbuf);
 		for (i = 0; i < MD5_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
 		len = snprintf(ctx->request_buf, ctx->request_buflen,
-				CLOUDXNS_UPDATE_IP_REQUEST,
-				info->server_url,
-				record_id,
-				info->server_name.name,
-				info->user_agent,
-				info->creds.username, date, digeststr,
-				paramlen, param);
-
+			       CLOUDXNS_UPDATE_IP_REQUEST,
+			       info->server_url,
+			       record_id,
+			       info->server_name.name,
+			       info->user_agent,
+			       info->creds.username, date, digeststr,
+			       paramlen, param);
 		free(date);
 
 		return len;
@@ -273,10 +305,18 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	return -1;
 }
 
-/* CloudXNS specific response validator.
-	{"code":1,"message":"success","data":{"id":12345,"domain_name":"example.com.","value":"1.2.3.4","bak_data":""}}
-	We search our own IP address in response and that's enough.
-*/
+/*
+ * CloudXNS specific response validator.  With added whitespace for
+ * clarity:
+ * { "code":1, "message":"success",
+ *   "data": {
+ *             "id":12345, "domain_name":"example.com.",
+ *             "value":"1.2.3.4","bak_data":""
+ *   }
+ * }
+ *
+ * We search our own IP address in response and that's enough.
+ */
 static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
