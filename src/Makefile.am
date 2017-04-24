@@ -43,7 +43,7 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/dtdns.c		../plugins/giradns.c	\
 		  ../plugins/duiadns.c		../plugins/dynv6.c	\
 		  ../plugins/dynv6-ipv4.c	../plugins/ddnss.c	\
-		  ../plugins/freemyip.c
+		  ../plugins/freemyip.c		../plugins/cloudxns.c
 inadyn_CPPFLAGS = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\" -DLOCALSTATEDIR=\"@localstatedir@\"
 inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
 inadyn_CFLAGS  += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
