@@ -753,12 +753,12 @@ static int init_context(ddns_t *ctx)
 		http_t *checkip = &info->checkip;
 		http_t *update  = &info->server;
 
-		if (strlen(info->proxy_server_name.name)) {
-			http_set_port(checkip, info->proxy_server_name.port);
-			http_set_port(update,  info->proxy_server_name.port);
+		if (strlen(info->proxy_name.name)) {
+			http_set_port(checkip, info->proxy_name.port);
+			http_set_port(update,  info->proxy_name.port);
 
-			http_set_remote_name(checkip, info->proxy_server_name.name);
-			http_set_remote_name(update,  info->proxy_server_name.name);
+			http_set_remote_name(checkip, info->proxy_name.name);
+			http_set_remote_name(update,  info->proxy_name.name);
 		} else {
 			http_set_port(checkip, info->checkip_name.port);
 			http_set_port(update,  info->server_name.port);
