@@ -180,7 +180,7 @@ int os_check_perms(void)
 			return RC_PIDFILE_EXISTS_ALREADY;
 		}
 
-		pidfile_dir = dirname(pidfile_name);
+		pidfile_dir = dirname(strdupa(pidfile_name));
 		if (access(pidfile_dir, F_OK)) {
 			if (mkpath(pidfile_dir, 0755) && errno != EEXIST) {
 				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
