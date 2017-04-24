@@ -35,7 +35,7 @@
 	"API-KEY: %s\r\n"			\
 	"API-REQUEST-DATE: %s\r\n"		\
 	"API-HMAC: %s\r\n"			\
-	"Content-Length: %u\r\n\r\n"		\
+	"Content-Length: %zd\r\n\r\n"		\
 	"%s"
 #define CLOUDXNS_GET_REQUEST			\
 	"GET %s HTTP/1.0\r\n"			\
