@@ -3,7 +3,7 @@ sbin_PROGRAMS	= inadyn
 inadyn_SOURCES	= main.c	ddns.c		cache.c		\
 		  error.c	conf.c		os.c		\
 		  http.c	plugin.c	tcp.c		\
-		  ip.c		sha1.c		base64.c	\
+		  sha1.c		base64.c	\
 		  makepath.c	md5.c		log.c
 
 if NO_PIDFILE

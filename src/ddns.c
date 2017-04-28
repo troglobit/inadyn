@@ -811,10 +811,10 @@ static int check_error(ddns_t *ctx, int rc)
 
 	/* dyn_dns_update_ip() failed, inform the user the (network) error
 	 * is not fatal and that we will retry again in a short while. */
-	case RC_IP_INVALID_REMOTE_ADDR: /* Probably temporary DNS error. */
-	case RC_IP_CONNECT_FAILED:      /* Cannot connect to DDNS server atm. */
-	case RC_IP_SEND_ERROR:
-	case RC_IP_RECV_ERROR:
+	case RC_TCP_INVALID_REMOTE_ADDR: /* Probably temporary DNS error. */
+	case RC_TCP_CONNECT_FAILED:      /* Cannot connect to DDNS server atm. */
+	case RC_TCP_SEND_ERROR:
+	case RC_TCP_RECV_ERROR:
 	case RC_OS_INVALID_IP_ADDRESS:
 	case RC_DYNDNS_RSP_RETRY_LATER:
 	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:

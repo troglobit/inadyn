@@ -31,16 +31,16 @@
 #define RC_HTTPS_NO_TRUSTED_CA_STORE                5
 #define RC_PIDFILE_EXISTS_ALREADY                   6
 
-#define RC_IP_SOCKET_CREATE_ERROR                   10
-#define RC_IP_BAD_PARAMETER                         11
-#define RC_IP_INVALID_REMOTE_ADDR                   12
-#define RC_IP_CONNECT_FAILED                        13
-#define RC_IP_SEND_ERROR                            14
-#define RC_IP_RECV_ERROR                            15
-#define RC_IP_OBJECT_NOT_INITIALIZED                16
-#define RC_IP_OS_SOCKET_INIT_FAILED                 17
+#define RC_TCP_SOCKET_CREATE_ERROR                   10
+#define RC_TCP_BAD_PARAMETER                         11
+#define RC_TCP_INVALID_REMOTE_ADDR                   12
+#define RC_TCP_CONNECT_FAILED                        13
+#define RC_TCP_SEND_ERROR                            14
+#define RC_TCP_RECV_ERROR                            15
+#define RC_TCP_OBJECT_NOT_INITIALIZED                16
+#define RC_TCP_OS_SOCKET_INIT_FAILED                 17
 
-#define RC_TCP_OBJECT_NOT_INITIALIZED               20
+// #define RC_TCP_OBJECT_NOT_INITIALIZED               20
 
 #define RC_HTTP_OBJECT_NOT_INITIALIZED              30
 #define RC_HTTP_BAD_PARAMETER                       31
