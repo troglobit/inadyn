@@ -9,7 +9,7 @@
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd February 21, 2017
+.Dd April 28, 2017
 .Dt INADYN 5 SMM
 .Os
 .Sh NAME
@@ -288,6 +288,8 @@ by Hurricane Electric.
 .Aq https://www.strato.com
 .It Cm default@freemyip.com
 .Aq https://freemyip.com
+.It Cm default@cloudxns.net
+.Aq https://www.cloudxns.net
 .El
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
@@ -426,8 +428,15 @@ provider tunnelbroker.net {
 
 # www.freemyip.com
 provider freemyip.com {
-        password = your_token
-        hostname = your_hostname.freemyip.com
+    password = your_token
+    hostname = your_hostname.freemyip.com
+}
+
+# www.cloudxns.net
+provider cloudxns.net {
+    username = your_api_key
+    password = your_secret_key
+    hostname = yourhost.example.com
 }
 
 # Generic example for twoDNS.de
