@@ -1,4 +1,4 @@
-/* Interface for IP functions
+/* Interface for TCP functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
