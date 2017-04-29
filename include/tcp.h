@@ -30,6 +30,15 @@
 #define TCP_SOCKET_MAX_PORT		65535
 #define TCP_DEFAULT_READ_CHUNK_SIZE	100
 
+typedef enum {
+	NO_PROXY = 0,
+	PROXY_SOCKS4,
+	PROXY_SOCKS4A,
+	PROXY_SOCKS5,
+	PROXY_SOCKS5_HOSTNAME,
+	PROXY_HTTP_CONNECT, /* SSL only. */
+} tcp_proxy_type_t;
+
 typedef struct {
 	int                 initialized;
 
@@ -38,6 +47,10 @@ typedef struct {
 
 	unsigned short      port;
 	int                 timeout;
+
+	tcp_proxy_type_t    proxy_type;
+	const char         *proxy_host;
+	unsigned short      proxy_port;
 } tcp_sock_t;
 
 int tcp_construct          (tcp_sock_t *tcp);
