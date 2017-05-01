@@ -155,7 +155,7 @@ This looks for the default `.conf` file, to check any file, use:
         username        = spaceman
         password        = bowie
         hostname        = spaceman.no-ip.com
-        checkip-command = /sbin/ifconfig eth0 | grep 'inet6 addr'
+        checkip-command = "/sbin/ifconfig eth0 | grep 'inet6 addr'"
     }
     
     # Note: hostname == update-key from Advanced tab in the Web UI
