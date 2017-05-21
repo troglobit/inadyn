@@ -216,7 +216,7 @@ static int usage(int code)
 	else
 		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
-	fprintf(stderr, "\nUsage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
+	fprintf(stderr, "Usage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
 		" -1, --once                     Run once, then exit regardless of status\n"
 		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
 		"                                Default use ident NAME: %s/\n"
@@ -239,11 +239,12 @@ static int usage(int code)
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
 		"Bug report address: %s\n"
-		"Project homepage: %s\n\n",
 		prognm, cache_dir, config,
 		prognm, prognm, pidfn,
-		PACKAGE_BUGREPORT,
-		PACKAGE_URL);
+		PACKAGE_BUGREPORT);
+#ifdef PACKAGE_URL
+	fprintf(stderr, "Project homepage: %s\n", PACKAGE_URL);
+#endif
 
 	return code;
 }
