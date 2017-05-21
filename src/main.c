@@ -238,7 +238,7 @@ static int usage(int code)
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
-		"Bug report address: %s\n"
+		"Bug report address: %s\n",
 		prognm, cache_dir, config,
 		prognm, prognm, pidfn,
 		PACKAGE_BUGREPORT);
