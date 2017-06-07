@@ -60,6 +60,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	http_trans_t  trans;
 	char         *buf, *tmp, *line, *hash = NULL;
 	char          host[256], updateurl[256];
+	char          username_lc[256];
 	char          buffer[256];
 	char          digeststr[SHA1_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[SHA1_DIGEST_BYTES];
@@ -73,8 +74,11 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		client.ssl_enabled = info->ssl_enabled;
 		TRY(http_init(&client, "Sending update URL query"));
 
+		for (int i = 0; info->creds.username[i]; i++)
+			username_lc[i] = tolower(info->creds.username[i]);
+
 		snprintf(buffer, sizeof(buffer), "%s|%s",
-			 info->creds.username, info->creds.password);
+			username_lc, info->creds.password);
 		sha1((unsigned char *)buffer, strlen(buffer), digestbuf);
 		for (i = 0; i < SHA1_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
