@@ -30,14 +30,6 @@ addons:
     build_command:   "make clean all"
     branch_pattern: dev
 
-install:
-  - wget https://github.com/troglobit/libite/releases/download/v1.8.3/libite-1.8.3.tar.xz
-  - tar xf libite-1.8.3.tar.xz
-  - (cd libite-1.8.3 && ./configure --prefix=/tmp && make && make install-strip)
-  - wget https://github.com/martinh/libconfuse/releases/download/v3.0/confuse-3.0.tar.xz
-  - tar xf confuse-3.0.tar.xz
-  - (cd confuse-3.0 && ./configure --prefix=/tmp --disable-examples && make && make install-strip)
-
 script:
   - ./autogen.sh
   - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp --disable-ssl
