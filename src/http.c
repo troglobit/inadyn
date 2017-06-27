@@ -154,9 +154,9 @@ int http_status_valid(int status)
 		return 0;
 
 	if (status >= 500 && status < 600)
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 int http_set_port(http_t *client, int port)

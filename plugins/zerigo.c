@@ -88,14 +88,14 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 			return 0;
 			
 		case 4:
-			return RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
+			return RC_DDNS_INVAL_MISSING_PARAM;
 
 		case 5:
-			return RC_DYNDNS_RSP_RETRY_LATER;
+			return RC_DDNS_RSP_RETRY_LATER;
 		}
 	}
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

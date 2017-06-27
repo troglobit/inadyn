@@ -87,7 +87,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 	    strstr(resp, "-ERROR: This tunnel is already associated with this IP address."))
 		return 0;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

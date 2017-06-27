@@ -87,7 +87,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 	if (strstr(resp, "OK") || strstr(resp, "good"))
 		return RC_OK;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

@@ -153,7 +153,7 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	rc = http_transaction(client, &ctx->http_transaction);
 	if (trans->status != 200)
-		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
+		rc = RC_DDNS_INVALID_CHECKIP_RSP;
 
 	http_exit(client);
 	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
@@ -583,7 +583,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	rc = info->system->response(&trans, info, alias);
 	if (rc) {
 		logit(LOG_WARNING, "%s error in DDNS server response:",
-		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
+		      rc == RC_DDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
 		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
 		      trans.rsp_body != trans.rsp ? trans.rsp_body : "");
 
@@ -659,10 +659,10 @@ static int update_alias_table(ddns_t *ctx)
 				os_shell_execute(script_exec, alias->address, alias->name);
 		}
 
-		if (RC_DYNDNS_RSP_NOTOK == rc)
+		if (RC_DDNS_RSP_NOTOK == rc)
 			remember = rc;
 
-		if (RC_DYNDNS_RSP_RETRY_LATER == rc && !remember)
+		if (RC_DDNS_RSP_RETRY_LATER == rc && !remember)
 			remember = rc;
 
 		info = conf_info_iterator(0);
@@ -816,13 +816,13 @@ static int check_error(ddns_t *ctx, int rc)
 	case RC_IP_SEND_ERROR:
 	case RC_IP_RECV_ERROR:
 	case RC_OS_INVALID_IP_ADDRESS:
-	case RC_DYNDNS_RSP_RETRY_LATER:
-	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:
+	case RC_DDNS_RSP_RETRY_LATER:
+	case RC_DDNS_INVALID_CHECKIP_RSP:
 		ctx->update_period = ctx->error_update_period_sec;
 		logit(LOG_WARNING, "Will retry again in %d sec ...", ctx->update_period);
 		break;
 
-	case RC_DYNDNS_RSP_NOTOK:
+	case RC_DDNS_RSP_NOTOK:
 		if (ignore_errors) {
 			logit(LOG_WARNING, "%s, ignoring ...", errstr);
 			break;

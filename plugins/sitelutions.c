@@ -74,9 +74,9 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		return 0;
 
 	if (strstr(resp, "dberror"))
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

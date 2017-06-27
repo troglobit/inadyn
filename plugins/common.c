@@ -74,9 +74,9 @@ int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		return 0;
 
 	if (strstr(body, "dnserr") || strstr(body, "911"))
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 /**

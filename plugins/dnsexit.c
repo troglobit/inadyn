@@ -79,12 +79,12 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		return 0;
 	case 4:
 	case 11:
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 	default:
 		break;
 	}
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

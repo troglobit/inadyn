@@ -109,7 +109,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		free(buf);
 
 		if (!hash)
-			rc = RC_DYNDNS_RSP_NOTOK;
+			rc = RC_DDNS_RSP_NOTOK;
 		else
 			hash++;
 	}
@@ -143,7 +143,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 	if (strstr(resp, alias->address))
 		return 0;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)
