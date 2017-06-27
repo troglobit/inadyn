@@ -1,6 +1,6 @@
 /* libConfuse interface to parse inadyn.conf v2 format
  *
- * Copyright (C) 2014-2015  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

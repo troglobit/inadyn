@@ -16,7 +16,7 @@ Copyright: 2006-2010 Brainspark B.V.
 License: GPL-2+
 
 Files: src/makepath.c
-Copyright: 2013-2016  Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2013-2017  Joachim Nilsson <troglobit@gmail.com>
 License: ISC
 
 Files: src/pidfile.c
