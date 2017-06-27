@@ -65,22 +65,12 @@ AC_SEARCH_LIBS([dlopen], [dl dld], [], [
   AC_MSG_ERROR([unable to find the dlopen() function])
 ])
 
-AC_CHECK_FUNC([pidfile], has_pidfile=yes, has_pidfile=no)
-AC_CHECK_FUNC([strlcpy], has_strlcpy=yes, has_strlcpy=no)
-AC_CHECK_FUNC([strlcat], has_strlcat=yes, has_strlcat=no)
-AC_CHECK_FUNC([strtonum], has_strtonum=yes, has_strtonum=no)
+# Check if some func is not in libc
+AC_CHECK_LIB([util], [pidfile])
 
-AS_IF([test "x$has_strlcpy" = xno],
-	AC_SEARCH_LIBS([strlcpy], [util],
-		has_strlcpy=yes
-		has_strlcat=yes
-		has_strtonum=yes
-		libutil=yes))
-
-AM_CONDITIONAL(NO_PIDFILE, [test "x$has_pidfile"  = "xno"])
-AM_CONDITIONAL(NO_STRLCPY, [test "x$has_strlcpy"  = "xno"])
-AM_CONDITIONAL(NO_STRLCAT, [test "x$has_strlcat"  = "xno"])
-AM_CONDITIONAL(NO_STRTONUM, [test "x$has_strtonum" = "xno"])
+# Check for usually missing API's, which we can replace
+AC_REPLACE_FUNCS([pidfile strlcpy strlcat strtonum])
+AC_CONFIG_LIBOBJ_DIR([lib])
 
 # Needed for the libraries
 AM_PROG_AR
@@ -155,9 +145,5 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 SBINDIR=`eval echo $sbindir`
 SBINDIR=`eval echo $SBINDIR`
 AC_SUBST(SBINDIR)
-
-LIBUTIL=
-AS_IF([test "x$libutil" = "yes"], [LIBUTIL=-lutil])
-AC_SUBST(LIBUTIL)
 
 AC_OUTPUT

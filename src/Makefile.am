@@ -1,26 +1,17 @@
-AUTOMAKE_OPTIONS= subdir-objects
+AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS      = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\" -DLOCALSTATEDIR=\"@localstatedir@\"
+AM_CPPFLAGS     += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
+AM_CFLAGS        = -W -Wall -Wextra -std=gnu99
+
 sbin_PROGRAMS	= inadyn
 inadyn_SOURCES	= main.c	ddns.c		cache.c		\
 		  error.c	conf.c		os.c		\
 		  http.c	plugin.c	tcp.c		\
 		  ip.c		sha1.c		base64.c	\
 		  makepath.c	md5.c		log.c
-
-if NO_PIDFILE
-inadyn_SOURCES += pidfile.c
-endif
-
-if NO_STRLCPY
-inadyn_SOURCES += strlcpy.c
-endif
-
-if NO_STRLCAT
-inadyn_SOURCES += strlcat.c
-endif
-
-if NO_STRTONUM
-inadyn_SOURCES += strtonum.c
-endif
+inadyn_CFLAGS   = $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
+inadyn_LDADD    = $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
+inadyn_LDADD   += $(LIBS) $(LIBOBJS)
 
 if ENABLE_SSL
 if ENABLE_OPENSSL
@@ -44,9 +35,3 @@ inadyn_SOURCES += ../plugins/common.c		../plugins/dyndns.c	\
 		  ../plugins/duiadns.c		../plugins/dynv6.c	\
 		  ../plugins/dynv6-ipv4.c	../plugins/ddnss.c	\
 		  ../plugins/freemyip.c		../plugins/cloudxns.c
-inadyn_CPPFLAGS = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\" -DLOCALSTATEDIR=\"@localstatedir@\"
-inadyn_CFLAGS   = -W -Wall -Wextra -std=gnu99
-inadyn_CFLAGS  += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
-inadyn_CFLAGS  += $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
-inadyn_LDADD    = $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
-inadyn_LDADD   += @LIBUTIL@
