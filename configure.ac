@@ -69,7 +69,7 @@ AC_SEARCH_LIBS([dlopen], [dl dld], [], [
 AC_CHECK_LIB([util], [pidfile])
 
 # Check for usually missing API's, which we can replace
-AC_REPLACE_FUNCS([pidfile strlcpy strlcat strtonum])
+AC_REPLACE_FUNCS([pidfile strlcpy strlcat strtonum utimensat])
 AC_CONFIG_LIBOBJ_DIR([lib])
 
 # Needed for the libraries
