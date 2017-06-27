@@ -93,7 +93,7 @@ static const ERROR_NAME global_error_table[] = {
 
 static const char *unknown_error = "Unknown error";
 
-const char *errorcode_get_name(int rc)
+const char *error_str(int rc)
 {
 	const ERROR_NAME *it = global_error_table;
 

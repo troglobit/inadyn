@@ -140,7 +140,7 @@ int os_install_signal_handler(void *ctx)
 	}
 
 	if (rc) {
-		logit(LOG_WARNING, "Failed installing signal handler: %s", errorcode_get_name(rc));
+		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
 

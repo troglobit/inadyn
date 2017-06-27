@@ -87,7 +87,7 @@
 #define TRY(fn)      {     rc = fn; if (rc) break; }
 #define ASSERT(cond) { if (!cond) return RC_INVALID_POINTER; }
 
-const char *errorcode_get_name(int rc);
+const char *error_str(int rc);
 
 #endif /* INADYN_ERROR_H_ */
 

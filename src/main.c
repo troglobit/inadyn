@@ -464,6 +464,9 @@ leave:
 	free(pidfile_name);
 	free(cache_dir);
 
+	if (rc)
+		logit(LOG_ERR, "Error code %d: %s", rc, error_str(rc));
+
 	return rc;
 }
 
