@@ -88,7 +88,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 			return 0;
 			
 		case 4:
-			return RC_DDNS_INVAL_MISSING_PARAM;
+			return RC_DDNS_INVALID_OPTION;
 
 		case 5:
 			return RC_DDNS_RSP_RETRY_LATER;

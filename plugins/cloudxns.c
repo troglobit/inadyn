@@ -159,7 +159,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		 */
 		tmp = strchr(trans.rsp_body, '[');
 		if (!tmp) {
-			rc = RC_DDNS_INVAL_MISSING_PARAM;
+			rc = RC_DDNS_INVALID_OPTION;
 			break;
 		}
 
@@ -179,7 +179,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		if (domain_id == 0) {
 			logit(LOG_ERR, "Hostname '%s' not found in domains list!", alias->name);
-			rc = RC_DDNS_INVAL_MISSING_PARAM;
+			rc = RC_DDNS_INVALID_OPTION;
 			break;
 		}
 		logit(LOG_DEBUG, "CloudXNS Domain: '%s' ID: %u", domain, domain_id);
@@ -220,7 +220,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		tmp = strchr(trans.rsp_body, '[');
 		if (!tmp) {
-			rc = RC_DDNS_INVAL_MISSING_PARAM;
+			rc = RC_DDNS_INVALID_OPTION;
 			break;
 		}
 
@@ -250,7 +250,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		if (record_id == 0) {
 			logit(LOG_ERR, "Record '%s' not found in records list!", prefix);
-			rc = RC_DDNS_INVAL_MISSING_PARAM;
+			rc = RC_DDNS_INVALID_OPTION;
 			break;
 		}
 		logit(LOG_DEBUG, "CloudXNS Record: '%s' ID: %u", prefix, record_id);

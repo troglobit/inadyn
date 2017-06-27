@@ -27,9 +27,8 @@
 #define RC_ERROR                        1
 #define RC_INVALID_POINTER              2
 #define RC_OUT_OF_MEMORY                3
-#define RC_OUT_BUFFER_OVERFLOW          4
-#define RC_HTTPS_NO_TRUSTED_CA_STORE    5
-#define RC_PIDFILE_EXISTS_ALREADY       6
+#define RC_BUFFER_OVERFLOW              4
+#define RC_PIDFILE_EXISTS_ALREADY       5
 
 #define RC_IP_SOCKET_CREATE_ERROR       10
 #define RC_IP_BAD_PARAMETER             11
@@ -37,26 +36,22 @@
 #define RC_IP_CONNECT_FAILED            13
 #define RC_IP_SEND_ERROR                14
 #define RC_IP_RECV_ERROR                15
-#define RC_IP_OBJECT_NOT_INITIALIZED    16
-#define RC_IP_OS_SOCKET_INIT_FAILED     17
 
-#define RC_TCP_OBJECT_NOT_INITIALIZED   20
+#define RC_IP_OBJECT_NOT_INITIALIZED    20
+#define RC_TCP_OBJECT_NOT_INITIALIZED   21
+#define RC_HTTP_OBJECT_NOT_INITIALIZED  22
 
-#define RC_HTTP_OBJECT_NOT_INITIALIZED  30
-#define RC_HTTP_BAD_PARAMETER           31
+#define RC_HTTPS_NO_TRUSTED_CA_STORE    31
 #define RC_HTTPS_OUT_OF_MEMORY          32
 #define RC_HTTPS_FAILED_CONNECT         33
 #define RC_HTTPS_FAILED_GETTING_CERT    34
-#define RC_HTTPS_NO_SSL_SUPPORT         35
 #define RC_HTTPS_SEND_ERROR             36
 #define RC_HTTPS_RECV_ERROR             37
 #define RC_HTTPS_SNI_ERROR              38
 #define RC_HTTPS_INVALID_REQUEST        39
 
-#define RC_DDNS_BUFFER_TOO_SMALL        40
 #define RC_DDNS_INVALID_CHECKIP_RSP     42
-#define RC_DDNS_INVALID_OPTION          44
-#define RC_DDNS_INVAL_MISSING_PARAM     45
+#define RC_DDNS_INVALID_OPTION          45
 #define RC_DDNS_RSP_NOTOK               48
 #define RC_DDNS_RSP_RETRY_LATER         49
 
@@ -67,9 +62,6 @@
 #define RC_OS_INVALID_GID               65
 #define RC_OS_INSTALL_SIGHANDLER_FAILED 66
 
-#define RC_FILE_IO_OPEN_ERROR           70
-#define RC_FILE_IO_READ_ERROR           71
-#define RC_FILE_IO_OUT_OF_BUFFER        72
 #define RC_FILE_IO_ACCESS_ERROR         73
 #define RC_FILE_IO_MISSING_FILE         74
 

@@ -716,7 +716,7 @@ static int get_encoded_user_passwd(void)
 		if (rc2) {
 			logit(LOG_WARNING, "Failed base64 encoding user:pass for %s!", info->system->name);
 			free(encode);
-			rc = RC_OUT_BUFFER_OVERFLOW;
+			rc = RC_BUFFER_OVERFLOW;
 			break;
 		}
 
