@@ -706,15 +706,15 @@ static int get_encoded_user_passwd(void)
 
 		encode = malloc(dlen);
 		if (!encode) {
-			logit(LOG_WARNING, "Out of memory when base64 encoding user:pass for %s!", info->system->name);
+			logit(LOG_WARNING, "Out of memory base64 encoding user:pass for %s!", info->system->name);
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
 
 		logit(LOG_DEBUG, "Base64 encode %s for %s ...", buf, info->system->name);
 		rc2 = base64_encode((unsigned char *)encode, &dlen, (unsigned char *)buf, strlen(buf));
-		if (rc2 != 0) {
-			logit(LOG_WARNING, "Failed base64 encoding of user:pass for %s!", info->system->name);
+		if (rc2) {
+			logit(LOG_WARNING, "Failed base64 encoding user:pass for %s!", info->system->name);
 			free(encode);
 			rc = RC_OUT_BUFFER_OVERFLOW;
 			break;
