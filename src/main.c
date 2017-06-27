@@ -440,13 +440,17 @@ int main(int argc, char *argv[])
 		if (rc != RC_OK)
 			break;
 
-		if (os_install_signal_handler(ctx))
-			return RC_OS_INSTALL_SIGHANDLER_FAILED;
+		rc = os_install_signal_handler(ctx);
+		if (rc) {
+			free_context(ctx);
+			break;
+		}
 
 		cfg = conf_parse_file(config, ctx);
 		if (!cfg) {
+			rc = RC_FILE_IO_MISSING_FILE;
 			free_context(ctx);
-			return RC_FILE_IO_MISSING_FILE;
+			break;
 		}
 
 		rc = ddns_main_loop(ctx);
