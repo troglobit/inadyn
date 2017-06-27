@@ -38,6 +38,7 @@ AC_USE_SYSTEM_EXTENSIONS
 # Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 
 # Checks for header files.
@@ -49,6 +50,19 @@ AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
 		  #ifdef HAVE_SYS_SOCKET_H
 		  #include <sys/socket.h>
 		  #endif
+])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_UINT32_T
+
+# Checks for library functions.
+AC_FUNC_FORK
+AC_FUNC_SELECT_ARGTYPES
+AC_CHECK_FUNCS([atexit memset poll socket strerror])
+AC_SEARCH_LIBS([dlopen], [dl dld], [], [
+  AC_MSG_ERROR([unable to find the dlopen() function])
 ])
 
 AC_CHECK_FUNC([pidfile], has_pidfile=yes, has_pidfile=no)
@@ -132,20 +146,6 @@ AS_IF([test "x$with_systemd" = "xyes" -o "x$with_systemd" = "xauto"], [
 AS_IF([test "x$with_systemd" != "xno"],
      [AC_SUBST([systemddir], [$with_systemd])])
 AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$with_systemd" != "xno"])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_UINT32_T
-
-# Checks for library functions.
-AC_FUNC_FORK
-AC_PROG_GCC_TRADITIONAL
-AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_FUNCS([atexit memset poll socket strerror])
-AC_SEARCH_LIBS([dlopen], [dl dld], [], [
-  AC_MSG_ERROR([unable to find the dlopen() function])
-])
 
 # Expand $sbindir early, into $SBINDIR, for systemd unit file
 # NOTE: This does *not* take prefix/exec_prefix override at "make
