@@ -30,6 +30,11 @@ addons:
     build_command:   "make clean all"
     branch_pattern: dev
 
+install:
+  - wget https://github.com/martinh/libconfuse/releases/download/v3.0/confuse-3.0.tar.xz
+  - tar xf confuse-3.0.tar.xz
+  - (cd confuse-3.0 && ./configure --prefix=/tmp --disable-examples && make && make install-strip)
+
 script:
   - ./autogen.sh
   - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp --disable-ssl
