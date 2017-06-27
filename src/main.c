@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
 
 	if (background) {
 		if (daemon(0, 0) < 0) {
-			fprintf(stderr, "Failed daemonizing %s: %s\n", ident, strerror(errno));
+			logit(LOG_ERR, "Failed daemonizing %s: %s", ident, strerror(errno));
 			return RC_OS_FORK_FAILURE;
 		}
 	}
