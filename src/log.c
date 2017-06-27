@@ -52,9 +52,9 @@ void log_exit(void)
 
 int log_level(char *arg)
 {
-	int rc;
+	int i, rc;
 
-	for (int i = 0; prioritynames[i].c_name; i++) {
+	for (i = 0; prioritynames[i].c_name; i++) {
 		if (string_match(prioritynames[i].c_name, arg)) {
 			level = prioritynames[i].c_val;
 			return 0;
