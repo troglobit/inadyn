@@ -459,11 +459,12 @@ static int get_address(ddns_t *ctx)
 	info = conf_info_iterator(1);
 	while (info) {
 		int anychange = 0;
+		size_t i;
 
 		if (get_address_backend(ctx, info, address, sizeof(address)))
 			goto next;
 
-		for (size_t i = 0; i < info->alias_count; i++) {
+		for (i = 0; i < info->alias_count; i++) {
 			ddns_alias_t *alias = &info->alias[i];
 
 			alias->ip_has_changed = strncmp(alias->address, address, sizeof(alias->address)) != 0;
@@ -507,7 +508,9 @@ static int check_alias_update_table(ddns_t *ctx)
 	 * iterate over servernum, but not if it's fix set to =! 0 */
 	info = conf_info_iterator(1);
 	while (info) {
-		for (size_t i = 0; i < info->alias_count; i++) {
+		size_t i;
+
+		for (i = 0; i < info->alias_count; i++) {
 			int override;
 			ddns_alias_t *alias = &info->alias[i];
 
@@ -617,7 +620,9 @@ static int update_alias_table(ddns_t *ctx)
 		 * change, i.e., an active user. */
 		info = conf_info_iterator(1);
 		while (info) {
-			for (size_t i = 0; i < info->alias_count; i++) {
+			size_t i;
+
+			for (i = 0; i < info->alias_count; i++) {
 				ddns_alias_t *alias = &info->alias[i];
 				char backup[sizeof(alias->address)];
 
@@ -639,7 +644,9 @@ static int update_alias_table(ddns_t *ctx)
 
 	info = conf_info_iterator(1);
 	while (info) {
-		for (size_t i = 0; i < info->alias_count; i++) {
+		size_t i;
+
+		for (i = 0; i < info->alias_count; i++) {
 			ddns_alias_t *alias = &info->alias[i];
 
 			if (!alias->update_required)
