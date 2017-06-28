@@ -142,7 +142,7 @@ int ssl_open(http_t *client, char *msg)
 	if (!SSL_set_tlsext_host_name(client->ssl, sn))
 		return RC_HTTPS_SNI_ERROR;
 
-	SSL_set_fd(client->ssl, client->tcp.ip.socket);
+	SSL_set_fd(client->ssl, client->tcp.socket);
 	if (-1 == SSL_connect(client->ssl))
 		return RC_HTTPS_FAILED_CONNECT;
 
