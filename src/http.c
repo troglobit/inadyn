@@ -38,7 +38,6 @@ int http_construct(http_t *client)
 	return 0;
 }
 
-/* Resource free. */
 int http_destruct(http_t *client, int num)
 {
 	int i = 0, rv = 0;
@@ -49,7 +48,6 @@ int http_destruct(http_t *client, int num)
 	return rv;
 }
 
-/* Set default TCP specififc params */
 static int local_set_params(http_t *client)
 {
 	int timeout = 0;
@@ -66,7 +64,6 @@ static int local_set_params(http_t *client)
 	return 0;
 }
 
-/* Sets up the object. */
 int http_init(http_t *client, char *msg)
 {
 	int rc = 0;
@@ -87,7 +84,6 @@ int http_init(http_t *client, char *msg)
 	return 0;
 }
 
-/* Disconnect and some other clean up. */
 int http_exit(http_t *client)
 {
 	ASSERT(client);
@@ -113,7 +109,8 @@ static void http_response_parse(http_trans_t *trans)
 		trans->rsp_body = body;
 	}
 
-	/* %*c         : HTTP/1.0, 1.1 etc, discard read value
+	/*
+	 * %*c         : HTTP/1.0, 1.1 etc, discard read value
 	 * %4d         : HTTP status code, e.g. 200
 	 * %255[^\r\n] : HTTP status text, e.g. OK -- Reads max 255 bytes, including \0, not \r or \n
 	 */
@@ -121,7 +118,6 @@ static void http_response_parse(http_trans_t *trans)
 		trans->status = status;
 }
 
-/* Send req and get response */
 int http_transaction(http_t *client, http_trans_t *trans)
 {
 	int rc = 0;
@@ -145,9 +141,6 @@ int http_transaction(http_t *client, http_trans_t *trans)
 	return rc;
 }
 
-/*
- * Validate HTTP status code
- */
 int http_status_valid(int status)
 {
 	if (status == 200)

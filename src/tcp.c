@@ -49,7 +49,6 @@ int tcp_construct(tcp_sock_t *tcp)
 	return 0;
 }
 
-/* Resource free. */
 int tcp_destruct(tcp_sock_t *tcp)
 {
 	ASSERT(tcp);
@@ -60,7 +59,6 @@ int tcp_destruct(tcp_sock_t *tcp)
 	return 0;
 }
 
-/* Check for socket error */
 static int soerror(int sd)
 {
 	int code = 0;
@@ -69,15 +67,15 @@ static int soerror(int sd)
 	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, &code, &len))
 		return 1;
 
-	errno = code;
-
-	return code;
+	return errno = code;
 }
 
-/* In the wonderful world of network programming the manual states that
+/*
+ * In the wonderful world of network programming the manual states that
  * EINPROGRESS is only a possible error on non-blocking sockets.  Real world
  * experience, however, suggests otherwise.  Simply poll() for completion and
- * then continue. --Joachim */
+ * then continue. --Joachim
+ */
 static int check_error(int sd, int msec)
 {
 	struct pollfd pfd = { sd, POLLOUT, 0 };
@@ -106,7 +104,6 @@ static void set_timeouts(int sd, int timeout)
 		logit(LOG_INFO, "Failed setting send timeout socket option: %s", strerror(errno));
 }
 
-/* Sets up the object. */
 int tcp_init(tcp_sock_t *tcp, char *msg)
 {
 	int rc = 0;
@@ -164,7 +161,8 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 			if (getnameinfo(sa, len, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 				goto next;
 
-			logit(LOG_INFO, "%s, %sconnecting to %s(%s:%d)", msg, tries ? "re" : "", tcp->remote_host, host, tcp->port);
+			logit(LOG_INFO, "%s, %sconnecting to %s(%s:%d)", msg, tries ? "re" : "",
+			      tcp->remote_host, host, tcp->port);
 			if (connect(sd, sa, len)) {
 				tries++;
 
@@ -199,7 +197,6 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 	return 0;
 }
 
-/* Disconnect and some other clean up. */
 int tcp_exit(tcp_sock_t *tcp)
 {
 	ASSERT(tcp);
@@ -232,15 +229,6 @@ int tcp_send(tcp_sock_t *tcp, const char *buf, int len)
 	return 0;
 }
 
-/*
-  Receive data into user's buffer.
-  return
-  if the max len has been received
-  if a timeout occures
-  In p_recv_len the total number of bytes are returned.
-  Note:
-  if the recv_len is bigger than 0, no error is returned.
-*/
 int tcp_recv(tcp_sock_t *tcp, char *buf, int len, int *recv_len)
 {
 	int rc = 0;
@@ -282,7 +270,6 @@ int tcp_recv(tcp_sock_t *tcp, char *buf, int len, int *recv_len)
 	return rc;
 }
 
-/* Accessors */
 int tcp_set_port(tcp_sock_t *tcp, int port)
 {
 	ASSERT(tcp);
