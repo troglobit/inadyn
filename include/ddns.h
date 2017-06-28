@@ -134,6 +134,7 @@ typedef struct di {
 	char          *checkip_cmd;
 
 	/* Optional local proxy server for this DDNS provider */
+	tcp_proxy_type_t proxy_type;
 	ddns_name_t    proxy_name;
 
 	ddns_alias_t   alias[DDNS_MAX_ALIAS_NUMBER];

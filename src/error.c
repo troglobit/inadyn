@@ -36,14 +36,13 @@ static const ERROR_NAME global_error_table[] = {
 	{ RC_BUFFER_OVERFLOW,             "Too small internal buffer"        },
 	{ RC_PIDFILE_EXISTS_ALREADY,      "Already running"                  },
 
-	{ RC_IP_SOCKET_CREATE_ERROR,      "Failed creating IP socket"        },
-	{ RC_IP_BAD_PARAMETER,            "Invalid Internet port"            },
-	{ RC_IP_INVALID_REMOTE_ADDR,      "Temporary network error (DNS)"    },
-	{ RC_IP_CONNECT_FAILED,           "Failed connecting to DDNS server" },
-	{ RC_IP_SEND_ERROR,               "Temporary network error (send)"   },
-	{ RC_IP_RECV_ERROR,               "Temporary network error (recv)"   },
+	{ RC_TCP_SOCKET_CREATE_ERROR,     "Failed creating IP socket"        },
+	{ RC_TCP_BAD_PARAMETER,           "Invalid Internet port"            },
+	{ RC_TCP_INVALID_REMOTE_ADDR,     "Temporary network error (DNS)"    },
+	{ RC_TCP_CONNECT_FAILED,          "Failed connecting to DDNS server" },
+	{ RC_TCP_SEND_ERROR,              "Temporary network error (send)"   },
+	{ RC_TCP_RECV_ERROR,              "Temporary network error (recv)"   },
 
-	{ RC_IP_OBJECT_NOT_INITIALIZED,   "Internal error (IP)"              },
 	{ RC_TCP_OBJECT_NOT_INITIALIZED,  "Internal error (TCP)"             },
 	{ RC_HTTP_OBJECT_NOT_INITIALIZED, "Internal error (HTTP)"            },
 

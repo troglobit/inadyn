@@ -222,8 +222,8 @@ int ssl_open(http_t *client, char *msg)
 	DO(tcp_init(&client->tcp, msg));
 
 	/* Forward TCP socket to GnuTLS, the set_int() API is perhaps too new still ... since 3.1.9 */
-//	gnutls_transport_set_int(client->ssl, client->tcp.ip.socket);
-	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.ip.socket);
+//	gnutls_transport_set_int(client->ssl, client->tcp.socket);
+	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.socket);
 
 	/* Perform the TLS handshake, ignore non-fatal errors. */
 	do {

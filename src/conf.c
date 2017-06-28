@@ -224,6 +224,82 @@ static int cfg_getserver(cfg_t *cfg, char *server, ddns_name_t *name)
 	return getserver(str, name);
 }
 
+/* TODO: Move to a separate file */
+#define string_startswith(string, prefix) strncasecmp(string, prefix, strlen(prefix)) == 0
+
+static int parseproxy(const char *proxy, tcp_proxy_type_t *type, ddns_name_t *name)
+{
+	int ret = 0;
+	char *tmp, *str, *host, *protocol;
+	int len;
+
+	tmp = str = strdup(proxy);
+
+	do {
+		tmp = strstr(str, "://");
+		if (tmp) {
+			host = tmp + 3;
+			if (string_startswith(str, "socks5h"))
+				*type = PROXY_SOCKS5_HOSTNAME;
+			else if (string_startswith(str, "socks5"))
+				*type = PROXY_SOCKS5;
+			else if (string_startswith(str, "socks4a"))
+				*type = PROXY_SOCKS4A;
+			else if (string_startswith(str, "socks4") || string_startswith(str, "socks"))
+				*type = PROXY_SOCKS4;
+			else {
+				len = tmp - str;
+				protocol = malloc(len + 1);
+				strncpy(protocol, str, len);
+				protocol[len + 1] = 0;
+				logit(LOG_ERR, "Unsupported proxy protocol '%s'.", protocol);
+				free(protocol);
+				ret = 1;
+				break;
+			}
+
+			tmp = strchr(host, ':');
+			if (tmp) {
+				*tmp++ = 0;
+				name->port = atonum(tmp);
+				if (-1 == name->port) {
+					logit(LOG_ERR, "Invalid proxy port.");
+					ret = 1;
+					break;
+				}
+
+				strlcpy(name->name, host, sizeof(name->name));
+			} else {
+				logit(LOG_ERR, "No proxy port is specified.");
+				ret = 1;
+				break;
+			}
+		} else {
+			/* Currently we do not support http proxy. */
+//			*type = PROXY_HTTP;
+//			logit(LOG_WARNING, "No proxy protocol is specified, use http proxy.");
+
+			logit(LOG_WARNING, "No proxy protocol is specified.");
+			ret = 1;
+			break;
+		}
+	} while (0);
+
+	free(str);
+	return ret;
+}
+
+static int cfg_parseproxy(cfg_t *cfg, char *server, tcp_proxy_type_t *type, ddns_name_t *name)
+{
+	const char *str;
+
+	str = cfg_getstr(cfg, server);
+	if (!str)
+		return 1;
+
+	return parseproxy(str, type, name);
+}
+
 static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 {
 	size_t j;
@@ -369,7 +445,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		info->user_agent = user_agent;
 
 	/* A per-proivder optional proxy server:port */
-	cfg_getserver(cfg, "proxy", &info->proxy_name);
+	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
 
 	return 0;
 
