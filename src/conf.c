@@ -521,7 +521,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
-		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
+//		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_END()
 	};
 	cfg_opt_t custom_opts[] = {
@@ -537,7 +537,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
 		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
-		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
+//		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),
