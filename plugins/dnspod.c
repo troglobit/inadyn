@@ -21,8 +21,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#include <time.h>
-
 #include "plugin.h"
 
 /* dnspod.cn specific update request format */
