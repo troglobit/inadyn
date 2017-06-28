@@ -264,7 +264,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		for (i = 0; i < MD5_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
-		len = snprintf(ctx->request_buf, ctx->request_buflen,
+		return snprintf(ctx->request_buf, ctx->request_buflen,
 			       CLOUDXNS_UPDATE_IP_REQUEST,
 			       info->server_url,
 			       record_id,
@@ -272,8 +272,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			       info->user_agent,
 			       info->creds.username, date, digeststr,
 			       paramlen, param);
-
-		return len;
 	} while (0);
 
 	return -1;
