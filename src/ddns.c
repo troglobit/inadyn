@@ -40,7 +40,6 @@
 #include "base64.h"
 #include "md5.h"
 #include "sha1.h"
-#include "cmd.h"
 
 /* Conversation with the checkip server */
 #define DYNDNS_CHECKIP_HTTP_REQUEST  					\
