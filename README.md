@@ -87,6 +87,7 @@ examples.
 * <https://www.strato.com>
 * <https://freemyip.com>
 * <https://www.cloudxns.net>
+* <https://www.dnspod.cn>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
@@ -175,6 +176,12 @@ This looks for the default `.conf` file, to check any file, use:
         username = your_api_key
         password = your_secret_key
         hostname = yourhost.example.com
+    }
+
+    provider dnspod.cn {
+         username = your_api_id
+         password = your_api_token
+         hostname = yourhost.example.com
     }
 
 Notice how this configuration file has two different users of the No-IP
