@@ -35,4 +35,5 @@ inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c	\
 		   ../plugins/generic.c		../plugins/giradns.c	\
 		   ../plugins/sitelutions.c				\
 		   ../plugins/tunnelbroker.c	../plugins/tzo.c	\
-		   ../plugins/zoneedit.c	../plugins/zerigo.c
+		   ../plugins/zoneedit.c	../plugins/zerigo.c	\
+		   ../plugins/dnspod.c
