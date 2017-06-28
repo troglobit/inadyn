@@ -1,6 +1,6 @@
 AC_PREREQ(2.61)
 AC_INIT(In-a-dyn, 2.2-rc1, https://github.com/troglobit/inadyn/issues, inadyn, http://troglobit.com/inadyn.html)
-AM_INIT_AUTOMAKE([1.11 foreign no-dist-gzip dist-xz])
+AM_INIT_AUTOMAKE([1.11 foreign dist-xz])
 AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
