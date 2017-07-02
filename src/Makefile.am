@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS      = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\" -DLOCALSTATEDIR=\"@localstatedir@\"
 AM_CPPFLAGS     += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
-AM_CFLAGS        = -W -Wall -Wextra -std=gnu99
+AM_CFLAGS        = -W -Wall -Wextra -Wno-unused-parameter -std=gnu99
 
 sbin_PROGRAMS	 = inadyn
 inadyn_SOURCES	 = main.c	ddns.c		cache.c		\

@@ -77,7 +77,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  * Hurricate Electric IPv6 tunnelbroker specific response validator
  * Own IP address and 'already in use' are the good answers.
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
 

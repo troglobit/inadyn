@@ -238,7 +238,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	return ret;
 }
 
-static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
 	size_t i;

@@ -65,7 +65,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  *  CODE=200, 201
  *  CODE=707, for duplicated updates
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	int code = -1;
 

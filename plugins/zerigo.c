@@ -70,7 +70,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  * Server error
  *  Status: 5xx
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *ptr, *rsp = trans->rsp_body;
 

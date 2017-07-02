@@ -187,7 +187,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  *
  * We search our own IP address in response and that's enough.
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
 

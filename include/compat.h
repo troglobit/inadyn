@@ -36,11 +36,6 @@
 #define NELEMS(array) (sizeof(array) / sizeof(array[0]))
 #endif
 
-/* Mark a function variable as unused, useful for generic callbacks */
-#ifndef UNUSED
-#define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
-#endif
-
 int     mkpath     (char *dir, mode_t mode);
 
 #ifndef pidfile

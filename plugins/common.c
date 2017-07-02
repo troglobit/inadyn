@@ -64,7 +64,7 @@ int common_request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  * DynDNS response validator -- common to many other DDNS providers as well
  *  'good' or 'nochg' are the good answers,
  */
-int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *body = trans->rsp_body;
 
