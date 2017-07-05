@@ -445,7 +445,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		info->user_agent = user_agent;
 
 	/* A per-proivder optional proxy server:port */
-	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
+//	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
 
 	return 0;
 
