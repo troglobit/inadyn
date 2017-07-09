@@ -1,7 +1,7 @@
 Source: inadyn
 Section: net
 Priority: optional
-Maintainer: Timur Birsh <taem@linukz.org>
+Maintainer: Joachim Nilsson <troglobit@gmail.com>
 Build-Depends: debhelper (>= 9), gnutls-dev
 Standards-Version: 3.9.6
 Homepage: http://troglobit.com/inadyn.html
