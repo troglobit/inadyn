@@ -42,6 +42,9 @@ release-hook:
 		echo;									\
 	fi
 
+package build-deb:
+	dpkg-buildpackage -uc -us -B
+
 ## Target to run when building a release
 ## distcheck <-- does not work atm., wrong search path for source/header files
 release: dist release-hook md5-dist gpg-dist
