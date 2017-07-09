@@ -2,7 +2,7 @@ Source: inadyn
 Section: net
 Priority: optional
 Maintainer: Timur Birsh <taem@linukz.org>
-Build-Depends: debhelper (>= 9), libgnutls-dev
+Build-Depends: debhelper (>= 9), gnutls-dev
 Standards-Version: 3.9.6
 Homepage: http://troglobit.com/inadyn.html
 Vcs-Git: git://github.com/troglobit/inadyn.git
