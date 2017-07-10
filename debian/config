@@ -1,0 +1,23 @@
+#!/bin/sh -e
+. /usr/share/debconf/confmodule
+
+db_title inadyn
+
+db_input critical inadyn/advancved || true
+db_go
+
+db_get inadyn/advanced
+[ "$RET" = "false" ] && exit 0
+
+db_input critical inadyn/provider || true
+db_go
+
+db_input critical inadyn/username || true
+db_go
+
+db_input critical inadyn/password || true
+db_go
+
+db_input critical inadyn/hostname || true
+db_go
+

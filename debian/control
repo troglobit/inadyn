@@ -11,7 +11,7 @@ Vcs-Browser: http://github.com/troglobit/inadyn
 Package: inadyn
 Architecture: any
 Pre-Depends: adduser
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: debconf (>= 0.2.17), ${shlibs:Depends}, ${misc:Depends}
 Provides: dyndns-client
 Description: Small and simple DDNS client with HTTPS support
  Commonly available in many GNU/Linux distributions, Inadyn is used in
