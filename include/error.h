@@ -51,6 +51,7 @@
 
 #define RC_DDNS_INVALID_CHECKIP_RSP     42
 #define RC_DDNS_INVALID_OPTION          45
+#define RC_DDNS_RSP_NOHOST              47
 #define RC_DDNS_RSP_NOTOK               48
 #define RC_DDNS_RSP_RETRY_LATER         49
 
