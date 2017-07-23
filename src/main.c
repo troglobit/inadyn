@@ -42,6 +42,7 @@ int    verify_addr = 1;
 char  *prognm = NULL;
 char  *ident = PACKAGE_NAME;
 char  *iface = NULL;
+char  *use_iface = NULL;
 char  *user_agent = DDNS_USER_AGENT;
 char  *config = NULL;
 char  *cache_dir = NULL;
@@ -324,7 +325,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'i':	/* --iface=IFNAME */
-			iface = optarg;
+			use_iface = iface = optarg;
 			break;
 
 		case 'I':	/* --ident=NAME */

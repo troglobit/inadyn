@@ -182,6 +182,7 @@ extern int verify_addr;
 extern char *ident;
 extern char *prognm;
 extern char *iface;
+extern char *use_iface;		/* Command line option */
 extern char *user_agent;
 extern char *script_cmd;
 extern char *script_exec;

@@ -603,11 +603,11 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
 
 	/* Command line --iface=IFNAME takes precedence */
-	if (!iface)
+	if (!use_iface)
 		iface                 = cfg_getstr(cfg, "iface");
 	user_agent                    = cfg_getstr(cfg, "user-agent");
 	if (!user_agent)
-		user_agent = DDNS_USER_AGENT;
+		user_agent            = DDNS_USER_AGENT;
 	allow_ipv6                    = cfg_getbool(cfg, "allow-ipv6");
 	secure_ssl                    = cfg_getbool(cfg, "secure-ssl");
 	ca_trust_file                 = cfg_getstr(cfg, "ca-trust-file");
