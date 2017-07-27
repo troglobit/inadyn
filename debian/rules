@@ -12,3 +12,8 @@ override_dh_auto_install:
 	dh_auto_install
 	rm -f debian/inadyn/usr/share/doc/inadyn/COPYING
 	rm -f debian/inadyn/usr/share/doc/inadyn/ChangeLog.md
+
+override_dh_installinit:
+	dh_systemd_enable
+	dh_installinit
+	dh_systemd_start --no-restart-on-upgrade
