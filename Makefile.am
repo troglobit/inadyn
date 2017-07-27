@@ -42,6 +42,7 @@ release-hook:
 		echo;									\
 	fi
 
+# lintian --profile debian -i -I --show-overrides ../$PKG.changes
 package build-deb:
 	dpkg-buildpackage -uc -us -B
 
