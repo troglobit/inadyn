@@ -1,24 +1,22 @@
-Template: inadyn/advanced
-Type: bool
-Default: false
+Template: inadyn/wizard
+Type: boolean
+Default: true
 Description: Do you want help creating your /etc/inadyn.conf?
- Answering yes will give you a series of questions that help you create
- a basic /etc/inadyn.conf
+ This configuration wizard can help you create a basic /etc/inadyn.conf
+ which you can later edit.
  .
- Most users can safely answer Yes here.  When inadyn is upgraded
- next time, you will be asked again for your password, this is
- merely because of safety reasons, since it is not stored in the
- Debconf db, only in /etc/inadyn.conf
+ If you want to update more than one record at the same provider, or
+ configure a custom DDNS provider, edit /etc/inadyn.conf when this
+ wizard has completed.
  .
- If you have an advanced setup, answer No and you can safely edit
- /etc/inadyn.conf with the help of the man pages, without having
- to worry about future upgrades of the package.
+ NOTE: remove the ##DEBCONF## from /etc/inadyn.conf to prevent future
+ upgrades or reinstall of the package to overwrite your changes.
 
 Template: inadyn/provider
 Type: select
 Choices: Dyn, FreeDNS, Loopia, nsupdate, duckdns, no-ip.com, dynv6.com, tunnelbroker
 Default: FreeDNS
-Description: Select your DDNS provider
+Description: Dynamic DNS provider:
  This is just a selection of all the DDNS providers Inadyn supports.  If
  you cannot find your provider in this list, select one and then edit
  the /etc/inadyn.conf file by hand to set up a custom one.
@@ -27,25 +25,20 @@ Description: Select your DDNS provider
 
 Template: inadyn/username
 Type: string
-Description: Your username at the DDNS provider
+Description: Your DDNS provider username:
 
 Template: inadyn/password
 Type: password
-Description: Your password at the DDNS provider
+Description: Your DDNS provider password:
  When Inadyn has been (re)configured the password is removed from
  the debconf db, but it will be visible from /etc/inadyn.conf for
  anyone with root access.
 
 Template: inadyn/hostname
 Type: string
-Description: Your hostname, or similar, at the DDNS provider
+Description: Your DDNS provider hostname, or similar:
  For some providers, most notably Tunnelbroker, the hostname must be
- an 'update-key', or similar, and not the actual hostname.
+ an 'update-key', or similar, and not the actual hostname.  For most
+ use-cases, however, the hostname is something like this:
  .
- For most use-cases, however, the hostname is something like this:
  hostname.provider.tla
- .
- If you want to update more than one record at the same provider, please
- run `dpkg-reconfigure inadyn` and select Advanced mode when done with
- this first pass.  You can then safely edit /etc/inadyn.conf as you want.
-
