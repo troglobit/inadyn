@@ -342,6 +342,22 @@ When building with HTTPS (SSL/TLS) support, make sure to also install
 the `ca-certificates` package on your system, otherwise Inadyn will not
 be able to validate the DDNS provider's HTTPS certificates.
 
+### Configure & Build
+
+The GNU Configure & Build system use `/usr/local` as the default install
+prefix.  In many cases this is useful, but this means the configuration
+files and cache files will also use that same prefix.  Most users have
+come to expect those files in `/etc/` and `/var/run/` and configure has
+a few useful options that are recommended to use:
+
+    $ ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+    $ make -j5
+    $ sudo make install-strip
+
+You may want to remove the `--prefix=/usr` option.
+
+### SSL/TLS Support
+
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
 provide OpenSSL as a system library.  However, when OpenSSL is available
@@ -349,7 +365,7 @@ as a system library, for example in many embedded systems:
 
     ./configure --enable-openssl
 
-To completely disable inadyn HTTPS support:
+To completely disable inadyn HTTPS support (not recommended!):
 
     ./configure --disable-ssl
 
@@ -374,6 +390,19 @@ update the linker cache:
 and run the Inadyn configure script like this:
 
     PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure
+
+### Integration with systemd
+
+For systemd integration you need to install `pkg-config`, which helps
+the Inadyn build system figure out the systemd paths.  When installed
+simply call `systemctl` to enable and start `inadyn`:
+
+    $ sudo systemctl enable inadyn.service
+    $ sudo systemctl start  inadyn.service
+
+Check that it started properly by inspecting the system log, or:
+
+    $ sudo systemctl status inadyn.service
 
 
 Building from GIT
