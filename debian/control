@@ -13,38 +13,40 @@ Architecture: any
 Pre-Depends: adduser
 Depends: debconf (>= 0.2.17), ${shlibs:Depends}, ${misc:Depends}
 Provides: dyndns-client
-Description: Small and simple DDNS client with HTTPS support
- Commonly available in many GNU/Linux distributions, Inadyn is used in
- off-the-shelf routers and Internet gateways to automate the task of
- keeping your DNS record up to date with any IP address changes from
- your ISP. It can also be used in installations with redundant (backup)
- connections to the Internet.
+Description: Internet automated Dynamic DNS client
+ Inadyn is a small and simple Dynamic DNS, DDNS, client with HTTPS
+ support.  It automates the task of keeping your Internet name in sync
+ with your public IP address.
  .
- Inadyn can maintain multiple host names with the same IP address, and
- has a web based IP detection which runs well behind a NAT router.
+ Most people are unaware they share a pool of Internet addresses with
+ other users of the same Internet Service Provider (ISP).  Protocols
+ like DHCP, PPPoE, or PPPoA are used to give you an address and a way
+ to connect to the Internet, but usually not a way for others to connect
+ to you.  If you want to run an Internet server on such a connection you
+ risk losing your IP address every time you reconnect.
  .
- The following DDNS providers are supported natively, other providers,
- like http://twoDNS.de for instance, can be supported using the generic
- DDNS plugin.
+ The following DDNS plugins are supported natively, other providers,
+ like <http://twoDNS.de> for instance, can be set up with the custom
+ DDNS plugin:
  .
-   * http://www.dyndns.org, <http://www.dyn.com>
-   * https://freedns.afraid.org
-   * https://www.zoneedit.com
-   * http://www.no-ip.com
-   * http://www.easydns.com
-   * http://www.tzo.com
-   * http://www.3322.org
-   * https://www.dnsomatic.com
-   * http://dns.he.net/
-   * http://www.tunnelbroker.net
-   * http://www.dynsip.org
-   * http://www.sitelutions.com
-   * http://www.dnsexit.com
-   * http://www.changeip.com
-   * http://www.zerigo.com
-   * http://www.dhis.org
-   * https://nsupdate.info
-   * https://duckdns.org
+   * <http://www.dyndns.org>, <http://www.dyn.com>
+   * <https://freedns.afraid.org>
+   * <https://www.zoneedit.com>
+   * <http://www.no-ip.com>
+   * <http://www.easydns.com>
+   * <http://www.tzo.com>
+   * <http://www.3322.org>
+   * <https://www.dnsomatic.com>
+   * <http://dns.he.net>
+   * <http://www.tunnelbroker.net>
+   * <http://www.dynsip.org>
+   * <http://www.sitelutions.com>
+   * <http://www.dnsexit.com>
+   * <http://www.changeip.com>
+   * <http://www.zerigo.com>
+   * <http://www.dhis.org>
+   * <https://nsupdate.info>
+   * <https://duckdns.org>
    * <https://www.loopia.com>
    * <https://www.namecheap.com>
    * <https://domains.google.com>
@@ -57,6 +59,9 @@ Description: Small and simple DDNS client with HTTPS support
    * <http://ipv4.dynv6.com>
    * <https://spdyn.de>
    * <https://www.strato.com>
+   * <https://freemyip.com>
+   * <https://www.cloudxns.net>
+   * <https://www.dnspod.cn>
  .
  Some of these services are free of charge for non-commercial use, others
  take a small fee, but also provide more domains to choose from.
