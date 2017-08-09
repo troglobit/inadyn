@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.2][] - 2017-02-XX
+[v2.2][] - 2017-08-09
 ---------------------
 
 ### Changes
@@ -28,10 +28,14 @@ All notable changes to the project are documented in this file.
 - Remove libite dependency by importing all its used files into inadyn.
   This should ease adoption by distributions and end users.  All code
   is under free licenses: BSD, ISC.
+- Import Timur's Debian packaging, adding debconf support
 
 ### Fixes
 - Issue #152: Do not attempt to create PID file in oneshot mode (`-1`)
 - Issue #152: Must URL encode custom server URL's
+- Issue #170: Use configured `--prefix` not hard coded `/etc/inadyn.conf`
+- Issue #172: Use separate variable for `--iface` command line option and
+  `.conf` file option
 
 
 [v2.1][] - 2016-12-04
@@ -666,7 +670,7 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.1...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.2...HEAD
 [v2.2]: https://github.com/troglobit/inadyn/compare/v2.1...v2.2
 [v2.1]: https://github.com/troglobit/inadyn/compare/v2.0...v2.1
 [v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
