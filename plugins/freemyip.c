@@ -21,9 +21,13 @@
 
 #include "plugin.h"
 
+/*
+ * For API information, see https://freemyip.com/help
+ * Maybe add support for "&myip=1.2.3.4"?
+ */
 #define FREEMYIP_UPDATE_IP_HTTP_REQUEST				\
 	"GET %s?"						\
-	"token=%s&"							\
+	"token=%s&"						\
 	"domain=%s "						\
 	"HTTP/1.0\r\n"						\
 	"Host: %s\r\n"						\
@@ -59,11 +63,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->rsp_body;
-
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "OK"))
+	if (strstr(trans->rsp_body, "OK"))
 		return RC_OK;
 
 	return RC_DDNS_RSP_NOTOK;
