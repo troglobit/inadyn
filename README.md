@@ -55,37 +55,32 @@ DDNS providers not supported natively like <http://twoDNS.de>, can be
 enabled using the generic DDNS plugin.  See below for configuration
 examples.
 
-* <http://www.dyndns.org>, <http://www.dyn.com>
 * <https://freedns.afraid.org>
-* <https://www.zoneedit.com>
-* <http://www.no-ip.com>
-* <http://www.easydns.com>
-* <http://www.tzo.com>
-* <http://www.3322.org>
-* <https://www.dnsomatic.com>
-* <http://dns.he.net>
-* <http://www.tunnelbroker.net>
-* <http://www.dynsip.org>
-* <http://www.sitelutions.com>
-* <http://www.dnsexit.com>
-* <http://www.changeip.com>
-* <http://www.zerigo.com>
-* <http://www.dhis.org>
 * <https://nsupdate.info>
 * <https://duckdns.org>
+* <https://freemyip.com>
 * <https://www.loopia.com>
+* <https://www.dyndns.org>, <https://dyn.com>
+* <https://www.zoneedit.com>
+* <https://www.no-ip.com>
+* <https://www.easydns.com>
+* <https://www.dnsomatic.com>
+* <https://dns.he.net>
+* <https://www.tunnelbroker.net>
+* <https://www.sitelutions.com>
+* <https://www.dnsexit.com>
+* <https://www.changeip.com>
+* <https://www.dhis.org>
 * <https://www.namecheap.com>
-* <https://domains.google.com>
+* <https://domains.google>
 * <https://www.ovh.com>
 * <https://www.dtdns.com>
-* <http://giradns.com>
+* <https://giradns.com>
 * <https://www.duiadns.net>
 * <https://ddnss.de>
-* <http://dynv6.com>
-* <http://ipv4.dynv6.com>
+* <https://dynv6.com>
 * <https://spdyn.de>
 * <https://www.strato.com>
-* <https://freemyip.com>
 * <https://www.cloudxns.net>
 * <https://www.dnspod.cn>
 
