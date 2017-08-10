@@ -113,12 +113,17 @@ This looks for the default `.conf` file, to check any file, use:
     period          = 300
     user-agent      = Mozilla/5.0
     
-    # The FreeDNS username must be in lower case, the
-    # password (max 16 chars) is case sensitive.
-    provider freedns.afraid.org {
-        username   = lower-case-username
-        password   = case-sensitive-pwd
-        hostname   = some.example.com
+    # The FreeDNS username must be in lower case
+    # The password (max 16 chars) is case sensitive
+    provider freedns {
+        username    = lower-case-username
+        password    = case-sensitive-pwd
+        hostname    = some.example.com
+    }
+    
+    provider freemyip {
+        password    = YOUR_TOKEN
+        hostname    = YOUR_DOMAIN.freemyip.com
     }
     
     provider dyn {
