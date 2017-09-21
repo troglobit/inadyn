@@ -21,4 +21,4 @@ after install, without having to edit the file, use
 
     dpkg-reconfigure inadyn
 
- -- Joachim Nilsson <troglobit@gmail.com>  Thu, 27 Jul 18:10
+ -- Joachim Nilsson <troglobit@gmail.com>  Thu, 27 Jul 18:10, 2017
