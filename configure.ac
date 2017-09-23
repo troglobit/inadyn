@@ -43,8 +43,8 @@ AC_PROG_INSTALL
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h string.h \
-                  sys/ioctl.h sys/socket.h sys/types.h syslog.h unistd.h],
+AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h stdint.h \
+	          string.h sys/ioctl.h sys/socket.h sys/types.h syslog.h unistd.h],
                   [], [],
 		  [
 		  #ifdef HAVE_SYS_SOCKET_H

@@ -19,6 +19,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include <stdint.h>
 #include <gnutls/x509.h>
 
 #include "log.h"
