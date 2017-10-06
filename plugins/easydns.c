@@ -25,7 +25,7 @@
 
 /*
  * For details, see the excellent support page at easyDNS
- * http://support.easydns.com/tutorials/dynamicUpdateSpecs.php
+ * https://fusion.easydns.com/Knowledgebase/Article/View/102/0/dynamic-dns
  */
 #define EASYDNS_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
