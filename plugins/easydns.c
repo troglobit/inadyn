@@ -50,8 +50,8 @@ static ddns_system_t plugin = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "members.easydns.com",
-	.server_url   = "/dyn/dyndns.php"
+	.server_name  = "api.cp.easydns.com",
+	.server_url   = "/dyn/generic.php"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
