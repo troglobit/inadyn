@@ -1,3 +1,11 @@
+inadyn (2.2.1-1) stable; urgency=low
+
+  * New upstream bug fix release, v2.2.1
+    - Build fix for ArchLinux, gnutls.c needs stdint.h for intptr_t conversion
+    - Update easyDNS plugin to new API, by Nicholas Alipaz
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Mon, 06 Oct 2017 23:18:00 +0100
+
 inadyn (2.2-1) unstable; urgency=low
 
   * New upstream release:

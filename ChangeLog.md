@@ -4,6 +4,15 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.2.1][] - 2017-10-06
+-----------------------
+
+### Fixes
+
+- Issue #174: `gnutls.c` missing `stdint.h`, fix for ArchLinux
+- Issue #179: Update easyDNS plugin to new API, by Nicholas Alipaz
+
+
 [v2.2][] - 2017-08-09
 ---------------------
 
@@ -670,10 +679,11 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.2...HEAD
-[v2.2]: https://github.com/troglobit/inadyn/compare/v2.1...v2.2
-[v2.1]: https://github.com/troglobit/inadyn/compare/v2.0...v2.1
-[v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.2.1...HEAD
+[v2.2.1]: https://github.com/troglobit/inadyn/compare/v2.2...v2.2.1
+[v2.2]:   https://github.com/troglobit/inadyn/compare/v2.1...v2.2
+[v2.1]:   https://github.com/troglobit/inadyn/compare/v2.0...v2.1
+[v2.0]:   https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
 [1.99.13]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
