@@ -3,7 +3,7 @@ DISTCHECK_CONFIGURE_FLAGS = --with-systemd=$$dc_install_base/$(systemd)
 
 SUBDIRS         = src include man
 doc_DATA        = README.md COPYING ChangeLog.md
-EXTRA_DIST      = README.md ChangeLog.md
+EXTRA_DIST      = README.md ChangeLog.md CONTRIBUTING.md
 DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 
 if HAVE_SYSTEMD
