@@ -131,7 +131,8 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		/* Obtain address(es) matching host/port */
 		memset(&hints, 0, sizeof(struct addrinfo));
 		hints.ai_family = AF_UNSPEC;		/* Allow IPv4 or IPv6 */
-		hints.ai_socktype = SOCK_DGRAM;		/* Datagram socket */
+		hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
+		hints.ai_flags = AI_NUMERICSERV;	/* No service name lookup */
 		snprintf(port, sizeof(port), "%d", tcp->port);
 
 		s = getaddrinfo(tcp->remote_host, port, &hints, &servinfo);
