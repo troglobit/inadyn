@@ -191,7 +191,7 @@ int ssl_send(http_t *client, const char *buf, int len)
 		/* XXX: TODO add SSL_get_error() to figure out why */
 		return RC_HTTPS_SEND_ERROR;
 
-	logit(LOG_DEBUG, "Successfully sent DDNS update using HTTPS!");
+	logit(LOG_DEBUG, "Successfully sent HTTPS request!");
 
 	return 0;
 }
@@ -214,7 +214,7 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 	if (*recv_len <= 0)
 		*recv_len = 0;
 	*recv_len += len;
-	logit(LOG_DEBUG, "Successfully received DDNS update response (%d bytes) using HTTPS!", *recv_len);
+	logit(LOG_DEBUG, "Successfully received HTTPS response (%d bytes)!", *recv_len);
 
 	return 0;
 }
