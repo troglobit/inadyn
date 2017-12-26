@@ -151,6 +151,7 @@ static ddns_system_t spdyn = {
 
 	.checkip_name = "checkip4.spdyn.de",
 	.checkip_url  = "/",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_UNSUPPORTED,
 
 	.server_name  = "update.spdyn.de",
 	.server_url   = "/nic/update"
