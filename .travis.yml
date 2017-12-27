@@ -51,3 +51,4 @@ script:
   - tree /tmp
   - ldd /tmp/sbin/inadyn
   - LD_LIBRARY_PATH=/tmp/lib /tmp/sbin/inadyn -h
+  - make package
