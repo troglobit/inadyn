@@ -302,8 +302,11 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 		ret = gnutls_record_recv(client->ssl, buf, len);
 	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-	if (ret < 0)
+	if (ret < 0) {
+		logit(LOG_WARNING, "Failed receiving GnuTLS header response: %s",
+		      gnutls_strerror(ret));
 		return RC_HTTPS_RECV_ERROR;
+	}
 
 	/* Read HTTP body */
 	len = ret;
@@ -316,8 +319,11 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 		}
 	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-	if (ret < 0)
+	if (ret < 0 && ret != GNUTLS_E_PREMATURE_TERMINATION) {
+		logit(LOG_WARNING, "Failed receiving GnuTLS body response: %s",
+		      gnutls_strerror(ret));
 		return RC_HTTPS_RECV_ERROR;
+	}
 
 	*recv_len = len;
 	logit(LOG_DEBUG, "Successfully received HTTPS response (%d bytes)!", len);
