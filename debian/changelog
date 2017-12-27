@@ -1,3 +1,12 @@
+inadyn (2.3-pre1-1) unstable; urgency=medium
+
+  * Pre-release of upcoming upstream v2.3 release
+    - Allow IPv6 for HTTP(S) connections
+    - Ignore premature session termination in GnuTLS
+  * New build-depends: libgnutls28-dev
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Wed, 27 Dec 2017 17:05:58 +0100
+
 inadyn (2.2.1-1) stable; urgency=low
 
   * New upstream bug fix release, v2.2.1
@@ -272,6 +281,4 @@ inadyn (v1.60-5.june.2004-1) unstable; urgency=low
 
  -- Shaul Karl <shaul@debian.org>  Sun, 20 Jun 2004 16:00:03 +0300
 
-Local variables:
-mode: debian-changelog
-End:
+
