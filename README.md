@@ -8,8 +8,8 @@ Table of Contents
 
 * [Introduction](#introduction)
 * [Supported Providers](#supported-providers)
-* [Example Configuration](#example-configuration)
-* [Generic DDNS Plugin](#generic-ddns-plugin)
+* [Configuration](#configuration)
+* [Custom DDNS Providers](#custom-ddns-providers)
 * [Build & Install](#build--install)
 * [Building from GIT](#building-from-git)
 * [Origin & References](#origin--references)
@@ -41,7 +41,7 @@ the same IP address, use a combination of a script, the address from an
 Internet-facing interface, or default to using the IP address change
 detector of the DDNS provider.
 
-__  
+__
 ¹ Public IP address is the default, private addresses can also be used.
 
 
@@ -112,7 +112,7 @@ This looks for the default `.conf` file, to check any file, use:
     # In-A-Dyn v2.0 configuration file format
     period          = 300
     user-agent      = Mozilla/5.0
-    
+
     # The FreeDNS username must be in lower case
     # The password (max 16 chars) is case sensitive
     provider freedns {
@@ -120,12 +120,12 @@ This looks for the default `.conf` file, to check any file, use:
         password    = case-sensitive-pwd
         hostname    = some.example.com
     }
-    
+
     provider freemyip {
         password    = YOUR_TOKEN
         hostname    = YOUR_DOMAIN.freemyip.com
     }
-    
+
     provider dyn {
 	    ssl         = false
         username    = charlie
@@ -133,7 +133,7 @@ This looks for the default `.conf` file, to check any file, use:
         hostname    = { peanuts, woodstock }
 		user-agent  = Mozilla/4.0
 	}
-    
+
     # With multiple usernames at the same provider, index with :#
     provider no-ip.com:1 {
         username    = ian
@@ -141,7 +141,7 @@ This looks for the default `.conf` file, to check any file, use:
         hostname    = flemming.no-ip.com
 		user-agent  = inadyn/2.2
 	}
-    
+
     # With multiple usernames at the same provider, index with :#
     provider no-ip.com:2 {
         username       = james
@@ -150,7 +150,7 @@ This looks for the default `.conf` file, to check any file, use:
 		checkip-ssl    = false
         checkip-server = api.ipify.org
     }
-    
+
     # With multiple usernames at the same provider, index with :#
     provider no-ip.com:3 {
         username        = spaceman
@@ -158,7 +158,7 @@ This looks for the default `.conf` file, to check any file, use:
         hostname        = spaceman.no-ip.com
         checkip-command = "/sbin/ifconfig eth0 | grep 'inet6 addr'"
     }
-    
+
     # Note: hostname == update-key from Advanced tab in the Web UI
     provider tunnelbroker.net {
         username    = futurekid
