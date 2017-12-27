@@ -130,8 +130,9 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 
 		/* Obtain address(es) matching host/port */
 		memset(&hints, 0, sizeof(struct addrinfo));
-		hints.ai_family = AF_INET;	/* Use AF_UNSPEC to allow IPv4 or IPv6 */
-		hints.ai_socktype = SOCK_DGRAM;	/* Datagram socket */
+		hints.ai_family = AF_UNSPEC;		/* Allow IPv4 or IPv6 */
+		hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
+		hints.ai_flags = AI_NUMERICSERV;	/* No service name lookup */
 		snprintf(port, sizeof(port), "%d", tcp->port);
 
 		s = getaddrinfo(tcp->remote_host, port, &hints, &servinfo);
@@ -143,7 +144,7 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 		ai = servinfo;
 
 		while (1) {
-			sd = socket(AF_INET, SOCK_STREAM, 0);
+			sd = socket(ai->ai_family, SOCK_STREAM, 0);
 			if (sd == -1) {
 				logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));
 				rc = RC_TCP_SOCKET_CREATE_ERROR;
@@ -161,7 +162,7 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 			if (getnameinfo(sa, len, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
 				goto next;
 
-			logit(LOG_INFO, "%s, %sconnecting to %s(%s:%d)", msg, tries ? "re" : "",
+			logit(LOG_INFO, "%s, %sconnecting to %s([%s]:%d)", msg, tries ? "re" : "",
 			      tcp->remote_host, host, tcp->port);
 			if (connect(sd, sa, len)) {
 				tries++;
