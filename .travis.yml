@@ -20,6 +20,9 @@ addons:
   apt:
     packages:
       - tree
+      - fakeroot
+      - debhelper
+      - dh-systemd
       - libconfuse-dev
       - libgnutls28-dev
   coverity_scan:
