@@ -106,7 +106,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
 			])
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL library])
    else
-      PKG_CHECK_MODULES([GnuTLS], [gnutls])
+      PKG_CHECK_MODULES([GnuTLS], [gnutls >= 3.0])
       LDFLAGS="$LDFLAGS $GnuTLS_LIBS"
       CPPFLAGS="$CPPFLAGS $GnuTLS_CFLAGS"
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
