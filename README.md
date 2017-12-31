@@ -41,7 +41,7 @@ the same IP address, use a combination of a script, the address from an
 Internet-facing interface, or default to using the IP address change
 detector of the DDNS provider.
 
-__
+__  
 ¹ Public IP address is the default, private addresses can also be used.
 
 
