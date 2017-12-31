@@ -11,12 +11,14 @@ All notable changes to the project are documented in this file.
 - Clean up debug messages for HTTPS connections, by André Colomb
 - New build-depends, `libgnutls28-dev` for Debian/Ubuntu users and
   GnuTLS >= 3.0 for others, by André Colomb
+- Issue #192: Add `examples/*.conf` to source distribution, by André Colomb
 
 ### Fixes
 - TCP, not UDP, for `getaddrinfo()` hints + numeric lookups, by André Colomb
 - Disable SSL for checkip connections to SPDYN service, by André Colomb
 - Issue #186: Allow IPv6 for HTTP(S) connections, by André Colomb
 - Issue #189: Ignore premature session termination in GnuTLS, by André Colomb
+- Issue #193: Fix broken internal links in README.md, by André Colomb
 
 
 [v2.2.1][] - 2017-10-06
