@@ -4,8 +4,9 @@ inadyn (2.3-pre1-1) unstable; urgency=medium
     - Allow IPv6 for HTTP(S) connections
     - Ignore premature session termination in GnuTLS
   * New build-depends: libgnutls28-dev
+  * Remove unnecessary files: docs, inadyn.examples, install, manpages
 
- -- Joachim Nilsson <troglobit@gmail.com>  Wed, 27 Dec 2017 17:05:58 +0100
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 31 Dec 2017 23:03:06 +0100
 
 inadyn (2.2.1-1) stable; urgency=low
 
