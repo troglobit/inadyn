@@ -3,8 +3,8 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
-[v2.3][UNRELEASED]
-------------------
+[v2.3][] - 2018-01-05
+---------------------
 
 ### Changes
 - Distribute `CONTRIBUTING.md` in release tarballs, by André Colomb
@@ -696,7 +696,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.2.1...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.3...HEAD
+[v2.3]:   https://github.com/troglobit/inadyn/compare/v2.2.1...v2.3
 [v2.2.1]: https://github.com/troglobit/inadyn/compare/v2.2...v2.2.1
 [v2.2]:   https://github.com/troglobit/inadyn/compare/v2.1...v2.2
 [v2.1]:   https://github.com/troglobit/inadyn/compare/v2.0...v2.1
