@@ -1,12 +1,14 @@
-inadyn (2.3-pre1-1) unstable; urgency=medium
+inadyn (2.3-1) unstable; urgency=medium
 
-  * Pre-release of upcoming upstream v2.3 release
+  * New upstream release, v2.3
     - Allow IPv6 for HTTP(S) connections
-    - Ignore premature session termination in GnuTLS
+    - Ignore premature session termination in GnuTLS, require GnuTLS >=3.0
+    - Cleanup of debug messages for HTTPS connections
+    - Disable SSL for checkip connectios to SPDYN service
   * New build-depends: libgnutls28-dev
   * Remove unnecessary files: docs, inadyn.examples, install, manpages
 
- -- Joachim Nilsson <troglobit@gmail.com>  Sun, 31 Dec 2017 23:03:06 +0100
+ -- Joachim Nilsson <troglobit@gmail.com>  Fri, 05 Jan 2018 03:01:54 +0100
 
 inadyn (2.2.1-1) stable; urgency=low
 
