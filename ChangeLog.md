@@ -727,9 +727,3 @@ First stable version.
 [libite]: https://github.com/troglobit/libite
 [README.md]: https://github.com/troglobit/inadyn/blob/master/README.md
 [libConfuse]: https://github.com/martinh/libconfuse
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->

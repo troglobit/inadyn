@@ -27,10 +27,3 @@ Example
 
 See the the system logfile for progress and the inadyn man page for
 debugging help, should you run into problems.
-
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->

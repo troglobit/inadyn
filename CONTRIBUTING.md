@@ -87,9 +87,3 @@ how `git commit -s` is used to automatically add a `Signed-off-by`:
 
 [1]: http://www.gnu.org/philosophy/free-sw.en.html
 [KNF]: https://en.wikipedia.org/wiki/Kernel_Normal_Form
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->

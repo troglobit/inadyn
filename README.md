@@ -454,9 +454,3 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
 [Coverity Status]:  https://scan.coverity.com/projects/2981/badge.svg
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->
