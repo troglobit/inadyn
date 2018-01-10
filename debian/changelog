@@ -1,3 +1,14 @@
+inadyn (2.3.1) unstable; urgency=medium
+
+  * Fix installation of program binary in /usr/sbin and symlink in /usr/bin
+  * Rename debian/inadyn.links to be standards-compliant
+  * Update deprecated build dependency for dh-systemd
+  * Fix lintian warning about unsafe symlinks for build scripts.
+  * Version numbers containing a dash are inappropriate for `native'
+    packages, bump revision instead.
+
+ -- André Colomb <src@andre.colomb.de>  Wed, 10 Jan 2018 22:04:10 +0100
+
 inadyn (2.3-1) unstable; urgency=medium
 
   * New upstream release, v2.3
