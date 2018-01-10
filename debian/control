@@ -2,7 +2,7 @@ Source: inadyn
 Section: net
 Priority: optional
 Maintainer: Joachim Nilsson <troglobit@gmail.com>
-Build-Depends: debhelper (>= 9), dh-systemd, libgnutls28-dev
+Build-Depends: debhelper (>= 9.20160709~), libgnutls28-dev
 Standards-Version: 3.9.6
 Homepage: http://troglobit.com/inadyn.html
 Vcs-Git: git://github.com/troglobit/inadyn.git
