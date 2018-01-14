@@ -92,9 +92,9 @@ static int validate_period(cfg_t *cfg, cfg_opt_t *opt)
 	int val = cfg_getint(cfg, opt->name);
 
 	if (val < DDNS_MIN_PERIOD)
-		val = DDNS_MIN_PERIOD;
+		cfg_setint(cfg, opt->name, DDNS_MIN_PERIOD);
 	if (val > DDNS_MAX_PERIOD)
-		val = DDNS_MAX_PERIOD;
+		cfg_setint(cfg, opt->name, DDNS_MAX_PERIOD);
 
 	return 0;
 }
