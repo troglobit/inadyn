@@ -160,7 +160,7 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 {
 	const char *provider;
 
-	cfg = cfg_opt_getnsec(opt, 0);
+	cfg = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
 	provider = cfg_title(cfg);
 
 	if (!provider) {
@@ -173,7 +173,7 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 
 static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
 {
-	cfg = cfg_opt_getnsec(opt, 0);
+	cfg = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
 	if (!cfg)
 		return -1;
 
