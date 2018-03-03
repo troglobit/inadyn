@@ -308,9 +308,9 @@ single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
 
 If your DDNS provider does not provide you with a `checkip-server`, you
-can use other free services, like http://ipify.com
+can use other free services, like http://ipify.org
 
-    checkip-server = api.ipify.com
+    checkip-server = api.ipify.org
 
 or even use a script or command:
 
