@@ -337,7 +337,9 @@ for them, in their required versions, using the `pkg-config` tool:
 
 They are available from most UNIX distributions as pre-built packages.
 Make sure to install the `-dev` or `-devel` package of the distribution
-packages when building Inadyn.
+packages when building Inadyn.  On Debian/Ubuntu (derivatives):
+
+    $ sudo apt install gnutls-dev libconfuse-dev
 
 When building with HTTPS (SSL/TLS) support, make sure to also install
 the `ca-certificates` package on your system, otherwise Inadyn will not
