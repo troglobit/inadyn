@@ -80,7 +80,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		for (i = 0; i < SHA1_DIGEST_BYTES; i++)
 			sprintf(&digeststr[i * 2], "%02x", digestbuf[i]);
 
-		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&sha=%s", digeststr);
+		snprintf(buffer, sizeof(buffer), "/api/?action=getdyndns&v=2&sha=%s", digeststr);
 		trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen, GENERIC_HTTP_REQUEST,
 					     buffer, info->server_name.name, info->user_agent);
 		trans.req         = ctx->request_buf;
