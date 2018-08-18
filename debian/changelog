@@ -1,3 +1,11 @@
+inadyn (2.4) unstable; urgency=medium
+
+  * Add support for Dynu DDNS provider
+  * Fix FreeDNS plugin, failed to update IPv6 records
+  * Use ~/.cache/inadyn or ~/.inadyn when unprivileged
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sat, 18 Aug 2018 13:29:01 +0200
+
 inadyn (2.3.1) unstable; urgency=medium
 
   * Fix installation of program binary in /usr/sbin and symlink in /usr/bin

@@ -3,6 +3,18 @@ Change Log
 
 All notable changes to the project are documented in this file.
 
+[v2.4][] - 2018-08-18
+---------------------
+
+### Changes
+- Add support for Dynu DDNS provider
+
+### Fixes
+- Add missing defines for `LLONG_MAX` and `LLONG_MIN` on some platforms
+- Fix #209: Update FreeDNS plugin to use v2 of their API to fetch update key
+- Fix #210: Use `~/.cache/inadyn` or `~/.inadyn` when running unprivileged
+
+
 [v2.3.1][] - 2018-02-12
 -----------------------
 
@@ -714,6 +726,7 @@ First stable version.
 
 
 [UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.3...HEAD
+[v2.4]:   https://github.com/troglobit/inadyn/compare/v2.3.1...v2.4
 [v2.3.1]: https://github.com/troglobit/inadyn/compare/v2.3...v2.3.1
 [v2.3]:   https://github.com/troglobit/inadyn/compare/v2.2.1...v2.3
 [v2.2.1]: https://github.com/troglobit/inadyn/compare/v2.2...v2.2.1
