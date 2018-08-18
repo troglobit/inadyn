@@ -257,7 +257,7 @@ static int usage(int code)
 		" -I, --ident=NAME               Identity for config file, PID file, cache dir,\n"
 		"                                and syslog messages.  Defaults to: %s\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
-		" -n, --foreground               Run in foreground, useful when run from finit\n"
+		" -n, --foreground               Run in foreground with logging to stdout/stderr\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
 		" -P, --pidfile=FILE             File to store process ID for signaling %s\n"
 		"                                Default uses ident NAME: %s\n"
