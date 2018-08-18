@@ -65,13 +65,14 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	unsigned char digestbuf[SHA1_DIGEST_BYTES];
 
 	do {
+		/* FreeDNS requires an API key, the following code fetches yours */
 		TRY(http_construct(&client));
 
 		http_set_port(&client, info->server_name.port);
 		http_set_remote_name(&client, info->server_name.name);
 
 		client.ssl_enabled = info->ssl_enabled;
-		TRY(http_init(&client, "Sending update URL query"));
+		TRY(http_init(&client, "Fetching account API key"));
 
 		snprintf(buffer, sizeof(buffer), "%s|%s",
 			 info->creds.username, info->creds.password);
@@ -87,10 +88,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
 		rc  = http_transaction(&client, &trans);
-		rc |= http_exit(&client);
-
+		http_exit(&client);
 		http_destruct(&client, 1);
 
+		logit(LOG_DEBUG, "Received API key(s), rc=%d:\n%s", rc, trans.rsp_body);
 		if (rc)
 			break;
 
@@ -116,7 +117,11 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	while (0);
 
 	if (rc) {
-		logit(LOG_INFO, "Update URL query failed");
+		if (rc == RC_DDNS_RSP_NOTOK)
+			logit(LOG_INFO, "Cannot find your DNS name in the list of API keys");
+		else
+			logit(LOG_INFO, "Cannot find you FreeDNS account API keys");
+
 		return 0;
 	}
 #endif /* ENABLE_SIMULATION */
