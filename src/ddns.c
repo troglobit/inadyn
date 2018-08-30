@@ -155,7 +155,8 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 		rc = RC_DDNS_INVALID_CHECKIP_RSP;
 
 	http_exit(client);
-	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
+	logit(LOG_DEBUG, "Server response: %s", trans->rsp);
+	logit(LOG_DEBUG, "Checked my IP, return code %d: %s", rc, error_str(rc));
 
 	return rc;
 }
