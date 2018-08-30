@@ -189,12 +189,18 @@ int ssl_open(http_t *client, char *msg)
 int ssl_close(http_t *client)
 {
 	if (client->ssl_enabled) {
-		/* SSL/TLS close_notify */
-		SSL_shutdown(client->ssl);
+		if (client->ssl) {
+			/* SSL/TLS close_notify */
+			SSL_shutdown(client->ssl);
 
-		/* Clean up. */
-		SSL_free(client->ssl);
-		SSL_CTX_free(client->ssl_ctx);
+			/* Clean up. */
+			SSL_free(client->ssl);
+			client->ssl = NULL;
+		}
+		if (client->ssl_ctx) {
+			SSL_CTX_free(client->ssl_ctx);
+			client->ssl_ctx = NULL;
+		}
 	}
 
 	return tcp_exit(&client->tcp);
