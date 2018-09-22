@@ -118,6 +118,13 @@ if test "x$ac_enable_ssl" = "xyes"; then
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
 fi
 
+# Add some flags for some OS
+case "$host_os" in
+darwin*)
+   LDFLAGS="$LDFLAGS -lresolv"
+   ;;
+esac
+
 AM_CONDITIONAL([ENABLE_SSL], test "x$ac_enable_ssl" = "xyes")
 AM_CONDITIONAL([ENABLE_OPENSSL], test "x$ac_enable_openssl" = "xyes")
 
