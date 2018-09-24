@@ -363,8 +363,9 @@ You may want to remove the `--prefix=/usr` option.
 
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
 is the recommended SSL library to use on UNIX distributions which do not
-provide OpenSSL as a system library.  However, when OpenSSL is available
-as a system library, for example in many embedded systems:
+provide OpenSSL/LibreSSL as a system library.  However, when OpenSSL or
+LibreSSL is available as a system library, for example in many embedded
+systems:
 
     ./configure --enable-openssl
 
