@@ -329,6 +329,20 @@ last example above.
 Build & Install
 ---------------
 
+### Homebrew (macOS)
+
+To run the latest stable version on macOS, type:
+
+    brew install inadyn
+
+To run the latest version from the master branch, install the git tap instead:
+
+    brew install --HEAD troglobit/inadyn/inadyn
+
+Either of these will install all dependencies.
+
+### Building from Source
+
 In-A-Dyn requires a few libraries to build.  The build system searches
 for them, in their required versions, using the `pkg-config` tool:
 
