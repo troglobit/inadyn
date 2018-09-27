@@ -246,6 +246,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&dyndns);
 	plugin_register(&dnsomatic);
 	plugin_register(&dynsip);
+	plugin_register(&selfhost);
 	plugin_register(&noip);
 	plugin_register(&_3322);
 	plugin_register(&henet);
@@ -262,6 +263,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndns);
 	plugin_unregister(&dnsomatic);
 	plugin_unregister(&dynsip);
+	plugin_unregister(&selfhost);
 	plugin_unregister(&noip);
 	plugin_unregister(&_3322);
 	plugin_unregister(&henet);

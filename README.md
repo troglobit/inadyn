@@ -84,6 +84,7 @@ examples.
 * <https://www.cloudxns.net>
 * <https://www.dnspod.cn>
 * <https://www.dynu.com>
+* <https://www.selfhost.de>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
