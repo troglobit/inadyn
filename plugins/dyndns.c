@@ -81,6 +81,21 @@ static ddns_system_t dynsip = {
 	.server_url   = "/nic/update"
 };
 
+/* Support HOSTNAME.selfhost.eu, see issue #215 */
+static ddns_system_t selfhost = {
+	.name         = "default@selfhost.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "carol.selfhost.de",
+	.server_url   = "/nic/update"
+};
+
 static ddns_system_t noip = {
 	.name         = "default@no-ip.com",
 
