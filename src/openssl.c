@@ -116,6 +116,8 @@ static int ssl_error_cb(const char *str, size_t len, void *data)
 	memcpy(buf, str, sz);
 
 	logit(LOG_ERR, "OpenSSL error: %s", buf);
+
+	return 0;
 }
 
 static void ssl_check_error(void)
