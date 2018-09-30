@@ -18,7 +18,7 @@ All notable changes to the project are documented in this file.
 - Fix #211: Only show DDNS server response on successful transaction
 - Fix #211: Improved error handling in OpenSSL back-end
 - Fix #214: Add `nochg` to list of good responses for custom providers
-- Fixes by Erich Sauvageau:
+- Fixes by Eric Sauvageau:
   - Fix #216: Add DNS lookup exception for `all.dnsomatic.com`
   - Fix #219: Add DNS lookup exception for `default@tunnelbrooker.net`
 
