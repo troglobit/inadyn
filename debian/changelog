@@ -1,3 +1,12 @@
+inadyn (2.5) unstable; urgency=medium
+
+  * Add support for selfhost.de DDNS provider
+  * Only show DDNS server response on successful transaction
+  * Add 'nochg' to list of good responses for custom providers
+  * DNS lookup exceptions for dnsomatic.com and tunnelbrooker.net
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 30 Sep 2018 11:03:53 +0200
+
 inadyn (2.4) unstable; urgency=medium
 
   * Add support for Dynu DDNS provider
