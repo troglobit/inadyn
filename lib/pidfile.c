@@ -39,6 +39,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef HAVE_UTIMENSAT
+int utimensat(int dirfd, const char *pathname, const struct timespec ts[2], int flags);
+#endif
+
 static char *pidfile_path = NULL;
 static pid_t pidfile_pid  = 0;
 
