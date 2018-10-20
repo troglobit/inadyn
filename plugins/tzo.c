@@ -46,7 +46,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "echo.tzo.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "rh.tzo.com",
 	.server_url   = "/webclient/tzoperl.html"

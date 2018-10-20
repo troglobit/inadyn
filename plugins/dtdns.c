@@ -40,7 +40,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "myip.dtdns.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "www.dtdns.com",
 	.server_url   = "/api/autodns.cfm"

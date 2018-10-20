@@ -232,6 +232,40 @@ static int cfg_getserver(cfg_t *cfg, char *server, ddns_name_t *name)
 /* TODO: Move to a separate file */
 #define string_startswith(string, prefix) strncasecmp(string, prefix, strlen(prefix)) == 0
 
+static int cfg_getaddrtype(cfg_t *cfg, ddns_info_t *info)
+{
+	const char *type;
+	int addrtype;
+	type = cfg_getstr(cfg, "addrtype");
+
+	/* If we supplied a numeric type, use that (will match v6, ipv4, inet6, rossi46... */
+	if (type && strcmp(type, "") != 0) {
+		if (strstr(type, "4") != NULL)
+			addrtype |= UPDATE_IPV4;
+			if ((info->system->address_type & UPDATE_IPV4) != UPDATE_IPV4)
+				logit(LOG_WARNING, "Provider %s is not known to support IPv4 updates.", info->system->name);
+		if (strstr(type, "6") != NULL)
+			addrtype |= UPDATE_IPV6;
+			if ((info->system->address_type & UPDATE_IPV6) != UPDATE_IPV6)
+				logit(LOG_WARNING, "Provider %s is not known to support IPv6 updates.", info->system->name);
+		/* If neither bit is set, we got an invalid value */
+		if (addrtype == UPDATE_NONE)
+			cfg_error(cfg, "Invalid value '%s' for 'addrtype' in provider %s", type, info->system->name);
+	}
+	else {
+		/* If IPv6 isn't enabled or the provider doesn't support it, only update IPv4 */
+		if (!allow_ipv6 || ((info->system->address_type & UPDATE_IPV6) != UPDATE_IPV6))
+			addrtype = UPDATE_IPV4;
+		/* If the provider doesn't support IPv4, only update IPv6 */
+		else if ((info->system->address_type & UPDATE_IPV4) != UPDATE_IPV4)
+			addrtype |= UPDATE_IPV6;
+		else
+			addrtype |= UPDATE_IPV46;
+	}
+
+	return addrtype;
+}
+
 static int parseproxy(const char *proxy, tcp_proxy_type_t *type, ddns_name_t *name)
 {
 	int ret = 0;
@@ -327,9 +361,15 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	}
 
 	info->system = system;
+	info->address_type = cfg_getaddrtype(cfg, info);
 
-	if (getserver(system->checkip_name, &info->checkip_name))
-		goto error;
+	if ((info->address_type & UPDATE_IPV4) == UPDATE_IPV4)
+		if (getserver(system->checkip_name, &info->checkip_name))
+			goto error;
+	if ((info->address_type & UPDATE_IPV6) == UPDATE_IPV6)
+		if (getserver(system->checkip_name_v6, &info->checkip_name_v6))
+			goto error;
+
 	if (strlen(system->checkip_url) > sizeof(info->checkip_url))
 		goto error;
 	strlcpy(info->checkip_url, system->checkip_url, sizeof(info->checkip_url));
@@ -427,29 +467,36 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 			info->checkip_ssl = 0;
 	}
 
-	/* The checkip server can be set for all provider types */
-	if (!cfg_getserver(cfg, "checkip-server", &info->checkip_name)) {
-		str = cfg_getstr(cfg, "checkip-path");
-		if (str && strlen(str) <= sizeof(info->checkip_url))
-			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
-		else
-			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
-
-		/*
-		 * If a custom checkip server is defined, the
-		 * checkip-ssl setting is fully honored.
-		 */
-		info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
-	}
+	// Share the path and based all IPv6-capable providers appear to use the same for both
+	str = cfg_getstr(cfg, "checkip-path");
+	if (str && strlen(str) <= sizeof(info->checkip_url))
+		strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
+	else
+		strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
 
 	/* The checkip-command overrides any default or custom checkip-server */
-	str = cfg_getstr(cfg, "checkip-command");
-	if (str && strlen(str) > 0)
-		info->checkip_cmd = strdup(str);
-	else if (script_cmd)
-		info->checkip_cmd = strdup(script_cmd);
+	if ((info->address_type & UPDATE_IPV4) == UPDATE_IPV4) {
+		str = cfg_getstr(cfg, "checkip-command");
+		if (str && strlen(str) > 0)
+			info->checkip_cmd = strdup(str);
+		else if (script_cmd)
+			info->checkip_cmd = strdup(script_cmd);
+		else if (!cfg_getserver(cfg, "checkip-server", &info->checkip_name))
+			/* If a custom checkip server is defined, the checkip-ssl setting is honored. */
+			info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
+	}
+	if ((info->address_type & UPDATE_IPV6) == UPDATE_IPV6) {
+		str = cfg_getstr(cfg, "checkip-command-v6");
+		if (str && strlen(str) > 0)
+			info->checkip_cmd = strdup(str);
+		else if (script_cmd)
+			info->checkip_cmd = strdup(script_cmd);
+		else if (!cfg_getserver(cfg, "checkip-server-v6", &info->checkip_name_v6))
+			/* If a custom checkip server is defined, the checkip-ssl setting is honored. */
+			info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
+	}
 
-	/* The per-provider user-agent setting, defaults to the global setting */
+	/* The per-provider user-agent setting defaults to the global setting */
 	info->user_agent = cfg_getstr(cfg, "user-agent");
 	if (!info->user_agent)
 		info->user_agent = user_agent;
@@ -525,11 +572,14 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_true, CFGF_NONE),
+		CFG_STR     ("addrtype",     NULL, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
+		CFG_STR     ("checkip-server-v6", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("checkip-command-v6",NULL, CFGF_NONE),
 		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
 //		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_END()
@@ -541,11 +591,14 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
 		CFG_BOOL    ("ssl",          cfg_true, CFGF_NONE),
+		CFG_STR     ("addrtype",     NULL, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
+		CFG_STR     ("checkip-server-v6", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
 		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("checkip-command-v6",NULL, CFGF_NONE),
 		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
 //		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		/* Custom settings */

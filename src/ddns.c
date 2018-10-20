@@ -119,6 +119,12 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 			DYNDNS_CHECKIP_HTTP_REQUEST, info->checkip_url,
 			info->checkip_name.name, info->user_agent);
 }
+static int get_req_for_ipv6_server(ddns_t *ctx, ddns_info_t *info)
+{
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			DYNDNS_CHECKIP_HTTP_REQUEST, info->checkip_url_v6,
+			info->checkip_name_v6.name, info->user_agent);
+}
 
 /*
  * Send req to IP server and get the response

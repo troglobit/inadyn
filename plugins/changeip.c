@@ -43,7 +43,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ip.changeip.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "nic.changeip.com",
 	.server_url   = "/nic/update"
@@ -56,8 +58,10 @@ static ddns_system_t ovh = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "www.ovh.com",
 	.server_url   = "/nic/update"
@@ -70,8 +74,10 @@ static ddns_system_t strato = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "dyndns.strato.com",
 	.server_url   = "/nic/update"

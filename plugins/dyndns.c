@@ -46,8 +46,10 @@ static ddns_system_t dyndns = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "members.dyndns.org",
 	.server_url   = "/nic/update"
@@ -60,7 +62,9 @@ static ddns_system_t dnsomatic = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "myip.dnsomatic.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "updates.dnsomatic.com",
 	.server_url   = "/nic/update"
@@ -74,8 +78,10 @@ static ddns_system_t dynsip = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "dynsip.org",
 	.server_url   = "/nic/update"
@@ -89,8 +95,10 @@ static ddns_system_t selfhost = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "carol.selfhost.de",
 	.server_url   = "/nic/update"
@@ -103,8 +111,10 @@ static ddns_system_t noip = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ip1.dynupdate.no-ip.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "dynupdate.no-ip.com",
 	.server_url   = "/nic/update"
@@ -117,7 +127,9 @@ static ddns_system_t _3322 = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "bliao.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/ip.phtml",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "members.3322.org",
 	.server_url   = "/dyndns/update"
@@ -131,7 +143,9 @@ static ddns_system_t henet = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "checkip.dns.he.net",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "dyn.dns.he.net",
 	.server_url   = "/nic/update"
@@ -148,8 +162,10 @@ static ddns_system_t tunnelbroker = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "ipv4.tunnelbroker.net",
 	.server_url   = "/nic/update"
@@ -166,8 +182,10 @@ static ddns_system_t spdyn = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "checkip4.spdyn.de",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
 	.checkip_ssl  = DDNS_CHECKIP_SSL_UNSUPPORTED,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "update.spdyn.de",
 	.server_url   = "/nic/update"
@@ -181,7 +199,9 @@ static ddns_system_t nsupdate_info_ipv4 = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ipv4.nsupdate.info",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/myip",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "ipv4.nsupdate.info",
 	.server_url   = "/nic/update"
@@ -198,7 +218,9 @@ static ddns_system_t loopia = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "dns.loopia.se",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/checkip/checkip.php",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "dns.loopia.se",
 	.server_url   = "/XDynDNSServer/XDynDNS.php"
@@ -211,8 +233,10 @@ static ddns_system_t googledomains = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "domains.google.com",
 	.server_url   = "/nic/update"
@@ -225,7 +249,9 @@ static ddns_system_t dynu = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "checkip.dynu.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "api.dynu.com",
 	.server_url   = "/nic/update"

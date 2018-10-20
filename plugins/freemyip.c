@@ -45,7 +45,9 @@ static ddns_system_t plugin = {
 	.nousername   = 1,	/* Provider does not require username */
 
 	.checkip_name = "ipv4.wtfismyip.com",
+	.checkip_name_v6 = "ipv6.wtfismyip.com",
 	.checkip_url  = "/text",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "freemyip.com",
 	.server_url   = "/update"

@@ -42,7 +42,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "dynamic.zoneedit.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/checkip.html",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "dynamic.zoneedit.com",
 	.server_url   = "/auth/dynamic.html"

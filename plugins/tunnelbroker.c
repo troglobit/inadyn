@@ -46,7 +46,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "checkip.dns.he.net",
+	.checkip_name_v6 = "checkip.dns.he.net",
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "ipv4.tunnelbroker.net",
 	.server_url   = "/ipv4_end.php"

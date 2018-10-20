@@ -38,6 +38,7 @@
 
 /* 2017-01-05: Dyn.com does NOT support HTTPS for checkip */
 #define DYNDNS_MY_IP_SERVER	"checkip.dyndns.com"
+#define DYNDNS_MY_IPV6_SERVER	"checkipv6.dyndns.com"
 #define DYNDNS_MY_CHECKIP_URL	"/"
 #define DYNDNS_MY_IP_SSL        DDNS_CHECKIP_SSL_UNSUPPORTED
 
@@ -81,6 +82,12 @@ typedef enum {
 	CMD_FORCED_UPDATE,
 	CMD_CHECK_NOW,
 } ddns_cmd_t;
+
+/* bit flags for IP Support options */
+#define UPDATE_NONE  0x0000
+#define UPDATE_IPV4  0x0001
+#define UPDATE_IPV6  0x0002
+#define UPDATE_IPV46 0x0003
 
 typedef struct {
 	char           username[USERNAME_LEN];
@@ -126,12 +133,14 @@ typedef struct di {
 
 	/* Address of "What's my IP" checker */
 	ddns_name_t    checkip_name;
+	ddns_name_t    checkip_name_v6;
 	char           checkip_url[SERVER_URL_LEN];
 	int            checkip_ssl; /* checkip server ssl mode */
 	http_t         checkip;
 
 	/* Shell command for "What's my IP" checker */
 	char          *checkip_cmd;
+	char          *checkip_cmd_v6;
 
 	/* Optional local proxy server for this DDNS provider */
 	tcp_proxy_type_t proxy_type;
@@ -141,6 +150,7 @@ typedef struct di {
 	size_t         alias_count;
 
 	int            wildcard;
+	int            address_type; /* Which type of addresses it will accept */
 
 	int            ssl_enabled;
 	int            append_myip; /* For custom setups! */

@@ -45,7 +45,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ipv4.wtfismyip.com",
+	.checkip_name_v6 = "ipv6.wtfismyip.com",
 	.checkip_url  = "/text",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "www.duckdns.org",
 	.server_url   = "/update"

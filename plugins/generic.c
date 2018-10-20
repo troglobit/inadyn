@@ -51,8 +51,10 @@ static ddns_system_t generic = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "",
 	.server_url   = ""

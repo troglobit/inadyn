@@ -52,8 +52,10 @@ typedef struct ddns_system {
 	rsp_fn_t       response;
 
 	const int      nousername;    /* Provider does not require username='' */
+	const int      address_type;  /* IPv4, IPv6, or both */
 
 	const char    *checkip_name;
+	const char    *checkip_name_v6;
 	const char    *checkip_url;
 	const int      checkip_ssl;
 

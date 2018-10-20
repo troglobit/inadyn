@@ -43,7 +43,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ipv4.duiadns.net",
+	.checkip_name_v6 = "ipv6.duiadns.net",
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV46,
 
 	.server_name  = "ipv4.duiadns.net",
 	.server_url   = "/dynamic.duia"
@@ -97,4 +99,3 @@ PLUGIN_EXIT(plugin_exit)
  *  c-file-style: "linux"
  * End:
  */
-

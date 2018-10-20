@@ -43,7 +43,9 @@ static ddns_system_t plugin = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "ip.dnsexit.com",
+	.checkip_name_v6 = DYNDNS_MY_IPV6_SERVER,
 	.checkip_url  = "/",
+	.address_type = UPDATE_IPV4,
 
 	.server_name  = "update.dnsexit.com",
 	.server_url   = "/RemoteUpdate.sv"
