@@ -450,6 +450,13 @@ Building from GIT requires, at least, the previously mentioned library
 dependencies.  GIT sources are a moving target and are not recommended
 for production systems, unless you know what you are doing!
 
+Building with Docker
+--------------------
+
+A Dockerfile is provided to simplify building and running `inadyn`.
+
+    docker build -t inadyn:latest .
+    docker run --rm --mount "type=bind,source=$PWD/inadyn.conf,target=/usr/local/etc/inadyn.conf" inadyn:latest
 
 Origin & References
 -------------------
