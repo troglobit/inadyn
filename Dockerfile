@@ -17,6 +17,11 @@ RUN ./autogen.sh && ./configure && make install
 
 FROM alpine:latest
 
+RUN apk --no-cache add \
+  ca-certificates \
+  confuse \
+  gnutls
+
 COPY --from=builder /usr/local/sbin/inadyn /usr/bin/inadyn
 
 ENTRYPOINT [ "/usr/bin/inadyn" ]
