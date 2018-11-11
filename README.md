@@ -185,6 +185,12 @@ This looks for the default `.conf` file, to check any file, use:
          password = your_api_token
          hostname = yourhost.example.com
     }
+    
+    provider duckdns.org {
+        username    = nouser
+        password    = YOUR_TOKEN
+        hostname    = YOUR_DOMAIN.duckdns.org
+    }
 
 Notice how this configuration file has two different users of the No-IP
 provider -- this is achieved by appending a `:ID` to the provider name.
