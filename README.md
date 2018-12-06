@@ -344,6 +344,10 @@ Either of these will install all dependencies.
 
 ### Building from Source
 
+First download the latest official In-A-Dyn release from GitHub:
+
+* https://github.com/troglobit/inadyn/releases
+
 In-A-Dyn requires a few libraries to build.  The build system searches
 for them, in their required versions, using the `pkg-config` tool:
 
@@ -355,6 +359,10 @@ Make sure to install the `-dev` or `-devel` package of the distribution
 packages when building Inadyn.  On Debian/Ubuntu (derivatives):
 
     $ sudo apt install gnutls-dev libconfuse-dev
+
+To build you also need a C compiler, the `pkg-config` tool, and make:
+
+    $ sudo apt install build-essential pkg-config
 
 When building with HTTPS (SSL/TLS) support, make sure to also install
 the `ca-certificates` package on your system, otherwise Inadyn will not
@@ -441,6 +449,11 @@ To build from GIT you first need to clone the repository and run the
 `autogen.sh` script.  This requires `automake` and `autoconf` to be
 installed on your system.
 
+    $ sudo apt install git automake autoconf
+
+Then you can clone the repository and create the `configure` script,
+which is not part of the GIT repo:
+
     git clone https://github.com/troglobit/inadyn.git
     cd inadyn/
     ./autogen.sh
@@ -449,6 +462,7 @@ installed on your system.
 Building from GIT requires, at least, the previously mentioned library
 dependencies.  GIT sources are a moving target and are not recommended
 for production systems, unless you know what you are doing!
+
 
 Building with Docker
 --------------------
