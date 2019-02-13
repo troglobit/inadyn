@@ -65,7 +65,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "updated"))
+	if (strstr(resp, "updated") || strstr(resp, "unchanged"))
 		return 0;
 
 	return RC_DDNS_RSP_NOTOK;
