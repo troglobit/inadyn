@@ -32,7 +32,7 @@ static int enabled = 0;
 
 void log_init(char *ident, int log, int bg)
 {
-	int log_opts = LOG_PID | LOG_CONS | LOG_NDELAY;
+	int log_opts = LOG_PID | LOG_NDELAY;
 
 #ifdef LOG_PERROR
 	if (!bg && log < 1)
