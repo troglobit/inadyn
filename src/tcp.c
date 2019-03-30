@@ -20,18 +20,19 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <arpa/nameser.h>
 #include <errno.h>
-#include <net/if.h>
-#include <netinet/in.h>
 #include <poll.h>
-#include <resolv.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/nameser.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <resolv.h>
 
 #include "log.h"
 #include "tcp.h"

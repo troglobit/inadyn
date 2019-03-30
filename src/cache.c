@@ -31,10 +31,11 @@
  * once it has read the IP and the modification time.
  */
 
-#include <resolv.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <resolv.h>
+#include <sys/stat.h>
 
 #include "ddns.h"
 #include "cache.h"
