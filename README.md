@@ -15,6 +15,10 @@ Table of Contents
 * [Origin & References](#origin--references)
 
 
+The latest release is always available from GitHub at  
+> https://github.com/troglobit/inadyn/releases
+
+
 Introduction
 ------------
 
