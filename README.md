@@ -447,7 +447,7 @@ unreleased features, then you need to know a few things about the
 
 To build from GIT; clone the repository and run the `autogen.sh` script.
 This requires the GNU tools `automake`, `autoconf` and `libtool` to be
-installed on your system.
+installed on your system.  Released tarballs do not require these tools.
 
     $ sudo apt install git automake autoconf
 
