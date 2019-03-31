@@ -3,6 +3,10 @@ Internet Automated Dynamic DNS Client
 [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 
+The latest release is always available from GitHub at  
+> https://github.com/troglobit/inadyn/releases
+
+
 Table of Contents
 -----------------
 
@@ -13,10 +17,6 @@ Table of Contents
 * [Build & Install](#build--install)
 * [Building from GIT](#building-from-git)
 * [Origin & References](#origin--references)
-
-
-The latest release is always available from GitHub at  
-> https://github.com/troglobit/inadyn/releases
 
 
 Introduction
