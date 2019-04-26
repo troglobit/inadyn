@@ -1,6 +1,6 @@
-FROM alpine:latest as builder
+FROM alpine:latest
 
-RUN apk --no-cache add \
+RUN apk --no-cache add --virtual .build-dependencies \
   autoconf \
   automake \
   confuse-dev \
@@ -13,16 +13,14 @@ RUN apk --no-cache add \
 
 RUN git clone https://github.com/troglobit/inadyn.git
 WORKDIR inadyn
-RUN ./autogen.sh && ./configure && make install
+RUN ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install
 
-FROM alpine:latest
+RUN apk del .build-dependencies
 
 RUN apk --no-cache add \
   ca-certificates \
   confuse \
   gnutls
 
-COPY --from=builder /usr/local/sbin/inadyn /usr/bin/inadyn
-
-ENTRYPOINT [ "/usr/bin/inadyn" ]
+ENTRYPOINT [ "inadyn" ]
 CMD [ "--foreground" ]
