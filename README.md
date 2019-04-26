@@ -474,7 +474,7 @@ Building with Docker
 A Dockerfile is provided to simplify building and running `inadyn`.
 
     docker build -t inadyn:latest .
-    docker run --rm --mount "type=bind,source=$PWD/inadyn.conf,target=/usr/local/etc/inadyn.conf" inadyn:latest
+    docker run --rm -v "$PWD/inadyn.conf:/etc/inadyn.conf" inadyn:latest
 
 Origin & References
 -------------------
