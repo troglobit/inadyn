@@ -62,7 +62,7 @@
 
 /* local configs */
 #define USERNAME_LEN                      50      /* chars */
-#define PASSWORD_LEN                      50      /* chars */
+#define PASSWORD_LEN                      256     /* chars */
 #define SERVER_NAME_LEN                   256     /* chars */
 #define SERVER_URL_LEN                    256     /* chars */
 #ifdef INET6_ADDRSTRLEN
