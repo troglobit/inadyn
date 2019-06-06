@@ -60,7 +60,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	http_trans_t  trans;
 	char         *buf, *tmp, *line, *hash = NULL;
 	char          host[256], updateurl[256];
-	char          buffer[256];
+	char          buffer[384];
 	char          digeststr[SHA1_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[SHA1_DIGEST_BYTES];
 
