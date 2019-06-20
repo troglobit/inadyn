@@ -90,6 +90,7 @@ examples.
 * <https://www.dynu.com>
 * <https://www.selfhost.de>
 * <https://connect.yandex.ru>
+* <https://www.cloudflare.com>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
@@ -187,6 +188,13 @@ This looks for the default `.conf` file, to check any file, use:
 
     provider dnspod.cn {
          username = your_api_id
+         password = your_api_token
+         hostname = yourhost.example.com
+    }
+	
+	# Note: username is your email, then the zone you are updating, separated by a slash.
+	provider cloudflare.com {
+         username = your_username/zone_name
          password = your_api_token
          hostname = yourhost.example.com
     }

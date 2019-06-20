@@ -21,6 +21,8 @@
  */
 
 #include "plugin.h"
+
+#define JSMN_HEADER
 #include "jsmn.h"
 
 #define YANDEX_GET_REQUEST						\

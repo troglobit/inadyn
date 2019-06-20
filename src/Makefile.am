@@ -8,7 +8,8 @@ inadyn_SOURCES	 = main.c	ddns.c		cache.c		\
 		   error.c	conf.c		os.c		\
 		   http.c	plugin.c	tcp.c		\
 		   		sha1.c		base64.c	\
-		   makepath.c	md5.c		log.c
+		   makepath.c	md5.c		log.c	\
+		   jsmn.c
 inadyn_CFLAGS    = $(confuse_CFLAGS) $(OpenSSL_CFLAGS) $(GnuTLS_CFLAGS)
 inadyn_LDADD     = $(confuse_LIBS)   $(OpenSSL_LIBS)   $(GnuTLS_LIBS)
 inadyn_LDADD    += $(LIBS) $(LIBOBJS)
@@ -36,4 +37,5 @@ inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c	\
 		   ../plugins/sitelutions.c				\
 		   ../plugins/tunnelbroker.c	../plugins/tzo.c	\
 		   ../plugins/zoneedit.c	../plugins/zerigo.c	\
-		   ../plugins/dnspod.c		../plugins/yandex.c
+		   ../plugins/dnspod.c		../plugins/yandex.c \
+		   ../plugins/cloudflare.c
