@@ -164,6 +164,8 @@ static int check_success(const char *json, const jsmntok_t tokens[], const int n
 			return -1;
 		}
 	}
+	
+	return -1;
 }
 
 static int check_success_only(const char *json)
