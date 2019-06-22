@@ -24,7 +24,6 @@
 #define JSMN_HEADER
 #include "jsmn.h"
 
-/* cloudxns.net specific update request format */
 static const char *CLOUDFLARE_ZONE_ID	= "GET %s/zones?name=%s HTTP/1.0\r\n"	\
 	"Host: %s\r\n"				\
 	"User-Agent: %s\r\n"		\
@@ -217,7 +216,7 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 	if (token->type != JSMN_STRING)
 		return -1;
 	
-	int length = token->end - token->start;
+	size_t length = token->end - token->start;
 	
 	if (length > dest_size - 1)
 		return -2;
@@ -380,6 +379,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname)
 {
+	(void)info;
+	(void)hostname;
+
 	int rc = check_response_code(trans->status);
 
 	if (rc == RC_OK && check_success_only(trans->rsp_body) < 0)
