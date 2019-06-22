@@ -249,8 +249,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			
 			size_t username_len = separator - info->creds.username;
 			
-			if (username_len > sizeof(username) - 1) {
-				logit(LOG_ERR, "Username too long.");
+			if (username_len > sizeof(username) - 1 || strlen(separator + 1) > sizeof(zone_name)) {
+				logit(LOG_ERR, "Username or zone name too long.");
 				break;
 			}
 
