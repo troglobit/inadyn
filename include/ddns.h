@@ -61,7 +61,7 @@
 #define DDNS_CHECKIP_SSL_REQUIRED         3       /* HTTPS required for checkip-server */
 
 /* local configs */
-#define USERNAME_LEN                      50      /* chars */
+#define USERNAME_LEN                      128     /* chars */
 #define PASSWORD_LEN                      256     /* chars */
 #define SERVER_NAME_LEN                   256     /* chars */
 #define SERVER_URL_LEN                    256     /* chars */
