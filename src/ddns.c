@@ -544,7 +544,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	http_t        *client = &info->server;
 
 	if (info->system->setup)
-		DO(info->system->setup(ctx, info, alias);)
+		DO(info->system->setup(ctx, info, alias));
 
 	client->ssl_enabled = info->ssl_enabled;
 	rc = http_init(client, "Sending IP# update to DDNS server");

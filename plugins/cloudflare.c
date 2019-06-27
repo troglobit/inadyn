@@ -24,24 +24,29 @@
 #define JSMN_HEADER
 #include "jsmn.h"
 
-static const char *CLOUDFLARE_ZONE_ID	= "GET %s/zones?name=%s HTTP/1.0\r\n"	\
-	"Host: %s\r\n"				\
+#define CHECK(fn)       { rc = (fn); if (rc) goto cleanup; }
+
+#define API_HOST "api.cloudflare.com"
+#define API_URL "/client/v4"
+
+static const char *CLOUDFLARE_ZONE_ID_REQUEST = "GET " API_URL "/zones?name=%s HTTP/1.0\r\n"	\
+	"Host: " API_HOST "\r\n"	\
 	"User-Agent: %s\r\n"		\
 	"Accept: */*\r\n"			\
 	"X-Auth-Email: %s\r\n"		\
 	"X-Auth-Key: %s\r\n"		\
 	"Content-Type: application/json\r\n\r\n";
 	
-static const char *CLOUDFLARE_DOMAIN_ID	= "GET %s/zones/%s/dns_records?type=A&name=%s HTTP/1.0\r\n"	\
-	"Host: %s\r\n"				\
+static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dns_records?type=A&name=%s HTTP/1.0\r\n"	\
+	"Host: " API_HOST "\r\n"	\
 	"User-Agent: %s\r\n"		\
 	"Accept: */*\r\n"			\
 	"X-Auth-Email: %s\r\n"		\
 	"X-Auth-Key: %s\r\n"		\
 	"Content-Type: application/json\r\n\r\n";
 	
-static const char *CLOUDFLARE_UPDATE_REQUEST	= "PUT %s/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
-	"Host: %s\r\n"				\
+static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
+	"Host: " API_HOST "\r\n"	\
 	"User-Agent: %s\r\n"		\
 	"Accept: */*\r\n"			\
 	"X-Auth-Email: %s\r\n"		\
@@ -54,12 +59,14 @@ static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"A\",\"name\":\"%
 
 static const char *KEY_SUCCESS = "success";
 
+static int setup	(ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname);
 
 static ddns_system_t plugin = {
 	.name         = "default@cloudflare.com",
 
+	.setup        = (setup_fn_t)setup,
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
@@ -70,6 +77,16 @@ static ddns_system_t plugin = {
 	.server_name  = "api.cloudflare.com",
 	.server_url   = "/client/v4"
 };
+
+static const size_t MAX_NAME = 64;
+static const size_t MAX_ID = 32 + 1;
+
+// filled by the setup func
+static struct {
+	char username[MAX_NAME];
+	char zone_id[MAX_ID];
+	char hostname_id[MAX_ID];
+} data;
 
 static int check_response_code(int status)
 {
@@ -85,7 +102,7 @@ static int check_response_code(int status)
 			logit(LOG_ERR, "Bad username.");
 			return RC_DDNS_RSP_NOTOK;
 		case 403:
-			logit(LOG_ERR, "We're not allowed to perform the DNS update.");
+			logit(LOG_ERR, "We're not allowed to perform the DNS update with the provided credentials.");
 			return RC_DDNS_INVALID_OPTION;
 		case 429:
 			logit(LOG_WARNING, "We got rate limited.");
@@ -227,154 +244,170 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 	return 0;
 }
 
-static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
+static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *request, size_t request_len)
 {
-	int           rc = RC_ERROR;
-	char          username[64], zone_name[64];
-	char          zone_id[256], hostname_id[256];
-	char          json_data[256];
-		
-	do {
-		{
-			const char *separator = strchr(info->creds.username, '/');
-			
-			/* cloudflare complains about request headers if the username is not an email, so let's try to make sure it is */
-			const char *at = strchr(info->creds.username, '@');
+	int rc = RC_OK;
 
-			if (!separator || !at) {
-				logit(LOG_ERR, "Username not in correct format.", hostname->name);
-				rc = RC_DDNS_INVALID_OPTION;
-				break;
-			}
-			
-			size_t username_len = separator - info->creds.username;
-			
-			if (username_len > sizeof(username) - 1 || strlen(separator + 1) > sizeof(zone_name)) {
-				logit(LOG_ERR, "Username or zone name too long.");
-				break;
-			}
+	const size_t RESP_BUFFER_SIZE = 4096;
+	
+	http_t        client;
+	http_trans_t  trans;
 
-			strncpy(username, info->creds.username, username_len);
-			username[username_len] = '\0';
-			strncpy(zone_name, separator + 1, sizeof(zone_name) - 1);
+	char *response_buf = malloc(RESP_BUFFER_SIZE * sizeof(char));
+
+	if (!response_buf)
+		return RC_OUT_OF_MEMORY;
+
+	CHECK(http_construct(&client));
+
+	http_set_port(&client, info->server_name.port);
+	http_set_remote_name(&client, info->server_name.name);
+
+	client.ssl_enabled = info->ssl_enabled;
+	CHECK(http_init(&client, "Id query"));
+
+	trans.req = request;
+	trans.req_len = request_len;
+	trans.rsp = response_buf;
+	trans.max_rsp_len = RESP_BUFFER_SIZE - 1; /* Save place for a \0 at the end */
+
+	CHECK(http_transaction(&client, &trans));
+
+	http_exit(&client);
+	http_destruct(&client, 1);
+
+	CHECK(check_response_code(trans.status));
+
+	const char *response = trans.rsp_body;
+	jsmntok_t id;
+
+	if (get_result_value(response, "id", &id) < 0) {
+		rc = RC_DDNS_INVALID_OPTION;
+		goto cleanup;
+	}
+
+	if (json_copy_value(dest, dest_size, response, &id) < 0) {
+		logit(LOG_ERR, "Id did not fit into buffer.");
+		rc = RC_BUFFER_OVERFLOW;
+	}
+
+cleanup:
+	free(response_buf);
+	return rc;
+}
+
+static int parse_username(char *username, char *zone_name, const ddns_info_t *info)
+{
+	const char *separator = strchr(info->creds.username, '/');
+
+	/* cloudflare complains about request headers if the username is not an email, so let's try to make sure it is */
+	const char *at = strchr(info->creds.username, '@');
+
+	if (!separator || !at) {
+		logit(LOG_ERR, "Username not in correct format.");
+		return RC_DDNS_INVALID_OPTION;
+	}
+
+	const char *username_ptr = info->creds.username;
+	const char *zone_name_ptr = separator + 1;
+
+	size_t username_len = separator - username_ptr;
+
+	if (username_len > MAX_NAME - 1 || strlen(zone_name_ptr) > MAX_NAME) {
+		logit(LOG_ERR, "Username or zone name too long.");
+		return RC_BUFFER_OVERFLOW;
+	}
+
+	strncpy(username, username_ptr, username_len);
+	username[username_len] = '\0';
+	strncpy(zone_name, zone_name_ptr, MAX_NAME - 1);
+
+	return RC_OK;
+}
+
+static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
+{
+	int rc = RC_OK;
+
+	const size_t REQUEST_BUFFER_SIZE = 1028;
+
+	char zone_name[MAX_NAME];
+
+	DO(parse_username(data.username, zone_name, info));
+	logit(LOG_DEBUG, "User: %s Zone: %s", data.username, zone_name);
+
+	char *request_buf = malloc(REQUEST_BUFFER_SIZE * sizeof(char));
+	if (!request_buf)
+		return RC_OUT_OF_MEMORY;
+
+	{
+		size_t request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
+			CLOUDFLARE_ZONE_ID_REQUEST,
+			zone_name,
+			info->user_agent,
+			data.username,
+			info->creds.password);
+
+		if (request_len > REQUEST_BUFFER_SIZE) {
+			logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
+			rc = RC_BUFFER_OVERFLOW;
+			goto cleanup;
 		}
 
-		logit(LOG_DEBUG, "User: %s Zone: %s", username, zone_name);
-		
-		{
-			http_t        client;
-			http_trans_t  trans;
-			
-			TRY(http_construct(&client));
+		rc = get_id(data.zone_id, MAX_ID, info, request_buf, request_len);
 
-			http_set_port(&client, info->server_name.port);
-			http_set_remote_name(&client, info->server_name.name);
-
-			client.ssl_enabled = info->ssl_enabled;
-			TRY(http_init(&client, "Zone id query"));
-
-			trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen,
-										CLOUDFLARE_ZONE_ID,
-										plugin.server_url,
-										zone_name,
-										info->server_name.name,
-										info->user_agent,
-										username,
-										info->creds.password);
-										
-			trans.req         = ctx->request_buf;
-			trans.rsp         = ctx->work_buf;
-			trans.max_rsp_len = ctx->work_buflen - 1; /* Save place for a \0 at the end */
-			
-			TRY(http_transaction(&client, &trans));
-			TRY(http_exit(&client));
-
-			http_destruct(&client, 1);
-			
-			TRY(check_response_code(trans.status));
-			{
-				const char *response = trans.rsp_body;
-				jsmntok_t id;
-				if (get_result_value(response, "id", &id) < 0) {
-					logit(LOG_ERR, "Zone '%s' not found.", zone_name);
-					rc = RC_DDNS_INVALID_OPTION;
-					break;
-				}
-				
-				if (json_copy_value(zone_id, sizeof(zone_id), response, &id) < 0) {
-					logit(LOG_ERR, "Zone id did not fit into buffer.");
-					rc = RC_ERROR;
-					break;
-				}
-			}
-		}
-		
-		logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, zone_id);
-		
-		{
-			http_t        client;
-			http_trans_t  trans;
-			
-			TRY(http_construct(&client));
-
-			http_set_port(&client, info->server_name.port);
-			http_set_remote_name(&client, info->server_name.name);
-
-			client.ssl_enabled = info->ssl_enabled;
-			TRY(http_init(&client, "Hostname id query"));
-
-			trans.req_len     = snprintf(ctx->request_buf, ctx->request_buflen,
-										CLOUDFLARE_DOMAIN_ID, plugin.server_url,
-										zone_id,
-										hostname->name,
-										info->server_name.name,
-										info->user_agent,
-										username,
-										info->creds.password);
-										
-			trans.req         = ctx->request_buf;
-			trans.rsp         = ctx->work_buf;
-			trans.max_rsp_len = ctx->work_buflen - 1; /* Save place for a \0 at the end */
-
-			TRY(http_transaction(&client, &trans));
-			TRY(http_exit(&client));
-
-			http_destruct(&client, 1);
-			
-			TRY(check_response_code(trans.status));
-			{
-				const char *response = trans.rsp_body;
-				jsmntok_t id;
-				if (get_result_value(response, "id", &id) < 0) {
-					logit(LOG_ERR, "Hostname '%s' not found.", hostname->name);
-					rc = RC_DDNS_INVALID_OPTION;
-					break;
-				}
-				
-				if (json_copy_value(hostname_id, sizeof(hostname_id), response, &id) < 0) {
-					logit(LOG_ERR, "Hostname id did not fit into buffer.");
-					rc = RC_ERROR;
-					break;
-				}
-			}
-		}
-		
-		{
-			int contentLength = snprintf(json_data, sizeof(json_data), CLOUDFLARE_UPDATE_JSON_FORMAT, hostname->name, hostname->address);
-			
-			return snprintf(ctx->request_buf, ctx->request_buflen,
-					   CLOUDFLARE_UPDATE_REQUEST,
-					   plugin.server_url, zone_id, hostname_id,
-					   info->server_name.name,
-					   info->user_agent,
-					   username,
-					   info->creds.password,
-					   contentLength, json_data);
+		if (rc != RC_OK) {
+			logit(LOG_ERR, "Zone '%s' not found.", zone_name);
+			rc = RC_DDNS_RSP_NOHOST;
+			goto cleanup;
 		}
 	}
-	while (0);
 	
-	return -1;
+	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data.zone_id);
+
+	{
+		size_t request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
+			CLOUDFLARE_HOSTNAME_ID_REQUEST,
+			data.zone_id,
+			hostname->name,
+			info->user_agent,
+			data.username,
+			info->creds.password);
+
+		if (request_len > REQUEST_BUFFER_SIZE) {
+			logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
+			rc = RC_BUFFER_OVERFLOW;
+			goto cleanup;
+		}
+
+		rc = get_id(data.hostname_id, MAX_ID, info, request_buf, request_len);
+
+		if (rc != RC_OK) {
+			logit(LOG_ERR, "Hostname '%s' not found.", hostname->name);
+			rc = RC_DDNS_RSP_NOHOST;
+			goto cleanup;
+		}
+	}
+
+	logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
+
+cleanup:
+	free(request_buf);
+	return rc;
+}
+
+static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
+{
+	char          json_data[256];
+	size_t content_len = snprintf(json_data, sizeof(json_data), CLOUDFLARE_UPDATE_JSON_FORMAT, hostname->name, hostname->address);
+
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+		CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
+		data.zone_id, data.hostname_id,
+		info->user_agent,
+		data.username,
+		info->creds.password,
+		content_len, json_data);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname)
