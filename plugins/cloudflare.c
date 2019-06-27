@@ -20,9 +20,7 @@
  */
 
 #include "plugin.h"
-
-#define JSMN_HEADER
-#include "jsmn.h"
+#include "json.h"
 
 #define CHECK(fn)       { rc = (fn); if (rc) goto cleanup; }
 
@@ -117,54 +115,6 @@ static int check_response_code(int status)
 			logit(LOG_ERR, "Received status %i, don't know what that means.", status);
 			return RC_DDNS_RSP_NOTOK;
 	}
-}
-
-/* TODO: these could be useful in other files; move them to their own file. */
-
-static int parse_json(const char *json, jsmntok_t *out_tokens[])
-{
-	int num_tokens;
-	
-	jsmn_parser parser;
-	jsmn_init(&parser);
-	num_tokens = jsmn_parse(&parser, json, strlen(json), NULL, 0);
-	
-	if (num_tokens < 0) {
-		logit(LOG_ERR, "Failed to parse JSON.");
-		return -1;
-	}
-	
-	*out_tokens = malloc(num_tokens * sizeof(jsmntok_t));
-	
-	if (!(*out_tokens)) {
-		logit(LOG_ERR, "Couldn't allocate memory to parse JSON.");
-		return -1;
-	}
-	
-	jsmn_init(&parser);
-	jsmn_parse(&parser, json, strlen(json), *out_tokens, num_tokens);
-	
-	return num_tokens;
-}
-
-static int jsoneq(const char *json, const jsmntok_t *tok, const char *s)
-{
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
-		return 0;
-	}
-
-	return -1;
-}
-
-static int json_bool(const char *json, const jsmntok_t *token, int *out_value)
-{
-	if (token->type == JSMN_PRIMITIVE) {
-		*out_value = json[token->start] == 't';
-		return 0;
-	}
-	
-	return -1;
 }
 
 static int check_success(const char *json, const jsmntok_t tokens[], const int num_tokens)

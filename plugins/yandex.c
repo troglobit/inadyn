@@ -21,9 +21,7 @@
  */
 
 #include "plugin.h"
-
-#define JSMN_HEADER
-#include "jsmn.h"
+#include "json.h"
 
 #define YANDEX_GET_REQUEST						\
 	"GET %s "							\
@@ -62,6 +60,7 @@ static ddns_system_t plugin = {
 // XXX: please increase if not enough
 #define TOKENS_EXPECTED		4096
 
+// FIXME: remove and use parse_json instead
 static jsmntok_t *get_tokens(const char *response, int *n) {
 	jsmn_parser *p;
 	jsmntok_t   *t;
@@ -95,15 +94,6 @@ static jsmntok_t *get_tokens(const char *response, int *n) {
 	}
 
 	return t;
-}
-
-static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
-		return 0;
-	}
-
-	return -1;
 }
 
 static int success(const char *response) {
