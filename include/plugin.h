@@ -38,6 +38,7 @@
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
+typedef int (*setup_fn_t) (void* this, void* info, void* alias);
 typedef int (*req_fn_t) (void *this, void *info, void *alias);
 typedef int (*rsp_fn_t) (void *this, void *info, void *alias);
 
@@ -46,6 +47,7 @@ typedef struct ddns_system {
 
 	const char    *name;
 
+	setup_fn_t     setup;
 	req_fn_t       request;
 	rsp_fn_t       response;
 
