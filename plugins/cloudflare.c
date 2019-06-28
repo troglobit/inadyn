@@ -76,8 +76,8 @@ static ddns_system_t plugin = {
 	.server_url   = "/client/v4"
 };
 
-static const size_t MAX_NAME = 64;
-static const size_t MAX_ID = 32 + 1;
+#define MAX_NAME 64
+#define MAX_ID (32 + 1)
 
 // filled by the setup func
 static struct {
