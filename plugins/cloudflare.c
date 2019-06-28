@@ -81,7 +81,6 @@ static ddns_system_t plugin = {
 
 // filled by the setup func
 static struct {
-	char username[MAX_NAME];
 	char zone_id[MAX_ID];
 	char hostname_id[MAX_ID];
 } data;
@@ -246,33 +245,34 @@ cleanup:
 	return rc;
 }
 
-static int parse_username(char *username, char *zone_name, const ddns_info_t *info)
+static int check_username(const ddns_info_t *info)
 {
-	const char *separator = strchr(info->creds.username, '/');
-
 	/* cloudflare complains about request headers if the username is not an email, so let's try to make sure it is */
-	const char *at = strchr(info->creds.username, '@');
-
-	if (!separator || !at) {
-		logit(LOG_ERR, "Username not in correct format.");
+	if (!strchr(info->creds.username, '@')) {
+		logit(LOG_ERR, "Username not in correct format. (Should be an email address.)");
 		return RC_DDNS_INVALID_OPTION;
 	}
 
-	const char *username_ptr = info->creds.username;
-	const char *zone_name_ptr = separator + 1;
+	return RC_OK;
+}
 
-	size_t username_len = separator - username_ptr;
+static void get_zone(char *dest, const char *hostname)
+{
+	const char *end = hostname + strlen(hostname);
+	const char *root;
 
-	if (username_len > MAX_NAME - 1 || strlen(zone_name_ptr) > MAX_NAME) {
-		logit(LOG_ERR, "Username or zone name too long.");
-		return RC_BUFFER_OVERFLOW;
+	int count = 0;
+	for (root = end; root != hostname; root--) {
+		if (*root == '.')
+			count++;
+
+		if (count == 2) {
+			root++;
+			break;
+		}
 	}
 
-	strncpy(username, username_ptr, username_len);
-	username[username_len] = '\0';
-	strncpy(zone_name, zone_name_ptr, MAX_NAME - 1);
-
-	return RC_OK;
+	strncpy(dest, root, MAX_NAME);
 }
 
 static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
@@ -283,8 +283,10 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 	char zone_name[MAX_NAME];
 
-	DO(parse_username(data.username, zone_name, info));
-	logit(LOG_DEBUG, "User: %s Zone: %s", data.username, zone_name);
+	DO(check_username(info));
+	get_zone(zone_name, hostname->name);
+
+	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
 
 	char *request_buf = malloc(REQUEST_BUFFER_SIZE * sizeof(char));
 	if (!request_buf)
@@ -295,7 +297,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			CLOUDFLARE_ZONE_ID_REQUEST,
 			zone_name,
 			info->user_agent,
-			data.username,
+			info->creds.username,
 			info->creds.password);
 
 		if (request_len > REQUEST_BUFFER_SIZE) {
@@ -321,7 +323,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			data.zone_id,
 			hostname->name,
 			info->user_agent,
-			data.username,
+			info->creds.username,
 			info->creds.password);
 
 		if (request_len > REQUEST_BUFFER_SIZE) {
@@ -355,7 +357,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
 		data.zone_id, data.hostname_id,
 		info->user_agent,
-		data.username,
+		info->creds.username,
 		info->creds.password,
 		content_len, json_data);
 }

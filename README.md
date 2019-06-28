@@ -192,9 +192,8 @@ This looks for the default `.conf` file, to check any file, use:
          hostname = yourhost.example.com
     }
 	
-	# Note: username is your email, then the zone you are updating, separated by a slash.
 	provider cloudflare.com {
-         username = your_username/zone_name
+         username = your_email
          password = your_api_token
          hostname = yourhost.example.com
     }
