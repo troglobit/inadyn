@@ -1,4 +1,4 @@
-/* JSMN implementation file
+/* JSON helpers
  *
  * Copyright (C) 2019 SimonP
  *
@@ -19,7 +19,14 @@
  * Boston, MA  02110-1301, USA.
  */
 
-/* The implementation is included here; JSMN_HEADER should be defined for other includes. (Or just include json.h) */
+#ifndef INADYN_JSON_H_
+#define INADYN_JSON_H_
 
-#define JSMN_STRICT
+#define JSMN_HEADER
 #include "jsmn.h"
+
+int parse_json(const char *json, jsmntok_t *out_tokens[]);
+int jsoneq(const char *json, const jsmntok_t *tok, const char *s);
+int json_bool(const char *json, const jsmntok_t *token, int *out_value);
+
+#endif
