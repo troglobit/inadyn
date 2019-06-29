@@ -140,6 +140,9 @@ static int check_success_only(const char *json)
 	
 	num_tokens = parse_json(json, &tokens);	
 	
+	if (num_tokens == -1)
+		return -1;
+
 	int result = check_success(json, tokens, num_tokens);
 
 	free(tokens);
