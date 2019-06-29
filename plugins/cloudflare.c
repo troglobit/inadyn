@@ -140,7 +140,10 @@ static int check_success_only(const char *json)
 	
 	num_tokens = parse_json(json, &tokens);	
 	
-	return check_success(json, tokens, num_tokens);
+	int result = check_success(json, tokens, num_tokens);
+
+	free(tokens);
+	return result;
 }
 
 static int get_result_value(const char *json, const char *key, jsmntok_t *out_result)
@@ -155,25 +158,28 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 	
 	if (tokens[0].type != JSMN_OBJECT) {
 		logit(LOG_ERR, "JSON response contained no objects.");
-		free(tokens);
-		return -1;
+		goto cleanup;
 	}
 	
 	if (check_success(json, tokens, num_tokens) == -1) {
 		logit(LOG_ERR, "Request was unsuccessful.");
-		return -1;
+		goto cleanup;
 	}
 	
 	for (int i = 1; i < num_tokens; i++) {
 		if (jsoneq(json, tokens + i, key) == 0) {
 			if (i < num_tokens - 1) {
 				*out_result = tokens[i+1];
+				free(tokens);
 				return 0;
 			}
 		}
 	}
 	
 	logit(LOG_ERR, "Could not find key '%s'.", key);
+
+cleanup:
+	free(tokens);
 	return -1;
 }
 
