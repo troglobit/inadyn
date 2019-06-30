@@ -37,6 +37,11 @@ int parse_json(const char *json, jsmntok_t *out_tokens[])
 		return -1;
 	}
 
+	if (num_tokens == 0) {
+		logit(LOG_WARNING, "No JSON found in string.");
+		return -1;
+	}
+
 	*out_tokens = malloc(num_tokens * sizeof(jsmntok_t));
 
 	if (!(*out_tokens)) {
