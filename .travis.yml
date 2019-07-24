@@ -55,5 +55,5 @@ script:
   - DESTDIR=/tmp/tok make install-strip
   - tree /tmp/tok
   - ldd /tmp/tok/sbin/inadyn
-  - LD_LIBRARY_PATH=/tmp/lib /tmp/sbin/inadyn -h
+  - LD_LIBRARY_PATH=/tmp/lib /tmp/tok/sbin/inadyn -h
   - PKG_CONFIG_PATH=/tmp/lib/pkgconfig make package
