@@ -1,7 +1,6 @@
 Internet Automated Dynamic DNS Client
 =====================================
-[![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
-
+[![License Badge][]][License] [![Travis Status][]][Travis] [![Coverity Status][]][Coverity Scan]
 
 The latest release is always available from GitHub at  
 > https://github.com/troglobit/inadyn/releases
@@ -502,7 +501,10 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [GnuTLS]:           http://www.gnutls.org/
 [GitHub]:           https://github.com/troglobit/inadyn
 [buildsystem]:      https://airs.com/ian/configure/
+[License]:          https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+[License Badge]:    https://img.shields.io/badge/License-GPL%20v2-blue.svg
 [Travis]:           https://travis-ci.org/troglobit/inadyn
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
 [Coverity Status]:  https://scan.coverity.com/projects/2981/badge.svg
+
