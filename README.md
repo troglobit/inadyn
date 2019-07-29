@@ -104,8 +104,14 @@ how this can be done:
         username    = charlie
         password    = snoopy
         hostname    = { "peanuts", "woodstock" }
-	}
-    
+	}   
+
+    provider duckdns.org {
+        username         = YOUR_TOKEN
+        password         = noPasswordForDuckdns
+        hostname         = YOUR_DOMAIN.duckdns.org
+    }
+
     # With multiple usernames at the same provider, index with :#
     provider default@no-ip.com:1 {
         username    = ian
