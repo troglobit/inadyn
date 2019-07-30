@@ -155,7 +155,7 @@ int read_cache_file(ddns_t *ctx)
 
 		/* Exceptions -- no name to lookup */
 		for (i = 0; i < NELEMS(except); i++) {
-			if (!strncmp(name, except[i], sizeof(name))) {
+			if (!strncmp(name, except[i], strlen(name))) {
 				nonslookup = 1;
 				break;
 			}
