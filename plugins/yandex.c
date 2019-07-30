@@ -66,12 +66,13 @@ static jsmntok_t *get_tokens(const char *response, int *n) {
 	jsmntok_t   *t;
 	int	     r;
 
-	p = malloc(sizeof(p));
+	p = malloc(sizeof(*p));
 	if (!p) {
 		logit(LOG_ERR, "Not enough memory\n");
 		return NULL;
 	}
-	t = malloc(sizeof(t) * TOKENS_EXPECTED);
+
+	t = malloc(sizeof(*t) * TOKENS_EXPECTED);
 	if (!t) {
 		logit(LOG_ERR, "Not enough memory\n");
 		free(p);
