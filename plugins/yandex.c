@@ -61,20 +61,21 @@ static ddns_system_t plugin = {
 #define TOKENS_EXPECTED		4096
 
 // FIXME: remove and use parse_json instead
-static jsmntok_t *get_tokens(const char *response, int *n) {
+static jsmntok_t *get_tokens(const char *response, int *n)
+{
 	jsmn_parser *p;
 	jsmntok_t   *t;
 	int	     r;
 
 	p = malloc(sizeof(*p));
 	if (!p) {
-		logit(LOG_ERR, "Not enough memory\n");
+		logit(LOG_ERR, "Not enough memory");
 		return NULL;
 	}
 
 	t = malloc(sizeof(*t) * TOKENS_EXPECTED);
 	if (!t) {
-		logit(LOG_ERR, "Not enough memory\n");
+		logit(LOG_ERR, "Not enough memory");
 		free(p);
 		return NULL;
 	}
@@ -83,11 +84,13 @@ static jsmntok_t *get_tokens(const char *response, int *n) {
 	r = jsmn_parse(p, response, strlen(response), t, TOKENS_EXPECTED);
 	free(p);
 	*n = r;
-	if (r < 0){
+
+	if (r < 0) {
 		logit(LOG_ERR, "Failed to parse JSON");
 		free(t);
 		return NULL;
 	}
+
 	if ((r < 1) || (t[0].type != JSMN_OBJECT)) {
 		logit(LOG_ERR, "JSON object expected");
 		free(t);
@@ -97,31 +100,35 @@ static jsmntok_t *get_tokens(const char *response, int *n) {
 	return t;
 }
 
-static int success(const char *response) {
+static int success(const char *response)
+{
 	jsmntok_t *t;
 	int	   n, i;
-	int	   retval = 0;
+	int	   rc = 0;
 
 	t = get_tokens(response, &n);
 	if (!t)
 		return 0;
 
-	for (i = 1; i < n-1; i++) {
+	for (i = 1; i < n - 1; i++) {
 		jsmntok_t *tok = &t[i];
-		if (jsoneq(response, tok, "success") == 0) {
-			if (jsoneq(response, tok + 1, "ok") == 0) {
-				retval = 1;
-				goto out;
-			}
+
+		if (jsoneq(response, tok, "success"))
+			continue;
+
+		if (jsoneq(response, tok + 1, "ok") == 0) {
+			rc = 1;
+			break;
 		}
 	}
 
-out:
 	free(t);
-	return retval;
+
+	return rc;
 }
 
-static int get_record_id(const char *response, const char *subdomain){
+static int get_record_id(const char *response, const char *subdomain)
+{
 	jsmntok_t *t;
 	int	   n, i;
 	int	   record_id = 0;
@@ -234,7 +241,8 @@ static int get_record_id(const char *response, const char *subdomain){
 	return 0;
 }
 
-static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias) {
+static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
+{
 	http_t	     client;
 	http_trans_t trans;
 	char	     url[512];
@@ -312,7 +320,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias) {
 	return -1;
 }
 
-static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias) {
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
+{
 	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
