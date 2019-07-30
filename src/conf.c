@@ -254,7 +254,7 @@ static int parseproxy(const char *proxy, tcp_proxy_type_t *type, ddns_name_t *na
 				*type = PROXY_SOCKS4;
 			else {
 				len = tmp - str;
-				protocol = malloc(len + 1);
+				protocol = malloc(len + 2);
 				strncpy(protocol, str, len);
 				protocol[len + 1] = 0;
 				logit(LOG_ERR, "Unsupported proxy protocol '%s'.", protocol);
