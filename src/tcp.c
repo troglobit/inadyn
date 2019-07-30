@@ -163,15 +163,10 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 
 			logit(LOG_INFO, "%s, %sconnecting to %s([%s]:%d)", msg, tries ? "re" : "",
 			      tcp->remote_host, host, tcp->port);
-			if (connect(sd, sa, len)) {
+			if (connect(sd, sa, len) && check_error(sd, tcp->timeout)) {
+			next:
 				tries++;
 
-				if (!check_error(sd, tcp->timeout)) {
-					tcp->socket = sd;
-					tcp->initialized = 1;
-					break; /* OK */
-				}
-			next:
 				ai = ai->ai_next;
 				if (ai) {
 					logit(LOG_INFO, "Failed connecting to that server: %s",
@@ -183,6 +178,9 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 
 				logit(LOG_WARNING, "Failed connecting to %s: %s", tcp->remote_host, strerror(errno));
 				rc = RC_TCP_CONNECT_FAILED;
+			} else {
+				tcp->socket = sd;
+				tcp->initialized = 1;
 			}
 
 			break;
