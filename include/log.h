@@ -1,7 +1,6 @@
-/* Interface functions for CMD options parsing system
+/* Custom error logging system
  *
- * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,35 +17,23 @@
  * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301, USA.
-*/
+ */
 
-#ifndef INADYN_CMD_H_
-#define INADYN_CMD_H_
+#ifndef INADYN_LOG_H_
+#define INADYN_LOG_H_
 
-#include "error.h"
-typedef struct {
-	int argc;
-	char **argv;
-} cmd_data_t;
+#include <stdarg.h>
+#include "os.h"
 
-typedef int (*cmd_fn_t) (cmd_data_t *cmd, int no, void *context);
+void log_init  (char *ident, int log, int bg);
+void log_exit  (void);
 
-typedef struct {
-	cmd_fn_t func;
-	void *context;
-} cmd_handler_t;
+int  log_level (char *level);
 
-typedef struct {
-	char *option;
-	int argno;
-	cmd_handler_t handler;
-	char *description;
-} cmd_desc_t;
+void logit     (int prio, const char *fmt, ...);
+void vlogit    (int prio, const char *fmt, va_list args);
 
-int get_cmd_parse_data(char **argv, int argc, cmd_desc_t *desc);
-int cmd_add_val(cmd_data_t *cmd, char *val);
-
-#endif /* INADYN_CMD_H_ */
+#endif /* INADYN_LOG_H_ */
 
 /**
  * Local Variables:

@@ -1,7 +1,7 @@
 /* Error code definitions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,70 +29,51 @@ typedef struct {
 } ERROR_NAME;
 
 static const ERROR_NAME global_error_table[] = {
-	{RC_OK, "RC_OK"},
-	{RC_ERROR, "RC_ERROR"},
-	{RC_INVALID_POINTER, "RC_INVALID_POINTER"},
-	{RC_OUT_OF_MEMORY, "RC_OUT_OF_MEMORY"},
-	{RC_OUT_BUFFER_OVERFLOW, "RC_OUT_BUFFER_OVERFLOW"},
-	{RC_HTTPS_NO_TRUSTED_CA_STORE, "RC_HTTPS_NO_TRUSTED_CA_STORE"},
+	{ RC_OK,                          "OK"                               },
+	{ RC_ERROR,                       "Error"                            },
+	{ RC_INVALID_POINTER,             "Invalid pointer"                  },
+	{ RC_OUT_OF_MEMORY,               "Out of memory"                    },
+	{ RC_BUFFER_OVERFLOW,             "Too small internal buffer"        },
+	{ RC_PIDFILE_EXISTS_ALREADY,      "Already running"                  },
 
-	{RC_IP_SOCKET_CREATE_ERROR, "RC_IP_SOCKET_CREATE_ERROR"},
-	{RC_IP_BAD_PARAMETER, "RC_IP_BAD_PARAMETER"},
-	{RC_IP_INVALID_REMOTE_ADDR, "RC_IP_INVALID_REMOTE_ADDR"},
-	{RC_IP_CONNECT_FAILED, "RC_IP_CONNECT_FAILED"},
-	{RC_IP_SEND_ERROR, "RC_IP_SEND_ERROR"},
-	{RC_IP_RECV_ERROR, "RC_IP_RECV_ERROR"},
-	{RC_IP_OBJECT_NOT_INITIALIZED, "RC_IP_OBJECT_NOT_INITIALIZED"},
-	{RC_IP_OS_SOCKET_INIT_FAILED, "RC_IP_OS_SOCKET_INIT_FAILED"},
+	{ RC_TCP_SOCKET_CREATE_ERROR,     "Failed creating IP socket"        },
+	{ RC_TCP_BAD_PARAMETER,           "Invalid Internet port"            },
+	{ RC_TCP_INVALID_REMOTE_ADDR,     "Temporary network error (DNS)"    },
+	{ RC_TCP_CONNECT_FAILED,          "Failed connecting to DDNS server" },
+	{ RC_TCP_SEND_ERROR,              "Temporary network error (send)"   },
+	{ RC_TCP_RECV_ERROR,              "Temporary network error (recv)"   },
 
-	{RC_TCP_OBJECT_NOT_INITIALIZED, "RC_TCP_OBJECT_NOT_INITIALIZED"},
+	{ RC_TCP_OBJECT_NOT_INITIALIZED,  "Internal error (TCP)"             },
+	{ RC_HTTP_OBJECT_NOT_INITIALIZED, "Internal error (HTTP)"            },
 
-	{RC_HTTP_OBJECT_NOT_INITIALIZED, "RC_HTTP_OBJECT_NOT_INITIALIZED"},
-	{RC_HTTP_BAD_PARAMETER, "RC_HTTP_BAD_PARAMETER"},
+	{ RC_HTTPS_NO_TRUSTED_CA_STORE,   "System has no trusted CA store"             },
+	{ RC_HTTPS_OUT_OF_MEMORY,         "Out of memory (HTTPS)"                      },
+	{ RC_HTTPS_FAILED_CONNECT,        "Failed connecting to DDNS server (HTTPS)"   },
+	{ RC_HTTPS_FAILED_GETTING_CERT,   "Failed retrieving DDNS server cert (HTTPS)" },
+	{ RC_HTTPS_SEND_ERROR,            "Temporary network error (HTTPS send)"       },
+	{ RC_HTTPS_RECV_ERROR,            "Temporary network error (HTTPS recv)"       },
+	{ RC_HTTPS_SNI_ERROR,             "Failed setting HTTPS server name"           },
+	{ RC_HTTPS_INVALID_REQUEST,       "Invalid request (HTTPS)"                    },
 
-	{ RC_HTTPS_OUT_OF_MEMORY,       "RC_HTTPS_OUT_OF_MEMORY"       },
-	{ RC_HTTPS_FAILED_CONNECT,      "RC_HTTPS_FAILED_CONNECT"      },
-	{ RC_HTTPS_FAILED_GETTING_CERT, "RC_HTTPS_FAILED_GETTING_CERT" },
-	{ RC_HTTPS_NO_SSL_SUPPORT,      "RC_HTTPS_NO_SSL_SUPPORT"      },
-	{ RC_HTTPS_SEND_ERROR,          "RC_HTTPS_SEND_ERROR"          },
-	{ RC_HTTPS_RECV_ERROR,          "RC_HTTPS_RECV_ERROR"          },
-	{ RC_HTTPS_SNI_ERROR,           "RC_HTTPS_SNI_ERROR"           },
-	{ RC_HTTPS_INVALID_REQUEST,     "RC_HTTPS_INVALID_REQUEST"     },
+	{ RC_DDNS_INVALID_CHECKIP_RSP,    "Check IP server response not OK"  },
+	{ RC_DDNS_INVALID_OPTION,         "Invalid or missing DDNS option"   },
+	{ RC_DDNS_RSP_NOTOK,              "DDNS server response not OK"      },
+	{ RC_DDNS_RSP_RETRY_LATER,        "DDNS server busy, try later"      },
 
-	{RC_DYNDNS_BUFFER_TOO_SMALL, "RC_DYNDNS_BUFFER_TOO_SMALL"},
-	{RC_DYNDNS_INVALID_IP_ADDR_IN_HTTP_RESPONSE,
-	 "RC_DYNDNS_INVALID_IP_ADDR_IN_HTTP_RESPONSE"},
-	{RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER,
-	 "RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER"},
-	{RC_DYNDNS_TOO_MANY_ALIASES, "RC_DYNDNS_TOO_MANY_ALIASES"},
-	{RC_DYNDNS_INVALID_OPTION, "RC_DYNDNS_INVALID_OPTION"},
-	{RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS,
-	 "RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS"},
-	{RC_DYNDNS_UNRESOLVED_ALIAS, "RC_DYNDNS_UNRESOLVED_ALIAS"},
-	{RC_DYNDNS_RSP_NOTOK, "RC_DYNDNS_RSP_NOTOK"},
-	{RC_DYNDNS_RSP_RETRY_LATER, "RC_DYNDNS_RSP_RETRY_LATER"},
+	{ RC_OS_FORK_FAILURE,             "Failed forking off child"         },
+	{ RC_OS_CHANGE_PERSONA_FAILURE,   "Failed dropping privileges"       },
+	{ RC_OS_INVALID_UID,              "Invalid or unknown UID"           },
+	{ RC_OS_INVALID_GID,              "Invalid or unknown GID"           },
 
-	{RC_CMD_PARSER_INVALID_OPTION, "RC_CMD_PARSER_INVALID_OPTION"},
-	{RC_CMD_PARSER_INVALID_OPTION_ARGUMENT,
-	 "RC_CMD_PARSER_INVALID_OPTION_ARGUMENT"},
+	{ RC_FILE_IO_ACCESS_ERROR,        "Failed create/modify file/dir"    },
+	{ RC_FILE_IO_MISSING_FILE,        "Missing .conf file"               },
 
-	{RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER,
-	 "RC_OS_ERROR_INSTALLING_SIGNAL_HANDLER"},
-	{RC_OS_FORK_FAILURE, "RC_FORK_FAILURE"},
-	{RC_OS_CHANGE_PERSONA_FAILURE, "RC_OS_CHANGE_PERSONA_FAILURE"},
-	{RC_OS_INVALID_UID, "RC_OS_INVALID_UID"},
-	{RC_OS_INVALID_GID, "RC_OS_INVALID_GID"},
-
-	{RC_FILE_IO_OPEN_ERROR, "RC_FILE_IO_OPEN_ERROR"},
-	{RC_FILE_IO_READ_ERROR, "RC_FILE_IO_READ_ERROR"},
-	{RC_FILE_IO_OUT_OF_BUFFER, "RC_FILE_IO_OUT_OF_BUFFER"},
-
-	{RC_OK, NULL}
+	{ RC_OK, NULL }
 };
 
 static const char *unknown_error = "Unknown error";
 
-const char *errorcode_get_name(int rc)
+const char *error_str(int rc)
 {
 	const ERROR_NAME *it = global_error_table;
 

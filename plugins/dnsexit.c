@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,7 +31,7 @@
 	"myip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -58,17 +58,18 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.password,
 			alias->name,
 			alias->address,
-			info->server_name.name);
+			info->server_name.name,
+			info->user_agent);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	int   code = -1;
 	char *tmp;
 
 	DO(http_status_valid(trans->status));
 
-	tmp = strstr(trans->p_rsp_body, "\n");
+	tmp = strstr(trans->rsp_body, "\n");
 	if (tmp)
 		sscanf(++tmp, "%4d=", &code);
 
@@ -78,12 +79,12 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		return 0;
 	case 4:
 	case 11:
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 	default:
 		break;
 	}
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

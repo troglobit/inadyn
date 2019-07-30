@@ -1,6 +1,6 @@
 /* OpenSSL interface for optional HTTPS functions
  *
- * Copyright (C) 2014-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,23 +19,27 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "debug.h"
+#include "log.h"
 #include "http.h"
 #include "ssl.h"
 
 int ssl_init(void)
 {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	SSL_library_init();
 	SSL_load_error_strings();
 	OpenSSL_add_all_algorithms();
-
+#endif
+	
 	return 0;
 }
 
 void ssl_exit(void)
 {
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	ERR_free_strings();
 	EVP_cleanup();
+#endif
 }
 
 static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
@@ -74,7 +78,7 @@ static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 	 * it for something special
 	 */
 	if (!preverify_ok && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT)) {
-		X509_NAME_oneline(X509_get_issuer_name(ctx->current_cert), buf, sizeof(buf));
+		X509_NAME_oneline(X509_get_issuer_name(cert), buf, sizeof(buf));
 		logit(LOG_ERR, "issuer= %s", buf);
 	}
 
@@ -106,16 +110,36 @@ done:
 	return 0;
 }
 
+static int ssl_error_cb(const char *str, size_t len, void *data)
+{
+	size_t sz;
+	char buf[512];
+
+	memset(buf, 0, sizeof(buf));
+	sz = len < sizeof(buf) ? len : sizeof(buf) - 1;
+	memcpy(buf, str, sz);
+
+	logit(LOG_ERR, "OpenSSL error: %s", buf);
+
+	return 0;
+}
+
+static void ssl_check_error(void)
+{
+	ERR_print_errors_cb(ssl_error_cb, NULL);
+}
+
 int ssl_open(http_t *client, char *msg)
 {
-	char buf[256];
 	const char *sn;
+	char buf[512];
 	X509 *cert;
+	int rc;
 
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
 
-	tcp_set_port(&client->tcp, 443);
+	tcp_set_port(&client->tcp, HTTPS_DEFAULT_PORT);
 	DO(tcp_init(&client->tcp, msg));
 
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
@@ -142,9 +166,12 @@ int ssl_open(http_t *client, char *msg)
 	if (!SSL_set_tlsext_host_name(client->ssl, sn))
 		return RC_HTTPS_SNI_ERROR;
 
-	SSL_set_fd(client->ssl, client->tcp.ip.socket);
-	if (-1 == SSL_connect(client->ssl))
+	SSL_set_fd(client->ssl, client->tcp.socket);
+	rc = SSL_connect(client->ssl);
+	if (rc < 0) {
+		ssl_check_error();
 		return RC_HTTPS_FAILED_CONNECT;
+	}
 
 	logit(LOG_INFO, "SSL connection using %s", SSL_get_cipher(client->ssl));
 
@@ -168,12 +195,18 @@ int ssl_open(http_t *client, char *msg)
 int ssl_close(http_t *client)
 {
 	if (client->ssl_enabled) {
-		/* SSL/TLS close_notify */
-		SSL_shutdown(client->ssl);
+		if (client->ssl) {
+			/* SSL/TLS close_notify */
+			SSL_shutdown(client->ssl);
 
-		/* Clean up. */
-		SSL_free(client->ssl);
-		SSL_CTX_free(client->ssl_ctx);
+			/* Clean up. */
+			SSL_free(client->ssl);
+			client->ssl = NULL;
+		}
+		if (client->ssl_ctx) {
+			SSL_CTX_free(client->ssl_ctx);
+			client->ssl_ctx = NULL;
+		}
 	}
 
 	return tcp_exit(&client->tcp);
@@ -181,40 +214,46 @@ int ssl_close(http_t *client)
 
 int ssl_send(http_t *client, const char *buf, int len)
 {
-	int err;
+	int rc;
 
 	if (!client->ssl_enabled)
 		return tcp_send(&client->tcp, buf, len);
 
-	err = SSL_write(client->ssl, buf, len);
-	if (err <= 0)
-		/* XXX: TODO add SSL_get_error() to figure out why */
+	rc = SSL_write(client->ssl, buf, len);
+	if (rc <= 0) {
+		ssl_check_error();
 		return RC_HTTPS_SEND_ERROR;
+	}
 
-	logit(LOG_DEBUG, "Successfully sent DDNS update using HTTPS!");
+	logit(LOG_DEBUG, "Successfully sent HTTPS request!");
 
 	return 0;
 }
 
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
-	int len, err;
+	int len, rc;
 
+	*recv_len = 0;
 	if (!client->ssl_enabled)
 		return tcp_recv(&client->tcp, buf, buf_len, recv_len);
 
 	/* Read HTTP header */
-	len = err = SSL_read(client->ssl, buf, buf_len);
-	if (err <= 0)
-		/* XXX: TODO add SSL_get_error() to figure out why */
+	len = rc = SSL_read(client->ssl, buf, buf_len);
+	if (rc <= 0) {
+		ssl_check_error();
 		return RC_HTTPS_RECV_ERROR;
+	}
+	*recv_len += len;
 
 	/* Read HTTP body */
-	*recv_len = SSL_read(client->ssl, &buf[len], buf_len - len);
-	if (*recv_len <= 0)
-		*recv_len = 0;
+	len = rc = SSL_read(client->ssl, &buf[len], buf_len - len);
+	if (rc <= 0) {
+		ssl_check_error();
+		len = 0;
+	}
 	*recv_len += len;
-	logit(LOG_DEBUG, "Successfully received DDNS update response (%d bytes) using HTTPS!", *recv_len);
+	logit(LOG_DEBUG, "Successfully received HTTPS response (%d bytes)!", *recv_len);
 
 	return 0;
 }

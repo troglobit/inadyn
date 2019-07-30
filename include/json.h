@@ -1,8 +1,6 @@
-/* Custom error logging system
+/* JSON helpers
  *
- * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2019 SimonP
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,23 +19,14 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#ifndef INADYN_DEBUG_H_
-#define INADYN_DEBUG_H_
+#ifndef INADYN_JSON_H_
+#define INADYN_JSON_H_
 
-#include <stdarg.h>
-#include "os.h"
+#define JSMN_HEADER
+#include "jsmn.h"
 
-extern char *__progname;
+int parse_json(const char *json, jsmntok_t *out_tokens[]);
+int jsoneq(const char *json, const jsmntok_t *tok, const char *s);
+int json_bool(const char *json, const jsmntok_t *token, int *out_value);
 
-int  loglvl (char *level);
-void logit  (int prio, const char *fmt, ...);
-void vlogit (int prio, const char *fmt, va_list args);
-
-#endif /* INADYN_DEBUG_H_ */
-
-/**
- * Local Variables:
- *  indent-tabs-mode: t
- *  c-file-style: "linux"
- * End:
- */
+#endif

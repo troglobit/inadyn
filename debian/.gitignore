@@ -1,0 +1,7 @@
+*~
+*.log
+*.debhelper
+*.substvars
+inadyn/*
+files
+debhelper-build-stamp

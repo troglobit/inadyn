@@ -1,7 +1,7 @@
 Example /etc/inadyn.conf files
 ==============================
 
-This directory holds a few examplel configuration files for common
+This directory holds a few example configuration files for common
 DDNS providers.  Please feel free to submit pull requests for your
 examples at GitHub! :)
 
@@ -27,4 +27,3 @@ Example
 
 See the the system logfile for progress and the inadyn man page for
 debugging help, should you run into problems.
-

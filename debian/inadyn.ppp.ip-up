@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# ip-up script for inadyn
+# based on script from ddclient package
+
+# # These variables are for the use of the scripts run by run-parts
+# PPP_IFACE="$1"
+# PPP_TTY="$2"
+# PPP_SPEED="$3"
+# PPP_LOCAL="$4"
+# PPP_REMOTE="$5"
+# PPP_IPPARAM="$6"
+
+
+# only run inadyn, if it is installed
+if [ ! -x /usr/bin/inadyn ]; then
+  exit 0
+fi
+
+# Check, if this script is activated
+if [ -r /etc/default/inadyn ]; then
+  . /etc/default/inadyn
+
+  RUN_IPUP=${RUN_IPUP:-no}
+  USER=${USER:-debian-inadyn}
+  GROUP=${GROUP:-debian-inadyn}
+
+  if [ ! $RUN_IPUP = "yes" ]; then
+    exit 0
+  fi
+  # Check, if config exist
+  if [ ! -r /etc/inadyn.conf ]; then
+    exit 0
+  fi
+  # Check, if this is the interface used for DynDNS (there could be other pppds)
+  eval `sed -n 's/^[[:blank:]]*\(iface[[:blank:]]\+[[:alnum:]]\+\)[[:blank:]]*$/\1/p' \
+          /etc/inadyn.conf | tr -s '[:blank:]' '='`
+  if [ ! "x$iface" = "x$PPP_IFACE" ]; then
+    exit 0
+  fi
+else
+  # No configuration defaults file, so do not run
+  exit 0
+fi
+
+
+PIDFILE=/tmp/inadyn.pid
+
+# Run inadyn
+/usr/bin/inadyn --config /etc/inadyn.conf --iterations 1 \
+    --drop-privs $USER:$GROUP --pidfile "$PIDFILE"
+
+# Remove pidfile
+[ -f "$PIDFILE" ] && rm -f "$PIDFILE"

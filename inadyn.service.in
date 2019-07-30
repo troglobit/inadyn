@@ -3,7 +3,7 @@ Description=Internet Dynamic DNS Client
 Documentation=man:inadyn
 Documentation=man:inadyn.conf
 Documentation=https://github.com/troglobit/inadyn
-ConditionPathExists=/etc/inadyn.conf
+ConditionPathExists=@SYSCONFDIR@/inadyn.conf
 After=network-online.target
 Requires=network-online.target
 

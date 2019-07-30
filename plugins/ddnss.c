@@ -29,7 +29,7 @@
 	" "								\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -42,6 +42,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ddnss.de",
 	.server_url   = "/upd.php"
@@ -55,19 +56,20 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			info->creds.password,
 			alias->name,
-			info->server_name.name);
+			info->server_name.name,
+			info->user_agent);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->p_rsp_body;
+	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
 	if (strstr(resp, "Updated"))
 		return 0;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

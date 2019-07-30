@@ -28,7 +28,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"           \
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -49,24 +49,25 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-					DUIADNS_UPDATE_IP_HTTP_REQUEST,
-					info->server_url,
-					alias->name,
-					alias->address,
-					info->server_name.name,
-					info->creds.encoded_password);
+			DUIADNS_UPDATE_IP_HTTP_REQUEST,
+			info->server_url,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->p_rsp_body;
+	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
 	if (strstr(resp, "Hostname "))
 		return RC_OK;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

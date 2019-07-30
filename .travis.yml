@@ -16,11 +16,17 @@ env:
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "JFknJb+purjGIPuKNWFBPlsSLX6KohuYmYV4dmisIhjkeFhhXFQNmoabYQ6D+r/mWYPWiNnohoTSyKv8gjj6eC1SbXb+f2dEXHrmAwr36Enbp2tV0XLx7V2KHZzUmKeJxOSwnNUVZxmSvzVbuiDodtU1PJ2YPK0CM0KF/J+wePA="
 
+dist: xenial
+
 addons:
   apt:
     packages:
       - tree
+      - fakeroot
+      - debhelper
+      - dh-systemd
       - libconfuse-dev
+      - libgnutls28-dev
   coverity_scan:
     project:
       name: "troglobit/inadyn"
@@ -31,22 +37,23 @@ addons:
     branch_pattern: dev
 
 install:
-  - wget https://github.com/troglobit/libite/releases/download/v1.5.0/libite-1.5.0.tar.xz
-  - tar xf libite-1.5.0.tar.xz
-  - (cd libite-1.5.0 && ./configure --prefix=/tmp && make && make install-strip)
   - wget https://github.com/martinh/libconfuse/releases/download/v3.0/confuse-3.0.tar.xz
   - tar xf confuse-3.0.tar.xz
   - (cd confuse-3.0 && ./configure --prefix=/tmp --disable-examples && make && make install-strip)
 
 script:
   - ./autogen.sh
-  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/ --disable-ssl
   - make clean
   - make V=1 -j5
-  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/tmp --enable-openssl
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/
   - make clean
   - make V=1 -j5
-  - make install-strip
-  - tree /tmp
-  - ldd /tmp/sbin/inadyn
-  - LD_LIBRARY_PATH=/tmp/lib /tmp/sbin/inadyn -h
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/ --enable-openssl
+  - make clean
+  - make V=1 -j5
+  - DESTDIR=/tmp/tok make install-strip
+  - tree /tmp/tok
+  - ldd /tmp/tok/sbin/inadyn
+  - LD_LIBRARY_PATH=/tmp/lib /tmp/tok/sbin/inadyn -h
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig make package

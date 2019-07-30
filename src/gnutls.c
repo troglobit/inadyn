@@ -1,6 +1,6 @@
 /* GnuTLS interface for optional HTTPS functions
  *
- * Copyright (C) 2014-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,12 +19,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include <stdint.h>
 #include <gnutls/x509.h>
 
-#include "debug.h"
+#include "log.h"
 #include "http.h"
 #include "ssl.h"
 
+extern char *prognm;
 static gnutls_certificate_credentials_t xcred;
 
 
@@ -140,7 +142,7 @@ done:
 int ssl_init(void)
 {
 	if (!gnutls_check_version("3.1.4")) {
-		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", __progname);
+		logit(LOG_ERR, "%s requires GnuTLS 3.1.4 or later for SSL", prognm);
 		exit(1);
 	}
 
@@ -217,12 +219,12 @@ int ssl_open(http_t *client, char *msg)
 	gnutls_credentials_set(client->ssl, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	/* connect to the peer */
-	tcp_set_port(&client->tcp, 443);
+	tcp_set_port(&client->tcp, HTTPS_DEFAULT_PORT);
 	DO(tcp_init(&client->tcp, msg));
 
 	/* Forward TCP socket to GnuTLS, the set_int() API is perhaps too new still ... since 3.1.9 */
-//	gnutls_transport_set_int(client->ssl, client->tcp.ip.socket);
-	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.ip.socket);
+//	gnutls_transport_set_int(client->ssl, client->tcp.socket);
+	gnutls_transport_set_ptr(client->ssl, (gnutls_transport_ptr_t)(intptr_t)client->tcp.socket);
 
 	/* Perform the TLS handshake, ignore non-fatal errors. */
 	do {
@@ -283,7 +285,7 @@ int ssl_send(http_t *client, const char *buf, int len)
 	if (ret < 0)
 		return RC_HTTPS_SEND_ERROR;
 
-	logit(LOG_DEBUG, "Successfully sent DDNS update using HTTPS!");
+	logit(LOG_DEBUG, "Successfully sent HTTPS request!");
 
 	return 0;
 }
@@ -300,8 +302,11 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 		ret = gnutls_record_recv(client->ssl, buf, len);
 	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-	if (ret < 0)
+	if (ret < 0) {
+		logit(LOG_WARNING, "Failed receiving GnuTLS header response: %s",
+		      gnutls_strerror(ret));
 		return RC_HTTPS_RECV_ERROR;
+	}
 
 	/* Read HTTP body */
 	len = ret;
@@ -314,11 +319,14 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 		}
 	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-	if (ret < 0)
+	if (ret < 0 && ret != GNUTLS_E_PREMATURE_TERMINATION) {
+		logit(LOG_WARNING, "Failed receiving GnuTLS body response: %s",
+		      gnutls_strerror(ret));
 		return RC_HTTPS_RECV_ERROR;
+	}
 
 	*recv_len = len;
-	logit(LOG_DEBUG, "Successfully received DDNS update response (%d bytes) using HTTPS!", len);
+	logit(LOG_DEBUG, "Successfully received HTTPS response (%d bytes)!", len);
 
 	return 0;
 }

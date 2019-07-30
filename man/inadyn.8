@@ -4,29 +4,31 @@
 .\" groff -man -Tascii foo.1
 .\"
 .\" Copyright (C) 2004       Shaul Karl.
-.\" Copyright (C) 2010-2015  Joachim Nilsson.
+.\" Copyright (C) 2010-2017  Joachim Nilsson.
 .\"
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd July 14, 2015
+.Dd June 28, 2017
 .Dt INADYN 8 SMM
 .Os
 .Sh NAME
 .Nm inadyn
-.Nd Update your Internet DNS name on demand
+.Nd Internet Automated Dynamic DNS Client
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl 1, -once
+.Op Fl -cache-dir=PATH
 .Op Fl c, -cmd=/path/to/cmd
-.Op Fl -continue-on-error
+.Op Fl C, -continue-on-error
 .Op Fl e, -exec=/path/to/cmd
 .Op Fl f, -config=FILE
 .Op Fl h, -help
 .Op Fl i, -iface=IFNAME
+.Op Fl I, -ident=NAME
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
-.Op Fl --pidfile=NAME
+.Op Fl P, -pidfile=FILE
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
 .Op Fl t, -startup-delay=SEC
@@ -44,15 +46,21 @@ are listed below.  Some of these services are free of charge for
 non-commercial use, others take a small fee, but also provide more
 domain names to choose from.
 .Pp
+.Nm
+defaults to HTTPS for all providers, some may however not support this
+so try disabling SSL for your provider in case of problems.  Providers
+known to support SSL updates are listed below with
+.Sy https :
+.Pp
 .Bl -bullet -compact
 .It
 .Aq http://www.dyndns.org
 a.k.a.
 .Aq http://dyn.com
 .It
-.Aq http://freedns.afraid.org
+.Aq https://freedns.afraid.org
 .It
-.Aq http://zoneedit.com
+.Aq https://zoneedit.com
 .It
 .Aq http://www.no-ip.com
 .It
@@ -62,7 +70,7 @@ a.k.a.
 .It
 .Aq http://www.3322.org
 .It
-.Aq http://www.dnsomatic.com
+.Aq https://www.dnsomatic.com
 .It
 .Aq http://www.tunnelbroker.net
 .It
@@ -82,7 +90,7 @@ a.k.a.
 .It
 .Aq https://nsupdate.info
 .It
-.Aq http://duckdns.org
+.Aq https://duckdns.org
 .It
 .Aq https://www.loopia.com
 .It
@@ -100,13 +108,23 @@ a.k.a.
 .It
 .Aq https://ddnss.de
 .It
-.Aq http://.dynv6.com
+.Aq http://dynv6.com
 .It
 .Aq http://ipv4.dynv6.com
 .It
 .Aq https://spdyn.de
 .It
 .Aq https://www.strato.com
+.It
+.Aq https://freemyip.com
+.It
+.Aq https://www.cloudxns.net
+.It
+.Aq https://www.dnspod.cn
+.It
+.Aq https://www.dynu.com
+.It
+.Aq https://www.selfhost.de
 .El
 .Pp
 DDNS providers not listed here, like
@@ -121,20 +139,44 @@ supported more command line options, from v2.0
 .Nm
 has been greatly simplified.  See
 .Xr inadyn.conf 5
-for defails of the
+for details of the
 .Pa /etc/inadyn.conf
 configuration file format.
 .Pp
 .Bl -tag -width Ds
 .It Fl 1, -once
 Force one update and quit
-.It Fl c, -cmd=/path/to/cmd Op optional args or pipe
+.It Fl -cache-dir=PATH
+Set directory for persistent cache files, defaults to
+.Pa /var/cache/inadyn
+.Pp
+The cache files are used to keep track of which addresses have been
+successfully sent to their respective DDNS provider and when.  The
+latter 'when' is important to prevent
+.Nm
+from banning you for excessive updates.
+.Pp
+When restarting
+.Nm
+or rebooting your server, or embedded device,
+.Nm
+reads the cache files to seed its internal data structures with the last
+sent IP address and when the update was performed.  It is therefore very
+important to both have a cache file and for it to have the correct time
+stamp.  The absence of a cache file will currently cause a forced
+update.
+.Pp
+On an embedded device with no RTC, or no battery backed RTC, it is
+strongly recommended to pair this setting with the
+.Fl -startup-delay=SEC
+command line option.
+.It Fl c, -cmd=/path/to/cmd Op optional args
 Full path to command, or script, to run to check for IP address change.
 This is the same as the configuration file option
 .Ar checkip-command
 but will apply to
 .Sy all
-providers.  This command line option is only provided for convenence, it
+providers.  This command line option is only provided for convenience, it
 is recommended to instead use the configuration file.  For more details,
 see the
 .Xr inadyn.conf 5
@@ -185,23 +227,45 @@ check-ip servers are slow to respond.
 This option can also be given as a configuration option in
 .Xr inadyn.conf 5 ,
 both serve a purpose, use whichever one works for you.
+.It Fl I, Fl -ident=NAME
+Specify program identity (name) to be used for PID file and syslog
+messages.  Useful with multiple instances of
+.Nm ,
+or to simply replace the
+.Nm
+name with something more generic, e.g. "DDNS", without renaming the
+binary.  Note, this option only changes the base name of the PID file,
+not the location, which is system specific.  Usually
+.Pa /var/run/inadyn.pid
+or
+.Pa /run/inadyn.pid .
 .It Fl l, -loglevel Ar LEVEL
 Set log level: none, err, info,
 .Ar notice ,
-debug
-.It Fl n, -forground
-Run in foreground, default is to daemonize and background.
-.It Fl -pidfile Ar NAME
-Override basename of default PID file.  Useful if running multiple
-instances of
-.Nm .
-With this option you can change the base name of the PID file, not the
-location, which is system specific.  Usually
-.Pa /var/run/inadyn.pid ,
-or
-.Pa /run/inadyn.pid .
+debug.  The default is
+.Ar notice ,
+but you might want to set this to
+.Fl l Ar warning .
+.It Fl n, -foreground
+Run in foreground, default is to daemonize and continue in the
+background.  This option is usually required when running under process
+supervisors like systemd and Finit, but is also useful when running from
+the terminal, when debugging a config or at initial set up.  Remember to
+also give the
+.Fl s
+option if you still want to redirect log messages to the syslog.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
+.It Fl P, -pidfile=FILE
+Set PID file name and location, defaults to
+.Pa /run/inadyn.pid ,
+derived from
+.Fl -ident=NAME ,
+which is strongly recommended to change over this option.  However, some
+users want to keep application runtime files in separate directories,
+usually in combination with
+.Fl -drop-privs ,
+for such cases this is the option to use.
 .It Fl s, -syslog
 Use
 .Xr syslog 3
@@ -280,7 +344,7 @@ writes its process ID to
 .Sh FILES
 .Bl -tag -width /var/cache/inadyn/freedns.afraid.org.cache -compact
 .It Pa /etc/inadyn.conf
-.It Pa /var/run/inadyn.pid
+.It Pa /run/inadyn.pid
 .It Pa /var/cache/inadyn/dyndns.org.cache
 .It Pa /var/cache/inadyn/freedns.afraid.org.cache
 .It Pa ... one .cache file per DDNS provider
@@ -304,4 +368,4 @@ This manual page was originally written for the
 .Em Debian GNU/Linux
 project by Shaul Karl
 .Aq mailto:shaul@debian.org ,
-but is now maintained by Joachim Nilsson.
+and is currently maintained by Joachim Nilsson.

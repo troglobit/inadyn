@@ -1,6 +1,6 @@
 /* Plugin for DtDNS
  *
- * Copyright (C) 2014-2015  Google, Inc
+ * Copyright (C) 2014-2017  Google, Inc
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -54,19 +54,20 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->name,
 			info->creds.password,
 			alias->address,
-			info->server_name.name);
+			info->server_name.name,
+			info->user_agent);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->p_rsp_body;
+	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
 	if (strstr(resp, "now points to"))
 		return RC_OK;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

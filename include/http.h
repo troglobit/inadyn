@@ -1,7 +1,7 @@
 /* Interface for HTTP functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,6 +41,7 @@
 
 #define HTTP_DEFAULT_TIMEOUT	10000	/* msec */
 #define	HTTP_DEFAULT_PORT	80
+#define	HTTPS_DEFAULT_PORT	443
 
 typedef struct {
 	tcp_sock_t tcp;
@@ -59,14 +60,14 @@ typedef struct {
 } http_t;
 
 typedef struct {
-	char *p_req;
+	char *req;
 	int   req_len;
 
-	char *p_rsp;
-	int   max_rsp_len;
+	char *rsp;
 	int   rsp_len;
+	int   max_rsp_len;
 
-	char *p_rsp_body;
+	char *rsp_body;
 
 	int   status;
 	char  status_desc[256];

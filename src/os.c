@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2003-2004  Narcis Ilisei
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,51 +21,12 @@
  */
 
 #include <libgen.h>		/* dirname() */
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <time.h>
-#include <unistd.h>
-
-#define SYSLOG_NAMES
-#include <syslog.h>
-
-#include "os.h"
-#include "debug.h"
-#include "ddns.h"
+#include "log.h"
 #include "cache.h"
 
 static void *param = NULL;
 
-
-int loglvl(char *level)
-{
-	for (int i = 0; prioritynames[i].c_name; i++) {
-		if (string_match(prioritynames[i].c_name, level))
-			return prioritynames[i].c_val;
-	}
-
-	return atoi(level);
-}
-
-void vlogit(int prio, const char *fmt, va_list args)
-{
-	if (loglevel == INTERNAL_NOPRI)
-		return;
-
-	vsyslog(prio, fmt, args);
-}
-
-void logit(int prio, const char *fmt, ...)
-{
-	va_list args;
-
-	va_start(args, fmt);
-	vlogit(prio, fmt, args);
-	va_end(args);
-}
 
 /**
  * Execute shell script on successful update.
@@ -179,7 +140,7 @@ int os_install_signal_handler(void *ctx)
 	}
 
 	if (rc) {
-		logit(LOG_WARNING, "Failed installing signal handler: %s", errorcode_get_name(rc));
+		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
 
@@ -195,7 +156,7 @@ int os_install_signal_handler(void *ctx)
  * the IP -- and the user will be locked-out of their DDNS server provider
  * for excessive updates.
  */
-int os_check_perms(void *UNUSED(arg))
+int os_check_perms(void)
 {
 	/* Create files with permissions 0644 */
 	umask(S_IWGRP | S_IWOTH);
@@ -203,13 +164,38 @@ int os_check_perms(void *UNUSED(arg))
 	if ((mkpath(cache_dir, 0755) && errno != EEXIST) || access(cache_dir, W_OK)) {
 		logit(LOG_ERR, "No write permission to %s, aborting.", cache_dir);
 		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
-
 		return RC_FILE_IO_ACCESS_ERROR;
+	}
+
+	if (chown(cache_dir, uid, gid)) {
+		logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", cache_dir);
+		return RC_FILE_IO_ACCESS_ERROR;
+	}
+
+	if (pidfile_name && pidfile_name[0] == '/') {
+		char *pidfile_dir;
+
+		if (!access(pidfile_name, F_OK)) {
+			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, prognm);
+			return RC_PIDFILE_EXISTS_ALREADY;
+		}
+
+		pidfile_dir = dirname(strdupa(pidfile_name));
+		if (access(pidfile_dir, F_OK)) {
+			if (mkpath(pidfile_dir, 0755) && errno != EEXIST) {
+				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
+				return RC_FILE_IO_ACCESS_ERROR;
+			}
+
+			if (chown(pidfile_dir, uid, gid)) {
+				logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", pidfile_dir);
+				return RC_FILE_IO_ACCESS_ERROR;
+			}
+		}
 	}
 
 	return 0;
 }
-
 
 /**
  * Local Variables:

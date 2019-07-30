@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2003-2004  Narcis Ilisei
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,13 +58,8 @@
 
 #include "error.h"
 
-typedef struct {
-	uid_t uid;
-	gid_t gid;
-} ddns_user_t;
-
 int os_install_signal_handler (void *ctx);
-int os_check_perms            (void *arg);
+int os_check_perms            (void);
 int os_shell_execute          (char *cmd, char *ip, char *hostname);
 
 #endif /* INADYN_OS_H_ */

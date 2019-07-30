@@ -11,10 +11,11 @@
  *   - nsupdate.info
  *   - Google Domains
  *   - SPDYN
+ *   - Dynu
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,6 +47,7 @@ static ddns_system_t dyndns = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "members.dyndns.org",
 	.server_url   = "/nic/update"
@@ -73,8 +75,24 @@ static ddns_system_t dynsip = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dynsip.org",
+	.server_url   = "/nic/update"
+};
+
+/* Support HOSTNAME.selfhost.eu, see issue #215 */
+static ddns_system_t selfhost = {
+	.name         = "default@selfhost.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "carol.selfhost.de",
 	.server_url   = "/nic/update"
 };
 
@@ -86,6 +104,7 @@ static ddns_system_t noip = {
 
 	.checkip_name = "ip1.dynupdate.no-ip.com",
 	.checkip_url  = "/",
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dynupdate.no-ip.com",
 	.server_url   = "/nic/update"
@@ -130,6 +149,7 @@ static ddns_system_t tunnelbroker = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ipv4.tunnelbroker.net",
 	.server_url   = "/nic/update"
@@ -147,6 +167,7 @@ static ddns_system_t spdyn = {
 
 	.checkip_name = "checkip4.spdyn.de",
 	.checkip_url  = "/",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_UNSUPPORTED,
 
 	.server_name  = "update.spdyn.de",
 	.server_url   = "/nic/update"
@@ -191,8 +212,22 @@ static ddns_system_t googledomains = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "domains.google.com",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t dynu = {
+	.name         = "default@dynu.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "checkip.dynu.com",
+	.checkip_url  = "/",
+
+	.server_name  = "api.dynu.com",
 	.server_url   = "/nic/update"
 };
 
@@ -211,6 +246,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&dyndns);
 	plugin_register(&dnsomatic);
 	plugin_register(&dynsip);
+	plugin_register(&selfhost);
 	plugin_register(&noip);
 	plugin_register(&_3322);
 	plugin_register(&henet);
@@ -219,6 +255,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&nsupdate_info_ipv4);
 	plugin_register(&loopia);
 	plugin_register(&googledomains);
+	plugin_register(&dynu);
 }
 
 PLUGIN_EXIT(plugin_exit)
@@ -226,6 +263,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndns);
 	plugin_unregister(&dnsomatic);
 	plugin_unregister(&dynsip);
+	plugin_unregister(&selfhost);
 	plugin_unregister(&noip);
 	plugin_unregister(&_3322);
 	plugin_unregister(&henet);
@@ -234,6 +272,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&nsupdate_info_ipv4);
 	plugin_unregister(&loopia);
 	plugin_unregister(&googledomains);
+	plugin_unregister(&dynu);
 }
 
 /**

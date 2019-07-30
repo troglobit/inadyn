@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,32 +21,32 @@
  * Boston, MA  02110-1301, USA.
  */
 
-#include <arpa/nameser.h>
-#include <net/if.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <ifaddrs.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <net/if.h>
 
 #include "ddns.h"
 #include "cache.h"
-#include "debug.h"
+#include "log.h"
 #include "base64.h"
 #include "md5.h"
 #include "sha1.h"
-#include "cmd.h"
 
 /* Conversation with the checkip server */
 #define DYNDNS_CHECKIP_HTTP_REQUEST  					\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 /* Used to preserve values during reset at SIGHUP.  Time also initialized from cache file at startup. */
 static int cached_num_iterations = 0;
@@ -117,7 +117,7 @@ static int get_req_for_ip_server(ddns_t *ctx, ddns_info_t *info)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			DYNDNS_CHECKIP_HTTP_REQUEST, info->checkip_url,
-			info->checkip_name.name);
+			info->checkip_name.name, info->user_agent);
 }
 
 /*
@@ -135,7 +135,7 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 	}
 
 	client = &provider->checkip;
-	client->ssl_enabled = 0;
+	client->ssl_enabled = provider->checkip_ssl;
 	DO(http_init(client, "Checking for IP# change"));
 
 	/* Prepare request for IP server */
@@ -145,18 +145,19 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	trans              = &ctx->http_transaction;
 	trans->req_len     = get_req_for_ip_server(ctx, provider);
-	trans->p_req       = ctx->request_buf;
-	trans->p_rsp       = ctx->work_buf;
+	trans->req         = ctx->request_buf;
+	trans->rsp         = ctx->work_buf;
 	trans->max_rsp_len = ctx->work_buflen - 1;	/* Save place for terminating \0 in string. */
 
 	logit(LOG_DEBUG, "Querying DDNS checkip server for my public IP#: %s", ctx->request_buf);
 
 	rc = http_transaction(client, &ctx->http_transaction);
 	if (trans->status != 200)
-		rc = RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER;
+		rc = RC_DDNS_INVALID_CHECKIP_RSP;
 
 	http_exit(client);
-	logit(LOG_DEBUG, "Checked my IP, return code: %d", rc);
+	logit(LOG_DEBUG, "Server response: %s", trans->rsp);
+	logit(LOG_DEBUG, "Checked my IP, return code %d: %s", rc, error_str(rc));
 
 	return rc;
 }
@@ -309,13 +310,13 @@ static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, siz
 		return 1;
 
 	DO(server_transaction(ctx, info));
-	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.p_rsp)
+	if (!ctx || ctx->http_transaction.rsp_len <= 0 || !ctx->http_transaction.rsp)
 		return RC_INVALID_POINTER;
 
 	logit(LOG_DEBUG, "IP server response:");
 	logit(LOG_DEBUG, "%s", ctx->work_buf);
 
-	DO(parse_my_address(ctx->http_transaction.p_rsp_body, address, len));
+	DO(parse_my_address(ctx->http_transaction.rsp_body, address, len));
 
 	return 0;
 }
@@ -341,7 +342,7 @@ static int get_ipv4_address_iface(const char *ifname, char *address, size_t len)
 
 	sd = socket(PF_INET, SOCK_DGRAM, 0);
 	if (sd < 0) {
-		logit(LOG_WARNING, "Failed opening network socket: %m");
+		logit(LOG_WARNING, "Failed opening network socket: %s", strerror(errno));
 		return 1;
 	}
 
@@ -353,7 +354,7 @@ static int get_ipv4_address_iface(const char *ifname, char *address, size_t len)
 	close(sd);
 
 	if (result < 0) {
-		logit(LOG_ERR, "Failed reading IP address of interface %s: %m", ifname);
+		logit(LOG_ERR, "Failed reading IP address of interface %s: %s", ifname, strerror(errno));
 		return 1;
 	}
 
@@ -459,11 +460,12 @@ static int get_address(ddns_t *ctx)
 	info = conf_info_iterator(1);
 	while (info) {
 		int anychange = 0;
+		size_t i;
 
 		if (get_address_backend(ctx, info, address, sizeof(address)))
 			goto next;
 
-		for (size_t i = 0; i < info->alias_count; i++) {
+		for (i = 0; i < info->alias_count; i++) {
 			ddns_alias_t *alias = &info->alias[i];
 
 			alias->ip_has_changed = strncmp(alias->address, address, sizeof(alias->address)) != 0;
@@ -507,7 +509,9 @@ static int check_alias_update_table(ddns_t *ctx)
 	 * iterate over servernum, but not if it's fix set to =! 0 */
 	info = conf_info_iterator(1);
 	while (info) {
-		for (size_t i = 0; i < info->alias_count; i++) {
+		size_t i;
+
+		for (i = 0; i < info->alias_count; i++) {
 			int override;
 			ddns_alias_t *alias = &info->alias[i];
 
@@ -539,6 +543,9 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	http_trans_t   trans;
 	http_t        *client = &info->server;
 
+	if (info->system->setup)
+		DO(info->system->setup(ctx, info, alias));
+
 	client->ssl_enabled = info->ssl_enabled;
 	rc = http_init(client, "Sending IP# update to DDNS server");
 	if (rc) {
@@ -552,8 +559,8 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	memset(&trans, 0, sizeof(trans));
 
 	trans.req_len     = info->system->request(ctx, info, alias);
-	trans.p_req       = (char *)ctx->request_buf;
-	trans.p_rsp       = (char *)ctx->work_buf;
+	trans.req         = (char *)ctx->request_buf;
+	trans.rsp         = (char *)ctx->work_buf;
 	trans.max_rsp_len = ctx->work_buflen - 1;	/* Save place for a \0 at the end */
 
 	if (trans.req_len < 0) {
@@ -572,20 +579,21 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	logit(LOG_DEBUG, "Sending alias table update to DDNS server: %s", ctx->request_buf);
 
 	rc = http_transaction(client, &trans);
-	logit(LOG_DEBUG, "DDNS server response: %s", trans.p_rsp);
-
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
+		logit(LOG_WARNING, "HTTP(S) Transaction failed, error %d: %s", rc, error_str(rc));
+		logit(LOG_INFO, "Update failed, forced update/retry in %d sec ...", ctx->cmd_check_period);
 		ctx->force_addr_update = 1;
 		goto exit;
 	}
+	logit(LOG_DEBUG, "DDNS server response: %s", trans.rsp);
 
 	rc = info->system->response(&trans, info, alias);
 	if (rc) {
 		logit(LOG_WARNING, "%s error in DDNS server response:",
-		      rc == RC_DYNDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
+		      rc == RC_DDNS_RSP_RETRY_LATER ? "Temporary" : "Fatal");
 		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
-		      trans.p_rsp_body != trans.p_rsp ? trans.p_rsp_body : "");
+		      trans.rsp_body != trans.rsp ? trans.rsp_body : "");
 
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		ctx->force_addr_update = 1;
@@ -617,7 +625,9 @@ static int update_alias_table(ddns_t *ctx)
 		 * change, i.e., an active user. */
 		info = conf_info_iterator(1);
 		while (info) {
-			for (size_t i = 0; i < info->alias_count; i++) {
+			size_t i;
+
+			for (i = 0; i < info->alias_count; i++) {
 				ddns_alias_t *alias = &info->alias[i];
 				char backup[sizeof(alias->address)];
 
@@ -639,7 +649,9 @@ static int update_alias_table(ddns_t *ctx)
 
 	info = conf_info_iterator(1);
 	while (info) {
-		for (size_t i = 0; i < info->alias_count; i++) {
+		size_t i;
+
+		for (i = 0; i < info->alias_count; i++) {
 			ddns_alias_t *alias = &info->alias[i];
 
 			if (!alias->update_required)
@@ -659,10 +671,10 @@ static int update_alias_table(ddns_t *ctx)
 				os_shell_execute(script_exec, alias->address, alias->name);
 		}
 
-		if (RC_DYNDNS_RSP_NOTOK == rc)
+		if (RC_DDNS_RSP_NOTOK == rc)
 			remember = rc;
 
-		if (RC_DYNDNS_RSP_RETRY_LATER == rc && !remember)
+		if (RC_DDNS_RSP_RETRY_LATER == rc && !remember)
 			remember = rc;
 
 		info = conf_info_iterator(0);
@@ -694,9 +706,11 @@ static int get_encoded_user_passwd(void)
 
 		info->creds.encoded = 0;
 
-		/* Concatenate username and password with a ':', without
+		/*
+		 * Concatenate username and password with a ':', without
 		 * snprintf(), since that can cause information loss if
-		 * the password has "\=" or similar in it, issue #57 */
+		 * the password has "\=" or similar in it, issue #57
+		 */
 		strlcpy(buf, info->creds.username, len);
 		strlcat(buf, ":", len);
 		strlcat(buf, info->creds.password, len);
@@ -706,17 +720,17 @@ static int get_encoded_user_passwd(void)
 
 		encode = malloc(dlen);
 		if (!encode) {
-			logit(LOG_WARNING, "Out of memory when base64 encoding user:pass for %s!", info->system->name);
+			logit(LOG_WARNING, "Out of memory base64 encoding user:pass for %s!", info->system->name);
 			rc = RC_OUT_OF_MEMORY;
 			break;
 		}
 
-		logit(LOG_DEBUG, "Base64 encode %s for %s ...", buf, info->system->name);
+//		logit(LOG_DEBUG, "Base64 encode %s for %s ...", buf, info->system->name);
 		rc2 = base64_encode((unsigned char *)encode, &dlen, (unsigned char *)buf, strlen(buf));
-		if (rc2 != 0) {
-			logit(LOG_WARNING, "Failed base64 encoding of user:pass for %s!", info->system->name);
+		if (rc2) {
+			logit(LOG_WARNING, "Failed base64 encoding user:pass for %s!", info->system->name);
 			free(encode);
-			rc = RC_OUT_BUFFER_OVERFLOW;
+			rc = RC_BUFFER_OVERFLOW;
 			break;
 		}
 
@@ -728,6 +742,7 @@ static int get_encoded_user_passwd(void)
 		info = conf_info_iterator(0);
 	}
 
+	memset(buf, 0, len);
 	free(buf);
 
 	return rc;
@@ -753,12 +768,12 @@ static int init_context(ddns_t *ctx)
 		http_t *checkip = &info->checkip;
 		http_t *update  = &info->server;
 
-		if (strlen(info->proxy_server_name.name)) {
-			http_set_port(checkip, info->proxy_server_name.port);
-			http_set_port(update,  info->proxy_server_name.port);
+		if (strlen(info->proxy_name.name)) {
+			http_set_port(checkip, info->proxy_name.port);
+			http_set_port(update,  info->proxy_name.port);
 
-			http_set_remote_name(checkip, info->proxy_server_name.name);
-			http_set_remote_name(update,  info->proxy_server_name.name);
+			http_set_remote_name(checkip, info->proxy_name.name);
+			http_set_remote_name(update,  info->proxy_name.name);
 		} else {
 			http_set_port(checkip, info->checkip_name.port);
 			http_set_port(update,  info->server_name.port);
@@ -811,18 +826,18 @@ static int check_error(ddns_t *ctx, int rc)
 
 	/* dyn_dns_update_ip() failed, inform the user the (network) error
 	 * is not fatal and that we will retry again in a short while. */
-	case RC_IP_INVALID_REMOTE_ADDR: /* Probably temporary DNS error. */
-	case RC_IP_CONNECT_FAILED:      /* Cannot connect to DDNS server atm. */
-	case RC_IP_SEND_ERROR:
-	case RC_IP_RECV_ERROR:
+	case RC_TCP_INVALID_REMOTE_ADDR: /* Probably temporary DNS error. */
+	case RC_TCP_CONNECT_FAILED:      /* Cannot connect to DDNS server atm. */
+	case RC_TCP_SEND_ERROR:
+	case RC_TCP_RECV_ERROR:
 	case RC_OS_INVALID_IP_ADDRESS:
-	case RC_DYNDNS_RSP_RETRY_LATER:
-	case RC_DYNDNS_INVALID_RSP_FROM_IP_SERVER:
+	case RC_DDNS_RSP_RETRY_LATER:
+	case RC_DDNS_INVALID_CHECKIP_RSP:
 		ctx->update_period = ctx->error_update_period_sec;
 		logit(LOG_WARNING, "Will retry again in %d sec ...", ctx->update_period);
 		break;
 
-	case RC_DYNDNS_RSP_NOTOK:
+	case RC_DDNS_RSP_NOTOK:
 		if (ignore_errors) {
 			logit(LOG_WARNING, "%s, ignoring ...", errstr);
 			break;
@@ -846,9 +861,6 @@ int ddns_main_loop(ddns_t *ctx)
 
 	if (!ctx)
 		return RC_INVALID_POINTER;
-
-	if (!once)
-		DO(os_check_perms(ctx));
 
 	/* On first startup only, optionally wait for network and any NTP daemon
 	 * to set system time correctly.  Intended for devices without battery
@@ -889,8 +901,8 @@ int ddns_main_loop(ddns_t *ctx)
 		ctx->force_addr_update = 1;
 
 	/* Initialization done, create pidfile to indicate we are ready to communicate */
-	if (pidfile(pidfile_name))
-		logit(LOG_WARNING, "Failed creating pidfile: %m");
+	if (once == 0 && pidfile(pidfile_name))
+		logit(LOG_WARNING, "Failed creating pidfile: %s", strerror(errno));
 
 	/* DDNS client main loop */
 	while (1) {

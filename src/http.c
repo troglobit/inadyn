@@ -1,7 +1,7 @@
 /* Interface for HTTP functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,7 +38,6 @@ int http_construct(http_t *client)
 	return 0;
 }
 
-/* Resource free. */
 int http_destruct(http_t *client, int num)
 {
 	int i = 0, rv = 0;
@@ -49,7 +48,6 @@ int http_destruct(http_t *client, int num)
 	return rv;
 }
 
-/* Set default TCP specififc params */
 static int local_set_params(http_t *client)
 {
 	int timeout = 0;
@@ -66,7 +64,6 @@ static int local_set_params(http_t *client)
 	return 0;
 }
 
-/* Sets up the object. */
 int http_init(http_t *client, char *msg)
 {
 	int rc = 0;
@@ -87,7 +84,6 @@ int http_init(http_t *client, char *msg)
 	return 0;
 }
 
-/* Disconnect and some other clean up. */
 int http_exit(http_t *client)
 {
 	ASSERT(client);
@@ -102,7 +98,7 @@ int http_exit(http_t *client)
 static void http_response_parse(http_trans_t *trans)
 {
 	char *body;
-	char *rsp = trans->p_rsp_body = trans->p_rsp;
+	char *rsp = trans->rsp_body = trans->rsp;
 	int status = trans->status = 0;
 	const char sep[] = "\r\n\r\n";
 
@@ -110,18 +106,18 @@ static void http_response_parse(http_trans_t *trans)
 
 	if (rsp != NULL && (body = strstr(rsp, sep)) != NULL) {
 		body += strlen(sep);
-		trans->p_rsp_body = body;
+		trans->rsp_body = body;
 	}
 
-	/* %*c         : HTTP/1.0, 1.1 etc, discard read value
+	/*
+	 * %*c         : HTTP/1.0, 1.1 etc, discard read value
 	 * %4d         : HTTP status code, e.g. 200
 	 * %255[^\r\n] : HTTP status text, e.g. OK -- Reads max 255 bytes, including \0, not \r or \n
 	 */
-	if (sscanf(trans->p_rsp, "HTTP/1.%*c %4d %255[^\r\n]", &status, trans->status_desc) == 2)
+	if (sscanf(trans->rsp, "HTTP/1.%*c %4d %255[^\r\n]", &status, trans->status_desc) == 2)
 		trans->status = status;
 }
 
-/* Send req and get response */
 int http_transaction(http_t *client, http_trans_t *trans)
 {
 	int rc = 0;
@@ -134,29 +130,26 @@ int http_transaction(http_t *client, http_trans_t *trans)
 
 	trans->rsp_len = 0;
 	do {
-		TRY(ssl_send(client, trans->p_req, trans->req_len));
-		TRY(ssl_recv(client, trans->p_rsp, trans->max_rsp_len, &trans->rsp_len));
+		TRY(ssl_send(client, trans->req, trans->req_len));
+		TRY(ssl_recv(client, trans->rsp, trans->max_rsp_len, &trans->rsp_len));
 	}
 	while (0);
 
-	trans->p_rsp[trans->rsp_len] = 0;
+	trans->rsp[trans->rsp_len] = 0;
 	http_response_parse(trans);
 
 	return rc;
 }
 
-/*
- * Validate HTTP status code
- */
 int http_status_valid(int status)
 {
 	if (status == 200)
 		return 0;
 
 	if (status >= 500 && status < 600)
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 int http_set_port(http_t *client, int port)

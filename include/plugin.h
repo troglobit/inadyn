@@ -1,6 +1,6 @@
 /* DDNS Provider Plugin API for Inadyn
  *
- * Copyright (c) 2012-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (c) 2012-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@
 #ifndef INADYN_PLUGIN_H_
 #define INADYN_PLUGIN_H_
 
-#include <lite/queue.h>		/* BSD sys/queue.h API */
+#include "queue.h"		/* BSD sys/queue.h API */
 
 #define GENERIC_HTTP_REQUEST                                      	\
 	"GET %s HTTP/1.0\r\n"						\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 #define PLUGIN_INIT(x) static void __attribute__ ((constructor)) x(void)
 #define PLUGIN_EXIT(x) static void __attribute__ ((destructor))  x(void)
@@ -38,6 +38,7 @@
 
 /* Types used for DNS system specific configuration */
 /* Function to prepare DNS system specific server requests */
+typedef int (*setup_fn_t) (void* this, void* info, void* alias);
 typedef int (*req_fn_t) (void *this, void *info, void *alias);
 typedef int (*rsp_fn_t) (void *this, void *info, void *alias);
 
@@ -46,11 +47,15 @@ typedef struct ddns_system {
 
 	const char    *name;
 
+	setup_fn_t     setup;
 	req_fn_t       request;
 	rsp_fn_t       response;
 
+	const int      nousername;    /* Provider does not require username='' */
+
 	const char    *checkip_name;
 	const char    *checkip_url;
+	const int      checkip_ssl;
 
 	const char    *server_name;
 	const char    *server_url;
@@ -61,7 +66,7 @@ int plugin_register   (ddns_system_t *system);
 int plugin_unregister (ddns_system_t *system);
 
 /* Helper API */
-ddns_system_t *plugin_find (const char *name);
+ddns_system_t *plugin_find (const char *name, int loose);
 
 /* Looks ugly, placed here due to deps. and to make it easier for plugin devs */
 #include "ddns.h"

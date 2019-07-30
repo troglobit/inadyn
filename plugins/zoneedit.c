@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,7 +30,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -56,7 +56,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->name,
 			alias->address,
 			info->server_name.name,
-			info->creds.encoded_password);
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
 /*
@@ -64,13 +65,13 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  *  CODE=200, 201
  *  CODE=707, for duplicated updates
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	int code = -1;
 
 	DO(http_status_valid(trans->status));
 
-	sscanf(trans->p_rsp_body, "%*s CODE=\"%4d\" ", &code);
+	sscanf(trans->rsp_body, "%*s CODE=\"%4d\" ", &code);
 	switch (code) {
 	case 200:
 	case 201:
@@ -81,7 +82,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		break;
 	}
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

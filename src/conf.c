@@ -1,6 +1,6 @@
 /* libConfuse interface to parse inadyn.conf v2 format
  *
- * Copyright (C) 2014-2015  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -92,9 +92,9 @@ static int validate_period(cfg_t *cfg, cfg_opt_t *opt)
 	int val = cfg_getint(cfg, opt->name);
 
 	if (val < DDNS_MIN_PERIOD)
-		val = DDNS_MIN_PERIOD;
+		cfg_setint(cfg, opt->name, DDNS_MIN_PERIOD);
 	if (val > DDNS_MAX_PERIOD)
-		val = DDNS_MAX_PERIOD;
+		cfg_setint(cfg, opt->name, DDNS_MAX_PERIOD);
 
 	return 0;
 }
@@ -123,25 +123,38 @@ static int validate_hostname(cfg_t *cfg, const char *provider, cfg_opt_t *hostna
 		}
 	}
 
+	if (i >= DDNS_MAX_ALIAS_NUMBER) {
+		cfg_error(cfg, "Too many hostname aliases, MAX %d supported!", DDNS_MAX_ALIAS_NUMBER);
+		return -1;
+	}
+
 	return 0;
 }
 
 /* No need to validate username/password for custom providers */
 static int validate_common(cfg_t *cfg, const char *provider, int custom)
 {
-	if (!plugin_find(provider)) {
-		cfg_error(cfg, "Invalid DDNS provider %s", provider);
-		return -1;
+	ddns_system_t *ds;
+
+	ds = plugin_find(provider, 0);
+	if (!ds) {
+		ds = plugin_find(provider, 1);
+		if (!ds) {
+			cfg_error(cfg, "Invalid DDNS provider %s", provider);
+			return -1;
+		}
 	}
 
-	if (!custom && !cfg_getstr(cfg, "username")) {
-		cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
-		return -1;
-	}
+	if (!custom) {
+		if (!ds->nousername && !cfg_getstr(cfg, "username")) {
+			cfg_error(cfg, "Missing username setting for DDNS provider %s", provider);
+			return -1;
+		}
 
-	if (!custom && !cfg_getstr(cfg, "password")) {
-		cfg_error(cfg, "Missing password setting for DDNS provider %s", provider);
-		return -1;
+		if (!cfg_getstr(cfg, "password")) {
+			cfg_error(cfg, "Missing password setting for DDNS provider %s", provider);
+			return -1;
+		}
 	}
 
 	return deprecate_alias(cfg) ||
@@ -152,7 +165,7 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 {
 	const char *provider;
 
-	cfg = cfg_opt_getnsec(opt, 0);
+	cfg = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
 	provider = cfg_title(cfg);
 
 	if (!provider) {
@@ -165,7 +178,7 @@ static int validate_provider(cfg_t *cfg, cfg_opt_t *opt)
 
 static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
 {
-	cfg = cfg_opt_getnsec(opt, 0);
+	cfg = cfg_opt_getnsec(opt, cfg_opt_size(opt) - 1);
 	if (!cfg)
 		return -1;
 
@@ -216,6 +229,82 @@ static int cfg_getserver(cfg_t *cfg, char *server, ddns_name_t *name)
 	return getserver(str, name);
 }
 
+/* TODO: Move to a separate file */
+#define string_startswith(string, prefix) strncasecmp(string, prefix, strlen(prefix)) == 0
+
+static int parseproxy(const char *proxy, tcp_proxy_type_t *type, ddns_name_t *name)
+{
+	int ret = 0;
+	char *tmp, *str, *host, *protocol;
+	int len;
+
+	tmp = str = strdup(proxy);
+
+	do {
+		tmp = strstr(str, "://");
+		if (tmp) {
+			host = tmp + 3;
+			if (string_startswith(str, "socks5h"))
+				*type = PROXY_SOCKS5_HOSTNAME;
+			else if (string_startswith(str, "socks5"))
+				*type = PROXY_SOCKS5;
+			else if (string_startswith(str, "socks4a"))
+				*type = PROXY_SOCKS4A;
+			else if (string_startswith(str, "socks4") || string_startswith(str, "socks"))
+				*type = PROXY_SOCKS4;
+			else {
+				len = tmp - str;
+				protocol = malloc(len + 1);
+				strncpy(protocol, str, len);
+				protocol[len + 1] = 0;
+				logit(LOG_ERR, "Unsupported proxy protocol '%s'.", protocol);
+				free(protocol);
+				ret = 1;
+				break;
+			}
+
+			tmp = strchr(host, ':');
+			if (tmp) {
+				*tmp++ = 0;
+				name->port = atonum(tmp);
+				if (-1 == name->port) {
+					logit(LOG_ERR, "Invalid proxy port.");
+					ret = 1;
+					break;
+				}
+
+				strlcpy(name->name, host, sizeof(name->name));
+			} else {
+				logit(LOG_ERR, "No proxy port is specified.");
+				ret = 1;
+				break;
+			}
+		} else {
+			/* Currently we do not support http proxy. */
+//			*type = PROXY_HTTP;
+//			logit(LOG_WARNING, "No proxy protocol is specified, use http proxy.");
+
+			logit(LOG_WARNING, "No proxy protocol is specified.");
+			ret = 1;
+			break;
+		}
+	} while (0);
+
+	free(str);
+	return ret;
+}
+
+static int cfg_parseproxy(cfg_t *cfg, char *server, tcp_proxy_type_t *type, ddns_name_t *name)
+{
+	const char *str;
+
+	str = cfg_getstr(cfg, server);
+	if (!str)
+		return 1;
+
+	return parseproxy(str, type, name);
+}
+
 static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 {
 	size_t j;
@@ -227,10 +316,14 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 	else
 		str = cfg_title(cfg);
 
-	system = plugin_find(str);
+	system = plugin_find(str, 0);
 	if (!system) {
-		logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
-		return 1;
+		system = plugin_find(str, 1);
+		if (!system) {
+			logit(LOG_ERR, "Cannot find an DDNS plugin for provider '%s'", str);
+			return 1;
+		}
+		logit(LOG_WARNING, "Guessing DDNS plugin '%s' from '%s'", system->name, str);
 	}
 
 	info->system = system;
@@ -262,6 +355,11 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		str = cfg_getnstr(cfg, "hostname", j);
 		if (!str)
 			continue;
+
+		if (info->alias_count == DDNS_MAX_ALIAS_NUMBER) {
+			logit(LOG_WARNING, "Too many hostname aliases, skipping %s ...", str);
+			continue;
+		}
 
 		strlcpy(info->alias[pos].name, str, sizeof(info->alias[pos].name));
 		info->alias_count++;
@@ -304,13 +402,44 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		}
 	}
 
-	/* The check-ip server can be set for all provider types */
+	/*
+	 * Follows the ssl setting by default, except for providers
+	 * known to NOT support HTTPS for their checkip servers.
+	 *
+	 * This setting may only be disabled by the user, with the
+	 * custom provider section being the exeception to the rule.
+	 */
+	info->checkip_ssl = info->ssl_enabled;
+
+	/* Check known status of checkip server for provider */
+	switch (system->checkip_ssl) {
+	case DDNS_CHECKIP_SSL_UNSUPPORTED:
+		info->checkip_ssl = 0;
+		break;
+
+	case DDNS_CHECKIP_SSL_REQUIRED:
+		info->checkip_ssl = 1;
+		break;
+
+	default:
+	case DDNS_CHECKIP_SSL_SUPPORTED:
+		if (!cfg_getbool(cfg, "checkip-ssl"))
+			info->checkip_ssl = 0;
+	}
+
+	/* The checkip server can be set for all provider types */
 	if (!cfg_getserver(cfg, "checkip-server", &info->checkip_name)) {
 		str = cfg_getstr(cfg, "checkip-path");
 		if (str && strlen(str) <= sizeof(info->checkip_url))
 			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 		else
 			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+
+		/*
+		 * If a custom checkip server is defined, the
+		 * checkip-ssl setting is fully honored.
+		 */
+		info->checkip_ssl = cfg_getbool(cfg, "checkip-ssl");
 	}
 
 	/* The checkip-command overrides any default or custom checkip-server */
@@ -319,6 +448,14 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		info->checkip_cmd = strdup(str);
 	else if (script_cmd)
 		info->checkip_cmd = strdup(script_cmd);
+
+	/* The per-provider user-agent setting, defaults to the global setting */
+	info->user_agent = cfg_getstr(cfg, "user-agent");
+	if (!info->user_agent)
+		info->user_agent = user_agent;
+
+	/* A per-proivder optional proxy server:port */
+//	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
 
 	return 0;
 
@@ -387,11 +524,14 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR     ("password",     NULL, CFGF_NONE),
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
-		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
+		CFG_BOOL    ("ssl",          cfg_true, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
+//		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_END()
 	};
 	cfg_opt_t custom_opts[] = {
@@ -400,11 +540,14 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_STR     ("password",     NULL, CFGF_NONE),
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
 		CFG_STR_LIST("alias",        NULL, CFGF_DEPRECATED),
-		CFG_BOOL    ("ssl",          cfg_false, CFGF_NONE),
+		CFG_BOOL    ("ssl",          cfg_true, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
+		CFG_BOOL    ("checkip-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR     ("checkip-command",NULL, CFGF_NONE), /* Syntax: /path/to/cmd [args] */
+		CFG_STR     ("user-agent",     NULL, CFGF_NONE),
+//		CFG_STR     ("proxy",          NULL, CFGF_NONE), /* Syntax:  name:port */
 		/* Custom settings */
 		CFG_BOOL    ("append-myip",    cfg_false, CFGF_NONE),
 		CFG_STR     ("ddns-server",    NULL, CFGF_NONE),
@@ -418,11 +561,12 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL("allow-ipv6",    cfg_false, CFGF_NONE),
 		CFG_BOOL("secure-ssl",    cfg_true, CFGF_NONE),
 		CFG_STR ("ca-trust-file", NULL, CFGF_NONE),
-		CFG_STR ("cache-dir",	  DEFAULT_CACHE_DIR, CFGF_NONE),
+		CFG_STR ("cache-dir",	  NULL, CFGF_DEPRECATED | CFGF_DROP),
 		CFG_INT ("period",	  DDNS_DEFAULT_PERIOD, CFGF_NONE),
 		CFG_INT ("iterations",    DDNS_DEFAULT_ITERATIONS, CFGF_NONE),
 		CFG_INT ("forced-update", DDNS_FORCED_UPDATE_PERIOD, CFGF_NONE),
 		CFG_STR ("iface",         NULL, CFGF_NONE),
+		CFG_STR ("user-agent",    NULL, CFGF_NONE),
 		CFG_SEC ("provider",      provider_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_SEC ("custom",        custom_opts, CFGF_MULTI | CFGF_TITLE),
 		CFG_END()
@@ -431,7 +575,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 
 	cfg = cfg_init(opts, CFGF_NONE);
 	if (!cfg) {
-		logit(LOG_ERR, "Failed initializing configuration file parser: %m");
+		logit(LOG_ERR, "Failed initializing configuration file parser: %s", strerror(errno));
 		return NULL;
 	}
 
@@ -465,13 +609,15 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	else
 		ctx->total_iterations = cfg_getint(cfg, "iterations");
 
-	cache_dir                     = cfg_getstr(cfg, "cache-dir");
 	verify_addr                   = cfg_getbool(cfg, "verify-address");
 	ctx->forced_update_fake_addr  = cfg_getbool(cfg, "fake-address");
 
 	/* Command line --iface=IFNAME takes precedence */
-	if (!iface)
+	if (!use_iface)
 		iface                 = cfg_getstr(cfg, "iface");
+	user_agent                    = cfg_getstr(cfg, "user-agent");
+	if (!user_agent)
+		user_agent            = DDNS_USER_AGENT;
 	allow_ipv6                    = cfg_getbool(cfg, "allow-ipv6");
 	secure_ssl                    = cfg_getbool(cfg, "secure-ssl");
 	ca_trust_file                 = cfg_getstr(cfg, "ca-trust-file");

@@ -1,7 +1,7 @@
 /* Interface for TCP functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,26 +17,35 @@
  * along with this program; if not, visit the Free Software Foundation
  * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA  02110-1301, USA.
-*/
+ * Boston, MA 02110-1301, USA.
+ */
 
+#include <errno.h>
 #include <poll.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/nameser.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <resolv.h>
 
-#include "debug.h"
+#include "log.h"
 #include "tcp.h"
 
 int tcp_construct(tcp_sock_t *tcp)
 {
 	ASSERT(tcp);
 
-	DO(ip_construct(&tcp->ip));
+	memset(tcp, 0, sizeof(tcp_sock_t));
 
-	/* Reset its part of the struct (skip IP part) */
-	memset(((char *)tcp + sizeof(tcp->ip)), 0, sizeof(*tcp) - sizeof(tcp->ip));
 	tcp->initialized = 0;
+	tcp->socket      = -1; /* Initialize to 'error', not a possible socket id. */
+	tcp->timeout     = TCP_DEFAULT_TIMEOUT;
 
 	return 0;
 }
@@ -48,22 +57,9 @@ int tcp_destruct(tcp_sock_t *tcp)
 	if (tcp->initialized == 1)
 		tcp_exit(tcp);
 
-	return ip_destruct(&tcp->ip);
-}
-
-static int local_set_params(tcp_sock_t *tcp)
-{
-	int timeout;
-
-	/* Set default TCP specififc params */
-	tcp_get_remote_timeout(tcp, &timeout);
-	if (timeout == 0)
-		tcp_set_remote_timeout(tcp, TCP_DEFAULT_TIMEOUT);
-
 	return 0;
 }
 
-/* Check for socket error */
 static int soerror(int sd)
 {
 	int code = 0;
@@ -72,15 +68,15 @@ static int soerror(int sd)
 	if (getsockopt(sd, SOL_SOCKET, SO_ERROR, &code, &len))
 		return 1;
 
-	errno = code;
-
-	return code;
+	return errno = code;
 }
 
-/* In the wonderful world of network programming the manual states that
+/*
+ * In the wonderful world of network programming the manual states that
  * EINPROGRESS is only a possible error on non-blocking sockets.  Real world
  * experience, however, suggests otherwise.  Simply poll() for completion and
- * then continue. --Joachim */
+ * then continue. --Joachim
+ */
 static int check_error(int sd, int msec)
 {
 	struct pollfd pfd = { sd, POLLOUT, 0 };
@@ -96,62 +92,104 @@ static int check_error(int sd, int msec)
 	return 1;
 }
 
-/* On error tcp_exit() is called by upper layers. */
+static void set_timeouts(int sd, int timeout)
+{
+	struct timeval sv;
+
+	memset(&sv, 0, sizeof(sv));
+	sv.tv_sec  =  timeout / 1000;
+	sv.tv_usec = (timeout % 1000) * 1000;
+	if (-1 == setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv)))
+		logit(LOG_INFO, "Failed setting receive timeout socket option: %s", strerror(errno));
+	if (-1 == setsockopt(sd, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv)))
+		logit(LOG_INFO, "Failed setting send timeout socket option: %s", strerror(errno));
+}
+
 int tcp_init(tcp_sock_t *tcp, char *msg)
 {
 	int rc = 0;
-	char host[NI_MAXHOST];
-	struct timeval sv;
-	struct sockaddr sa;
-	socklen_t salen;
 
 	ASSERT(tcp);
 
+	if (tcp->initialized == 1)
+		return 0;
+
 	do {
-		int sd;
+		int s, sd, tries = 0;
+		char port[10];
+		char host[NI_MAXHOST];
+		struct addrinfo hints, *servinfo, *ai;
+		struct sockaddr *sa;
+		socklen_t len;
 
-		TRY(local_set_params(tcp));
-		TRY(ip_init(&tcp->ip));
+		/* remote address */
+		if (!tcp->remote_host)
+			break;
 
-		if (tcp->ip.type != TYPE_TCP)
-			return RC_IP_BAD_PARAMETER;
+		/* Clear DNS cache before calling getaddrinfo(). */
+		res_init();
 
-		sd = socket(AF_INET, SOCK_STREAM, 0);
-		if (sd == -1) {
-			logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));
-			rc = RC_IP_SOCKET_CREATE_ERROR;
+		/* Obtain address(es) matching host/port */
+		memset(&hints, 0, sizeof(struct addrinfo));
+		hints.ai_family = AF_UNSPEC;		/* Allow IPv4 or IPv6 */
+		hints.ai_socktype = SOCK_STREAM;	/* Stream socket */
+		hints.ai_flags = AI_NUMERICSERV;	/* No service name lookup */
+		snprintf(port, sizeof(port), "%d", tcp->port);
+
+		s = getaddrinfo(tcp->remote_host, port, &hints, &servinfo);
+		if (s != 0 || !servinfo) {
+			logit(LOG_WARNING, "Failed resolving hostname %s: %s", tcp->remote_host, gai_strerror(s));
+			rc = RC_TCP_INVALID_REMOTE_ADDR;
+			break;
+		}
+		ai = servinfo;
+
+		while (1) {
+			sd = socket(ai->ai_family, SOCK_STREAM, 0);
+			if (sd == -1) {
+				logit(LOG_ERR, "Error creating client socket: %s", strerror(errno));
+				rc = RC_TCP_SOCKET_CREATE_ERROR;
+				break;
+			}
+
+			set_timeouts(sd, tcp->timeout);
+			tcp->socket = sd;
+			tcp->initialized = 1;
+
+			/* Now we try connecting to the server, on connect fail, try next DNS record */
+			sa  = ai->ai_addr;
+			len = ai->ai_addrlen;
+
+			if (getnameinfo(sa, len, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+				goto next;
+
+			logit(LOG_INFO, "%s, %sconnecting to %s([%s]:%d)", msg, tries ? "re" : "",
+			      tcp->remote_host, host, tcp->port);
+			if (connect(sd, sa, len)) {
+				tries++;
+
+				if (!check_error(sd, tcp->timeout))
+					break; /* OK */
+			next:
+				ai = ai->ai_next;
+				if (ai) {
+					logit(LOG_INFO, "Failed connecting to that server: %s",
+					      errno != EINPROGRESS ? strerror(errno) : "retrying ...");
+
+					close(sd);
+					continue;
+				}
+
+				logit(LOG_WARNING, "Failed connecting to %s: %s", tcp->remote_host, strerror(errno));
+				rc = RC_TCP_CONNECT_FAILED;
+			}
+
 			break;
 		}
 
-		/* Call to socket() OK, allow tcp_exit() to run to
-		 * prevent socket leak if any of the below calls fail. */
-		tcp->ip.socket = sd;
-		tcp->initialized  = 1;
-
-		/* Attempt to set TCP timers, silently fall back to OS defaults */
-		sv.tv_sec  =  tcp->ip.timeout / 1000;
-		sv.tv_usec = (tcp->ip.timeout % 1000) * 1000;
-		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_RCVTIMEO, &sv, sizeof(sv)))
-			logit(LOG_WARNING, "Failed setting receive timeout socket option: %m");
-		if (-1 == setsockopt(tcp->ip.socket, SOL_SOCKET, SO_SNDTIMEO, &sv, sizeof(sv)))
-			logit(LOG_WARNING, "Failed setting send timeout socket option: %m");
-
-		sa    = tcp->ip.remote_addr;
-		salen = tcp->ip.remote_len;
-		if (!getnameinfo(&sa, salen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST))
-			logit(LOG_INFO, "%s, connecting to %s(%s:%d)", msg, tcp->ip.p_remote_host_name, host, tcp->ip.port);
-		else
-			logit(LOG_ERR, "%s, failed resolving %s!", msg, host);
-
-		if (connect(sd, &sa, salen)) {
-			if (!check_error(sd, tcp->ip.timeout))
-				break; /* OK */
-
-			logit(LOG_WARNING, "Failed connecting to remote server: %s", strerror(errno));
-			rc = RC_IP_CONNECT_FAILED;
-			break;
-		}
-	} while (0);
+		freeaddrinfo(servinfo);
+	}
+	while (0);
 
 	if (rc) {
 		tcp_exit(tcp);
@@ -168,9 +206,14 @@ int tcp_exit(tcp_sock_t *tcp)
 	if (!tcp->initialized)
 		return 0;
 
+	if (tcp->socket > -1) {
+		close(tcp->socket);
+		tcp->socket = -1;
+	}
+
 	tcp->initialized = 0;
 
-	return ip_exit(&tcp->ip);
+	return 0;
 }
 
 int tcp_send(tcp_sock_t *tcp, const char *buf, int len)
@@ -180,59 +223,108 @@ int tcp_send(tcp_sock_t *tcp, const char *buf, int len)
 	if (!tcp->initialized)
 		return RC_TCP_OBJECT_NOT_INITIALIZED;
 
-	return ip_send(&tcp->ip, buf, len);
+	if (send(tcp->socket, buf, len, 0) == -1) {
+		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(errno));
+		return RC_TCP_SEND_ERROR;
+	}
+
+	return 0;
 }
 
-int tcp_recv(tcp_sock_t *tcp, char *buf, int buf_len, int *recv_len)
+int tcp_recv(tcp_sock_t *tcp, char *buf, int len, int *recv_len)
 {
+	int rc = 0;
+	int remaining_bytes = len;
+	int total_bytes = 0;
+
 	ASSERT(tcp);
+	ASSERT(buf);
+	ASSERT(recv_len);
 
 	if (!tcp->initialized)
 		return RC_TCP_OBJECT_NOT_INITIALIZED;
 
-	return ip_recv(&tcp->ip, buf, buf_len, recv_len);
+	while (remaining_bytes > 0) {
+		int bytes;
+		int chunk_size = remaining_bytes > TCP_DEFAULT_READ_CHUNK_SIZE
+			? TCP_DEFAULT_READ_CHUNK_SIZE
+			: remaining_bytes;
+
+		bytes = recv(tcp->socket, buf + total_bytes, chunk_size, 0);
+		if (bytes < 0) {
+			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(errno));
+			rc = RC_TCP_RECV_ERROR;
+			break;
+		}
+
+		if (bytes == 0) {
+			if (total_bytes == 0)
+				rc = RC_TCP_RECV_ERROR;
+			break;
+		}
+
+		total_bytes    += bytes;
+		remaining_bytes = len - total_bytes;
+	}
+
+	*recv_len = total_bytes;
+
+	return rc;
 }
 
 int tcp_set_port(tcp_sock_t *tcp, int port)
 {
 	ASSERT(tcp);
 
-	return ip_set_port(&tcp->ip, port);
+	if (port < 0 || port > TCP_SOCKET_MAX_PORT)
+		return RC_TCP_BAD_PARAMETER;
+
+	tcp->port = port;
+
+	return 0;
 }
 
 int tcp_get_port(tcp_sock_t *tcp, int *port)
 {
 	ASSERT(tcp);
+	ASSERT(port);
+	*port = tcp->port;
 
-	return ip_get_port(&tcp->ip, port);
+	return 0;
 }
 
-int tcp_set_remote_name(tcp_sock_t *tcp, const char *p)
+int tcp_set_remote_name(tcp_sock_t *tcp, const char *name)
 {
 	ASSERT(tcp);
+	tcp->remote_host = name;
 
-	return ip_set_remote_name(&tcp->ip, p);
+	return 0;
 }
 
-int tcp_get_remote_name(tcp_sock_t *tcp, const char **p)
+int tcp_get_remote_name(tcp_sock_t *tcp, const char **name)
 {
 	ASSERT(tcp);
+	ASSERT(name);
+	*name = tcp->remote_host;
 
-	return ip_get_remote_name(&tcp->ip, p);
+	return 0;
 }
 
-int tcp_set_remote_timeout(tcp_sock_t *tcp, int p)
+int tcp_set_remote_timeout(tcp_sock_t *tcp, int timeout)
 {
 	ASSERT(tcp);
+	tcp->timeout = timeout;
 
-	return ip_set_remote_timeout(&tcp->ip, p);
+	return 0;
 }
 
-int tcp_get_remote_timeout(tcp_sock_t *tcp, int *p)
+int tcp_get_remote_timeout(tcp_sock_t *tcp, int *timeout)
 {
 	ASSERT(tcp);
+	ASSERT(timeout);
+	*timeout = tcp->timeout;
 
-	return ip_get_remote_timeout(&tcp->ip, p);
+	return 0;
 }
 
 /**

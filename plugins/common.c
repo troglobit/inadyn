@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 /*
  * DynDNS request composer -- common to many other DDNS providers as well
@@ -56,16 +56,17 @@ int common_request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			wildcard,
 			info->server_name.name,
-			info->creds.encoded_password);
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
 /*
  * DynDNS response validator -- common to many other DDNS providers as well
  *  'good' or 'nochg' are the good answers,
  */
-int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *body = trans->p_rsp_body;
+	char *body = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
@@ -73,9 +74,13 @@ int common_response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 		return 0;
 
 	if (strstr(body, "dnserr") || strstr(body, "911"))
-		return RC_DYNDNS_RSP_RETRY_LATER;
+		return RC_DDNS_RSP_RETRY_LATER;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	/* Loopia responds "[200 OK] nohost" when no DNS record exists */
+	if (strstr(body, "nohost"))
+		return RC_DDNS_RSP_NOHOST;
+
+	return RC_DDNS_RSP_NOTOK;
 }
 
 /**

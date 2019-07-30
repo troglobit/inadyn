@@ -1,7 +1,7 @@
 /* Plugin for Zerigo
  *
- * Copyright (C) 2011  Bryan Hoover <bhoover@wecs.com>
- * Copyright (C) 2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2011       Bryan Hoover <bhoover@wecs.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"Authorization: Basic %s\r\n"					\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -54,7 +54,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->name,
 			alias->address,
 			info->server_name.name,
-			info->creds.encoded_password);
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
 /*
@@ -69,9 +70,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
  * Server error
  *  Status: 5xx
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *UNUSED(alias))
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *ptr, *rsp = trans->p_rsp_body;
+	char *ptr, *rsp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
@@ -87,14 +88,14 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 			return 0;
 			
 		case 4:
-			return RC_DYNDNS_INVALID_OR_MISSING_PARAMETERS;
+			return RC_DDNS_INVALID_OPTION;
 
 		case 5:
-			return RC_DYNDNS_RSP_RETRY_LATER;
+			return RC_DDNS_RSP_RETRY_LATER;
 		}
 	}
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

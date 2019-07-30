@@ -1,7 +1,7 @@
 /* Plugin for DHIS.org
  *
- * Copyright (C) 2011  Bryan Hoover <bhoover@wecs.com>
- * Copyright (C) 2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2011       Bryan Hoover <bhoover@wecs.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@
 	"updatetimeout=0 "						\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
@@ -47,6 +47,7 @@ static ddns_system_t plugin = {
 
 	.checkip_name = DYNDNS_MY_IP_SERVER,
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "is.dhis.org",
 	.server_url   =  "/?"
@@ -60,19 +61,20 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->name,
 			info->creds.password,
 			alias->address,
-			info->server_name.name);
+			info->server_name.name,
+			info->user_agent);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *rsp = trans->p_rsp_body;
+	char *rsp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
 	if (strstr(rsp, alias->address))
 		return 0;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)

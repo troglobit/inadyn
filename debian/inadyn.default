@@ -1,0 +1,9 @@
+# Please note, /etc/inadyn.conf should be configured first!
+
+# Set to "yes" if inadyn should run in daemon mode
+# If this is changed to "yes", RUN_IPUP must be set to "no".
+RUN_DAEMON="no"
+
+# Set to "yes" if inadyn should be run every time a new ppp connection is
+# established. This might be useful, if you are using dial-on-demand.
+RUN_IPUP="no"

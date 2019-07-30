@@ -1,6 +1,6 @@
 /* Interface for optional HTTPS functions
  *
- * Copyright (C) 2014-2016  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2014-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,17 +25,6 @@
 #include "config.h"
 #include "http.h"
 #include "tcp.h"
-
-/*
- * By default we rely on the built-in locations of Open/LibreSSL and
- * GnuTLS, on error we fall back to these two locations, used by Debian
- * and RedHat.
- *
- * For more excellent information on the topic, see this blog post
- * https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
- */
-#define CAFILE1 "/etc/ssl/certs/ca-certificates.crt"
-#define CAFILE2 "/etc/pki/tls/certs/ca-bundle.trust.crt"
 
 /* User can supply local CA PEM bundle in .conf file */
 extern char *ca_trust_file;

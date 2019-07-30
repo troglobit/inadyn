@@ -1,7 +1,7 @@
 /* Interface for TCP functions
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,20 +18,39 @@
  * website at http://www.gnu.org/licenses/gpl-2.0.html or write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA  02110-1301, USA.
-*/
+ */
 
 #ifndef INADYN_TCP_H_
 #define INADYN_TCP_H_
 
 #include "os.h"
 #include "error.h"
-#include "ip.h"
 
-#define TCP_DEFAULT_TIMEOUT	20000	/* msec */
+#define TCP_DEFAULT_TIMEOUT		5000	/* msec */
+#define TCP_SOCKET_MAX_PORT		65535
+#define TCP_DEFAULT_READ_CHUNK_SIZE	100
+
+typedef enum {
+	NO_PROXY = 0,
+	PROXY_SOCKS4,
+	PROXY_SOCKS4A,
+	PROXY_SOCKS5,
+	PROXY_SOCKS5_HOSTNAME,
+	PROXY_HTTP_CONNECT, /* SSL only. */
+} tcp_proxy_type_t;
 
 typedef struct {
-	ip_sock_t ip;
-	int       initialized;
+	int                 initialized;
+
+	int                 socket;
+	const char         *remote_host;
+
+	unsigned short      port;
+	int                 timeout;
+
+	tcp_proxy_type_t    proxy_type;
+	const char         *proxy_host;
+	unsigned short      proxy_port;
 } tcp_sock_t;
 
 int tcp_construct          (tcp_sock_t *tcp);

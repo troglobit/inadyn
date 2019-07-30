@@ -4,13 +4,145 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.0][UNRELEASED] - 2016-09-YY
--------------------------------
-
-New configuration file format and changed command line options.
+[v2.5][] - 2018-09-30
+---------------------
 
 ### Changes
-- New configuration file format using libConfuse
+- macOS changes by Jo Rhett:
+  - Add linking with `-lresolv`
+  - Use Homebrew's CA trust store
+  - Update REDAME with install help
+- Add support for selfhost.de DDNS
+
+### Fixes
+- Fix #211: Only show DDNS server response on successful transaction
+- Fix #211: Improved error handling in OpenSSL back-end
+- Fix #214: Add `nochg` to list of good responses for custom providers
+- Fixes by Eric Sauvageau:
+  - Fix #216: Add DNS lookup exception for `all.dnsomatic.com`
+  - Fix #219: Add DNS lookup exception for `default@tunnelbrooker.net`
+
+
+[v2.4][] - 2018-08-18
+---------------------
+
+### Changes
+- Add support for Dynu DDNS provider
+
+### Fixes
+- Add missing defines for `LLONG_MAX` and `LLONG_MIN` on some platforms
+- Fix #209: Update FreeDNS plugin to use v2 of their API to fetch update key
+- Fix #210: Use `~/.cache/inadyn` or `~/.inadyn` when running unprivileged
+
+
+[v2.3.1][] - 2018-02-12
+-----------------------
+
+This minor bug fix release holds Debian packaging fixes by André Colomb.
+
+### Changes
+- Make .deb files an official part of releases
+
+### Fixes
+- Fix installation of `inadyn` in `/usr/sbin` and symlink in `/usr/bin`
+- Rename debian/inadyn.links to be standards-compliant
+- Update deprecated build dependency for dh-systemd
+- Fix lintian warning about unsafe symlinks for build scripts
+- Version numbers containing a dash are inappropriate for 'native'
+  packages, bump revision instead
+
+
+[v2.3][] - 2018-01-05
+---------------------
+
+### Changes
+- Distribute `CONTRIBUTING.md` in release tarballs, by André Colomb
+- Clean up debug messages for HTTPS connections, by André Colomb
+- New build-depends, `libgnutls28-dev` for Debian/Ubuntu users and
+  GnuTLS >= 3.0 for others, by André Colomb
+- Issue #192: Add `examples/*.conf` to source distribution, by André Colomb
+
+### Fixes
+- TCP, not UDP, for `getaddrinfo()` hints + numeric lookups, by André Colomb
+- Disable SSL for checkip connections to SPDYN service, by André Colomb
+- Issue #186: Allow IPv6 for HTTP(S) connections, by André Colomb
+- Issue #189: Ignore premature session termination in GnuTLS, by André Colomb
+- Issue #193: Fix broken internal links in README.md, by André Colomb
+
+
+[v2.2.1][] - 2017-10-06
+-----------------------
+
+### Fixes
+
+- Issue #174: `gnutls.c` missing `stdint.h`, fix for ArchLinux
+- Issue #179: Update easyDNS plugin to new API, by Nicholas Alipaz
+
+
+[v2.2][] - 2017-08-09
+---------------------
+
+### Changes
+- Use HTTP by default for DYN.com checkip server, used by many DDNS
+  providers that do not have their own.  This change is far more user
+  friendly since you no longer have to explicitly set `checkip-ssl =
+  false` for the most common use-case.
+- Some DDNS providers have multiple IP addresses registered for the same
+  service, as of this release Inadyn immediately tries to connect to the
+  next listed addresses on connection problems.
+- Issue #153: Support for custom HTTP User Agent.  Useful with providers
+  that require using a specific brower.  Set to, e.g. "Mozilla/4.0", or
+  rely on the default "inadyn/VERSION" user agent.
+- Support for the `%%` format specifier in custom server URL's, as
+  mentioned in issue #152.
+- Add support for a `.conf` syntax checker: `inadyn --check-config`
+- Add support for logging to `stderr` when running in foreground or
+  without syslog enabled
+- Simplified provider name lookup in `.conf` file.  Now substring match
+  is used, resulting in support for `provider Dyn { ... }`.
+- Remove libite dependency by importing all its used files into inadyn.
+  This should ease adoption by distributions and end users.  All code
+  is under free licenses: BSD, ISC.
+- Import Timur's Debian packaging, adding debconf support
+
+### Fixes
+- Issue #152: Do not attempt to create PID file in oneshot mode (`-1`)
+- Issue #152: Must URL encode custom server URL's
+- Issue #170: Use configured `--prefix` not hard coded `/etc/inadyn.conf`
+- Issue #172: Use separate variable for `--iface` command line option and
+  `.conf` file option
+
+
+[v2.1][] - 2016-12-04
+---------------------
+
+### Changes
+- Use HTTPS instead of HTTP by default
+- Support for disabling HTTPS for `checkip-server`, per provider.
+  Idea from Valery Frolov
+- Add `-I,--ident=NAME` option for syslog+pidfile name
+- Deprecate `--pidfile=NAME` option in favor of `--ident=NAME`
+
+### Fixes
+- Issue #150: Custom update URL parser fixes
+- Issue #151: Support for detecting OpenSSL v1.1
+- Issue #144: Clarify use of public vs private IP.  It is possible
+  to register private IP addresses in a public DNS
+- Clarify `--foreground` option in man page
+- Document minimum required versions of libite and libConfuse
+- Portability fixes, replace `__progname` with a small function,
+  replace `%m` with `%s` and `strerror(errno)`.
+
+
+[v2.0][] - 2016-09-12
+---------------------
+
+New configuration file format, changed command line options, improved
+HTTPS support using GnuTLS and Open/LibreSSL.  Inadyn now comes with
+certificate validation enabled by default.
+
+### Changes
+- New configuration file format using [libConfuse][]
 - Radically simplified command line, a .conf file is now required
 - Reorganized SSL code, split `ssl.c` into `openssl.c` and `gnutls.c`
 - Strict HTTPS certificate validation is now default.  To disable this
@@ -21,7 +153,7 @@ New configuration file format and changed command line options.
   to provide the path to another CA cert bundle, in PEM format.
 - Massive overhaul of `inadyn(8)` and `inadyn.conf(5)` man pages
 - Support for reading address from interface, including IPv6 addresses
-- Support for calling an external script to get the IP address.
+- Support for calling an external script to get the IP address
 - Support for multiple users @ same provider, idea from Valery Frolov:
 
         provider default@no-ip.com:1 {
@@ -613,8 +745,14 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/1.99.15...HEAD
-[v2.0]: https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.3...HEAD
+[v2.4]:   https://github.com/troglobit/inadyn/compare/v2.3.1...v2.4
+[v2.3.1]: https://github.com/troglobit/inadyn/compare/v2.3...v2.3.1
+[v2.3]:   https://github.com/troglobit/inadyn/compare/v2.2.1...v2.3
+[v2.2.1]: https://github.com/troglobit/inadyn/compare/v2.2...v2.2.1
+[v2.2]:   https://github.com/troglobit/inadyn/compare/v2.1...v2.2
+[v2.1]:   https://github.com/troglobit/inadyn/compare/v2.0...v2.1
+[v2.0]:   https://github.com/troglobit/inadyn/compare/1.99.15...v2.0
 [1.99.15]: https://github.com/troglobit/inadyn/compare/1.99.14...1.99.15
 [1.99.14]: https://github.com/troglobit/inadyn/compare/1.99.13...1.99.14
 [1.99.13]: https://github.com/troglobit/inadyn/compare/1.99.12...1.99.13
@@ -640,9 +778,4 @@ First stable version.
 [1.97.0]: https://github.com/troglobit/inadyn/compare/1.96.2...1.97.0
 [libite]: https://github.com/troglobit/libite
 [README.md]: https://github.com/troglobit/inadyn/blob/master/README.md
-
-<!--
-  -- Local Variables:
-  -- mode: markdown
-  -- End:
-  -->
+[libConfuse]: https://github.com/martinh/libconfuse

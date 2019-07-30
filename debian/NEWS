@@ -1,0 +1,69 @@
+inadyn (1.99.3-1) unstable; urgency=low
+
+  This release fixes the following bugs: #709391, #711226. The installation
+  script checks the owner id and group id of the directory /run/inadyn and
+  if that user or group is root, then they changed to the debian-inadyn, which
+  by default are used for inadyn.
+
+  If you have created a custom user/group, you need to set up the $USER/$GROUP
+  in the file /etc/default/inadyn. Or change user/group of /run/inadyn
+  directory to debian-inadyn.
+
+ -- Timur Birsh <taem@linukz.org>  Thu, 18 Jul 2013 15:30:55 +0600
+
+inadyn (1.98.1+git20130517-1) unstable; urgency=low
+
+  New upstream release is based on the several sources: original INADYN
+  implementation from Narcis Ilisei, INADYN by Christoph Brill
+  (https://sourceforge.net/projects/inadyn/), inadyn-advanced
+  (https://sourceforge.net/projects/inadyn-advanced/),
+  Neufbox4 patches from http://dev.efixo.net, wl500g patches from
+  http://code.google.com/p/wl500g, patch by Christian Eyrich (multiple
+  accounts) and patches by Timur Birsh (https://github.com/taem/inadyn).
+
+  New upstream homepage is http://github.com/troglobit/inadyn.
+
+  The following DDNS providers added:
+    - http://www.3322.org
+    - http://www.easydns.org
+    - http://www.tzo.com
+    - http://dnsomatic.com/
+    - https://dns.he.net/
+    - http://www.dynsip.org
+    - http://www.sitelutions.com
+
+  New options:
+    - pidfile <FILE>
+      path to the pidfile, defaults to /run/inadyn/inadyn.pid.
+    - iface <IFNAME>
+      sets interface to bind to.
+    - exec <SCRIPT>
+      Full path to external command, or script, to run after a successful
+      DDNS update.
+    - wildcard
+      Enable domain name wildcarding for dyndns.org, 3322.org, or easydns.com.
+      Default disabled.
+    - test
+      Force one update and quit.
+
+  Renamed options (former --> new):
+    - dyndns_system --> system
+    - update_period_sec --> period
+    - log_file --> logfile
+    - change_persona --> drop-privs
+    - input_file --> config
+    - ip_server_name --> checkip-url
+    - dyndns_server_name --> server-name
+    - dyndns_server_url --> server-url
+    - proxy_server --> proxy-server
+    - forced_update_period --> forced-update
+  Old option names supported.
+
+  A drop-privs option now accepts username and groupname instead of the uid/gid.
+
+  Now inadyn can start on boot. Please edit /etc/inadyn.conf, then set
+  RUN_DAEMON to "yes" in /etc/default/inadyn.
+
+  By default inadyn logs messages to the file /var/log/inadyn/inadyn.log.
+
+ -- Timur Birsh <taem@linukz.org>  Fri, 17 May 2013 16:58:56 +0600

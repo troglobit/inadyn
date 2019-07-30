@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
- * Copyright (C) 2010-2014  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@
 	"tid=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
-	"User-Agent: " AGENT_NAME " " SUPPORT_ADDR "\r\n\r\n"
+	"User-Agent: %s\r\n\r\n"
 #define MD5_DIGEST_BYTES  16
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
@@ -69,16 +69,17 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			info->creds.username,
 			digeststr,
 			alias->name,
-			info->server_name.name);
+			info->server_name.name,
+			info->user_agent);
 }
 
 /*
  * Hurricate Electric IPv6 tunnelbroker specific response validator
  * Own IP address and 'already in use' are the good answers.
  */
-static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t *alias)
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->p_rsp_body;
+	char *resp = trans->rsp_body;
 
 	DO(http_status_valid(trans->status));
 
@@ -86,7 +87,7 @@ static int response(http_trans_t *trans, ddns_info_t *UNUSED(info), ddns_alias_t
 	    strstr(resp, "-ERROR: This tunnel is already associated with this IP address."))
 		return 0;
 
-	return RC_DYNDNS_RSP_NOTOK;
+	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)
