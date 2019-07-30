@@ -134,12 +134,18 @@ This looks for the default `.conf` file, to check any file, use:
     }
 
     provider dyn {
-	    ssl         = false
+        ssl         = false
         username    = charlie
         password    = snoopy
         hostname    = { peanuts, woodstock }
-		user-agent  = Mozilla/4.0
-	}
+	user-agent  = Mozilla/4.0
+    }   
+
+    provider duckdns.org {
+        username         = YOUR_TOKEN
+        password         = noPasswordForDuckdns
+        hostname         = YOUR_DOMAIN.duckdns.org
+    }
 
     # With multiple usernames at the same provider, index with :#
     provider no-ip.com:1 {
