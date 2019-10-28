@@ -222,8 +222,12 @@ int tcp_send(tcp_sock_t *tcp, const char *buf, int len)
 
 	if (!tcp->initialized)
 		return RC_TCP_OBJECT_NOT_INITIALIZED;
-
+again:
 	if (send(tcp->socket, buf, len, 0) == -1) {
+		int err = errno;
+		if(err == EAGAIN || err == EWOULDBLOCK){ /* Markus @ Dovado Europe AB */
+			goto again;
+		}
 		logit(LOG_WARNING, "Network error while sending query/update: %s", strerror(errno));
 		return RC_TCP_SEND_ERROR;
 	}
@@ -246,11 +250,16 @@ int tcp_recv(tcp_sock_t *tcp, char *buf, int len, int *recv_len)
 
 	while (remaining_bytes > 0) {
 		int bytes;
+		int err = 0;
 		int chunk_size = remaining_bytes > TCP_DEFAULT_READ_CHUNK_SIZE
 			? TCP_DEFAULT_READ_CHUNK_SIZE
 			: remaining_bytes;
 
 		bytes = recv(tcp->socket, buf + total_bytes, chunk_size, 0);
+		err = errno;
+		if(bytes == -1 && (err == EAGAIN || err == EWOULDBLOCK)){ /* Markus @ Dovado Europe AB */
+			continue;
+		}
 		if (bytes < 0) {
 			logit(LOG_WARNING, "Network error while waiting for reply: %s", strerror(errno));
 			rc = RC_TCP_RECV_ERROR;
