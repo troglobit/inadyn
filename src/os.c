@@ -58,6 +58,7 @@ int os_shell_execute(char *cmd, char *ip, char *name)
 
 	case -1:
 		rc = RC_OS_FORK_FAILURE;
+		break;
 	default:
 		break;
 	}
@@ -108,6 +109,35 @@ static void unix_signal_handler(int signo)
 	}
 }
 
+static int os_install_child_handler(void)
+{
+	int rc = 0;
+	static int installed = 0;
+	struct sigaction sa;
+	
+	if (!installed) {
+		memset(&sa, 0, sizeof(struct sigaction));
+
+		sa.sa_flags = 0;
+#ifdef SA_RESTART
+		sa.sa_flags |= SA_RESTART;
+#endif
+		sa.sa_handler = SIG_IGN; /* Set to 'ignore' which is supposed to reap children since POSIX.1-2001, since we are not interested in the exit status. */
+
+		rc = sigemptyset(&sa.sa_mask) ||
+			sigaddset(&sa.sa_mask, SIGCHLD) ||
+			sigaction(SIGCHLD, &sa, NULL);
+
+		installed = 1;
+	}
+
+	if (rc == ((int)SIG_ERR)) {
+		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
+		return RC_OS_INSTALL_SIGHANDLER_FAILED;
+	}
+	return 0;
+}
+
 /**
  * Install signal handler for signals HUP, INT, TERM and USR1
  *
@@ -121,7 +151,11 @@ int os_install_signal_handler(void *ctx)
 	struct sigaction sa;
 
 	if (!installed) {
+		memset(&sa, 0, sizeof(struct sigaction));
 		sa.sa_flags   = 0;
+#ifdef SA_RESTART
+		sa.sa_flags |= SA_RESTART;
+#endif
 		sa.sa_handler = unix_signal_handler;
 
 		rc = sigemptyset(&sa.sa_mask) ||
@@ -139,7 +173,10 @@ int os_install_signal_handler(void *ctx)
 		installed = 1;
 	}
 
-	if (rc) {
+	if (script_exec) 
+		os_install_child_handler();
+
+	if (rc == ((int)SIG_ERR)) {
 		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
