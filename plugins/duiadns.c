@@ -39,10 +39,10 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "ipv4.duia.ro",
+	.checkip_name = "ipv4.duiadns.net",
 	.checkip_url  = "/",
 
-	.server_name  = "ipv4.duia.ro",
+	.server_name  = "ipv4.duiadns.net",
 	.server_url   = "/dynamic.duia"
 };
 
