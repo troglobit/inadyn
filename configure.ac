@@ -91,6 +91,7 @@ AC_CHECK_HEADERS([confuse.h], [],
 # If HTTPS is enabled we check for either OpenSSL/LibreSSL or GnuTLS libs+headers
 if test "x$ac_enable_ssl" = "xyes"; then
    if test "x$ac_enable_openssl" = "xyes"; then
+      ac_enable_gnutls="no"
       PKG_CHECK_MODULES([OpenSSL], [openssl])
       LDFLAGS="$LDFLAGS $OpenSSL_LIBS"
       CPPFLAGS="$CPPFLAGS $OpenSSL_CFLAGS"
@@ -107,6 +108,7 @@ if test "x$ac_enable_ssl" = "xyes"; then
 			])
       AC_DEFINE([CONFIG_OPENSSL], [], [Enable HTTPS support using OpenSSL/LibreSSL library])
    else
+      ac_enable_gnutls="yes"
       PKG_CHECK_MODULES([GnuTLS], [gnutls >= 3.0])
       LDFLAGS="$LDFLAGS $GnuTLS_LIBS"
       CPPFLAGS="$CPPFLAGS $GnuTLS_CFLAGS"
@@ -117,6 +119,9 @@ if test "x$ac_enable_ssl" = "xyes"; then
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
    fi
    AC_DEFINE([ENABLE_SSL], [], [Enable HTTPS support])
+else
+   ac_enable_gnutls="no"
+   ac_enable_openssl="no"
 fi
 
 
@@ -170,3 +175,36 @@ SBINDIR=`eval echo $SBINDIR`
 AC_SUBST(SBINDIR)
 
 AC_OUTPUT
+
+# Expand directories for configuration summary, unexpanded defaults:
+# sysconfdir  => ${prefix}/etc
+# runstatedir => ${localstatedir}/run
+SYSCONFDIR=`eval echo $sysconfdir`
+RUNSTATEDIR=`eval echo $runstatedir`
+RUNSTATEDIR=`eval echo $RUNSTATEDIR`
+CACHEDIR=`eval echo $localstatedir/cache`
+
+cat <<EOF
+
+------------------ Summary ------------------
+ $PACKAGE_NAME version $PACKAGE_VERSION
+  Prefix.........: $prefix
+  Sysconfdir.....: $SYSCONFDIR
+  Runstatedir....: $RUNSTATEDIR
+  Cachedir.......: $CACHEDIR
+  C Compiler.....: $CC $CFLAGS $CPPFLAGS $LDFLAGS $LIBS
+
+ Optional features:
+  HTTPS support..: $ac_enable_ssl
+    GnuTLS.......: $ac_enable_gnutls
+    Open/LibreSSL: $ac_enable_openssl
+  systemd........: $with_systemd
+
+------------- Compiler version --------------
+$($CC --version || true)
+---------------------------------------------
+
+Check the above options and compile with:
+ ${MAKE-make}
+
+EOF
