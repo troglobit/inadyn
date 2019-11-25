@@ -1,5 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
-AM_CPPFLAGS      = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\" -DLOCALSTATEDIR=\"@localstatedir@\"
+AM_CPPFLAGS      = -I$(top_srcdir)/include -DSYSCONFDIR=\"@sysconfdir@\"
+AM_CPPFLAGS     += -DLOCALSTATEDIR=\"@localstatedir@\" -DRUNSTATEDIR=\"@runstatedir@\"
 AM_CPPFLAGS     += -D_GNU_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE
 AM_CFLAGS        = -W -Wall -Wextra -Wno-unused-parameter -std=gnu99
 

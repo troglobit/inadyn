@@ -48,7 +48,7 @@ static pid_t pidfile_pid  = 0;
 
 static void pidfile_cleanup(void);
 
-const  char *__pidfile_path = LOCALSTATEDIR "/run";
+const  char *__pidfile_path = RUNSTATEDIR;
 const  char *__pidfile_name = NULL;
 extern char *prognm;
 

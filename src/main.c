@@ -238,7 +238,7 @@ static int usage(int code)
 
 	DO(compose_paths());
 	if (pidfile_name[0] != '/')
-		snprintf(pidfn, sizeof(pidfn), "%s/run/%s.pid", LOCALSTATEDIR, pidfile_name);
+		snprintf(pidfn, sizeof(pidfn), "%s/%s.pid", RUNSTATEDIR, pidfile_name);
 	else
 		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
 		char pidfn[80];
 
 		if (pidfile_name[0] != '/')
-			snprintf(pidfn, sizeof(pidfn), "%s/run/%s.pid", LOCALSTATEDIR, pidfile_name);
+			snprintf(pidfn, sizeof(pidfn), "%s/%s.pid", RUNSTATEDIR, pidfile_name);
 		else
 			snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
