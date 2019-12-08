@@ -22,5 +22,6 @@ RUN apk --no-cache add \
   confuse \
   gnutls
 
-ENTRYPOINT [ "inadyn" ]
-CMD [ "--foreground" ]
+ENV INADYN_OPTS=""
+
+ENTRYPOINT [ "sh", "-c", "inadyn", "--foreground", $INADYN_OPTS]
