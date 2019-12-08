@@ -24,4 +24,4 @@ RUN apk --no-cache add \
 
 ENV INADYN_OPTS=""
 
-ENTRYPOINT [ "sh", "-c", "inadyn", "--foreground", $INADYN_OPTS]
+ENTRYPOINT inadyn --foreground ${INADYN_OPTS}
