@@ -21,6 +21,11 @@
 
 #include "plugin.h"
 
+/*
+ * Note: this is the exact same as a dynv6-ipv4.c and should probably be
+ *       refactored to be the same plugin.  In the meantime, please make
+ *       sure to update both if you change something. --J
+ */
 #define DYNV6_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"ipv6=auto&"							\

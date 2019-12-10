@@ -21,7 +21,12 @@
 
 #include "plugin.h"
 
-#define IPV4_DYNV6_UPDATE_IP_REQUEST						\
+/*
+ * Note: this is the exact same as a dynv6.c and should probably be
+ *       refactored to be the same plugin.  In the meantime, please
+ *       make sure to update both if you change something. --J
+ */
+#define DYNV6_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"ipv4=auto&"							\
 	"hostname=%s&"							\
@@ -51,7 +56,7 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			IPV4_DYNV6_UPDATE_IP_REQUEST,
+			DYNV6_UPDATE_IP_REQUEST,
 			info->server_url,
 			alias->name,
 			info->creds.username,
@@ -65,7 +70,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "updated"))
+	if (strstr(resp, "updated") || strstr(resp, "unchanged"))
 		return 0;
 
 	return RC_DDNS_RSP_NOTOK;
