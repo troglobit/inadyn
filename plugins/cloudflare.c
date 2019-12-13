@@ -229,11 +229,13 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	trans.rsp = response_buf;
 	trans.max_rsp_len = RESP_BUFFER_SIZE - 1; /* Save place for a \0 at the end */
 
+	logit(LOG_DEBUG, "Request:\n%s", request);
 	CHECK(http_transaction(&client, &trans));
 
 	http_exit(&client);
 	http_destruct(&client, 1);
 
+	logit(LOG_DEBUG, "Response:\n%s", trans.rsp);
 	CHECK(check_response_code(trans.status));
 
 	const char *response = trans.rsp_body;
