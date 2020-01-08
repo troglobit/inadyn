@@ -197,8 +197,10 @@ This looks for the default `.conf` file, to check any file, use:
          hostname = yourhost.example.com
     }
 	
+	# API token must have the Zone.Zone Read and Zone.DNS Edit permissions
+	# global API keys are NOT supported for security reasons
 	provider cloudflare.com {
-         username = your_email
+         username = unused (but currently something must be entered)
          password = your_api_token
          hostname = yourhost.example.com
     }
