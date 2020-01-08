@@ -28,27 +28,24 @@
 #define API_URL "/client/v4"
 
 static const char *CLOUDFLARE_ZONE_ID_REQUEST = "GET " API_URL "/zones?name=%s HTTP/1.0\r\n"	\
-	"Host: " API_HOST "\r\n"	\
-	"User-Agent: %s\r\n"		\
-	"Accept: */*\r\n"			\
-	"X-Auth-Email: %s\r\n"		\
-	"X-Auth-Key: %s\r\n"		\
+	"Host: " API_HOST "\r\n"		\
+	"User-Agent: %s\r\n"			\
+	"Accept: */*\r\n"				\
+	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
 	
 static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dns_records?type=A&name=%s HTTP/1.0\r\n"	\
-	"Host: " API_HOST "\r\n"	\
-	"User-Agent: %s\r\n"		\
-	"Accept: */*\r\n"			\
-	"X-Auth-Email: %s\r\n"		\
-	"X-Auth-Key: %s\r\n"		\
+	"Host: " API_HOST "\r\n"		\
+	"User-Agent: %s\r\n"			\
+	"Accept: */*\r\n"				\
+	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
 	
 static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
-	"Host: " API_HOST "\r\n"	\
-	"User-Agent: %s\r\n"		\
-	"Accept: */*\r\n"			\
-	"X-Auth-Email: %s\r\n"		\
-	"X-Auth-Key: %s\r\n"		\
+	"Host: " API_HOST "\r\n"		\
+	"User-Agent: %s\r\n"			\
+	"Accept: */*\r\n"				\
+	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n" \
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
@@ -72,8 +69,8 @@ static ddns_system_t plugin = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "api.cloudflare.com",
-	.server_url   = "/client/v4"
+	.server_name  = API_HOST,
+	.server_url   = API_URL
 };
 
 #define MAX_NAME 64
@@ -93,22 +90,19 @@ static int check_response_code(int status)
 		case 304:
 			return RC_OK;
 		case 400:
-			logit(LOG_ERR, "Cloudflare says our request was invalid.");
-			return RC_DDNS_RSP_NOTOK;
-		case 401:
-			logit(LOG_ERR, "Bad username.");
+			logit(LOG_ERR, "HTTP 400: Cloudflare says our request was invalid. Possibly a malformed API token.");
 			return RC_DDNS_RSP_NOTOK;
 		case 403:
-			logit(LOG_ERR, "We're not allowed to perform the DNS update with the provided credentials.");
+			logit(LOG_ERR, "HTTP 403: Provided API token does not have the required permissions.");
 			return RC_DDNS_INVALID_OPTION;
 		case 429:
-			logit(LOG_WARNING, "We got rate limited.");
+			logit(LOG_WARNING, "HTTP 429: We got rate limited.");
 			return RC_DDNS_RSP_RETRY_LATER;
 		case 405:
-			logit(LOG_ERR, "Bad HTTP method; the interface changed?");
+			logit(LOG_ERR, "HTTP 405: Bad HTTP method; has the interface changed?");
 			return RC_DDNS_RSP_NOTOK;
 		case 415:
-			logit(LOG_ERR, "Cloudflare didn't like our JSON; the inferface changed?");
+			logit(LOG_ERR, "HTTP 415: Cloudflare didn't like our JSON; has the inferface changed?");
 			return RC_DDNS_RSP_NOTOK;
 		default:
 			logit(LOG_ERR, "Received status %i, don't know what that means.", status);
@@ -256,17 +250,6 @@ cleanup:
 	return rc;
 }
 
-static int check_username(const ddns_info_t *info)
-{
-	/* cloudflare complains about request headers if the username is not an email, so let's try to make sure it is */
-	if (!strchr(info->creds.username, '@')) {
-		logit(LOG_ERR, "Username not in correct format. (Should be an email address.)");
-		return RC_DDNS_INVALID_OPTION;
-	}
-
-	return RC_OK;
-}
-
 static void get_zone(char *dest, const char *hostname)
 {
 	const char *end = hostname + strlen(hostname);
@@ -293,8 +276,6 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	const size_t REQUEST_BUFFER_SIZE = 1028;
 
 	char zone_name[MAX_NAME];
-
-	DO(check_username(info));
 	get_zone(zone_name, hostname->name);
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
@@ -308,7 +289,6 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			CLOUDFLARE_ZONE_ID_REQUEST,
 			zone_name,
 			info->user_agent,
-			info->creds.username,
 			info->creds.password);
 
 		if (request_len > REQUEST_BUFFER_SIZE) {
@@ -334,7 +314,6 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			data.zone_id,
 			hostname->name,
 			info->user_agent,
-			info->creds.username,
 			info->creds.password);
 
 		if (request_len > REQUEST_BUFFER_SIZE) {
@@ -368,7 +347,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
 		data.zone_id, data.hostname_id,
 		info->user_agent,
-		info->creds.username,
 		info->creds.password,
 		content_len, json_data);
 }
