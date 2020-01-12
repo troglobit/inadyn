@@ -156,9 +156,23 @@ static int drop_privs(void)
 
 static void parse_privs(char *user)
 {
-	char *group = strstr(user, ":");
 	struct passwd *pw;
+	char *group;
+	char buf[L_cuserid];
 
+	if (!user) {
+		if (!cuserid(buf))
+			user = getenv("LOGNAME");
+		else
+			user = buf;
+	}
+
+	if (!user) {
+		logit(LOG_INFO, "Cannot figure out username", user);
+		return;
+	}
+
+	group = strstr(user, ":");
 	if (group)
 		*group++ = 0;
 
@@ -315,6 +329,9 @@ int main(int argc, char *argv[])
 		{ NULL,                0, 0, 0   }
 	};
 	ddns_t *ctx = NULL;
+
+	/* Set up initial values for uid + gid */
+	parse_privs(NULL);
 
 	prognm = ident = progname(argv[0]);
 	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:P:st:v", opt, NULL)) != EOF) {
