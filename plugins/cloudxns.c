@@ -94,7 +94,6 @@ static char *get_time(char *str, size_t len)
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	int           i, rc = 0;
 	http_t        client;
 	http_trans_t  trans;
 	char          digeststr[MD5_DIGEST_BYTES * 2 + 1];
@@ -102,7 +101,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	char          buffer[256], domain[256], prefix[sizeof(alias->name)], param[256], date[30];
 	char          *tmp, *item;
 	int           domain_id = 0, record_id = 0;
-	size_t        hostlen, domainlen, len, paramlen;
 
 	get_time(date, sizeof(date));
 
@@ -111,6 +109,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	 * SECRET_KEY = info->creds.password
 	 */
 	do {
+		size_t hostlen, domainlen, len, paramlen;
+		int i, rc = 0;
+
 		TRY(http_construct(&client));
 
 		http_set_port(&client, info->server_name.port);
@@ -156,10 +157,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		 * }
 		 */
 		tmp = strchr(trans.rsp_body, '[');
-		if (!tmp) {
-			rc = RC_DDNS_INVALID_OPTION;
-			break;
-		}
+		if (!tmp)
+			break;	/* RC_DDNS_INVALID_OPTION */
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
 			int num, id;
@@ -177,8 +176,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		if (domain_id == 0) {
 			logit(LOG_ERR, "Hostname '%s' not found in domains list!", alias->name);
-			rc = RC_DDNS_INVALID_OPTION;
-			break;
+			break;	/* RC_DDNS_INVALID_OPTION */
 		}
 		logit(LOG_DEBUG, "CloudXNS Domain: '%s' ID: %u", domain, domain_id);
 
@@ -207,9 +205,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		rc  = http_transaction(&client, &trans);
 		rc |= http_exit(&client);
-
 		http_destruct(&client, 1);
-
 		if (rc)
 			break;
 
@@ -217,10 +213,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		TRY(http_status_valid(trans.status));
 
 		tmp = strchr(trans.rsp_body, '[');
-		if (!tmp) {
-			rc = RC_DDNS_INVALID_OPTION;
-			break;
-		}
+		if (!tmp)
+			break;	/* RC_DDNS_INVALID_OPTION */
 
 		hostlen = strlen(alias->name);
 		domainlen = strlen(domain);
@@ -250,8 +244,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 		if (record_id == 0) {
 			logit(LOG_ERR, "Record '%s' not found in records list!", prefix);
-			rc = RC_DDNS_INVALID_OPTION;
-			break;
+			break;	/* RC_DDNS_INVALID_OPTION */
 		}
 		logit(LOG_DEBUG, "CloudXNS Record: '%s' ID: %u", prefix, record_id);
 
