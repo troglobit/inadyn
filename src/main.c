@@ -21,6 +21,7 @@
  */
 
 #include <getopt.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <pwd.h>		/* getpwnam() */
 #include <grp.h>		/* getgrnam() */
