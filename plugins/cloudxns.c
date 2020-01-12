@@ -99,7 +99,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	http_trans_t  trans;
 	char          digeststr[MD5_DIGEST_BYTES * 2 + 1];
 	unsigned char digestbuf[MD5_DIGEST_BYTES];
-	char          buffer[256], domain[256], prefix[64], param[256], date[30];
+	char          buffer[256], domain[256], prefix[sizeof(alias->name)], param[256], date[30];
 	char          *tmp, *item;
 	int           domain_id = 0, record_id = 0;
 	size_t        hostlen, domainlen, len, paramlen;
@@ -228,8 +228,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			prefix[0] = '@';
 			prefix[1] = 0;
 		} else {
-			strncpy(prefix, alias->name, hostlen - domainlen - 1);
-			prefix[hostlen - domainlen - 1] = 0;
+			size_t num = hostlen - domainlen - 1;
+
+			if (num <= sizeof(prefix))
+				strlcpy(prefix, alias->name, num);
 		}
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
