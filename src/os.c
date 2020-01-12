@@ -191,10 +191,10 @@ int os_install_signal_handler(void *ctx)
 /*
  * Check file system permissions
  *
- * Create pid and cache file repository, make sure we can write to it.  If
- * we are restarted we cannot otherwise make sure we've not already updated
- * the IP -- and the user will be locked-out of their DDNS server provider
- * for excessive updates.
+ * Try to create PID file directory and cache file repository.  Check if
+ * we are allowed to write to them.  This to ensure we can both signal
+ * ACK to a SIGHUP and to ensure we do not cause op to have their DDNS
+ * provider lock them out for excessive updates.
  */
 int os_check_perms(void)
 {
@@ -202,15 +202,11 @@ int os_check_perms(void)
 	umask(S_IWGRP | S_IWOTH);
 
 	if ((mkpath(cache_dir, 0755) && errno != EEXIST) || access(cache_dir, W_OK)) {
-		logit(LOG_ERR, "No write permission to %s, aborting.", cache_dir);
-		logit(LOG_ERR, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
-		return RC_FILE_IO_ACCESS_ERROR;
-	}
-
-	if (chown(cache_dir, uid, gid)) {
-		logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", cache_dir);
-		return RC_FILE_IO_ACCESS_ERROR;
-	}
+		logit(LOG_WARNING, "No write permission to %s: %s", cache_dir, strerror(errno));
+		logit(LOG_WARNING, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
+	} else if (chown(cache_dir, uid, gid))
+		logit(LOG_WARNING, "Cannot change owner of cache directory %s to %d:%d, skipping: %s",
+		      cache_dir, uid, gid, strerror(errno));
 
 	if (pidfile_name && pidfile_name[0] == '/') {
 		char *pidfile_dir;
@@ -222,15 +218,12 @@ int os_check_perms(void)
 
 		pidfile_dir = dirname(strdupa(pidfile_name));
 		if (access(pidfile_dir, F_OK)) {
-			if (mkpath(pidfile_dir, 0755) && errno != EEXIST) {
+			if (mkpath(pidfile_dir, 0755) && errno != EEXIST)
 				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
-				return RC_FILE_IO_ACCESS_ERROR;
-			}
-
-			if (chown(pidfile_dir, uid, gid)) {
-				logit(LOG_ERR, "Not allowed to change owner of %s, aborting.", pidfile_dir);
-				return RC_FILE_IO_ACCESS_ERROR;
-			}
+			else if (chown(pidfile_dir, uid, gid))
+				logit(LOG_WARNING,
+				      "Cannot change owner of PID file directory %s to %d:%d, skipping: %s",
+				      pidfile_dir, uid, gid, strerror(errno));
 		}
 	}
 
