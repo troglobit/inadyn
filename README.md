@@ -196,10 +196,17 @@ This looks for the default `.conf` file, to check any file, use:
          password = your_api_token
          hostname = yourhost.example.com
     }
-	
-	# API token must have the Zone.Zone Read and Zone.DNS Edit permissions
-	# global API keys are NOT supported for security reasons
-	provider cloudflare.com {
+
+    # Create a unique API token with the following Permissions:
+    #   Zone: Zone - Read
+    #   Zone: DNS - Edit
+    #
+    # If the token is limited to a specific zone (it should be) it will also need
+    #   Account: Account Settings - Read
+    # per https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
+    #
+    # global API keys are NOT supported for security reasons
+    provider cloudflare.com {
          username = unused (but currently something must be entered)
          password = your_api_token
          hostname = yourhost.example.com
@@ -515,4 +522,3 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [Travis Status]:    https://travis-ci.org/troglobit/inadyn.png?branch=master
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
 [Coverity Status]:  https://scan.coverity.com/projects/2981/badge.svg
-
