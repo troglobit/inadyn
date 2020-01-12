@@ -111,30 +111,34 @@ static void unix_signal_handler(int signo)
 
 static int os_install_child_handler(void)
 {
-	int rc = 0;
 	static int installed = 0;
-	struct sigaction sa;
-	
-	if (!installed) {
-		memset(&sa, 0, sizeof(struct sigaction));
+	int rc = 0;
 
-		sa.sa_flags = 0;
+	if (!installed) {
+		struct sigaction sa = { 0 };
+
+		/*
+		 * Set to 'ignore' which is supposed to reap children
+		 * since POSIX.1-2001, since we are not interested in
+		 * the exit status.
+		 */
 #ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #endif
-		sa.sa_handler = SIG_IGN; /* Set to 'ignore' which is supposed to reap children since POSIX.1-2001, since we are not interested in the exit status. */
+		sa.sa_handler = SIG_IGN;
 
-		rc = sigemptyset(&sa.sa_mask) ||
-			sigaddset(&sa.sa_mask, SIGCHLD) ||
-			sigaction(SIGCHLD, &sa, NULL);
+		rc = (sigemptyset(&sa.sa_mask)        ||
+		      sigaddset(&sa.sa_mask, SIGCHLD) ||
+		      sigaction(SIGCHLD, &sa, NULL));
 
 		installed = 1;
 	}
 
-	if (rc == ((int)SIG_ERR)) {
+	if (-1 == rc) {
 		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
+
 	return 0;
 }
 
@@ -146,29 +150,28 @@ static int os_install_child_handler(void)
  */
 int os_install_signal_handler(void *ctx)
 {
-	int rc = 0;
 	static int installed = 0;
-	struct sigaction sa;
+	int rc = 0;
 
 	if (!installed) {
-		memset(&sa, 0, sizeof(struct sigaction));
-		sa.sa_flags   = 0;
+		struct sigaction sa = { 0 };
+
 #ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #endif
 		sa.sa_handler = unix_signal_handler;
 
-		rc = sigemptyset(&sa.sa_mask) ||
-			sigaddset(&sa.sa_mask, SIGHUP)  ||
-			sigaddset(&sa.sa_mask, SIGINT)  ||
-			sigaddset(&sa.sa_mask, SIGTERM) ||
-			sigaddset(&sa.sa_mask, SIGUSR1) ||
-			sigaddset(&sa.sa_mask, SIGUSR2) ||
-			sigaction(SIGHUP, &sa, NULL)    ||
-			sigaction(SIGINT, &sa, NULL)    ||
-			sigaction(SIGUSR1, &sa, NULL)   ||
-			sigaction(SIGUSR2, &sa, NULL)   ||
-			sigaction(SIGTERM, &sa, NULL);
+		rc = (sigemptyset(&sa.sa_mask)        ||
+		      sigaddset(&sa.sa_mask, SIGHUP)  ||
+		      sigaddset(&sa.sa_mask, SIGINT)  ||
+		      sigaddset(&sa.sa_mask, SIGTERM) ||
+		      sigaddset(&sa.sa_mask, SIGUSR1) ||
+		      sigaddset(&sa.sa_mask, SIGUSR2) ||
+		      sigaction(SIGHUP, &sa, NULL)    ||
+		      sigaction(SIGINT, &sa, NULL)    ||
+		      sigaction(SIGUSR1, &sa, NULL)   ||
+		      sigaction(SIGUSR2, &sa, NULL)   ||
+		      sigaction(SIGTERM, &sa, NULL));
 
 		installed = 1;
 	}
@@ -176,7 +179,7 @@ int os_install_signal_handler(void *ctx)
 	if (script_exec) 
 		os_install_child_handler();
 
-	if (rc == ((int)SIG_ERR)) {
+	if (-1 == rc) {
 		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
