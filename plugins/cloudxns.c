@@ -100,7 +100,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	unsigned char digestbuf[MD5_DIGEST_BYTES];
 	char          buffer[256], domain[256], prefix[sizeof(alias->name)], param[256], date[30];
 	char          *tmp, *item;
-	int           domain_id = 0, record_id = 0;
+	unsigned int  domain_id = 0;
+	int           record_id = 0;
 
 	get_time(date, sizeof(date));
 
@@ -161,7 +162,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			break;	/* RC_DDNS_INVALID_OPTION */
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
-			int num, id;
+			unsigned int id;
+			int num;
 
 			item++;
 			num = sscanf(item, "{\"id\":\"%u\",\"domain\":\"%255[^\"]", &id, domain);
@@ -229,8 +231,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		}
 
 		for (item = tmp; item; item = strstr(item, ",{")) {
-			int num, id;
+			unsigned int id;
 			char _prefix[64];
+			int num;
 
 			item++;
 			num = sscanf(item, "{\"record_id\":\"%u\",\"host_id\":\"%*d\",\"host\":\"%63[^\"]", &id, _prefix);
