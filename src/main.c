@@ -21,7 +21,6 @@
  */
 
 #include <getopt.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <pwd.h>		/* getpwnam() */
 #include <grp.h>		/* getgrnam() */
@@ -159,13 +158,13 @@ static void parse_privs(char *user)
 {
 	struct passwd *pw;
 	char *group;
-	char buf[L_cuserid];
 
 	if (!user) {
-		if (!cuserid(buf))
+		pw = getpwuid(geteuid());
+		if (!pw)
 			user = getenv("LOGNAME");
 		else
-			user = buf;
+			user = pw->pw_name;
 	}
 
 	if (!user) {
