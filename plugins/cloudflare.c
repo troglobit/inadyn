@@ -41,6 +41,15 @@ static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dn
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
 	
+static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/%s/dns_records HTTP/1.0\r\n"	\
+	"Host: " API_HOST "\r\n"		\
+	"User-Agent: %s\r\n"			\
+	"Accept: */*\r\n"				\
+	"Authorization: Bearer %s\r\n"	\
+	"Content-Type: application/json\r\n" \
+	"Content-Length: %zd\r\n\r\n" \
+	"%s";
+
 static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
@@ -175,7 +184,7 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 		}
 	}
 	
-	logit(LOG_ERR, "Could not find key '%s'.", key);
+	logit(LOG_INFO, "Could not find key '%s'.", key);
 
 cleanup:
 	free(tokens);
@@ -238,7 +247,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	jsmntok_t id;
 
 	if (get_result_value(response, "id", &id) < 0) {
-		rc = RC_DDNS_INVALID_OPTION;
+		rc = RC_DDNS_RSP_NOHOST;
 		goto cleanup;
 	}
 
@@ -312,7 +321,6 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 		if (rc != RC_OK) {
 			logit(LOG_ERR, "Zone '%s' not found.", zone_name);
-			rc = RC_DDNS_RSP_NOHOST;
 			goto cleanup;
 		}
 	}
@@ -336,14 +344,12 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 		rc = get_id(data.hostname_id, MAX_ID, info, request_buf, request_len);
 
-		if (rc != RC_OK) {
-			logit(LOG_ERR, "Hostname '%s' not found.", hostname->name);
-			rc = RC_DDNS_RSP_NOHOST;
-			goto cleanup;
-		}
+		if (rc == RC_OK)
+			logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
+		else
+			logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
+			rc = RC_OK;
 	}
-
-	logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
 
 cleanup:
 	free(request_buf);
@@ -352,16 +358,29 @@ cleanup:
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
-	char          json_data[256];
+	char json_data[256];
 	const char *record_type = get_record_type(hostname->address);
-	size_t content_len = snprintf(json_data, sizeof(json_data), CLOUDFLARE_UPDATE_JSON_FORMAT, record_type, hostname->name, hostname->address);
+	size_t content_len = snprintf(json_data, sizeof(json_data),
+	  CLOUDFLARE_UPDATE_JSON_FORMAT,
+		record_type,
+		hostname->name,
+		hostname->address);
 
-	return snprintf(ctx->request_buf, ctx->request_buflen,
-		CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
-		data.zone_id, data.hostname_id,
-		info->user_agent,
-		info->creds.password,
-		content_len, json_data);
+	if (strlen(data.hostname_id) == 0)
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			CLOUDFLARE_HOSTNAME_CREATE_REQUEST,
+			data.zone_id,
+			info->user_agent,
+			info->creds.password,
+			content_len, json_data);
+	else
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
+			data.zone_id,
+			data.hostname_id,
+			info->user_agent,
+			info->creds.password,
+			content_len, json_data);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname)
