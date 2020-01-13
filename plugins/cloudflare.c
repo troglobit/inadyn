@@ -34,7 +34,7 @@ static const char *CLOUDFLARE_ZONE_ID_REQUEST = "GET " API_URL "/zones?name=%s H
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
 	
-static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dns_records?type=A&name=%s HTTP/1.0\r\n"	\
+static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dns_records?type=%s&name=%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
@@ -50,8 +50,10 @@ static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 	
-static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"A\",\"name\":\"%s\",\"content\":\"%s\"}";
+static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s\",\"content\":\"%s\"}";
 
+static const char *IPV4_RECORD_TYPE = "A";
+static const char *IPV6_RECORD_TYPE = "AAAA";
 static const char *KEY_SUCCESS = "success";
 
 static int setup	(ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
@@ -269,6 +271,14 @@ static void get_zone(char *dest, const char *hostname)
 	strncpy(dest, root, MAX_NAME);
 }
 
+const static char* get_record_type(const char *address)
+{
+	if (strstr(address, ":"))
+		return IPV6_RECORD_TYPE;
+	else
+		return IPV4_RECORD_TYPE;
+}
+
 static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
 	int rc = RC_OK;
@@ -277,6 +287,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 	char zone_name[MAX_NAME];
 	get_zone(zone_name, hostname->name);
+	const char *record_type = get_record_type(hostname->address);
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
 
@@ -312,6 +323,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		size_t request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
 			CLOUDFLARE_HOSTNAME_ID_REQUEST,
 			data.zone_id,
+			record_type,
 			hostname->name,
 			info->user_agent,
 			info->creds.password);
@@ -341,7 +353,8 @@ cleanup:
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
 	char          json_data[256];
-	size_t content_len = snprintf(json_data, sizeof(json_data), CLOUDFLARE_UPDATE_JSON_FORMAT, hostname->name, hostname->address);
+	const char *record_type = get_record_type(hostname->address);
+	size_t content_len = snprintf(json_data, sizeof(json_data), CLOUDFLARE_UPDATE_JSON_FORMAT, record_type, hostname->name, hostname->address);
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 		CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
