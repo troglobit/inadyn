@@ -97,42 +97,42 @@ static int check_response_code(int status)
 {
 	switch (status)
 	{
-		case 200:
-		case 304:
-			return RC_OK;
-		case 400:
-			logit(LOG_ERR, "HTTP 400: Cloudflare says our request was invalid. Possibly a malformed API token.");
-			return RC_DDNS_RSP_NOTOK;
-		case 403:
-			logit(LOG_ERR, "HTTP 403: Provided API token does not have the required permissions.");
-			return RC_DDNS_INVALID_OPTION;
-		case 429:
-			logit(LOG_WARNING, "HTTP 429: We got rate limited.");
-			return RC_DDNS_RSP_RETRY_LATER;
-		case 405:
-			logit(LOG_ERR, "HTTP 405: Bad HTTP method; has the interface changed?");
-			return RC_DDNS_RSP_NOTOK;
-		case 415:
-			logit(LOG_ERR, "HTTP 415: Cloudflare didn't like our JSON; has the inferface changed?");
-			return RC_DDNS_RSP_NOTOK;
-		default:
-			logit(LOG_ERR, "Received status %i, don't know what that means.", status);
-			return RC_DDNS_RSP_NOTOK;
+	case 200:
+	case 304:
+		return RC_OK;
+	case 400:
+		logit(LOG_ERR, "HTTP 400: Cloudflare says our request was invalid. Possibly a malformed API token.");
+		return RC_DDNS_RSP_NOTOK;
+	case 403:
+		logit(LOG_ERR, "HTTP 403: Provided API token does not have the required permissions.");
+		return RC_DDNS_INVALID_OPTION;
+	case 429:
+		logit(LOG_WARNING, "HTTP 429: We got rate limited.");
+		return RC_DDNS_RSP_RETRY_LATER;
+	case 405:
+		logit(LOG_ERR, "HTTP 405: Bad HTTP method; has the interface changed?");
+		return RC_DDNS_RSP_NOTOK;
+	case 415:
+		logit(LOG_ERR, "HTTP 415: Cloudflare didn't like our JSON; has the inferface changed?");
+		return RC_DDNS_RSP_NOTOK;
+	default:
+		logit(LOG_ERR, "Received status %i, don't know what that means.", status);
+		return RC_DDNS_RSP_NOTOK;
 	}
 }
 
 static int check_success(const char *json, const jsmntok_t tokens[], const int num_tokens)
 {
 	for (int i = 1; i < num_tokens; i++) {
-		if (jsoneq(json, tokens + i, KEY_SUCCESS) == 0) {
-			int true;
-			
-			if (i < num_tokens - 1 && json_bool(json, tokens + i + 1, &true) == 0) {
-				return true ? 0 : -1;
-			}
+		int set;
+
+		if (jsoneq(json, tokens + i, KEY_SUCCESS) != 0)
+			continue;
+
+		if (i < num_tokens - 1 && json_bool(json, tokens + i + 1, &set) == 0)
+			return set ? 0 : -1;
 				
-			return -1;
-		}
+		return -1;
 	}
 	
 	return -1;
@@ -140,27 +140,26 @@ static int check_success(const char *json, const jsmntok_t tokens[], const int n
 
 static int check_success_only(const char *json)
 {
-	int num_tokens;
 	jsmntok_t *tokens;
+	int num_tokens;
+	int result;
 	
 	num_tokens = parse_json(json, &tokens);	
-	
 	if (num_tokens == -1)
 		return -1;
 
-	int result = check_success(json, tokens, num_tokens);
-
+	result = check_success(json, tokens, num_tokens);
 	free(tokens);
+
 	return result;
 }
 
 static int get_result_value(const char *json, const char *key, jsmntok_t *out_result)
 {
-	int num_tokens;
 	jsmntok_t *tokens;
+	int num_tokens;
 	
 	num_tokens = parse_json(json, &tokens);
-	
 	if (num_tokens < 0)
 		return -1;
 	
@@ -175,12 +174,13 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 	}
 	
 	for (int i = 1; i < num_tokens; i++) {
-		if (jsoneq(json, tokens + i, key) == 0) {
-			if (i < num_tokens - 1) {
-				*out_result = tokens[i+1];
-				free(tokens);
-				return 0;
-			}
+		if (jsoneq(json, tokens + i, key) != 0)
+			continue;
+
+		if (i < num_tokens - 1) {
+			*out_result = tokens[i+1];
+			free(tokens);
+			return 0;
 		}
 	}
 	
@@ -193,11 +193,12 @@ cleanup:
 
 static int json_copy_value(char *dest, size_t dest_size, const char *json, const jsmntok_t *token)
 {
+	size_t length;
+
 	if (token->type != JSMN_STRING)
 		return -1;
 	
-	size_t length = token->end - token->start;
-	
+	length = token->end - token->start;
 	if (length > dest_size - 1)
 		return -2;
 	
@@ -209,15 +210,15 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 
 static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *request, size_t request_len)
 {
-	int rc = RC_OK;
-
-	const size_t RESP_BUFFER_SIZE = 4096;
-	
-	http_t        client;
+	const size_t  RESP_BUFFER_SIZE = 4096;
+	const char   *body;
 	http_trans_t  trans;
+	jsmntok_t     id;
+	http_t        client;
+	char         *response_buf;
+	int           rc = RC_OK;
 
-	char *response_buf = malloc(RESP_BUFFER_SIZE * sizeof(char));
-
+	response_buf = malloc(RESP_BUFFER_SIZE * sizeof(char));
 	if (!response_buf)
 		return RC_OUT_OF_MEMORY;
 
@@ -243,21 +244,20 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	logit(LOG_DEBUG, "Response:\n%s", trans.rsp);
 	CHECK(check_response_code(trans.status));
 
-	const char *response = trans.rsp_body;
-	jsmntok_t id;
-
-	if (get_result_value(response, "id", &id) < 0) {
+	body = trans.rsp_body;
+	if (get_result_value(body, "id", &id) < 0) {
 		rc = RC_DDNS_RSP_NOHOST;
 		goto cleanup;
 	}
 
-	if (json_copy_value(dest, dest_size, response, &id) < 0) {
+	if (json_copy_value(dest, dest_size, body, &id) < 0) {
 		logit(LOG_ERR, "Id did not fit into buffer.");
 		rc = RC_BUFFER_OVERFLOW;
 	}
 
 cleanup:
 	free(response_buf);
+
 	return rc;
 }
 
@@ -265,8 +265,8 @@ static void get_zone(char *dest, const char *hostname)
 {
 	const char *end = hostname + strlen(hostname);
 	const char *root;
-
 	int count = 0;
+
 	for (root = end; root != hostname; root--) {
 		if (*root == '.')
 			count++;
@@ -284,87 +284,88 @@ const static char* get_record_type(const char *address)
 {
 	if (strstr(address, ":"))
 		return IPV6_RECORD_TYPE;
-	else
-		return IPV4_RECORD_TYPE;
+
+	return IPV4_RECORD_TYPE;
 }
 
 static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
+	const size_t REQUEST_BUFFER_SIZE = 1028;
+	const char *record_type;
+	size_t request_len;
+	char *request_buf;
+	char zone_name[MAX_NAME];
 	int rc = RC_OK;
 
-	const size_t REQUEST_BUFFER_SIZE = 1028;
-
-	char zone_name[MAX_NAME];
 	get_zone(zone_name, hostname->name);
-	const char *record_type = get_record_type(hostname->address);
+	record_type = get_record_type(hostname->address);
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
 
-	char *request_buf = malloc(REQUEST_BUFFER_SIZE * sizeof(char));
+	request_buf = malloc(REQUEST_BUFFER_SIZE * sizeof(char));
 	if (!request_buf)
 		return RC_OUT_OF_MEMORY;
 
-	{
-		size_t request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
-			CLOUDFLARE_ZONE_ID_REQUEST,
-			zone_name,
-			info->user_agent,
-			info->creds.password);
 
-		if (request_len > REQUEST_BUFFER_SIZE) {
-			logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
-			rc = RC_BUFFER_OVERFLOW;
-			goto cleanup;
-		}
+	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
+			       CLOUDFLARE_ZONE_ID_REQUEST,
+			       zone_name,
+			       info->user_agent,
+			       info->creds.password);
 
-		rc = get_id(data.zone_id, MAX_ID, info, request_buf, request_len);
+	if (request_len > REQUEST_BUFFER_SIZE) {
+		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
+		rc = RC_BUFFER_OVERFLOW;
+		goto cleanup;
+	}
 
-		if (rc != RC_OK) {
-			logit(LOG_ERR, "Zone '%s' not found.", zone_name);
-			goto cleanup;
-		}
+	rc = get_id(data.zone_id, MAX_ID, info, request_buf, request_len);
+	if (rc != RC_OK) {
+		logit(LOG_ERR, "Zone '%s' not found.", zone_name);
+		goto cleanup;
 	}
 	
 	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data.zone_id);
 
-	{
-		size_t request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
-			CLOUDFLARE_HOSTNAME_ID_REQUEST,
-			data.zone_id,
-			record_type,
-			hostname->name,
-			info->user_agent,
-			info->creds.password);
+	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
+			       CLOUDFLARE_HOSTNAME_ID_REQUEST,
+			       data.zone_id,
+			       record_type,
+			       hostname->name,
+			       info->user_agent,
+			       info->creds.password);
+	if (request_len > REQUEST_BUFFER_SIZE) {
+		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
+		rc = RC_BUFFER_OVERFLOW;
+		goto cleanup;
+	}
 
-		if (request_len > REQUEST_BUFFER_SIZE) {
-			logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
-			rc = RC_BUFFER_OVERFLOW;
-			goto cleanup;
-		}
-
-		rc = get_id(data.hostname_id, MAX_ID, info, request_buf, request_len);
-
-		if (rc == RC_OK)
-			logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
-		else
-			logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
-			rc = RC_OK;
+	rc = get_id(data.hostname_id, MAX_ID, info, request_buf, request_len);
+	if (rc == RC_OK)
+		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
+	else {
+		logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
+		rc = RC_OK;
 	}
 
 cleanup:
 	free(request_buf);
+
 	return rc;
 }
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
+	const char *record_type;
+	size_t content_len;
 	char json_data[256];
-	const char *record_type = get_record_type(hostname->address);
-	size_t content_len = snprintf(json_data, sizeof(json_data),
-	  CLOUDFLARE_UPDATE_JSON_FORMAT,
-		record_type,
-		hostname->name,
-		hostname->address);
+
+	record_type = get_record_type(hostname->address);
+	content_len = snprintf(json_data, sizeof(json_data),
+			       CLOUDFLARE_UPDATE_JSON_FORMAT,
+			       record_type,
+			       hostname->name,
+			       hostname->address);
 
 	if (strlen(data.hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,
@@ -373,8 +374,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			info->user_agent,
 			info->creds.password,
 			content_len, json_data);
-	else
-		return snprintf(ctx->request_buf, ctx->request_buflen,
+
+	return snprintf(ctx->request_buf, ctx->request_buflen,
 			CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
 			data.zone_id,
 			data.hostname_id,
@@ -385,11 +386,12 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname)
 {
+	int rc;
+
 	(void)info;
 	(void)hostname;
 
-	int rc = check_response_code(trans->status);
-
+	rc = check_response_code(trans->status);
 	if (rc == RC_OK && check_success_only(trans->rsp_body) < 0)
 		rc = RC_DDNS_RSP_NOTOK;
 
