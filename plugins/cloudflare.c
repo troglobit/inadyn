@@ -199,10 +199,14 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 		return -1;
 	
 	length = token->end - token->start;
+	logit(LOG_INFO, "token->start: %i", token->start);
+	logit(LOG_INFO, "token->end: %i", token->end);
+	logit(LOG_INFO, "length: %i", length);
+	logit(LOG_INFO, "dest_size: %i", dest_size);
 	if (length >= dest_size)
 		return -2;
 	
-	strlcpy(dest, json + token->start, length);
+	strlcpy(dest, json + token->start, length+1);
 
 	return 0;
 }
@@ -248,11 +252,13 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 		rc = RC_DDNS_RSP_NOHOST;
 		goto cleanup;
 	}
+  logit(LOG_DEBUG, "ID position in string: %i", id);
 
 	if (json_copy_value(dest, dest_size, body, &id) < 0) {
 		logit(LOG_ERR, "Id did not fit into buffer.");
 		rc = RC_BUFFER_OVERFLOW;
 	}
+  logit(LOG_DEBUG, "ID value: %s", dest);
 
 cleanup:
 	free(response_buf);
