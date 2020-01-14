@@ -199,7 +199,7 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 		return -1;
 	
 	length = token->end - token->start;
-	if (length > dest_size - 1)
+	if (length >= dest_size)
 		return -2;
 	
 	strncpy(dest, json + token->start, length);
@@ -313,7 +313,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			       info->user_agent,
 			       info->creds.password);
 
-	if (request_len > REQUEST_BUFFER_SIZE) {
+	if (request_len >= REQUEST_BUFFER_SIZE) {
 		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
 		rc = RC_BUFFER_OVERFLOW;
 		goto cleanup;
@@ -334,7 +334,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			       hostname->name,
 			       info->user_agent,
 			       info->creds.password);
-	if (request_len > REQUEST_BUFFER_SIZE) {
+	if (request_len >= REQUEST_BUFFER_SIZE) {
 		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
 		rc = RC_BUFFER_OVERFLOW;
 		goto cleanup;
