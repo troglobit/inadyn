@@ -202,9 +202,8 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 	if (length >= dest_size)
 		return -2;
 	
-	strncpy(dest, json + token->start, length);
-	dest[length] = '\0';
-	
+	strlcpy(dest, json + token->start, length);
+
 	return 0;
 }
 
@@ -261,7 +260,7 @@ cleanup:
 	return rc;
 }
 
-static void get_zone(char *dest, const char *hostname)
+static void get_zone(char *dest, size_t dest_len, const char *hostname)
 {
 	const char *end = hostname + strlen(hostname);
 	const char *root;
@@ -277,7 +276,7 @@ static void get_zone(char *dest, const char *hostname)
 		}
 	}
 
-	strncpy(dest, root, MAX_NAME);
+	strlcpy(dest, root, dest_len);
 }
 
 const static char* get_record_type(const char *address)
@@ -297,7 +296,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	char zone_name[MAX_NAME];
 	int rc = RC_OK;
 
-	get_zone(zone_name, hostname->name);
+	get_zone(zone_name, sizeof(zone_name), hostname->name);
 	record_type = get_record_type(hostname->address);
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
