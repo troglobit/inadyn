@@ -217,7 +217,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	char         *response_buf;
 	int           rc = RC_OK;
 
-	response_buf = malloc(RESP_BUFFER_SIZE * sizeof(char));
+	response_buf = calloc(RESP_BUFFER_SIZE, sizeof(char));
 	if (!response_buf)
 		return RC_OUT_OF_MEMORY;
 
@@ -301,10 +301,9 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
 
-	request_buf = malloc(REQUEST_BUFFER_SIZE * sizeof(char));
+	request_buf = calloc(REQUEST_BUFFER_SIZE, sizeof(char));
 	if (!request_buf)
 		return RC_OUT_OF_MEMORY;
-
 
 	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
 			       CLOUDFLARE_ZONE_ID_REQUEST,
