@@ -49,9 +49,6 @@ release: release-hook distcheck package md5-dist
 	@for file in $(DIST_ARCHIVES); do					\
 		printf "%-32s Distribution tarball\n" $$file;			\
 		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';	\
-		printf "%-32s GPG signature " $$file.asc;			\
-		gpg --verify ../$$file.asc 2>&1 | grep 'key ID' | 		\
-			sed 's/.*using \(.*\)/\1/'; echo;			\
 	done
 	@for file in `cd ..; ls $(PACKAGE)_$(VERSION)*`; do			\
 		printf "%-32s Debian/Ubuntu file\n" $$file;			\
