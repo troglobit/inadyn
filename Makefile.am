@@ -40,7 +40,6 @@ package build-deb:
 	@dpkg-buildpackage -uc -us -B
 
 ## Target to run when building a release
-## distcheck <-- does not work atm., wrong search path for source/header files
 release: release-hook distcheck package md5-dist
 	@mv $(DIST_ARCHIVES) ../
 	@echo
@@ -51,5 +50,5 @@ release: release-hook distcheck package md5-dist
 		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';	\
 	done
 	@for file in `cd ..; ls $(PACKAGE)_$(VERSION)*`; do			\
-		printf "%-32s Debian/Ubuntu file\n" $$file;			\
+		printf "%-32s Debian/Ubuntu package\n" $$file;			\
 	done
