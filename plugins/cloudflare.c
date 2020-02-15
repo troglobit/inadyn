@@ -340,7 +340,8 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		       info->user_agent,
 		       info->creds.password);
 	if (len >= ctx->request_buflen) {
-		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
+		logit(LOG_ERR, "Request for zone '%s', id %s did not fit into buffer.",
+		      zone_name, data->zone_id);
 		return RC_BUFFER_OVERFLOW;
 	}
 
