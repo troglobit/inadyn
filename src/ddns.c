@@ -897,7 +897,7 @@ int ddns_main_loop(ddns_t *ctx)
 	DO(read_cache_file(ctx));
 	DO(get_encoded_user_passwd());
 
-	if (once == 1)
+	if (once && force)
 		ctx->force_addr_update = 1;
 
 	/* Initialization done, create pidfile to indicate we are ready to communicate */

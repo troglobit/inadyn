@@ -175,6 +175,7 @@ typedef struct {
 } ddns_t;
 
 extern int once;
+extern int force;
 extern int ignore_errors;
 extern int startup_delay;
 extern int allow_ipv6;

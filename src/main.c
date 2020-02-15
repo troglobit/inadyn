@@ -35,6 +35,7 @@
 #include "ssl.h"
 
 int    once = 0;
+int    force = 0;		/* Only allowed with 'once' */
 int    ignore_errors = 0;
 int    startup_delay = DDNS_DEFAULT_STARTUP_SLEEP;
 int    allow_ipv6 = 0;
@@ -257,7 +258,8 @@ static int usage(int code)
 		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
 	fprintf(stderr, "Usage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
-		" -1, --once                     Run once, then exit regardless of status\n"
+		" -1, --once                     Run only once, updates if too old or unknown\n"
+		"     --force                    Force update, even if address has not changed\n"
 		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
 		"                                Default use ident NAME: %s/\n"
 		" -c, --cmd=/path/to/cmd         Script or command to run to check IP\n"
@@ -310,6 +312,7 @@ int main(int argc, char *argv[])
 	int background = 1;
 	struct option opt[] = {
 		{ "once",              0, 0, '1' },
+		{ "force",             0, 0, '4' },
 		{ "cache-dir",         1, 0, 128 },
 		{ "cmd",               1, 0, 'c' },
 		{ "continue-on-error", 0, 0, 'C' },
@@ -459,8 +462,12 @@ int main(int argc, char *argv[])
 	log_init(ident, use_syslog < 1 ? 0 : 1, background);
 
 	/* Check permission to write PID and cache files */
-	if (!once)
+	if (!once) {
 		DO(os_check_perms());
+
+		/* Only allowed with --once */
+		force = 0;
+	}
 
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));

@@ -18,6 +18,7 @@
 .Sh SYNOPSIS
 .Nm inadyn
 .Op Fl 1, -once
+.Op Fl -force
 .Op Fl -cache-dir=PATH
 .Op Fl c, -cmd=/path/to/cmd
 .Op Fl C, -continue-on-error
@@ -140,7 +141,13 @@ configuration file format.
 .Pp
 .Bl -tag -width Ds
 .It Fl 1, -once
-Force one update and quit
+Run only once and quit, updates only if too old or unknown.  Use
+.Fl -force
+to for an update before exiting.
+.It Fl -force
+Force one update.  Only works with
+.Fl 1, -once
+flag, ignored for all other use-cases.
 .It Fl -cache-dir=PATH
 Set directory for persistent cache files, defaults to
 .Pa /var/cache/inadyn
@@ -321,9 +328,7 @@ to exit gracefully
 .It INT
 Same as TERM
 .It USR1
-Force update now, even if the IP address has not changed.  Works in
-tandem with
-.Fl -fake-address
+Force update now, even if the IP address has not changed
 .It USR2
 Check IP address change now. Useful when a new DHCP/PPPoE lease or new
 gateway is received.  Please note that

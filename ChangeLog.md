@@ -7,6 +7,9 @@ All notable changes to the project are documented in this file.
 [v2.6][] - 2020-02-xx
 ---------------------
 
+**NOTE:** The `-1, --once` mode has changed semantics, it no longer
+    defaults to forced update, for that you now need `--force`
+
 ### Changes
 - Add support for Cloudflare, by Simon Pilkington and Jo Rhett
 - Add Yandex PDD (Yandex.Connect) plugin, by Timur Birsh
@@ -35,6 +38,7 @@ All notable changes to the project are documented in this file.
   found by Coverity Scan
 - Fix configure script to allow `--prefix=` for install to `/sbin`
 - Fix #274: D.U.I.A. DNS basic authentication, by Markus Gothe
+- Fix #276: Change `--once` behavior, now requires `--force` to update
 - Fix #277: See #235 but also for IPv4 ...
 
 
