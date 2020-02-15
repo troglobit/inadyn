@@ -1,6 +1,6 @@
 /* Plugin for Cloudflare
  *
- * Copyright (C) 2019 SimonP
+ * Copyright (C) 2019-2020 Simon Pilkington
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -65,7 +65,7 @@ static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
 static const char *KEY_SUCCESS = "success";
 
-static int setup	(ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
+static int setup    (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname);
 
@@ -87,7 +87,7 @@ static ddns_system_t plugin = {
 #define MAX_NAME 64
 #define MAX_ID (32 + 1)
 
-// filled by the setup func
+/* filled by the setup func */
 static struct {
 	char zone_id[MAX_ID];
 	char hostname_id[MAX_ID];
