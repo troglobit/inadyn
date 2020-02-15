@@ -306,7 +306,10 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	if (!data)
 		return RC_OUT_OF_MEMORY;
 
+	if (info->data)
+		free(info->data);
 	info->data = data;
+
 	get_zone(zone_name, sizeof(zone_name), hostname->name);
 	record_type = get_record_type(hostname->address);
 
