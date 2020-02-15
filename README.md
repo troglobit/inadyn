@@ -137,7 +137,14 @@ This looks for the default `.conf` file, to check any file, use:
         password    = snoopy
         hostname    = { peanuts, woodstock }
 	user-agent  = Mozilla/4.0
-    }   
+    }
+
+    # Google Domains - notice use of '@' to update root entry
+    provider domains.google.com {
+        hostname = @.mydomain.com
+        username = your_username
+        password = your_password
+    }
 
     provider duckdns.org {
         username         = YOUR_TOKEN

@@ -383,6 +383,13 @@ provider no-ip.com:2 {
     hostname   = another.no-ip.com
 }
 
+# Google Domains - notice use of '@' to update root entry
+provider domains.google.com {
+    hostname = @.mydomain.com
+    username = your_username
+    password = your_password
+}
+
 # Loopia
 provider loopia.com {
     wildcard   = true
