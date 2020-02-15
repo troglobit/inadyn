@@ -36,7 +36,7 @@ inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c	\
 		   ../plugins/freedns.c		../plugins/freemyip.c	\
 		   ../plugins/generic.c		../plugins/giradns.c	\
 		   ../plugins/sitelutions.c				\
-		   ../plugins/tunnelbroker.c	../plugins/tzo.c	\
+		   ../plugins/tunnelbroker.c				\
 		   ../plugins/zoneedit.c	../plugins/zerigo.c	\
 		   ../plugins/dnspod.c		../plugins/yandex.c \
 		   ../plugins/cloudflare.c
