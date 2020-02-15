@@ -30,7 +30,9 @@ All notable changes to the project are documented in this file.
   bumped max aliases from 20 -> 50 per provider
 - Fix #241: OpenBSD header ordering, tested on OpenBSD 6.1
 - Fix #242: Mention libtool requirement when building from GIT
+- Fix #247: Check if PID is actually running if PID file exists
 - Fix internal buffer size warnings, found by GCC-9 (freeDNS)
+- Fix #256: Document how to use Google Domains plugin
 - Fix #262: Use .com TLD instead of .org for DynDNS, because the latter
   cannot be resolved in China, by Eric Sauvageau
 - Fix #268: Set SIGCHLD to SIG_IGN to reap children, by Markus Gothe
@@ -39,6 +41,8 @@ All notable changes to the project are documented in this file.
 - Fix configure script to allow `--prefix=` for install to `/sbin`
 - Fix #274: D.U.I.A. DNS basic authentication, by Markus Gothe
 - Fix #276: Change `--once` behavior, now requires `--force` to update
+- Fix default checkip server for PubYun/3322, bliao.com not working.
+  This patch adds support for the official 3322 checkip server
 - Fix #277: See #235 but also for IPv4 ...
 
 
