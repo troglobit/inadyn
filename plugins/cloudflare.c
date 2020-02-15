@@ -84,14 +84,17 @@ static ddns_system_t plugin = {
 	.server_url   = API_URL
 };
 
+/*
+ * filled by the setup() callback and handed to ddns_info_t
+ * for use later in the request() callback .
+ */
 #define MAX_NAME 64
 #define MAX_ID (32 + 1)
 
-/* filled by the setup func */
-static struct {
+struct cfdata {
 	char zone_id[MAX_ID];
 	char hostname_id[MAX_ID];
-} data;
+};
 
 static int check_response_code(int status)
 {
@@ -293,11 +296,17 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
 	const size_t REQUEST_BUFFER_SIZE = 1028;
 	const char *record_type;
+	struct cfdata *data;
 	size_t request_len;
 	char *request_buf;
 	char zone_name[MAX_NAME];
 	int rc = RC_OK;
 
+	data = calloc(1, sizeof(struct cfdata));
+	if (!data)
+		return RC_OUT_OF_MEMORY;
+
+	info->data = data;
 	get_zone(zone_name, sizeof(zone_name), hostname->name);
 	record_type = get_record_type(hostname->address);
 
@@ -319,17 +328,17 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		goto cleanup;
 	}
 
-	rc = get_id(data.zone_id, MAX_ID, info, request_buf, request_len);
+	rc = get_id(data->zone_id, MAX_ID, info, request_buf, request_len);
 	if (rc != RC_OK) {
 		logit(LOG_ERR, "Zone '%s' not found.", zone_name);
 		goto cleanup;
 	}
 	
-	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data.zone_id);
+	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data->zone_id);
 
 	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
 			       CLOUDFLARE_HOSTNAME_ID_REQUEST,
-			       data.zone_id,
+			       data->zone_id,
 			       record_type,
 			       hostname->name,
 			       info->user_agent,
@@ -340,9 +349,9 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		goto cleanup;
 	}
 
-	rc = get_id(data.hostname_id, MAX_ID, info, request_buf, request_len);
+	rc = get_id(data->hostname_id, MAX_ID, info, request_buf, request_len);
 	if (rc == RC_OK)
-		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data.hostname_id);
+		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data->hostname_id);
 	else {
 		logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
 		rc = RC_OK;
@@ -357,6 +366,7 @@ cleanup:
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
 	const char *record_type;
+	struct cfdata *data = (struct cfdata *)info->data;
 	size_t content_len;
 	char json_data[256];
 
@@ -367,18 +377,18 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			       hostname->name,
 			       hostname->address);
 
-	if (strlen(data.hostname_id) == 0)
+	if (strlen(data->hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,
 			CLOUDFLARE_HOSTNAME_CREATE_REQUEST,
-			data.zone_id,
+			data->zone_id,
 			info->user_agent,
 			info->creds.password,
 			content_len, json_data);
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
-			data.zone_id,
-			data.hostname_id,
+			data->zone_id,
+			data->hostname_id,
 			info->user_agent,
 			info->creds.password,
 			content_len, json_data);
