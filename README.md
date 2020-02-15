@@ -52,43 +52,42 @@ Supported Providers
 -------------------
 
 Some of these services are free of charge for non-commercial use, some
-take a small fee, but also provide more domains to choose from.
+take a small fee, but also provide more domains to choose from:
+
+   * <https://freedns.afraid.org>
+   * <https://www.nsupdate.info>
+   * <https://duckdns.org>
+   * <https://freemyip.com>
+   * <https://www.loopia.com>
+   * <https://www.dyndns.org>, <https://dyn.com>
+   * <https://www.noip.com>
+   * <https://www.easydns.com>
+   * <https://www.dnsomatic.com>
+   * <https://dns.he.net>
+   * <https://www.tunnelbroker.net>
+   * <https://www.sitelutions.com>
+   * <https://www.dnsexit.com>, parent of <https://www.zoneedit.com>
+   * <https://www.changeip.com>
+   * <https://www.dhis.org>
+   * <https://www.namecheap.com>
+   * <https://domains.google>
+   * <https://www.ovh.com>
+   * <https://giradns.com>
+   * <https://www.duiadns.net>
+   * <https://ddnss.de>
+   * <https://dynv6.com>
+   * <https://spdyn.de>
+   * <https://www.cloudxns.net>
+   * <https://www.pubyun.com>, formerly <http://www.3322.org>
+   * <https://www.dnspod.cn>
+   * <https://www.dynu.com>
+   * <https://www.selfhost.de>
+   * <https://connect.yandex.ru>
+   * <https://www.cloudflare.com>
 
 DDNS providers not supported natively like <http://twoDNS.de>, can be
 enabled using the generic DDNS plugin.  See below for configuration
 examples.
-
-* <https://freedns.afraid.org>
-* <https://nsupdate.info>
-* <https://duckdns.org>
-* <https://freemyip.com>
-* <https://www.loopia.com>
-* <https://www.dyndns.org>, <https://dyn.com>
-* <https://www.zoneedit.com>
-* <https://www.no-ip.com>
-* <https://www.easydns.com>
-* <https://www.dnsomatic.com>
-* <https://dns.he.net>
-* <https://www.tunnelbroker.net>
-* <https://www.sitelutions.com>
-* <https://www.dnsexit.com>
-* <https://www.changeip.com>
-* <https://www.dhis.org>
-* <https://www.namecheap.com>
-* <https://domains.google>
-* <https://www.ovh.com>
-* <https://giradns.com>
-* <https://www.duiadns.net>
-* <https://ddnss.de>
-* <https://dynv6.com>
-* <https://spdyn.de>
-* <https://www.strato.com>
-* <https://www.cloudxns.net>
-* <https://www.dnspod.cn>
-* <https://www.dynu.com>
-* <https://www.selfhost.de>
-* <https://connect.yandex.ru>
-* <https://www.cloudflare.com>
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase

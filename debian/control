@@ -29,35 +29,36 @@ Description: Internet automated Dynamic DNS client
  like <http://twoDNS.de> for instance, can be set up with the custom
  DDNS plugin:
  .
-   * <http://www.dyndns.org>, <http://www.dyn.com>
    * <https://freedns.afraid.org>
-   * <https://www.zoneedit.com>
-   * <http://www.no-ip.com>
-   * <http://www.easydns.com>
-   * <http://www.3322.org>
-   * <https://www.dnsomatic.com>
-   * <http://dns.he.net>
-   * <http://www.tunnelbroker.net>
-   * <http://www.sitelutions.com>
-   * <http://www.dnsexit.com>
-   * <http://www.changeip.com>
-   * <http://www.dhis.org>
-   * <https://nsupdate.info>
+   * <https://www.nsupdate.info>
    * <https://duckdns.org>
+   * <https://freemyip.com>
    * <https://www.loopia.com>
+   * <https://www.dyndns.org>, <https://dyn.com>
+   * <https://www.noip.com>
+   * <https://www.easydns.com>
+   * <https://www.dnsomatic.com>
+   * <https://dns.he.net>
+   * <https://www.tunnelbroker.net>
+   * <https://www.sitelutions.com>
+   * <https://www.dnsexit.com>, parent of <https://www.zoneedit.com>
+   * <https://www.changeip.com>
+   * <https://www.dhis.org>
    * <https://www.namecheap.com>
-   * <https://domains.google.com>
+   * <https://domains.google>
    * <https://www.ovh.com>
-   * <http://giradns.com>
+   * <https://giradns.com>
    * <https://www.duiadns.net>
    * <https://ddnss.de>
-   * <http://dynv6.com>
-   * <http://ipv4.dynv6.com>
+   * <https://dynv6.com>
    * <https://spdyn.de>
-   * <https://www.strato.com>
-   * <https://freemyip.com>
    * <https://www.cloudxns.net>
+   * <https://www.pubyun.com>, formerly <http://www.3322.org>
    * <https://www.dnspod.cn>
+   * <https://www.dynu.com>
+   * <https://www.selfhost.de>
+   * <https://connect.yandex.ru>
+   * <https://www.cloudflare.com>
  .
  Some of these services are free of charge for non-commercial use, others
  take a small fee, but also provide more domains to choose from.
