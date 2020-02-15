@@ -252,7 +252,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 		goto cleanup;
 	}
 
-	logit(LOG_DEBUG, "ID position in string: %i", id);
+	logit(LOG_DEBUG, "ID position in string: %d", id);
 	if (json_copy_value(dest, dest_size, body, &id) < 0) {
 		logit(LOG_ERR, "Id did not fit into buffer.");
 		rc = RC_BUFFER_OVERFLOW;
