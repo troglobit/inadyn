@@ -171,12 +171,12 @@ int tcp_init(tcp_sock_t *tcp, char *msg)
 				if (ai) {
 					logit(LOG_INFO, "Failed connecting to that server: %s",
 					      errno != EINPROGRESS ? strerror(errno) : "retrying ...");
-
 					close(sd);
 					continue;
 				}
 
 				logit(LOG_WARNING, "Failed connecting to %s: %s", tcp->remote_host, strerror(errno));
+				close(sd);
 				rc = RC_TCP_CONNECT_FAILED;
 			} else {
 				tcp->socket = sd;
