@@ -80,7 +80,7 @@ static ddns_system_t selfhost = {
 	.server_url   = "/nic/update"
 };
 
-static ddns_system_t noip = {
+static ddns_system_t no_ip = {
 	.name         = "default@no-ip.com",
 
 	.request      = (req_fn_t)request,
@@ -91,6 +91,20 @@ static ddns_system_t noip = {
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dynupdate.no-ip.com",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t noip = {
+	.name         = "default@noip.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "ip1.dynupdate.noip.com",
+	.checkip_url  = "/",
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dynupdate.noip.com",
 	.server_url   = "/nic/update"
 };
 
@@ -231,6 +245,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&dyndns);
 	plugin_register(&dnsomatic);
 	plugin_register(&selfhost);
+	plugin_register(&no_ip);
 	plugin_register(&noip);
 	plugin_register(&_3322);
 	plugin_register(&henet);
@@ -247,6 +262,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndns);
 	plugin_unregister(&dnsomatic);
 	plugin_unregister(&selfhost);
+	plugin_unregister(&no_ip);
 	plugin_unregister(&noip);
 	plugin_unregister(&_3322);
 	plugin_unregister(&henet);
