@@ -40,12 +40,23 @@
 	"Content-Type: application/x-www-form-urlencoded\r\n\r\n"	\
 	"%s"
 
+/* XXX: please increase if not enough */
+#define TOKENS_EXPECTED		4096
+
+struct yandex {
+	char url[512];
+	int  len;
+	int  record_id;
+};
+
+static int setup    (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin = {
 	.name         = "default@pdd.yandex.ru",
 
+	.setup        = (setup_fn_t)setup,
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
@@ -57,10 +68,7 @@ static ddns_system_t plugin = {
 	.server_url   = "/dynamic/update.php"
 };
 
-// XXX: please increase if not enough
-#define TOKENS_EXPECTED		4096
-
-// FIXME: remove and use parse_json instead
+/* FIXME: remove and use parse_json() instead */
 static jsmntok_t *get_tokens(const char *response, int *n)
 {
 	jsmn_parser *p;
@@ -228,6 +236,9 @@ static int get_record_id(const char *response, const char *subdomain)
 			type_field	 = TYPE_NONE;
 			id_keyword_found = 0;
 			break;
+
+		case JSMN_UNDEFINED:
+			break;
 		}
 	}
 
@@ -241,91 +252,108 @@ static int get_record_id(const char *response, const char *subdomain)
 	return 0;
 }
 
+static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
+{
+	struct yandex *y;
+	http_trans_t trans;
+	http_t client;
+	char *resp;
+	int rc = 0;
+
+	if (!info->data) {
+		info->data = malloc(sizeof(struct yandex));
+		if (!info->data)
+			return RC_OUT_OF_MEMORY;
+	}
+	y = (struct yandex *)info->data;
+	memset(y, 0, sizeof(struct yandex));
+
+	rc = http_construct(&client);
+	if (rc)
+		return rc;
+
+	http_set_port(&client, info->server_name.port);
+	http_set_remote_name(&client, info->server_name.name);
+
+	client.ssl_enabled = info->ssl_enabled;
+	rc = http_init(&client, "Sending records list query");
+	if (rc) {
+		http_destruct(&client, 1);
+		return rc;
+	}
+
+	snprintf(y->url, sizeof(y->url), "/api2/admin/dns/list?domain=%s",
+		 info->creds.username);
+	trans.req_len = snprintf(ctx->request_buf, ctx->request_buflen,
+				 YANDEX_GET_REQUEST, y->url,
+				 info->server_name.name,
+				 info->creds.password,
+				 info->user_agent);
+	trans.req = ctx->request_buf;
+	trans.rsp = ctx->work_buf;
+	trans.max_rsp_len = ctx->work_buflen - 1;
+
+	rc = http_transaction(&client, &trans);
+	http_exit(&client);
+	http_destruct(&client, 1);
+	if (rc || (rc = http_status_valid(trans.status))) {
+		logit(LOG_WARNING, "Failed fetching record_id, rc: %d", rc);
+		return rc;
+	}
+
+	resp = trans.rsp_body;
+	logit(LOG_DEBUG, "Yandex response: %s", resp);
+	if (!success(resp))
+		return RC_DDNS_INVALID_OPTION;
+
+	y->record_id = get_record_id(resp, alias->name);
+	if (y->record_id < 0)
+		return RC_DDNS_INVALID_OPTION;
+
+	if (y->record_id > 0) {
+		logit(LOG_INFO, "Updating record, id = %i", y->record_id);
+		y->len = snprintf(y->url, sizeof(y->url),
+			       "domain=%s&record_id=%i&subdomain=%s&content=%s",
+			       info->creds.username, y->record_id, alias->name,
+			       alias->address);
+	} else {
+		logit(LOG_INFO, "Creating record");
+		y->len = snprintf(y->url, sizeof(y->url),
+			       "domain=%s&type=A&subdomain=%s&content=%s",
+			       info->creds.username, alias->name,
+			       alias->address);
+	}
+
+	return 0;
+}
+
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	http_t	     client;
-	http_trans_t trans;
-	char	     url[512];
-	char	     *resp;
-	int	     record_id;
-	int	     len;
-	int	     rc = 0;
+	struct yandex *y = (struct yandex *)info->data;
 
-	do {
-		TRY(http_construct(&client));
+	(void)alias;
+	if (!y)
+		return -1;
 
-		http_set_port(&client, info->server_name.port);
-		http_set_remote_name(&client, info->server_name.name);
-
-		client.ssl_enabled = info->ssl_enabled;
-		TRY(http_init(&client, "Trying to get record_id"));
-
-		snprintf(url, sizeof(url), "/api2/admin/dns/list?domain=%s",
-			 info->creds.username);
-
-		trans.req_len = snprintf(ctx->request_buf, ctx->request_buflen,
-					 YANDEX_GET_REQUEST, url,
-					 info->server_name.name,
-					 info->creds.password,
-					 info->user_agent);
-		trans.req = ctx->request_buf;
-		trans.rsp = ctx->work_buf;
-		trans.max_rsp_len = ctx->work_buflen - 1;
-
-		rc  = http_transaction(&client, &trans);
-		rc |= http_exit(&client);
-
-		http_destruct(&client, 1);
-
-		if (rc)
-			break;
-
-		TRY(http_status_valid(trans.status));
-		resp = trans.rsp_body;
-
-		logit(LOG_DEBUG, "Yandex response: %s\n", resp);
-
-		if (!success(resp))
-			break;
-
-		record_id = get_record_id(resp, alias->name);
-
-		if (record_id < 0)
-			break;
-
-		if (record_id > 0) {
-			logit(LOG_INFO, "Updating record, id = %i", record_id);
-			len = snprintf(url, sizeof(url),
-					"domain=%s&record_id=%i&subdomain=%s&content=%s",
-					info->creds.username, record_id, alias->name,
-					alias->address);
-		} else {
-			logit(LOG_INFO, "Creating record");
-			len = snprintf(url, sizeof(url),
-					"domain=%s&type=A&subdomain=%s&content=%s",
-					info->creds.username, alias->name,
-					alias->address);
-		}
-
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-				YANDEX_POST_REQUEST,
-				record_id > 0 ? "/api2/admin/dns/edit"
-					      : "/api2/admin/dns/add",
-				info->server_name.name,
-				info->creds.password,
-				info->user_agent,
-				len, url);
-	} while (0);
-
-	return -1;
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			YANDEX_POST_REQUEST,
+			y->record_id > 0
+			? "/api2/admin/dns/edit"
+			: "/api2/admin/dns/add",
+			info->server_name.name,
+			info->creds.password,
+			info->user_agent,
+			y->len, y->url);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
 
-	DO(http_status_valid(trans->status));
+	(void)info;
+	(void)alias;
 
+	DO(http_status_valid(trans->status));
 	if (success(resp))
 		return 0;
 
