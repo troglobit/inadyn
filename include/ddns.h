@@ -181,7 +181,7 @@ typedef struct {
 	int            work_buflen;
 
 	char          *request_buf; /* for HTTP requests */
-	int            request_buflen;
+	size_t         request_buflen;
 } ddns_t;
 
 extern int once;
