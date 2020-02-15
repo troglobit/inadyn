@@ -77,7 +77,6 @@ examples.
 * <https://www.namecheap.com>
 * <https://domains.google>
 * <https://www.ovh.com>
-* <https://www.dtdns.com>
 * <https://giradns.com>
 * <https://www.duiadns.net>
 * <https://ddnss.de>

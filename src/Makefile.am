@@ -29,7 +29,7 @@ endif
 inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c	\
 		   ../plugins/cloudxns.c	../plugins/ddnss.c	\
 		   ../plugins/dhis.c		../plugins/dnsexit.c	\
-		   ../plugins/dtdns.c		../plugins/duckdns.c	\
+		   				../plugins/duckdns.c	\
 		   ../plugins/duiadns.c		../plugins/dyndns.c	\
 		   ../plugins/dynv6.c		../plugins/dynv6-ipv4.c	\
 		   ../plugins/easydns.c					\
