@@ -3,7 +3,6 @@
  * Supported DDNS providers are:
  *   - DynDNS,
  *   - DNS-O-Matic,
- *   - DynSIP,
  *   - no-ip,
  *   - 3322,
  *   - Hurricane-Electric (HE)
@@ -63,21 +62,6 @@ static ddns_system_t dnsomatic = {
 	.checkip_url  = "/",
 
 	.server_name  = "updates.dnsomatic.com",
-	.server_url   = "/nic/update"
-};
-
-/* Support for dynsip.org by milkfish, from DD-WRT */
-static ddns_system_t dynsip = {
-	.name         = "default@dynsip.org",
-
-	.request      = (req_fn_t)request,
-	.response     = (rsp_fn_t)response,
-
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
-
-	.server_name  = "dynsip.org",
 	.server_url   = "/nic/update"
 };
 
@@ -245,7 +229,6 @@ PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&dyndns);
 	plugin_register(&dnsomatic);
-	plugin_register(&dynsip);
 	plugin_register(&selfhost);
 	plugin_register(&noip);
 	plugin_register(&_3322);
@@ -262,7 +245,6 @@ PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&dyndns);
 	plugin_unregister(&dnsomatic);
-	plugin_unregister(&dynsip);
 	plugin_unregister(&selfhost);
 	plugin_unregister(&noip);
 	plugin_unregister(&_3322);
