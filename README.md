@@ -206,19 +206,22 @@ This looks for the default `.conf` file, to check any file, use:
     #   Zone: Zone - Read
     #   Zone: DNS - Edit
     #
-    # If the token is limited to a specific zone (it should be) it will also need
+    # If the token is limited to a specific zone (it should be)
+	# it will also need the following permission:
     #   Account: Account Settings - Read
-    # per https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
+	#
+    # For more information, see this Cloudflare Community post:
+	# https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
     #
-    # global API keys are NOT supported for security reasons
+    # Note: global API keys are NOT supported for security reasons
     provider cloudflare.com {
          username = unused (but currently something must be entered)
          password = your_api_token
          hostname = yourhost.example.com
     }
 
-Notice how this configuration file has two different users of the No-IP
-provider -- this is achieved by appending a `:ID` to the provider name.
+Notice how the config has three different users of the No-IP provider --
+this is achieved by appending a `:ID` to the provider name.
 
 We also define a custom cache directory, default is to use `/var/cache`.
 In our case `/mnt` is a system specific persistent store for caching
