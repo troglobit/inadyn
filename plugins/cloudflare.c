@@ -284,7 +284,7 @@ static void get_zone(char *dest, size_t dest_len, const char *hostname)
 	strlcpy(dest, root, dest_len);
 }
 
-const static char* get_record_type(const char *address)
+static const char* get_record_type(const char *address)
 {
 	if (strstr(address, ":"))
 		return IPV6_RECORD_TYPE;
@@ -294,11 +294,9 @@ const static char* get_record_type(const char *address)
 
 static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
-	const size_t REQUEST_BUFFER_SIZE = 1028;
 	const char *record_type;
 	struct cfdata *data;
-	size_t request_len;
-	char *request_buf;
+	size_t len;
 	char zone_name[MAX_NAME];
 	int rc = RC_OK;
 
@@ -315,53 +313,42 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
 
-	request_buf = calloc(REQUEST_BUFFER_SIZE, sizeof(char));
-	if (!request_buf)
-		return RC_OUT_OF_MEMORY;
+	len = snprintf(ctx->request_buf, ctx->request_buflen,
+		       CLOUDFLARE_ZONE_ID_REQUEST,
+		       zone_name,
+		       info->user_agent,
+		       info->creds.password);
 
-	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
-			       CLOUDFLARE_ZONE_ID_REQUEST,
-			       zone_name,
-			       info->user_agent,
-			       info->creds.password);
-
-	if (request_len >= REQUEST_BUFFER_SIZE) {
+	if (len >= ctx->request_buflen) {
 		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
-		rc = RC_BUFFER_OVERFLOW;
-		goto cleanup;
+		return RC_BUFFER_OVERFLOW;
 	}
 
-	rc = get_id(data->zone_id, MAX_ID, info, request_buf, request_len);
+	rc = get_id(data->zone_id, MAX_ID, info, ctx->request_buf, len);
 	if (rc != RC_OK) {
 		logit(LOG_ERR, "Zone '%s' not found.", zone_name);
-		goto cleanup;
+		return rc;
 	}
 	
 	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data->zone_id);
 
-	request_len = snprintf(request_buf, REQUEST_BUFFER_SIZE,
-			       CLOUDFLARE_HOSTNAME_ID_REQUEST,
-			       data->zone_id,
-			       record_type,
-			       hostname->name,
-			       info->user_agent,
-			       info->creds.password);
-	if (request_len >= REQUEST_BUFFER_SIZE) {
+	len = snprintf(ctx->request_buf, ctx->request_buflen,
+		       CLOUDFLARE_HOSTNAME_ID_REQUEST,
+		       data->zone_id,
+		       record_type,
+		       hostname->name,
+		       info->user_agent,
+		       info->creds.password);
+	if (len >= ctx->request_buflen) {
 		logit(LOG_ERR, "Request did not fit into buffer.", zone_name);
-		rc = RC_BUFFER_OVERFLOW;
-		goto cleanup;
+		return RC_BUFFER_OVERFLOW;
 	}
 
-	rc = get_id(data->hostname_id, MAX_ID, info, request_buf, request_len);
+	rc = get_id(data->hostname_id, MAX_ID, info, ctx->request_buf, ctx->request_buflen);
 	if (rc == RC_OK)
 		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data->hostname_id);
-	else {
+	else
 		logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
-		rc = RC_OK;
-	}
-
-cleanup:
-	free(request_buf);
 
 	return rc;
 }
