@@ -94,14 +94,15 @@ static ddns_system_t noip = {
 	.server_url   = "/nic/update"
 };
 
+/* http://www.pubyun.com/wiki/%E5%B8%AE%E5%8A%A9:api#%E6%8E%A5%E5%8F%A3%E5%9C%B0%E5%9D%80 */
 static ddns_system_t _3322 = {
 	.name         = "dyndns@3322.org",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "bliao.com",
-	.checkip_url  = "/ip.phtml",
+	.checkip_name = "ip.3322.net",
+	.checkip_url  = "/",
 
 	.server_name  = "members.3322.org",
 	.server_url   = "/dyndns/update"
