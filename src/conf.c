@@ -510,6 +510,8 @@ void conf_info_cleanup(void)
 			free(ptr->creds.encoded_password);
 		if (ptr->checkip_cmd)
 			free(ptr->checkip_cmd);
+		if (ptr->data)
+			free(ptr->data);
 		LIST_REMOVE(ptr, link);
 		free(ptr);
 	}

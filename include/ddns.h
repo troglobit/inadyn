@@ -137,11 +137,21 @@ typedef struct di {
 	tcp_proxy_type_t proxy_type;
 	ddns_name_t    proxy_name;
 
+	/* Your aliases/names to update */
 	ddns_alias_t   alias[DDNS_MAX_ALIAS_NUMBER];
 	size_t         alias_count;
 
+	/* Use wildcard, *.foo.bar */
 	int            wildcard;
 
+	/*
+	 * Provider specific data, per-conf-entry.  E.g., the Cloudflare
+	 * plugin stores zone_id and hostname_id here.  Set up by the
+	 * plugin setup callback, and is automatically freed by Inadyn.
+	 */
+	void          *data;
+
+	/* Does the provider support SSL? */
 	int            ssl_enabled;
 	int            append_myip; /* For custom setups! */
 } ddns_info_t;
