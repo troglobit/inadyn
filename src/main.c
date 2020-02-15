@@ -169,7 +169,7 @@ static void parse_privs(char *user)
 	}
 
 	if (!user) {
-		logit(LOG_INFO, "Cannot figure out username", user);
+		logit(LOG_INFO, "Cannot figure out username");
 		return;
 	}
 
