@@ -22,6 +22,11 @@
 
 #include <libgen.h>		/* dirname() */
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <stdio.h>		/* fopen() et al */
+#include <stdlib.h>		/* atoi() */
+
 #include "log.h"
 #include "cache.h"
 
@@ -188,6 +193,27 @@ int os_install_signal_handler(void *ctx)
 	return 0;
 }
 
+static int pid_alive(char *pidfn)
+{
+	FILE *fp;
+	int alive = 1;
+
+	fp = fopen(pidfn, "r");
+	if (fp) {
+		char buf[20];
+
+		if (fgets(buf, sizeof(buf), fp)) {
+			pid_t pid = atoi(buf);
+
+			if (kill(pid, 0) && errno == ESRCH)
+				alive = 0;
+		}
+		fclose(fp);
+	}
+
+	return alive;
+}
+
 /*
  * Check file system permissions
  *
@@ -208,15 +234,22 @@ int os_check_perms(void)
 		logit(LOG_WARNING, "Cannot change owner of cache directory %s to %d:%d, skipping: %s",
 		      cache_dir, uid, gid, strerror(errno));
 
-	if (pidfile_name && pidfile_name[0] == '/') {
+	if (pidfile_name) {
+		char pidfn[strlen(RUNSTATEDIR) + strlen(pidfile_name) + 6];
 		char *pidfile_dir;
 
-		if (!access(pidfile_name, F_OK)) {
-			logit(LOG_ERR, "PID file %s already exists, %s already running?", pidfile_name, prognm);
+		if (pidfile_name[0] != '/')
+			snprintf(pidfn, sizeof(pidfn), "%s/%s.pid", RUNSTATEDIR, pidfile_name);
+		else
+			strlcpy(pidfn, pidfile_name, sizeof(pidfn));
+
+		if (!access(pidfn, F_OK) && pid_alive(pidfn)) {
+			logit(LOG_ERR, "PID file %s already exists, %s already running?",
+			      pidfn, prognm);
 			return RC_PIDFILE_EXISTS_ALREADY;
 		}
 
-		pidfile_dir = dirname(strdupa(pidfile_name));
+		pidfile_dir = dirname(strdupa(pidfn));
 		if (access(pidfile_dir, F_OK)) {
 			if (mkpath(pidfile_dir, 0755) && errno != EEXIST)
 				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
