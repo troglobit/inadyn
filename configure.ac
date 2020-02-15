@@ -1,10 +1,10 @@
 AC_PREREQ(2.61)
 AC_INIT([In-a-dyn], [2.6-rc1], [https://github.com/troglobit/inadyn/issues],
 	[inadyn], [https://troglobit.com/projects/inadyn/])
+AC_CONFIG_AUX_DIR(aux)
 AM_INIT_AUTOMAKE([1.11 foreign dist-xz])
 AM_SILENT_RULES([yes])
 
-AC_CONFIG_AUX_DIR(aux)
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
 AC_CONFIG_FILES([Makefile inadyn.service src/Makefile include/Makefile man/Makefile examples/Makefile])
