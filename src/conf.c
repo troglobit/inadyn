@@ -381,7 +381,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 				continue;
 
 			if (info->server_response_num >= NELEMS(info->server_response)) {
-				logit(LOG_WARNING, "Skipping response '%s', only %d custom responses supported",
+				logit(LOG_WARNING, "Skipping response '%s', only %zu custom responses supported",
 				      str, NELEMS(info->server_response));
 				continue;
 			}
