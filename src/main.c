@@ -222,7 +222,7 @@ static int compose_paths(void)
 		snprintf(cache_dir, len, "%s/cache/%s", LOCALSTATEDIR, ident);
 
 		if (access(cache_dir, W_OK)) {
-			char *home;
+			char *home, *tmp;
 
 			home = getenv("HOME");
 			if (!home) {
@@ -232,9 +232,13 @@ static int compose_paths(void)
 
 			/* Fallback cache dir: $HOME + "/.cache/" + "inadyn" */
 			len = strlen(home) + strlen(ident) + 10;
-			cache_dir = realloc(cache_dir, len);
-			if (!cache_dir)
+			tmp = realloc(cache_dir, len);
+			if (!tmp){
+				free(cache_dir);
 				goto nomem;
+			} else {
+				cache_dir = tmp;
+			}
 
 			snprintf(cache_dir, len, "%s/.cache/%s", home, ident);
 			if (mkdir(cache_dir, 0755) && EEXIST != errno) {
