@@ -139,7 +139,7 @@ static int os_install_child_handler(void)
 		installed = 1;
 	}
 
-	if (-1 == rc) {
+	if (rc) {
 		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
@@ -184,7 +184,7 @@ int os_install_signal_handler(void *ctx)
 	if (script_exec) 
 		os_install_child_handler();
 
-	if (-1 == rc) {
+	if (rc) {
 		logit(LOG_WARNING, "Failed installing signal handler: %s", strerror(errno));
 		return RC_OS_INSTALL_SIGHANDLER_FAILED;
 	}
