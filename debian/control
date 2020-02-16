@@ -2,9 +2,9 @@ Source: inadyn
 Section: net
 Priority: optional
 Maintainer: Joachim Nilsson <troglobit@gmail.com>
-Build-Depends: debhelper (>= 9), dh-systemd, libgnutls28-dev
-Standards-Version: 3.9.6
-Homepage: http://troglobit.com/inadyn.html
+Build-Depends: debhelper (>= 10), libgnutls28-dev, pkg-config, systemd
+Standards-Version: 4.3.0
+Homepage: https://troglobit.com/inadyn.html
 Vcs-Git: git://github.com/troglobit/inadyn.git
 Vcs-Browser: http://github.com/troglobit/inadyn
 
@@ -14,15 +14,15 @@ Pre-Depends: adduser
 Depends: debconf (>= 0.2.17), ${shlibs:Depends}, ${misc:Depends}
 Provides: dyndns-client
 Description: Internet automated Dynamic DNS client
- Inadyn is a small and simple Dynamic DNS, DDNS, client with HTTPS
- support.  It automates the task of keeping your Internet name in sync
- with your public IP address.
+ Inadyn is a small and simple Dynamic DNS (DDNS) client with HTTPS
+ support.  It automates the task of keeping your Internet name(s) in
+ sync with your public IP address.
  .
  Most people are unaware they share a pool of Internet addresses with
- other users of the same Internet Service Provider (ISP).  Protocols
- like DHCP, PPPoE, or PPPoA are used to give you an address and a way
- to connect to the Internet, but usually not a way for others to connect
- to you.  If you want to run an Internet server on such a connection you
+ other customers of the same Internet Service Provider (ISP).  Protocols
+ like DHCP, PPPoE, or PPPoA are used to give you an address and a way to
+ connect to the Internet, but usually not a way for others to connect to
+ you.  If you want to run an Internet server on such a connection you
  risk losing your IP address every time you reconnect.
  .
  The following DDNS plugins are supported natively, other providers,
