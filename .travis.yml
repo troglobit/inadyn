@@ -16,6 +16,9 @@ env:
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "JFknJb+purjGIPuKNWFBPlsSLX6KohuYmYV4dmisIhjkeFhhXFQNmoabYQ6D+r/mWYPWiNnohoTSyKv8gjj6eC1SbXb+f2dEXHrmAwr36Enbp2tV0XLx7V2KHZzUmKeJxOSwnNUVZxmSvzVbuiDodtU1PJ2YPK0CM0KF/J+wePA="
 
+# Use Ubuntu 18.04 LTS for builds
+dist: bionic
+
 addons:
   apt:
     packages:
