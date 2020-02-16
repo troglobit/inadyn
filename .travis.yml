@@ -44,13 +44,13 @@ install:
 
 script:
   - ./autogen.sh
-  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/ --disable-ssl
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix= --disable-ssl
   - make clean
   - make V=1 -j5
-  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=
   - make clean
   - make V=1 -j5
-  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix=/ --enable-openssl
+  - PKG_CONFIG_PATH=/tmp/lib/pkgconfig ./configure --prefix= --enable-openssl
   - make clean
   - make V=1 -j5
   - DESTDIR=/tmp/tok make install-strip
@@ -58,3 +58,4 @@ script:
   - ldd /tmp/tok/sbin/inadyn
   - LD_LIBRARY_PATH=/tmp/lib /tmp/tok/sbin/inadyn -h
   - PKG_CONFIG_PATH=/tmp/lib/pkgconfig make package
+  - cat ../inadyn*.changes
