@@ -7,7 +7,7 @@ Files: *
 Copyright: 2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 	   2006 Steve Horbachuk
 	   2009 Christoph Brill <egore911@egore911.de>
-	   2008-2017 Joachim Nilsson <troglobit@gmail.com>
+	   2008-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2010 Timur Birsh <taem@linukz.org>
 License: GPL-2+
 
@@ -20,31 +20,27 @@ Files: include/base64.h include/md5.h include/sha1.h
 Copyright: 2006-2010 Brainspark B.V.
 License: GPL-2+
 
-Files: include/strlfun.h
-Copyright: 2014 Joachim Nilsson <troglobit@gmail.com>
-License: ISC
-
 Files: include/cache.h
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: include/compat.h
-Copyright: 2008-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2008-2020 Joachim Nilsson <troglobit@gmail.com>
 License: MIT/X11 (BSD like)
 
 Files: include/ddns.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: include/error.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: include/http.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
@@ -57,17 +53,17 @@ Copyright: 2019 Simon Pilkington
 License: GPL-2+
 
 Files: include/log.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: include/os.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei
 License: GPL-2+
 
 Files: include/plugin.h
-Copyright: 2012-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2012-2020 Joachim Nilsson <troglobit@gmail.com>
 License: MIT/X11 (BSD like)
 
 Files: include/queue.h
@@ -75,7 +71,7 @@ Copyright: 1991, 1993 The Regents of the University of California
 License: BSD-3-clause
 
 Files: include/ssl.h
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: include/strdupa.h
@@ -83,7 +79,7 @@ Copyright: 2009 William Ahern
 License: MIT/X11 (BSD like)
 
 Files: include/tcp.h
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
@@ -104,7 +100,7 @@ Copyright: 2004 Ted Unangst and Todd Miller
 License: ISC
 
 Files: lib/utimensat.c
-Copyright: 2017-2018  Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2017-2020  Joachim Nilsson <troglobit@gmail.com>
 License: ISC
 
 Files: plugins/cloudflare.c
@@ -116,7 +112,7 @@ Copyright: 2017 Richard Yu <yurichard3839@gmail.com>
 License: GPL-2+
 
 Files: plugins/common.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -126,12 +122,12 @@ Copyright: 2016 Sven Hoefer <sven@svenhoefer.com>
 License: GPL-2+
 
 Files: plugins/dhis.c
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2011 Bryan Hoover <bhoover@wecs.com>
 License: GPL-2+
 
 Files: plugins/dnsexit.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -142,7 +138,7 @@ License: GPL-2+
 
 Files: plugins/duckdns.c
 Copyright: 2014 Andy Padavan <andy.padavan@gmail.com>
-	   2010-2017 Joachim Nilsson <troglobit@gmail.com>
+	   2010-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: plugins/duiadns.c
@@ -150,7 +146,7 @@ Copyright: 2015 Duiadns, Co. www.duiadns.net
 License: GPL-2+
 
 Files: plugins/dyndns.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -161,13 +157,13 @@ Copyright: 2016 Sven Hoefer <sven@svenhoefer.com>
 License: GPL-2+
 
 Files: plugins/easydns.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: plugins/freedns.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -177,7 +173,7 @@ Copyright: 2017 Tomasz 'Cadence' Grabowski
 License: GPL-2+
 
 Files: plugins/generic.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -187,19 +183,19 @@ Copyright: 2015 Thorsten Mahlfelder <thenktor@gmail.com>
 License: GPL-2+
 
 Files: plugins/sitelutions.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: plugins/tunnelbroker.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: plugins/zoneedit.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
@@ -209,12 +205,12 @@ Copyright: 2006-2010 Brainspark B.V.
 License: GPL-2+
 
 Files: src/cache.c
- Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+ Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
  2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: src/conf.c
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 License: ISC
 
 Files: src/jsmn.c
@@ -222,54 +218,54 @@ Copyright: 2010 Serge Zaitsev
 License: MIT
 
 Files: src/ddns.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: src/error.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: src/gnutls.c
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: src/http.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: src/log.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: src/main.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
 Files: src/makepath.c
-Copyright: 2013-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2013-2020 Joachim Nilsson <troglobit@gmail.com>
 License: ISC
 
 Files: src/openssl.c
-Copyright: 2014-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2014-2020 Joachim Nilsson <troglobit@gmail.com>
 License: GPL-2+
 
 Files: src/os.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2006 Steve Horbachuk
 	   2003-2004 Narcis Ilisei
 License: GPL-2+
 
 Files: src/plugin.c
-Copyright: 2012-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2012-2020 Joachim Nilsson <troglobit@gmail.com>
 License: MIT/X11 (BSD like)
 
 Files: src/tcp.c
-Copyright: 2010-2017 Joachim Nilsson <troglobit@gmail.com>
+Copyright: 2010-2020 Joachim Nilsson <troglobit@gmail.com>
 	   2003-2004 Narcis Ilisei <inarcis2002@hotpop.com>
 License: GPL-2+
 
