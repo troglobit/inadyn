@@ -114,19 +114,20 @@ static void unix_signal_handler(int signo)
 	}
 }
 
+/*
+ * Set SIGCHLD to 'ignore', i.e., children are automatically reaped,
+ * as of POSIX.1-2001.  This is fine since we are (currently) not
+ * interested in their exit status.
+ */
 static int os_install_child_handler(void)
 {
 	static int installed = 0;
 	int rc = 0;
 
 	if (!installed) {
-		struct sigaction sa = { 0 };
+		struct sigaction sa;
 
-		/*
-		 * Set to 'ignore' which is supposed to reap children
-		 * since POSIX.1-2001, since we are not interested in
-		 * the exit status.
-		 */
+		memset(&sa, 0, sizeof(sa));
 #ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #endif
@@ -159,8 +160,9 @@ int os_install_signal_handler(void *ctx)
 	int rc = 0;
 
 	if (!installed) {
-		struct sigaction sa = { 0 };
+		struct sigaction sa;
 
+		memset(&sa, 0, sizeof(sa));
 #ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #endif
