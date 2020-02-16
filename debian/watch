@@ -1,2 +1,4 @@
 version=3
-https://github.com/troglobit/inadyn/tags .*/v?(\d[\d\.]+)\.tar\.xz
+
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/inadyn-$1\.tar\.gz/ \
+  https://github.com/troglobit/inadyn/tags .*/v?(\d\S*)\.tar\.gz
