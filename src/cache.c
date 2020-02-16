@@ -116,7 +116,8 @@ char *cache_file(char *name, char *buf, size_t len)
 	if (!buf || !name)
 		return NULL;
 
-	snprintf(buf, len, "%s/%s.cache", cache_dir, name);
+	if (snprintf(buf, len, "%s/%s.cache", cache_dir, name) >= (int)len)
+		logit(LOG_WARNING, "Too long name for buffer: '%s/' + '%s' + '.cache'", cache_dir, name);
 
 	return buf;
 }
