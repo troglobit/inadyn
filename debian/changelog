@@ -1,4 +1,4 @@
-inadyn (2.6) unstable; urgency=medium
+inadyn (2.6) stable; urgency=medium
 
   * Add support for Cloudflare
   * Add support for Yandex PDD
@@ -10,10 +10,12 @@ inadyn (2.6) unstable; urgency=medium
   * Fixed D.U.I.A. DNS basic authentication
   * Fix default checkip server for PubYun/3322
   * Fix Dynv6 (both IPv4 and IPv6) bogus error on successful update
+  * Add missing build-depends for libConfuse-dev
+  * Sync with latest downstream Debian packaging
   * Behavior change: `--once` now requires `--force` to force an update
     even if there is no need to update
 
- -- Joachim Nilsson <troglobit@gmail.com>  Sun, 16 Feb 2020 11:52:54 +0100
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 16 Feb 2020 17:02:58 +0100
 
 inadyn (2.5) unstable; urgency=medium
 
