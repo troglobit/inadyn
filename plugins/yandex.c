@@ -152,13 +152,13 @@ static int get_record_id(const char *response, const char *subdomain)
 		SUBDOMAIN_NONE,
 		SUBDOMAIN_KEYWORD,
 		SUBDOMAIN_VALUE
-	} subdomain_field;
+	} subdomain_field = SUBDOMAIN_NONE;
 
 	enum {
 		TYPE_NONE,
 		TYPE_KEYWORD,
 		TYPE_VALUE
-	} type_field;
+	} type_field = TYPE_NONE;
 
 	t = get_tokens(response, &n);
 	if (!t)
