@@ -1,8 +1,8 @@
-f## Inadyn - A small and simple DDNS client                -*-Makefile-*-
-
-inadyn_SOURCES += common.c	dyndns.c	changeip.c	\
-		  dnsexit.c	easydns.c	freedns.c	\
-		  generic.c	sitelutions.c	tunnelbroker.c	\
-		  	     	zoneedit.c			\
-		  dhis.c	dynv6.c		dynv6-ipv4.c	\
-		  ddnss.c	yandex.c	cloudflare.c
+inadyn_SOURCES += common.c	changeip.c	cloudflare.c	\
+		  cloudxns.c	ddnss.c		dhis.c		\
+		  dnsexit.c	dnspod.c	duckdns.c	\
+		  duiadns.c	dyndns.c	dynv6.c		\
+		  easydns.c	freedns.c	freemyip.c	\
+		  generic.c	giradns.c			\
+		  sitelutions.c	tunnelbroker.c			\
+		  yandex.c	zoneedit.c

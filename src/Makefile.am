@@ -26,17 +26,14 @@ endif
 ## Plugins are currently built-in, and built from this directory instead
 ## of where they reside.  They should be built by plugins/Makefile.am
 ## and be installed into $libdir/inadyn/plugins/ as *.so files
-inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c	\
-		   ../plugins/cloudxns.c	../plugins/ddnss.c	\
-		   ../plugins/dhis.c		../plugins/dnsexit.c	\
-		   				../plugins/duckdns.c	\
-		   ../plugins/duiadns.c		../plugins/dyndns.c	\
-		   ../plugins/dynv6.c		../plugins/dynv6-ipv4.c	\
-		   ../plugins/easydns.c					\
-		   ../plugins/freedns.c		../plugins/freemyip.c	\
-		   ../plugins/generic.c		../plugins/giradns.c	\
-		   ../plugins/sitelutions.c				\
-		   ../plugins/tunnelbroker.c				\
-		   ../plugins/zoneedit.c				\
-		   ../plugins/dnspod.c		../plugins/yandex.c 	\
-		   ../plugins/cloudflare.c
+inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c		\
+		   ../plugins/cloudflare.c	../plugins/cloudxns.c		\
+		   ../plugins/ddnss.c		../plugins/dhis.c		\
+		   ../plugins/dnsexit.c		../plugins/dnspod.c		\
+		   ../plugins/duckdns.c		../plugins/duiadns.c		\
+		   ../plugins/dyndns.c		../plugins/dynv6.c		\
+		   ../plugins/easydns.c		../plugins/freedns.c		\
+		   ../plugins/freemyip.c	../plugins/generic.c		\
+		   ../plugins/giradns.c						\
+		   ../plugins/sitelutions.c	../plugins/tunnelbroker.c	\
+		   ../plugins/yandex.c		../plugins/zoneedit.c
