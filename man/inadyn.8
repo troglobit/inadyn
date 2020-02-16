@@ -19,21 +19,21 @@
 .Nm inadyn
 .Op Fl 1, -once
 .Op Fl -force
-.Op Fl -cache-dir=PATH
-.Op Fl c, -cmd=/path/to/cmd
+.Op Fl -cache-dir Ar PATH
+.Op Fl c, -cmd Ar /path/to/cmd
 .Op Fl C, -continue-on-error
-.Op Fl e, -exec=/path/to/cmd
-.Op Fl f, -config=FILE
+.Op Fl e, -exec Ar /path/to/cmd
+.Op Fl f, -config Ar FILE
 .Op Fl h, -help
-.Op Fl i, -iface=IFNAME
-.Op Fl I, -ident=NAME
-.Op Fl l, -loglevel=LEVEL
+.Op Fl i, -iface Ar IFNAME
+.Op Fl I, -ident Ar NAME
+.Op Fl l, -loglevel Ar LEVEL
 .Op Fl n, -foreground
 .Op Fl -no-pidfile
-.Op Fl P, -pidfile=FILE
-.Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
+.Op Fl P, -pidfile Ar FILE
+.Op Fl p, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
-.Op Fl t, -startup-delay=SEC
+.Op Fl t, -startup-delay Ar SEC
 .Op Fl v, -version
 .Sh DESCRIPTION
 .Nm ,
@@ -149,7 +149,7 @@ to for an update before exiting.
 Force one update.  Only works with
 .Fl 1, -once
 flag, ignored for all other use-cases.
-.It Fl -cache-dir=PATH
+.It Fl -cache-dir Ar PATH
 Set directory for persistent cache files, defaults to
 .Pa /var/cache/inadyn
 .Pp
@@ -171,9 +171,9 @@ update.
 .Pp
 On an embedded device with no RTC, or no battery backed RTC, it is
 strongly recommended to pair this setting with the
-.Fl -startup-delay=SEC
+.Fl -startup-delay Ar SEC
 command line option.
-.It Fl c, -cmd=/path/to/cmd Op optional args
+.It Fl c, -cmd Ar /path/to/cmd Op optional args
 Full path to command, or script, to run to check for IP address change.
 This is the same as the configuration file option
 .Ar checkip-command
@@ -193,7 +193,7 @@ to not exit on errors from a DDNS provider and instead try again later.
 Please do not use this, it usually indicates that we are sending a
 malformed request, e.g. wrong username, password or DNS alias for the
 given account.  Continuing could possibly lock you out of your account!
-.It Fl e, -exec=/path/to/cmd Op optional args
+.It Fl e, -exec Ar /path/to/cmd Op optional args
 Full path to command, or script, to run after a successful DDNS update.
 The following environment variables are set: INADYN_IP, INADYN_HOSTNAME.
 The first environment variable contains the new IP address, the second
@@ -230,7 +230,7 @@ check-ip servers are slow to respond.
 This option can also be given as a configuration option in
 .Xr inadyn.conf 5 ,
 both serve a purpose, use whichever one works for you.
-.It Fl I, Fl -ident=NAME
+.It Fl I, Fl -ident Ar NAME
 Specify program identity (name) to be used for PID file and syslog
 messages.  Useful with multiple instances of
 .Nm ,
@@ -257,7 +257,7 @@ the terminal, when debugging a config or at initial set up.  Remember to
 also give the
 .Fl s
 option if you still want to redirect log messages to the syslog.
-.It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
+.It Fl p, -drop-privs Ar USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
 .It Fl -no-pidfile
 When running as a daemon, even when running in the foreground with
@@ -271,11 +271,11 @@ for more information on this.  This option tells
 to
 .Sy not
 create a PID file.  Some users prefer this when running under systemd.
-.It Fl P, -pidfile=FILE
+.It Fl P, -pidfile Ar FILE
 Set PID file name and location, defaults to
 .Pa /run/inadyn.pid ,
 derived from
-.Fl -ident=NAME ,
+.Fl -ident Ar NAME ,
 which is strongly recommended to change over this option.  However, some
 users want to keep application runtime files in separate directories,
 usually in combination with
@@ -302,7 +302,7 @@ real time clock to set their clock via NTP at bootup.  This is so that
 the time since the last update can be calculated correctly from the
 .Nm
 cache file and the
-.Cm forced-update=SEC
+.Cm forced-update Ar SEC
 setting honored across reboots, avoiding unnecessary IP address updates.
 .It Fl v, -version
 Show program version and exit.
