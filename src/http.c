@@ -51,7 +51,7 @@ int http_destruct(http_t *client, int num)
 static int local_set_params(http_t *client)
 {
 	int timeout = 0;
-	int port;
+	int port = 0;
 
 	http_get_remote_timeout(client, &timeout);
 	if (timeout == 0)
