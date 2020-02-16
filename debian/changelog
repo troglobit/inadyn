@@ -1,3 +1,20 @@
+inadyn (2.6) unstable; urgency=medium
+
+  * Add support for Cloudflare
+  * Add support for Yandex PDD
+  * Add Dockerfile for running Inadyn in an Alpine container
+  * Dropped support for: TZO, DtDNS, DynSIP, and Zerigo, services offline
+  * Increased number of aliases (hostnames) per provider, 20 -> 50
+  * Use .com TLD instead of .org for DynDNS, works in mainland China
+  * Multiple fixes to socket leaks, memory corruptions and buffer overflows
+  * Fixed D.U.I.A. DNS basic authentication
+  * Fix default checkip server for PubYun/3322
+  * Fix Dynv6 (both IPv4 and IPv6) bogus error on successful update
+  * Behavior change: `--once` now requires `--force` to force an update
+    even if there is no need to update
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 16 Feb 2020 11:52:54 +0100
+
 inadyn (2.5) unstable; urgency=medium
 
   * Add support for selfhost.de DDNS provider
