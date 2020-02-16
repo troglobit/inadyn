@@ -131,7 +131,6 @@ char *cache_file(char *name, char *buf, size_t len)
  */
 int read_cache_file(ddns_t *ctx)
 {
-	size_t j;
 	ddns_info_t *info;
 
 	/*
@@ -152,7 +151,8 @@ int read_cache_file(ddns_t *ctx)
 			"default@tunnelbroker.net"
 		};
 		const char *name = info->system->name;
-		int i, nonslookup = 0;
+		size_t i, j;
+		int nonslookup = 0;
 
 		/* Exceptions -- no name to lookup */
 		for (i = 0; i < NELEMS(except); i++) {
