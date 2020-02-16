@@ -58,6 +58,8 @@ static int fetch_record_id(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, 
 	int record_id = 0;
 	int rc, len;
 
+	(void)alias;
+
 	/* login_token=API_ID,API_TOKEN */
 	len = snprintf(buffer, sizeof(buffer),
 		       "login_token=%s%%2C%s&format=json&domain=%s&length=1&sub_domain=%s",
@@ -190,6 +192,8 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	size_t len;
 	char *post;
 
+	(void)alias;
+
 	if (!info->data)
 		return -RC_INVALID_POINTER;
 
@@ -221,6 +225,9 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *resp = trans->rsp_body;
+
+	(void)info;
+	(void)alias;
 
 	DO(http_status_valid(trans->status));
 
