@@ -234,7 +234,8 @@ int os_check_perms(void)
 		logit(LOG_WARNING, "Cannot change owner of cache directory %s to %d:%d, skipping: %s",
 		      cache_dir, uid, gid, strerror(errno));
 
-	if (pidfile_name) {
+	/* Handle --no-pidfile case as well, check for "" */
+	if (pidfile_name && pidfile_name[0]) {
 		char pidfn[strlen(RUNSTATEDIR) + strlen(pidfile_name) + 6];
 		char *pidfile_dir;
 

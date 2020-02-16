@@ -279,6 +279,7 @@ static int usage(int code)
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -n, --foreground               Run in foreground with logging to stdout/stderr\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
+		"     --no-pidfile               Do not create PID file, for use with systemd\n"
 		" -P, --pidfile=FILE             File to store process ID for signaling %s\n"
 		"                                Default uses ident NAME: %s\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
@@ -328,6 +329,7 @@ int main(int argc, char *argv[])
 		{ "loglevel",          1, 0, 'l' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
+		{ "no-pidfile",        0, 0, 'N' },
 		{ "pidfile",           1, 0, 'P' },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
@@ -341,7 +343,7 @@ int main(int argc, char *argv[])
 	parse_privs(NULL);
 
 	prognm = ident = progname(argv[0]);
-	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:np:P:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:nNp:P:st:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -392,7 +394,12 @@ int main(int argc, char *argv[])
 			use_syslog--;
 			break;
 
+		case 'N':	/* --no-pidfile */
+			optarg = "";
+			/* fallthrough */
 		case 'P':	/* --pidfile=NAME */
+			if (pidfile_name)
+				free(pidfile_name);
 			pidfile_name = strdup(optarg);
 			break;
 
@@ -426,7 +433,9 @@ int main(int argc, char *argv[])
 	if (check_config) {
 		char pidfn[80];
 
-		if (pidfile_name[0] != '/')
+		if (pidfile_name[0] == 0)
+			strlcpy(pidfn, "<none>", sizeof(pidfn));
+		else if (pidfile_name[0] != '/')
 			snprintf(pidfn, sizeof(pidfn), "%s/%s.pid", RUNSTATEDIR, pidfile_name);
 		else
 			snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);

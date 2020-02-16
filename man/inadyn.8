@@ -29,6 +29,7 @@
 .Op Fl I, -ident=NAME
 .Op Fl l, -loglevel=LEVEL
 .Op Fl n, -foreground
+.Op Fl -no-pidfile
 .Op Fl P, -pidfile=FILE
 .Op Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 .Op Fl s, -syslog
@@ -258,6 +259,18 @@ also give the
 option if you still want to redirect log messages to the syslog.
 .It Fl p, -drop-privs=USER Ns Op : Ns Ar GROUP
 Drop root privileges after initial setup to the given user and group.
+.It Fl -no-pidfile
+When running as a daemon, even when running in the foreground with
+.Fl n ,
+.Nm
+creates a PID file so users can easily find the PID of the process to
+send signals to.  See
+.Sx SIGNALS
+for more information on this.  This option tells
+.Nm
+to
+.Sy not
+create a PID file.  Some users prefer this when running under systemd.
 .It Fl P, -pidfile=FILE
 Set PID file name and location, defaults to
 .Pa /run/inadyn.pid ,
@@ -340,7 +353,10 @@ that
 For convenience in sending signals,
 .Nm
 writes its process ID to
-.Pa /var/run/inadyn.pid
+.Pa /var/run/inadyn.pid ,
+unless the
+.Fl -ident Ar NAME
+option is used.
 .Sh FILES
 .Bl -tag -width /var/cache/inadyn/freedns.afraid.org.cache -compact
 .It Pa /etc/inadyn.conf
