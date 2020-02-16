@@ -229,6 +229,7 @@ static int cfg_getserver(cfg_t *cfg, char *server, ddns_name_t *name)
 	return getserver(str, name);
 }
 
+#if 0
 /* TODO: Move to a separate file */
 #define string_startswith(string, prefix) strncasecmp(string, prefix, strlen(prefix)) == 0
 
@@ -304,6 +305,7 @@ static int cfg_parseproxy(cfg_t *cfg, char *server, tcp_proxy_type_t *type, ddns
 
 	return parseproxy(str, type, name);
 }
+#endif
 
 static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 {
@@ -455,8 +457,9 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 		info->user_agent = user_agent;
 
 	/* A per-proivder optional proxy server:port */
-//	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
-
+#if 0
+	cfg_parseproxy(cfg, "proxy", &info->proxy_type, &info->proxy_name);
+#endif
 	return 0;
 
 error:
