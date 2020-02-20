@@ -343,7 +343,8 @@ single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
 
 If your DDNS provider does not provide you with a `checkip-server`, you
-can use other free services, like http://ipify.org
+can use other services, like http://ipify.org, which is the default if
+you do not specify one for your custom provider config:
 
     checkip-server = api.ipify.org
 

@@ -9,7 +9,7 @@
 .\" You may modify and distribute this document for any purpose, as
 .\" long as this copyright notice remains intact.
 .\"
-.Dd February 15, 2020
+.Dd February 20, 2020
 .Dt INADYN 5 SMM
 .Os
 .Sh NAME
@@ -156,14 +156,17 @@ Server to use for periodic IP address changes,
 defaults to
 .Ar 80 .
 .Pp
-.Pa Note:
-This is an optional setting for
+This is an optional setting.  For
 .Cm provider{}
-sections, which always have a default
+sections it defaults to a pre-defined
 .Cm checkip-server
 and
 .Cm checkip-path
-defined.  For custom DDNS setups however it is required.  When set in a
+for the given DDNS provider.  For custom DDNS setups it defaults to
+.Cm "api.ipify.org" ,
+which is a really great and free service that even support HTTPS, see
+.Cm checkip-ssl
+setting, below.  When set in a
 .Cm provider{}
 section it overrides the provider's default
 .Cm checkip-server .
