@@ -365,6 +365,12 @@ last example above.
 Build & Install
 ---------------
 
+### Debian/Ubuntu
+
+    curl -sS https://deb.troglobit.com/pubkey.gpg | sudo apt-key add -
+    echo "deb [arch=amd64] https://deb.troglobit.com/debian stable main" | sudo tee /etc/apt/sources.list.d/troglobit.list
+    sudo apt-get update && sudo apt-get install inadyn
+
 ### Homebrew (macOS)
 
 To run the latest stable version on macOS, type:
