@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.6][] - 2020-02-xx
+[v2.6][] - 2020-02-22
 ---------------------
 
 **NOTE:** The `-1, --once` mode has changed semantics, it no longer
@@ -44,6 +44,7 @@ All notable changes to the project are documented in this file.
 - Fix default checkip server for PubYun/3322, bliao.com not working.
   This patch adds support for the official 3322 checkip server
 - Fix #277: See #235 but also for IPv4 ...
+- Fix #297: api.ipify.org default checkip server for custom providers
 
 
 [v2.5][] - 2018-09-30

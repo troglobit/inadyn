@@ -14,8 +14,9 @@ inadyn (2.6) stable; urgency=medium
   * Sync with latest downstream Debian packaging
   * Behavior change: `--once` now requires `--force` to force an update
     even if there is no need to update
+  * Change default checkip server for custom providers to api.ipify.org
 
- -- Joachim Nilsson <troglobit@gmail.com>  Sun, 16 Feb 2020 17:02:58 +0100
+ -- Joachim Nilsson <troglobit@gmail.com>  Sat, 22 Feb 2020 16:10:34 +0100
 
 inadyn (2.5) unstable; urgency=medium
 
