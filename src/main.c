@@ -349,6 +349,10 @@ int main(int argc, char *argv[])
 			once = 1;
 			break;
 
+		case '4':	/* -- force */
+			force = 1;
+			break;
+
 		case 128:	/* --cache-dir=PATH */
 			cache_dir = strdup(optarg);
 			break;
