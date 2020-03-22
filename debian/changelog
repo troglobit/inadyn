@@ -1,3 +1,12 @@
+inadyn (2.7) stable; urgency=medium
+
+  * New 'broken-rtc = <true|false>' setting
+  * New authentication failure handling, improves error reporting
+  * Fix '--force' option not being recognized
+  * Fix hash generation regression in FreeDNS plugin
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Sun, 22 Mar 2020 11:21:30 +0100
+
 inadyn (2.6) stable; urgency=medium
 
   * Add support for Cloudflare
