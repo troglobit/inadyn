@@ -38,6 +38,8 @@ static void *param = NULL;
  * @cmd:  Full path to script or command to run
  * @ip:   IP address to set as %INADYN_IP env. variable
  * @name: String to set as %INADYN_HOSTNAME env. variable
+ * @event:Event name to set as %INADYN_EVENT env. variable
+ * @error:Error code to set as %INADYN_ERROR env. variable
  *
  * If inadyn has been started with the --iface=IFNAME command line
  * option the IFNAME is sent to the script as %INADYN_IFACE.
@@ -45,18 +47,24 @@ static void *param = NULL;
  * Returns:
  * Posix %OK(0), or %RC_OS_FORK_FAILURE on vfork() failure
  */
-int os_shell_execute(char *cmd, char *ip, char *name)
+int os_shell_execute(char *cmd, char *ip, char *name, char *event, int error)
 {
 	int rc = 0;
 	int child;
+	char errbuf[11];
 
 	child = vfork();
 	switch (child) {
 	case 0:
+		snprintf(errbuf, sizeof(errbuf), "%d", error);
 		setenv("INADYN_IP", ip, 1);
 		setenv("INADYN_HOSTNAME", name, 1);
+		setenv("INADYN_EVENT", event, 1);
+		setenv("INADYN_ERROR", errbuf, 1);
+		setenv("INADYN_ERROR_MESSAGE", error_str(error), 1);
 		if (iface)
 			setenv("INADYN_IFACE", iface, 1);
+
 		execl("/bin/sh", "sh", "-c", cmd, (char *)0);
 		exit(1);
 		break;

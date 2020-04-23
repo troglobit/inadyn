@@ -653,22 +653,29 @@ static int update_alias_table(ddns_t *ctx)
 
 		for (i = 0; i < info->alias_count; i++) {
 			ddns_alias_t *alias = &info->alias[i];
+			char *event = "update";
+			rc = 0;
 
-			if (!alias->update_required)
-				continue;
+			if (!alias->update_required) {
+				if (exec_mode == EXEC_MODE_COMPAT)
+					continue;
+				event = "nochg";
+			} else if ((rc = send_update(ctx, info, alias, &anychange))) {
+				if (exec_mode == EXEC_MODE_COMPAT)
+					break;
+				event = "error";
+			} else {
+				/* Only reset if send_update() succeeds. */
+				alias->update_required = 0;
+				alias->last_update = time(NULL);
 
-			TRY(send_update(ctx, info, alias, &anychange));
-
-			/* Only reset if send_update() succeeds. */
-			alias->update_required = 0;
-			alias->last_update = time(NULL);
-
-			/* Update cache file for this entry */
-			write_cache_file(alias);
+				/* Update cache file for this entry */
+				write_cache_file(alias);
+			}
 
 			/* Run command or script on successful update. */
 			if (script_exec)
-				os_shell_execute(script_exec, alias->address, alias->name);
+				os_shell_execute(script_exec, alias->address, alias->name, event, rc);
 		}
 
 		if (RC_DDNS_RSP_NOTOK == rc || RC_DDNS_RSP_AUTH_FAIL == rc)
