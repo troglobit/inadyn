@@ -90,6 +90,11 @@ typedef enum {
 	CMD_CHECK_NOW,
 } ddns_cmd_t;
 
+typedef enum {
+	EXEC_MODE_COMPAT,
+	EXEC_MODE_EVENT
+} ddns_exec_mode_t;
+
 typedef struct {
 	char           username[USERNAME_LEN];
 	char           password[PASSWORD_LEN];
@@ -198,6 +203,7 @@ extern int ignore_errors;
 extern int startup_delay;
 extern int allow_ipv6;
 extern int verify_addr;
+extern int exec_mode;
 extern char *ident;
 extern char *prognm;
 extern char *iface;
