@@ -240,9 +240,7 @@ int os_check_perms(void)
 	if ((mkpath(cache_dir, 0755) && errno != EEXIST) || access(cache_dir, W_OK)) {
 		logit(LOG_WARNING, "No write permission to %s: %s", cache_dir, strerror(errno));
 		logit(LOG_WARNING, "Cannot guarantee DDNS server won't lock you out for excessive updates.");
-	} else if (chown(cache_dir, uid, gid))
-		logit(LOG_WARNING, "Cannot change owner of cache directory %s to %d:%d, skipping: %s",
-		      cache_dir, uid, gid, strerror(errno));
+	}
 
 	/* Handle --no-pidfile case as well, check for "" */
 	if (pidfile_name && pidfile_name[0]) {
@@ -264,10 +262,6 @@ int os_check_perms(void)
 		if (access(pidfile_dir, F_OK)) {
 			if (mkpath(pidfile_dir, 0755) && errno != EEXIST)
 				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);
-			else if (chown(pidfile_dir, uid, gid))
-				logit(LOG_WARNING,
-				      "Cannot change owner of PID file directory %s to %d:%d, skipping: %s",
-				      pidfile_dir, uid, gid, strerror(errno));
 		}
 	}
 
