@@ -206,18 +206,17 @@ This looks for the default `.conf` file, to check any file, use:
     #   Zone: Zone - Read
     #   Zone: DNS - Edit
     #
-    # If the token is limited to a specific zone (it should be)
-	# it will also need the following permission:
-    #   Account: Account Settings - Read
-	#
-    # For more information, see this Cloudflare Community post:
-	# https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
+    # Due to a bug in Cloudflare's API, the token must currently be 
+    # granted access to all zones on the account.
     #
-    # Note: global API keys are NOT supported for security reasons
+    # For more information, see this Cloudflare Community post:
+    # https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
+    #
+    # Note: global API keys are NOT supported for security reasons.
     provider cloudflare.com {
-         username = unused (but currently something must be entered)
+         username = your_zone 
          password = your_api_token
-         hostname = yourhost.example.com
+         hostname = host.your_zone
     }
 
 Notice how the config has three different users of the No-IP provider --
