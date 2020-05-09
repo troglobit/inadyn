@@ -88,7 +88,6 @@ static ddns_system_t plugin = {
  * filled by the setup() callback and handed to ddns_info_t
  * for use later in the request() callback .
  */
-#define MAX_NAME 64
 #define MAX_ID (32 + 1)
 
 struct cfdata {
@@ -264,25 +263,6 @@ cleanup:
 	return rc;
 }
 
-static void get_zone(char *dest, size_t dest_len, const char *hostname)
-{
-	const char *end = hostname + strlen(hostname);
-	const char *root;
-	int count = 0;
-
-	for (root = end; root != hostname; root--) {
-		if (*root == '.')
-			count++;
-
-		if (count == 2) {
-			root++;
-			break;
-		}
-	}
-
-	strlcpy(dest, root, dest_len);
-}
-
 static const char* get_record_type(const char *address)
 {
 	if (strstr(address, ":"))
@@ -296,8 +276,14 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	const char *record_type;
 	struct cfdata *data;
 	size_t len;
-	char zone_name[MAX_NAME];
+	const char *zone_name = info->creds.username;
 	int rc = RC_OK;
+
+	if (*zone_name == '\0' || !strchr(zone_name, '.'))
+	{
+		logit(LOG_ERR, "Invalid zone. Enter the Cloudflare zone in the username field.");
+		return RC_DDNS_INVALID_OPTION;
+	}
 
 	data = calloc(1, sizeof(struct cfdata));
 	if (!data)
@@ -307,10 +293,9 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		free(info->data);
 	info->data = data;
 
-	get_zone(zone_name, sizeof(zone_name), hostname->name);
 	record_type = get_record_type(hostname->address);
 
-	logit(LOG_DEBUG, "User: %s Zone: %s", info->creds.username, zone_name);
+	logit(LOG_DEBUG, "Zone: %s", zone_name);
 
 	len = snprintf(ctx->request_buf, ctx->request_buflen,
 		       CLOUDFLARE_ZONE_ID_REQUEST,
