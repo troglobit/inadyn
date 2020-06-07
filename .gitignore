@@ -2,6 +2,7 @@
 #*#
 *.o
 .deps
+.dirstamp
 aclocal.m4
 ar-lib
 autom4te.cache
