@@ -45,10 +45,10 @@ release: release-hook distcheck package md5-dist
 	@echo
 	@echo "Resulting release files:"
 	@echo "================================================================="
-	@for file in $(DIST_ARCHIVES); do					\
-		printf "%-32s Distribution tarball\n" $$file;			\
-		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';	\
+	@for file in $(DIST_ARCHIVES); do						\
+		printf "%-32s Distribution tarball\n" $$file;				\
+		printf "%-32s " $$file.md5; cat ../$$file.md5 | cut -f1 -d' ';		\
 	done
-	@for file in `cd ..; ls $(PACKAGE)_$(VERSION)*`; do			\
-		printf "%-32s Debian/Ubuntu package\n" $$file;			\
+	@for file in `cd ..; ls nemesis_$(VERSION)* $(PACKAGE)-dbg*_$(VERSION)*`; do	\
+		printf "%-32s Debian/Ubuntu package\n" $$file;				\
 	done
