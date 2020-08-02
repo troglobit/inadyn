@@ -206,12 +206,6 @@ This looks for the default `.conf` file, to check any file, use:
     #   Zone: Zone - Read
     #   Zone: DNS - Edit
     #
-    # Due to a bug in Cloudflare's API, the token must currently be 
-    # granted access to all zones on the account.
-    #
-    # For more information, see this Cloudflare Community post:
-    # https://community.cloudflare.com/t/bug-zone-detail-by-name-requires-zone-list-permission/128042
-    #
     # Note: global API keys are NOT supported for security reasons.
     provider cloudflare.com {
          username = your_zone 
