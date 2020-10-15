@@ -9,6 +9,9 @@ sudo: false
 compiler:
   - gcc
   - clang
+arch:
+  - amd64
+  - ppc64le
 
 env:
   global:
