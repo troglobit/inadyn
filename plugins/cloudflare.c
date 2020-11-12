@@ -211,15 +211,15 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 
 static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *request, size_t request_len)
 {
-	const size_t  RESP_BUFFER_SIZE = 4096;
 	const char   *body;
 	http_trans_t  trans;
 	jsmntok_t     id;
 	http_t        client;
 	char         *response_buf;
+	size_t        response_buflen = DDNS_HTTP_RESPONSE_BUFFER_SIZE;
 	int           rc = RC_OK;
 
-	response_buf = calloc(RESP_BUFFER_SIZE, sizeof(char));
+	response_buf = calloc(response_buflen, sizeof(char));
 	if (!response_buf)
 		return RC_OUT_OF_MEMORY;
 
@@ -234,7 +234,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	trans.req = request;
 	trans.req_len = request_len;
 	trans.rsp = response_buf;
-	trans.max_rsp_len = RESP_BUFFER_SIZE - 1; /* Save place for a \0 at the end */
+	trans.max_rsp_len = response_buflen - 1; /* Save place for a \0 at the end */
 
 	logit(LOG_DEBUG, "Request:\n%s", request);
 	CHECK(http_transaction(&client, &trans));
