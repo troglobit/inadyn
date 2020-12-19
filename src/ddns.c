@@ -516,7 +516,7 @@ static int check_alias_update_table(ddns_t *ctx)
 			ddns_alias_t *alias = &info->alias[i];
 
 /* XXX: TODO time_to_check() will return false positive if the cache
- *     file is missing => causing unnnecessary update.  We should save
+ *     file is missing => causing unnecessary update.  We should save
  *     the cache file with the current IP instead and fall back to
  *     standard update interval!
  */
