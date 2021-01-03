@@ -334,10 +334,14 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	}
 
 	rc = get_id(data->hostname_id, MAX_ID, info, ctx->request_buf, ctx->request_buflen);
-	if (rc == RC_OK)
+	if (rc == RC_OK) {
 		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data->hostname_id);
-	else
+	} else if (rc == RC_DDNS_RSP_NOHOST) {
+		strcpy(data->hostname_id, "");
+		return RC_OK;
+	} else {
 		logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
+	}
 
 	return rc;
 }
