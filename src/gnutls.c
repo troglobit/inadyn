@@ -295,14 +295,17 @@ int ssl_send(http_t *client, const char *buf, int len)
 
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
-	int ret, len = buf_len;
+	int ret, len = 0;
 
 	if (!client->ssl_enabled)
 		return tcp_recv(&client->tcp, buf, buf_len, recv_len);
 
 	do {
-		ret = gnutls_record_recv(client->ssl, buf, len);
-	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+		ret = gnutls_record_recv(client->ssl, buf + len, buf_len - len);
+		if (ret > 0) {
+			len += ret;
+		}
+	} while (ret > 0 || ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
 	/*
 	 * We may get GNUTLS_E_PREMATURE_TERMINATION here.  It happens
@@ -316,7 +319,8 @@ int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 		return RC_HTTPS_RECV_ERROR;
 	}
 
-	*recv_len = ret;
+	*recv_len = len;
+
 	logit(LOG_DEBUG, "Successfully received HTTPS response (%d/%d bytes)!", *recv_len, buf_len);
 
 	return 0;

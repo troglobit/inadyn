@@ -244,26 +244,28 @@ int ssl_send(http_t *client, const char *buf, int len)
 
 int ssl_recv(http_t *client, char *buf, int buf_len, int *recv_len)
 {
-	int rc, err;
+	int rc, err, len = 0;
 
-	*recv_len = 0;
 	if (!client->ssl_enabled)
 		return tcp_recv(&client->tcp, buf, buf_len, recv_len);
 
 	err = SSL_ERROR_NONE;
 	do {
 		ERR_clear_error();
-		rc  = SSL_read(client->ssl, buf, buf_len);
-		if (rc <= 0)
+		rc = SSL_read(client->ssl, buf + len, buf_len - len);
+		if (rc > 0) {
+			len += rc;
+		} else {
 			err = SSL_get_error(client->ssl, rc);
-	} while (err == SSL_ERROR_WANT_READ);
+		}
+	} while (rc > 0 || err == SSL_ERROR_WANT_READ);
 
-	if (rc <= 0) {
+	if (rc < 0) {
 		ssl_check_error();
 		return RC_HTTPS_RECV_ERROR;
 	}
 
-	*recv_len = rc;
+	*recv_len = len;
 
 	logit(LOG_DEBUG, "Successfully received HTTPS response (%d/%d bytes)!", *recv_len, buf_len);
 
