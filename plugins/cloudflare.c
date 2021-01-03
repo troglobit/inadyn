@@ -59,7 +59,7 @@ static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 	
-static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s\",\"content\":\"%s\"}";
+static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s\",\"content\":\"%s\",\"ttl\":%li,\"proxied\":%s}";
 
 static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
@@ -350,7 +350,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			       CLOUDFLARE_UPDATE_JSON_FORMAT,
 			       record_type,
 			       hostname->name,
-			       hostname->address);
+			       hostname->address,
+			       info->ttl >= 0 ? info-> ttl : 1, // Time to live for DNS record. Value of 1 is 'automatic'
+			       info->proxied ? "true" : "false");
+
 
 	if (strlen(data->hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,

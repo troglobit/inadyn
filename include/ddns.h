@@ -157,6 +157,12 @@ typedef struct di {
 	/* Use wildcard, *.foo.bar */
 	int            wildcard;
 
+	/* DNS ttl option */
+	long int       ttl;
+
+	/* CDN proxied option */
+	int            proxied;
+
 	/*
 	 * Provider specific data, per-conf-entry.  E.g., the Cloudflare
 	 * plugin stores zone_id and hostname_id here.  Set up by the
