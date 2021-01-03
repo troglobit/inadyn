@@ -75,10 +75,14 @@ static ddns_system_t plugin = {
 	.setup        = (setup_fn_t)setup,
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
-
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	/*
+	 * www.cloudflare.com would also work but is dual stack
+	 * use 1.1.1.1 to force it return ipv4 by default
+	 * see examples/cloudflare-ipv6.conf for ipv6 setting
+	 */
+	.checkip_name = "1.1.1.1",
+	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = API_HOST,
 	.server_url   = API_URL
