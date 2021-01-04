@@ -59,7 +59,7 @@ static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 	
-static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s\",\"content\":\"%s\"}";
+static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s\",\"content\":\"%s\",\"ttl\":%li,\"proxied\":%s}";
 
 static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
@@ -76,9 +76,15 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	/*
+	 * 1.1.1.1 is chosen here due to "allow-ipv6" is default to false
+	 * www.cloudflare.com would also work but is dual stack and may return ipv6 address
+	 * use 1.1.1.1 to would force it return ipv4 by default
+	 * see examples/cloudflare-*.conf
+	 */
+	.checkip_name = "1.1.1.1",
+	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = API_HOST,
 	.server_url   = API_URL
@@ -330,10 +336,14 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	}
 
 	rc = get_id(data->hostname_id, MAX_ID, info, ctx->request_buf, ctx->request_buflen);
-	if (rc == RC_OK)
+	if (rc == RC_OK) {
 		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data->hostname_id);
-	else
+	} else if (rc == RC_DDNS_RSP_NOHOST) {
+		strcpy(data->hostname_id, "");
+		return RC_OK;
+	} else {
 		logit(LOG_INFO, "Hostname '%s' not found.", hostname->name);
+	}
 
 	return rc;
 }
@@ -350,7 +360,10 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			       CLOUDFLARE_UPDATE_JSON_FORMAT,
 			       record_type,
 			       hostname->name,
-			       hostname->address);
+			       hostname->address,
+			       info->ttl >= 0 ? info-> ttl : 1, // Time to live for DNS record. Value of 1 is 'automatic'
+			       info->proxied ? "true" : "false");
+
 
 	if (strlen(data->hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,

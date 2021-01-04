@@ -168,6 +168,34 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
  */
 static int is_address_valid(int family, const char *host)
 {
+	/*
+	 * cloudflare would return requested hostname before client's ip address
+	 * block cloudflare ips so that https://1.1.1.1/cdn-cgi/trace would work
+	 * even if 1.1.1.1 is the first ip in the response body
+	 */
+	const char *except[] = {
+		"1.1.1.1",
+		"1.0.0.1",
+		"2606:4700:4700::1111",
+		"2606:4700:4700::1001",
+		"1.1.1.2",
+		"1.0.0.2",
+		"2606:4700:4700::1112",
+		"2606:4700:4700::1002",
+		"1.1.1.3",
+		"1.0.0.3",
+		"2606:4700:4700::1113",
+		"2606:4700:4700::1003",
+		"2606:4700:4700::64",
+		"2606:4700:4700::6400"
+	};
+
+	for (int i = 0; i < NELEMS(except); i++) {
+		if (!strncmp(host, except[i], strlen(host))) {
+			return 0;
+		}
+	}
+
 	if (!verify_addr) {
 		logit(LOG_DEBUG, "IP address validation disabled, %s is thus valid.", host);
 		return 1;
