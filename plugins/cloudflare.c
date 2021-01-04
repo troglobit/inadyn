@@ -75,9 +75,11 @@ static ddns_system_t plugin = {
 	.setup        = (setup_fn_t)setup,
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
+
 	/*
-	 * www.cloudflare.com would also work but is dual stack
-	 * use 1.1.1.1 to force it return ipv4 by default
+	 * 1.1.1.1 is chosen here due to "allow-ipv6" is default to false
+	 * www.cloudflare.com would also work but is dual stack and may return ipv6 address
+	 * use 1.1.1.1 to would force it return ipv4 by default
 	 * see examples/cloudflare-*.conf
 	 */
 	.checkip_name = "1.1.1.1",
