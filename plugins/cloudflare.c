@@ -78,7 +78,7 @@ static ddns_system_t plugin = {
 	/*
 	 * www.cloudflare.com would also work but is dual stack
 	 * use 1.1.1.1 to force it return ipv4 by default
-	 * see examples/cloudflare-ipv6.conf for ipv6 setting
+	 * see examples/cloudflare-*.conf
 	 */
 	.checkip_name = "1.1.1.1",
 	.checkip_url  = "/cdn-cgi/trace",
