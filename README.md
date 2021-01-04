@@ -202,15 +202,12 @@ This looks for the default `.conf` file, to check any file, use:
          hostname = yourhost.example.com
     }
 
-    # Create a unique API token with the following Permissions:
-    #   Zone: Zone - Read
-    #   Zone: DNS - Edit
-    #
-    # Note: global API keys are NOT supported for security reasons.
     provider cloudflare.com {
-         username = your_zone 
-         password = your_api_token
-         hostname = host.your_zone
+        username = zone.name
+        password = api_token # Create a unique custom api token with the following permissions: Zone.Zone - Read, Zone.DNS - Edit.
+        hostname = hostname.zone.name
+        ttl = 1 # optional, value of 1 is 'automatic'.
+        proxied = false # optional.
     }
 
 Notice how the config has three different users of the No-IP provider --
