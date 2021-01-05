@@ -203,25 +203,26 @@ int os_install_signal_handler(void *ctx)
 	return 0;
 }
 
-static int pid_alive(char *pidfn)
+static int pid_alive(pid_t pid) {
+	return !(kill(pid, 0) && errno == ESRCH);
+}
+
+static pid_t getpid_from_pidfile(char *pidfn)
 {
 	FILE *fp;
-	int alive = 1;
-
+	pid_t pid = 0;
 	fp = fopen(pidfn, "r");
 	if (fp) {
 		char buf[20];
 
 		if (fgets(buf, sizeof(buf), fp)) {
-			pid_t pid = atoi(buf);
-
-			if (kill(pid, 0) && errno == ESRCH)
-				alive = 0;
+			pid = atoi(buf);
 		}
+
 		fclose(fp);
 	}
 
-	return alive;
+	return pid;
 }
 
 /*
@@ -252,10 +253,13 @@ int os_check_perms(void)
 		else
 			strlcpy(pidfn, pidfile_name, sizeof(pidfn));
 
-		if (!access(pidfn, F_OK) && pid_alive(pidfn)) {
-			logit(LOG_ERR, "PID file %s already exists, %s already running?",
-			      pidfn, prognm);
-			return RC_PIDFILE_EXISTS_ALREADY;
+		if (!access(pidfn, F_OK)) {
+			pid_t pid = getpid_from_pidfile(pidfn);
+			if (pid > 0 && pid != getpid() && pid_alive(pid)) {
+				logit(LOG_ERR, "PID file %s already exists, %s already running?",
+							pidfn, prognm);
+				return RC_PIDFILE_EXISTS_ALREADY;
+			}
 		}
 
 		pidfile_dir = dirname(strdupa(pidfn));
