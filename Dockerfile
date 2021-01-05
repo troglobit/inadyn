@@ -24,4 +24,4 @@ RUN apk --no-cache add \
 
 COPY --from=0 /usr/sbin/inadyn /usr/sbin/inadyn
 COPY --from=0 /usr/share/doc/inadyn /usr/share/doc/inadyn
-ENTRYPOINT ["/usr/sbin/inadyn", "--foreground"]
+ENTRYPOINT ["/usr/sbin/inadyn", "--foreground", "--no-pidfile"]
