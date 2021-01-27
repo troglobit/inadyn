@@ -4,6 +4,36 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.8][UNRELEASED] - 2021-01-31
+---------------------
+
+Improvied `--exec SCRIPT` support and massive Cloudflare plugin updates.
+
+### Changes
+- Issue #310: Extended support for external script.  By default it runs
+  only on successful DDNS update (`compat` mode).  New `event` mode
+  calls the script on any action, with added new environment variables.
+- Cloudflare plugin, curated by Simon Pilkington:
+  - Increased size of response buffer, JSON reply is quite big and
+    In-a-dyn is used to one-liner replies from most servers
+  - Add `ttl` option, by なつき
+  - Add `proxied` option, by なつき
+  - Use 1.1.1.1 as default checkip server, by なつき
+  - Updated examples for IPv4 and IPv6, by なつき
+- New multi-arch docker image, by なつき
+
+### Fixes
+- Issue #309: Do not attempt to `chown(2)` the cache or pidfile dirs,
+  because this may fail and cause In-a-dyn to fail.  Users that want to
+  drop-privs must ensure the cache and pidfile directories are writable
+  by the `-p uid:gid` specified
+- Issue #313: Cloudflare, get zone name from username field in config
+- Issue #327: Fix duiadns.net plugin, by Sergey Aleynikov
+- Issue #328: Fix TLS regression with multiple data packets, by なつき
+- Issue #329: Fix creation of new Cloudflare record, by なつき
+- Fix default install prefix, regression introduced in v2.6
+
+
 [v2.7][] - 2020-03-22
 ---------------------
 
@@ -806,7 +836,11 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.3...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.7...HEAD
+[v2.8]:   https://github.com/troglobit/inadyn/compare/v2.7...v2.8
+[v2.7]:   https://github.com/troglobit/inadyn/compare/v2.6...v2.7
+[v2.6]:   https://github.com/troglobit/inadyn/compare/v2.5...v2.6
+[v2.5]:   https://github.com/troglobit/inadyn/compare/v2.4...v2.5
 [v2.4]:   https://github.com/troglobit/inadyn/compare/v2.3.1...v2.4
 [v2.3.1]: https://github.com/troglobit/inadyn/compare/v2.3...v2.3.1
 [v2.3]:   https://github.com/troglobit/inadyn/compare/v2.2.1...v2.3
