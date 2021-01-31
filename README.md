@@ -125,9 +125,12 @@ This looks for the default `.conf` file, to check any file, use:
         hostname    = some.example.com
     }
 
+    # We override checkip server with the In-a-dyn built-in 'default',
+    # api.ipify.org, for details on this, see below.
     provider freemyip {
-        password    = YOUR_TOKEN
-        hostname    = YOUR_DOMAIN.freemyip.com
+        password       = YOUR_TOKEN
+        hostname       = YOUR_DOMAIN.freemyip.com
+        checkip-server = default
     }
 
     provider dyn {
@@ -231,9 +234,11 @@ and password **must** be the *Update key* found in the *Advanced*
 configuration tab.
 
 Sometimes the default `checkip-server` for a DDNS provider can be very
-slow to respond, to this end Inadyn now supports overriding this server
-with a custom one, like for custom DDNS provider, or even a custom
-command.  See the man pages, or the below section, for more information.
+slow to respond, to this end In-a-dyn now support overriding it with a
+custom one, or a custom command.  The easiest way to change it is to set
+`checkip-server = default`, triggering In-a-dyn to use `api.ipify.org`,
+which it also use for custom DDNS providers.  See the man pages, or the
+below section, for more information.
 
 Some providers require using a specific browser to send updates, this
 can be worked around using the `user-agent = STRING` setting, as shown

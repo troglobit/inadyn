@@ -309,9 +309,9 @@ static int cfg_parseproxy(cfg_t *cfg, char *server, tcp_proxy_type_t *type, ddns
 
 static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 {
-	size_t j;
-	const char *str;
 	ddns_system_t *system;
+	const char *str;
+	size_t j;
 
 	if (custom)
 		str = "custom";
@@ -438,6 +438,12 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 			strlcpy(info->checkip_url, str, sizeof(info->checkip_url));
 		else
 			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+
+		if (!strcasecmp(info->checkip_name.name, "default")) {
+			strlcpy(info->checkip_name.name, DDNS_MY_IP_SERVER, sizeof(info->checkip_name.name));
+			strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+			/* let local checkip-ssl decide HTTP/HTTPS for ipify */
+		}
 
 		/*
 		 * If a custom checkip server is defined, the

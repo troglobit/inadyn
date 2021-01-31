@@ -161,10 +161,16 @@ record.  Default is to use HTTPS (true).
 The username, if applicable.  This might be referred to as hash by some providers.
 .It Cm password = PASSWORD
 The password, if applicable.
-.It Cm checkip-server = checkip.example.com[:port]
-Server to use for periodic IP address changes,
+.It Cm checkip-server = <default | checkip.example.com[:port]>
+This setting allows you to override the default checkip server with
+either the string
+.Cm default ,
+to use In-a-dyn's built-in default,
+.Cm "api.ipify.org",
+or the complete name of the server to use for periodic IP address
+changes.  The optional
 .Pa port
-defaults to
+argument defaults to
 .Ar 80 .
 .Pp
 This is an optional setting.  For
@@ -182,7 +188,11 @@ setting, below.  When set in a
 section it overrides the provider's default
 .Cm checkip-server .
 .It Cm checkip-path = "/some/checkip/url"
-Optional server path for check IP server, defaults to "/".
+Optional server path for check IP server, defaults to "/".  When the
+.Cm checkip-server
+is set to
+.Cm default ,
+this setting is ignored.
 .It Cm checkip-ssl = <true | false>
 This setting usually follows the
 .Cm ssl
