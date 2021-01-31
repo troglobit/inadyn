@@ -10,6 +10,11 @@ All notable changes to the project are documented in this file.
 Improvied `--exec SCRIPT` support and massive Cloudflare plugin updates.
 
 ### Changes
+- Issue #306: New keyword `default` to use the built-in In-a-dyn default
+  `checkip-server` in the configuration file
+- Issue #306: Automatically fall back to use built-in checkip-server if
+  the provider's server fails.  Warnings added to log so user can change
+  their preferences
 - Issue #310: Extended support for external script.  By default it runs
   only on successful DDNS update (`compat` mode).  New `event` mode
   calls the script on any action, with added new environment variables.

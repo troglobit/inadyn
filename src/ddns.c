@@ -459,6 +459,10 @@ static int get_address_iface(ddns_t *ctx, const char *ifname, char *address, siz
 
 static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
 {
+	char name[sizeof(info->checkip_name.name)];
+	char url[sizeof(info->checkip_url)];
+	int rc;
+
 	logit(LOG_DEBUG, "Get address for %s", info->system->name);
 	memset(address, 0, len);
 
@@ -471,6 +475,36 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 	if (!get_address_remote(ctx, info, address, len))
 		return 0;
 
+	logit(LOG_WARNING, "Communication with checkip server %s failed, "
+	      "run again with 'inadyn -l debug' if problem persists",
+	      info->checkip_name.name);
+
+	/* Skip fallback if it's the same server ... option: flip SSL bit? */
+	if (strstr(info->checkip_name.name, DDNS_MY_IP_SERVER))
+		goto error;
+
+	logit(LOG_WARNING, "Retrying with built-in 'default', api.ipify.org ...");
+
+	/* keep backup, for now, future extension: count failures and replace permanently */
+	strlcpy(name, info->checkip_name.name, sizeof(name));
+	strlcpy(url, info->checkip_url, sizeof(url));
+
+	/* Retry with http(s)://api.ipify.org/ */
+	strlcpy(info->checkip_name.name, DDNS_MY_IP_SERVER, sizeof(info->checkip_name.name));
+	strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+	rc = get_address_remote(ctx, info, address, len);
+
+	/* restore backup, for now, the official server may just have temporary problems */
+	strlcpy(info->checkip_name.name, name, sizeof(info->checkip_name.name));
+	strlcpy(info->checkip_url, url, sizeof(info->checkip_url));
+
+	if (!rc) {
+		logit(LOG_WARNING, "Please note, %s seems unstable, consider overriding it "
+		      "in your configuration with 'checkip-server = default'", info->checkip_name.name);
+		return 0;
+	}
+
+error:
 	logit(LOG_ERR, "Failed to get IP address for %s, giving up!", info->system->name);
 
 	return 1;
