@@ -1,3 +1,19 @@
+inadyn (2.8) stable; urgency=medium
+
+  * New keyword 'default' for 'checkip-server', uses api.ipify.org
+  * Fallback to api.ipify.org if a provider's 'checkip-server' fails
+  * Extended support for external script, new 'event' mode introduced
+    to allow script to be called for all events
+  * Massive updates to, and related to, Cloudlflare plugin
+    - Increased size of response buffer, JSON reply is quite big and
+      In-a-dyn is used to one-liner replies from most servers
+    - Add 'ttl' option, by なつき
+    - Add 'proxied' option, by なつき
+    - Use 1.1.1.1 as default checkip server, by なつき
+    - Updated examples for IPv4 and IPv6, by なつき
+
+ -- Joachim Wiberg <troglobit@gmail.com>  Sun, 31 Jan 2021 12:49:52 +0100
+
 inadyn (2.7) stable; urgency=medium
 
   * New 'broken-rtc = <true|false>' setting

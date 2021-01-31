@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.8][UNRELEASED] - 2021-01-31
+[v2.8][] - 2021-01-31
 ---------------------
 
 Improvied `--exec SCRIPT` support and massive Cloudflare plugin updates.
@@ -842,7 +842,7 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.7...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.8...HEAD
 [v2.8]:   https://github.com/troglobit/inadyn/compare/v2.7...v2.8
 [v2.7]:   https://github.com/troglobit/inadyn/compare/v2.6...v2.7
 [v2.6]:   https://github.com/troglobit/inadyn/compare/v2.5...v2.6
