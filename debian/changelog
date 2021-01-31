@@ -1,3 +1,10 @@
+inadyn (2.8.1) stable; urgency=medium
+
+  * Fix warnings for 'ttl' and 'proxied' settings missing in custom
+    provider sections.  Found and fixed by André Colomb
+
+ -- Joachim Wiberg <troglobit@gmail.com>  Sun, 31 Jan 2021 23:29:17 +0100
+
 inadyn (2.8) stable; urgency=medium
 
   * New keyword 'default' for 'checkip-server', uses api.ipify.org

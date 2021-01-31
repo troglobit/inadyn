@@ -4,6 +4,15 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.8.1][] - 2021-01-31
+-----------------------
+
+### Fixes
+- Issue #340: the new settings `ttl` and `proxied`, introduced in
+  [v2.8][], were missing from custom provider sections.  Found and
+  fixed by André Colomb
+
+
 [v2.8][] - 2021-01-31
 ---------------------
 
@@ -842,7 +851,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.8...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.8.1...HEAD
+[v2.8.1]: https://github.com/troglobit/inadyn/compare/v2.8...v2.8.1
 [v2.8]:   https://github.com/troglobit/inadyn/compare/v2.7...v2.8
 [v2.7]:   https://github.com/troglobit/inadyn/compare/v2.6...v2.7
 [v2.6]:   https://github.com/troglobit/inadyn/compare/v2.5...v2.6
