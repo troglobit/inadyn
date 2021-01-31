@@ -25,9 +25,8 @@ Description: Internet automated Dynamic DNS client
  you.  If you want to run an Internet server on such a connection you
  risk losing your IP address every time you reconnect.
  .
- The following DDNS plugins are supported natively, other providers,
- like <http://twoDNS.de> for instance, can be set up with the custom
- DDNS plugin:
+ The following DDNS plugins are supported natively, other providers can
+ be set up with a custom DDNS plugin, see inadyn.conf(5) for an example:
  .
    * <https://freedns.afraid.org>
    * <https://www.nsupdate.info>

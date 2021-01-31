@@ -85,9 +85,8 @@ take a small fee, but also provide more domains to choose from:
    * <https://connect.yandex.ru>
    * <https://www.cloudflare.com>
 
-DDNS providers not supported natively like <http://twoDNS.de>, can be
-enabled using the generic DDNS plugin.  See below for configuration
-examples.
+DDNS providers not supported natively can be enabled using the generic
+DDNS plugin.  See below for configuration examples.
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
@@ -258,21 +257,22 @@ and/or password, you can leave these fields out.  Basic authentication,
 will still be used in communication with the server, but with empty
 username and password.
 
-A DDNS provider like <http://twoDNS.de> can be setup like this:
+A custom DDNS provider can be setup like this:
 
-    custom twoDNS {
+    custom example {
         username       = myuser
         password       = mypass
-        checkip-server = checkip.two-dns.de
+        checkip-server = checkip.example.com
         checkip-path   = /
-        ddns-server    = update.twodns.de
+        ddns-server    = update.example.com
         ddns-path      = "/update?hostname="
-        hostname       = myhostname.dd-dns.de
+        hostname       = myhostname.example.net
 	}
 
-For <https://www.namecheap.com> DDNS can look as follows.  Notice how
-the hostname syntax differs between these two DDNS providers.  You need
-to investigate details like this yourself when using the generic/custom
+You can even override existing plugin support for known DDNS providers,
+e.g., for <https://www.namecheap.com> it can look as follows.  Notice
+how the hostname syntax differs between these two examples.  You need to
+investigate details like this yourself when using the generic/custom
 DDNS plugin:
 
     custom namecheap {

@@ -487,16 +487,16 @@ provider cloudflare.com {
     proxied = false # optional.
 }
 
-# Generic example for twoDNS.de
-custom twoDNS.de {
-    username       = account4
-    password       = secret4
-    checkip-server = checkip.two-dns.de
+# Generic example, check all details for your provider!
+custom example {
+    username       = myuser
+    password       = mypass
+    checkip-server = checkip.example.com
     checkip-path   = /
     checkip-ssl    = false
-    ddns-server    = update.twodns.de
+    ddns-server    = update.example.com
     ddns-path      = "/update?hostname="
-    hostname       = example.dd-dns.de
+    hostname       = myhostname.example.net
 }
 .Ed
 .Pp

@@ -28,6 +28,7 @@ Improvied `--exec SCRIPT` support and massive Cloudflare plugin updates.
   drop-privs must ensure the cache and pidfile directories are writable
   by the `-p uid:gid` specified
 - Issue #313: Cloudflare, get zone name from username field in config
+- Issue #314: twoDNS changed API, drop support and remove custom example
 - Issue #327: Fix duiadns.net plugin, by Sergey Aleynikov
 - Issue #328: Fix TLS regression with multiple data packets, by なつき
 - Issue #329: Fix creation of new Cloudflare record, by なつき
