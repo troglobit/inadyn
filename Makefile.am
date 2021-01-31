@@ -47,6 +47,6 @@ release: release-hook distcheck package
 		printf "%-32s " $$file.md5;    cat ../$$file.md5    | cut -f1 -d' ';	\
 		printf "%-32s " $$file.sha256; cat ../$$file.sha256 | cut -f1 -d' ';	\
 	done
-	@for file in `cd ..; ls nemesis_$(VERSION)* $(PACKAGE)-dbg*_$(VERSION)*`; do	\
+	@for file in `cd ..; ls inadyn_$(VERSION)* inadyn-dbg*_$(VERSION)*`; do		\
 		printf "%-32s Debian/Ubuntu package\n" $$file;				\
 	done
