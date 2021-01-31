@@ -7,7 +7,7 @@ All notable changes to the project are documented in this file.
 [v2.8][] - 2021-01-31
 ---------------------
 
-Improvied `--exec SCRIPT` support and massive Cloudflare plugin updates.
+Improved `--exec SCRIPT` support and massive Cloudflare plugin updates.
 
 ### Changes
 - Issue #306: New keyword `default` to use the built-in In-a-dyn default
