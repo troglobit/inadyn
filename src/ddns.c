@@ -190,7 +190,7 @@ static int is_address_valid(int family, const char *host)
 		"2606:4700:4700::6400"
 	};
 
-	for (int i = 0; i < NELEMS(except); i++) {
+	for (size_t i = 0; i < NELEMS(except); i++) {
 		if (!strncmp(host, except[i], strlen(host))) {
 			return 0;
 		}
