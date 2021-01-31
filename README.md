@@ -138,7 +138,7 @@ This looks for the default `.conf` file, to check any file, use:
         username    = charlie
         password    = snoopy
         hostname    = { peanuts, woodstock }
-	user-agent  = Mozilla/4.0
+        user-agent  = Mozilla/4.0
     }
 
     # Google Domains - notice use of '@' to update root entry
@@ -204,9 +204,11 @@ This looks for the default `.conf` file, to check any file, use:
          hostname = yourhost.example.com
     }
 
+    # Create a unique custom API token with the following permissions:
+    # -> Zone.Zone - Read, Zone.DNS - Edit.
     provider cloudflare.com {
         username = zone.name
-        password = api_token # Create a unique custom api token with the following permissions: Zone.Zone - Read, Zone.DNS - Edit.
+        password = api_token_important_read_comment
         hostname = hostname.zone.name
         ttl = 1 # optional, value of 1 is 'automatic'.
         proxied = false # optional.
