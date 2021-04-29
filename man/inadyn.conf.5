@@ -419,8 +419,14 @@ provider no-ip.com:2 {
 }
 
 # Google Domains - notice use of '@' to update root entry
-provider domains.google.com {
+provider domains.google.com:1 {
     hostname = @.mydomain.com
+    username = your_username
+    password = your_password
+}
+# Wildcard subdomains - notice the quoutes (required!)
+provider domains.google.com:2 {
+    hostname = "*.mydomain.com"
     username = your_username
     password = your_password
 }

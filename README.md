@@ -142,8 +142,14 @@ This looks for the default `.conf` file, to check any file, use:
     }
 
     # Google Domains - notice use of '@' to update root entry
-    provider domains.google.com {
+    provider domains.google.com:1 {
         hostname = @.mydomain.com
+        username = your_username
+        password = your_password
+    }
+    # Wildcard subdomains - notice the quotes (required!)
+    provider domains.google.com:2 {
+        hostname = "*.mydomain.com"
         username = your_username
         password = your_password
     }
