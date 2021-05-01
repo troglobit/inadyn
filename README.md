@@ -141,19 +141,6 @@ This looks for the default `.conf` file, to check any file, use:
         user-agent  = Mozilla/4.0
     }
 
-    # Google Domains - notice use of '@' to update root entry
-    provider domains.google.com:1 {
-        hostname = @.mydomain.com
-        username = your_username
-        password = your_password
-    }
-    # Wildcard subdomains - notice the quotes (required!)
-    provider domains.google.com:2 {
-        hostname = "*.mydomain.com"
-        username = your_username
-        password = your_password
-    }
-
     provider duckdns.org {
         username         = YOUR_TOKEN
         password         = noPasswordForDuckdns
@@ -183,6 +170,19 @@ This looks for the default `.conf` file, to check any file, use:
         password        = bowie
         hostname        = spaceman.no-ip.com
         checkip-command = "/sbin/ifconfig eth0 | grep 'inet6 addr'"
+    }
+
+    # Google Domains - notice use of '@' to update root entry
+    provider domains.google.com:1 {
+        hostname = @.mydomain.com
+        username = your_username
+        password = your_password
+    }
+    # Wildcard subdomains - notice the quotes (required!)
+    provider domains.google.com:2 {
+        hostname = "*.mydomain.com"
+        username = your_username
+        password = your_password
     }
 
     # Note: hostname == update-key from Advanced tab in the Web UI
