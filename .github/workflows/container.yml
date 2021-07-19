@@ -3,7 +3,7 @@ name: Container Claus
 on:
   push:
     branches:
-      - 'master'
+      - 'disabled'
     tags:
       - '*'
 
