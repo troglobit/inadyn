@@ -1,0 +1,57 @@
+name: Bob the Builder
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    # Verify we can build on latest Ubuntu with both gcc and clang
+    name: ${{ matrix.compiler }} build opts ${{ matrix.ssl }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        ssl: [--disable-ssl, --enable-openssl]
+      fail-fast: false
+    steps:
+      - name: Installing dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq -y tree libconfuse-dev libgnutls28-dev
+      - uses: actions/checkout@v2
+      - name: Configure
+        run: |
+          ./autogen.sh
+          ./configure --prefix= ${{ matrix.ssl }} CC=${{ matrix.compiler }}
+      - name: Build
+        run: |
+          make -j3 V=1
+      - name: Install to ~/tmp and Inspect
+        run: |
+          DESTDIR=~/tmp make install-strip V=1
+          tree ~/tmp
+          ldd ~/tmp/sbin/inadyn
+          size ~/tmp/sbin/inadyn
+          ~/tmp/sbin/inadyn -h
+  debian:
+    # Verify Debian package building
+    runs-on: ubuntu-latest
+    container: debian:stable
+    steps:
+      - uses: actions/checkout@v2
+      - name: Installing dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential autoconf automake libconfuse-dev libgnutls28-dev \
+                             dpkg-dev debhelper dh-systemd devscripts
+      - name: Building Debian package
+        run: |
+          ./autogen.sh
+          ./configure -C
+          make package
+          cat ../inadyn*.changes
