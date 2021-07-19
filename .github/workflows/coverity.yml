@@ -12,7 +12,7 @@ env:
   COVERITY_PROJ: troglobit%2Finadyn
 
 jobs:
-  build:
+  coverity:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
