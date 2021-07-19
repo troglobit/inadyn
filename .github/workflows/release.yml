@@ -1,0 +1,88 @@
+name: Release General
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract ChangeLog entry ...
+        # Hack to extract latest entry for body_path below
+        run: |
+          awk '/-----*/{if (x == 1) exit; x=1;next}x' ChangeLog.md \
+              |head -n -1 > release.md
+          cat release.md
+      - name: Create release ...
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: In-a-dyn ${{ github.ref }}
+          body_path: release.md
+          draft: false
+          prerelease: false
+  tarball:
+    name: Build and upload release tarball
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Installing dependencies ...
+        run: |
+          sudo apt-get install -y libconfuse-dev libgnutls28-dev
+      - name: Creating Makefiles ...
+        run: |
+          ./autogen.sh
+          ./configure
+      - name: Build release ...
+        run: |
+          make distcheck
+          ls -lF ../
+          mkdir -p artifacts/
+          mv ../*.tar.* artifacts/
+      - name: Upload release artifacts ...
+        uses: skx/github-action-publish-binaries@release-0.15
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.release.outputs.release_id }}
+          args: artifacts/*
+  debian:
+    name: Build and upload Debian package
+    needs: release
+    runs-on: ubuntu-latest
+    container: debian:stable
+    steps:
+      - uses: actions/checkout@v2
+      - name: Installing dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential autoconf automake pkg-config \
+                             libconfuse-dev libgnutls28-dev systemd       \
+                             dpkg-dev debhelper dh-systemd devscripts
+      - name: Building Debian package
+        run: |
+          ./autogen.sh
+          ./configure -C
+          make package
+          mkdir -p artifacts/
+          mv ../*deb ../*.build* ../*.changes artifacts/
+      - name: Uploading Debian package
+        uses: skx/github-action-publish-binaries@release-0.15
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.release.outputs.release_id }}
+          args: artifacts/*
