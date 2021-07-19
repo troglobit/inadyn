@@ -1,9 +1,7 @@
-ACLOCAL_AMFLAGS           = -I m4
-DISTCHECK_CONFIGURE_FLAGS = --with-systemd=$$dc_install_base/$(systemd)
-
 SUBDIRS         = src include man examples
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md CONTRIBUTING.md
+ACLOCAL_AMFLAGS = -I m4
 DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 
 if HAVE_SYSTEMD
@@ -50,3 +48,5 @@ release: release-hook distcheck package
 	@for file in `cd ..; ls inadyn_$(VERSION)* inadyn-dbg*_$(VERSION)*`; do		\
 		printf "%-32s Debian/Ubuntu package\n" $$file;				\
 	done
+
+DISTCHECK_CONFIGURE_FLAGS = --with-systemd=$$dc_install_base/$(systemd)
