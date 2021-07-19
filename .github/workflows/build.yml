@@ -47,7 +47,8 @@ jobs:
       - name: Installing dependencies
         run: |
           apt-get update
-          apt-get install -y build-essential autoconf automake libconfuse-dev libgnutls28-dev \
+          apt-get install -y build-essential autoconf automake pkg-config \
+                             libconfuse-dev libgnutls28-dev               \
                              dpkg-dev debhelper dh-systemd devscripts
       - name: Building Debian package
         run: |
