@@ -154,6 +154,11 @@ unique.
 Common settings in custom{} and provider{} sections are:
 .Pp
 .Bl -tag -width TERM
+.It Cm include("/path/to/file")
+Include settings from another file, supports tilde expansion, e.g.
+.Pa ~/.freedns.pw .
+Any custom{} or provider{} setting can be included, and any amount of
+include statements may be used.
 .It Cm ssl = <true | false>
 Use HTTPS, both when checking for IP changes and updating the DNS
 record.  Default is to use HTTPS (true).

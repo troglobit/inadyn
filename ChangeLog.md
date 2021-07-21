@@ -4,6 +4,14 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.9.0][UNRELEASED]
+--------------------
+
+### Changes
+- Support for including provider config, e.g. username & password
+  from an external file: `include("~/.freedns.pw")
+
+
 [v2.8.1][] - 2021-01-31
 -----------------------
 
@@ -852,6 +860,7 @@ First stable version.
 
 
 [UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.8.1...HEAD
+[v2.9.0]: https://github.com/troglobit/inadyn/compare/v2.8.1...v2.9.0
 [v2.8.1]: https://github.com/troglobit/inadyn/compare/v2.8...v2.8.1
 [v2.8]:   https://github.com/troglobit/inadyn/compare/v2.7...v2.8
 [v2.7]:   https://github.com/troglobit/inadyn/compare/v2.6...v2.7

@@ -533,6 +533,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	int ret = 0;
 	size_t i;
 	cfg_opt_t provider_opts[] = {
+		CFG_FUNC    ("include",      &cfg_include),
 		CFG_STR     ("username",     NULL, CFGF_NONE),
 		CFG_STR     ("password",     NULL, CFGF_NONE),
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
@@ -551,6 +552,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	};
 	cfg_opt_t custom_opts[] = {
 		/* Same as a general provider */
+		CFG_FUNC    ("include",      &cfg_include),
 		CFG_STR     ("username",     NULL, CFGF_NONE),
 		CFG_STR     ("password",     NULL, CFGF_NONE),
 		CFG_STR_LIST("hostname",     NULL, CFGF_NONE),
