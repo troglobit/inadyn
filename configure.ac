@@ -7,7 +7,13 @@ AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
-AC_CONFIG_FILES([Makefile inadyn.service src/Makefile include/Makefile man/Makefile examples/Makefile])
+AC_CONFIG_FILES([Makefile
+		 inadyn.service
+		 src/Makefile
+		 test/Makefile
+		 include/Makefile
+		 man/Makefile
+		 examples/Makefile])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_ARG_ENABLE(ssl,
@@ -26,6 +32,12 @@ AC_ARG_ENABLE(simulation,
         [AS_HELP_STRING([--enable-simulation], [Developer simulation mode, do not use!])],
         [ac_enable_simulation="$enableval"],
         [ac_enable_simulation="no"]
+)
+
+AC_ARG_ENABLE(test,
+        [AS_HELP_STRING([--enable-test], [Enable tests, requries ~/.config/inadyn/*.conf!])],
+        [ac_enable_test="$enableval"],
+        [ac_enable_test="no"]
 )
 
 AC_ARG_WITH([systemd],
@@ -151,6 +163,7 @@ AM_CONDITIONAL([ENABLE_OPENSSL], test "x$ac_enable_openssl" = "xyes")
 AS_IF([test "x$ac_enable_simulation" = "xyes"], [
    AC_DEFINE([ENABLE_SIMULATION], [], [Enable developer-only simulation mode])])
 
+AM_CONDITIONAL([ENABLE_TEST], [test "x$ac_enable_test" != "xno"])
 
 # Check where to install the systemd .service file
 AS_IF([test "x$with_systemd" = "xyes" -o "x$with_systemd" = "xauto"], [
@@ -206,6 +219,7 @@ cat <<EOF
     GnuTLS.......: $ac_enable_gnutls
     Open/LibreSSL: $ac_enable_openssl
   systemd........: $with_systemd
+  Unit tests.....: $ac_enable_test
 
 ------------- Compiler version --------------
 $($CC --version || true)

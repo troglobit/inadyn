@@ -1,4 +1,4 @@
-SUBDIRS         = src include man examples
+SUBDIRS         = src test man examples
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md CONTRIBUTING.md
 ACLOCAL_AMFLAGS = -I m4
@@ -6,6 +6,10 @@ DISTCLEANFILES  = *~ DEADJOE semantic.cache *.gdb *.elf core core.* *.d
 
 if HAVE_SYSTEMD
 systemd_DATA    = inadyn.service
+endif
+
+if ENABLE_TEST
+SUBDIRS        += test
 endif
 
 ## Check if tagged in git
