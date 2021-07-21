@@ -18,6 +18,9 @@ jobs:
         compiler: [gcc, clang]
         ssl: [--disable-ssl, --enable-openssl]
       fail-fast: false
+    env:
+      CC: ${{ matrix.compiler }}
+      DESTDIR: ~/tmp
     steps:
       - name: Installing dependencies
         run: |
@@ -27,17 +30,26 @@ jobs:
       - name: Configure
         run: |
           ./autogen.sh
-          ./configure --prefix= ${{ matrix.ssl }} CC=${{ matrix.compiler }}
+          ./configure --prefix= ${{ matrix.ssl }} --enable-test
       - name: Build
         run: |
           make -j3 V=1
       - name: Install to ~/tmp and Inspect
         run: |
-          DESTDIR=~/tmp make install-strip V=1
+          make install-strip V=1
           tree ~/tmp
           ldd ~/tmp/sbin/inadyn
           size ~/tmp/sbin/inadyn
           ~/tmp/sbin/inadyn -h
+      - name: Set up Unit Tests
+        run: |
+          mkdir -p ~/.config/inadyn
+          echo "username = ${{ secrets.freedns_user }}"  > ~/.config/inadyn/freedns.conf
+          echo "password = ${{ secrets.freedns_pass }}" >> ~/.config/inadyn/freedns.conf
+          echo "hostname = ${{ secrets.freedns_host }}" >> ~/.config/inadyn/freedns.conf
+      - name: Unit Tests
+        run: |
+          make check || cat test/freedns.log
   debian:
     name: Debian Package
     runs-on: ubuntu-latest
