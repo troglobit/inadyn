@@ -20,7 +20,6 @@ jobs:
       fail-fast: false
     env:
       CC: ${{ matrix.compiler }}
-      DESTDIR: ~/tmp
     steps:
       - name: Installing dependencies
         run: |
@@ -36,7 +35,7 @@ jobs:
           make -j3 V=1
       - name: Install to ~/tmp and Inspect
         run: |
-          make install-strip V=1
+          make install-strip V=1 DESTDIR=~/tmp
           tree ~/tmp
           ldd ~/tmp/sbin/inadyn
           size ~/tmp/sbin/inadyn
