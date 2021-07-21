@@ -148,9 +148,9 @@ AC_DEFINE_UNQUOTED([CAFILE2], "$CAFILE2", [Second location for Open/LibreSSL and
 AM_CONDITIONAL([ENABLE_SSL], test "x$ac_enable_ssl" = "xyes")
 AM_CONDITIONAL([ENABLE_OPENSSL], test "x$ac_enable_openssl" = "xyes")
 
-if test "x$ac_enable_simulation" = "xyes"; then
-   AC_DEFINE([ENABLE_SIMULATION], [], [Enable developer-only simulation mode])
-fi
+AS_IF([test "x$ac_enable_simulation" = "xyes"], [
+   AC_DEFINE([ENABLE_SIMULATION], [], [Enable developer-only simulation mode])])
+
 
 # Check where to install the systemd .service file
 AS_IF([test "x$with_systemd" = "xyes" -o "x$with_systemd" = "xauto"], [
