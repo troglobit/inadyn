@@ -803,7 +803,7 @@ static int get_encoded_user_passwd(void)
 			break;
 		}
 
-		logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
+//		logit(LOG_DEBUG, "Base64 encoded string: %s", encode);
 		info->creds.encoded_password = encode;
 		info->creds.encoded = 1;
 		info->creds.size = strlen(info->creds.encoded_password);
