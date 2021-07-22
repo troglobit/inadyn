@@ -10,6 +10,10 @@ endif
 
 if ENABLE_TEST
 SUBDIRS        += test
+else
+## Short circuit `make distcheck` in package target when --disable-test
+check-recursive:
+	@true
 endif
 
 ## Check if tagged in git
