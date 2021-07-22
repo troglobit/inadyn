@@ -50,6 +50,7 @@ jobs:
         run: |
           make check || cat test/freedns.log
   debian:
+    # Verify that Debian packages can be built
     name: Debian Package
     runs-on: ubuntu-latest
     container: debian:stable
