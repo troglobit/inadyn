@@ -209,9 +209,9 @@ static ddns_system_t googledomains = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.checkip_name = "domains.google.com",
+	.checkip_url  = "/checkip",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "domains.google.com",
 	.server_url   = "/nic/update"
