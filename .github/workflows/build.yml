@@ -43,6 +43,9 @@ jobs:
       - name: Set up Unit Tests
         run: |
           mkdir -p ~/.config/inadyn
+          echo "username = ${{ secrets.dyndns_user }}"  > ~/.config/inadyn/dyndns.conf
+          echo "password = ${{ secrets.dyndns_pass }}" >> ~/.config/inadyn/dyndns.conf
+          echo "hostname = ${{ secrets.dyndns_host }}" >> ~/.config/inadyn/dyndns.conf
           echo "username = ${{ secrets.freedns_user }}"  > ~/.config/inadyn/freedns.conf
           echo "password = ${{ secrets.freedns_pass }}" >> ~/.config/inadyn/freedns.conf
           echo "hostname = ${{ secrets.freedns_host }}" >> ~/.config/inadyn/freedns.conf
