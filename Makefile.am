@@ -1,4 +1,4 @@
-SUBDIRS         = src test man examples
+SUBDIRS         = src man examples
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md CONTRIBUTING.md
 ACLOCAL_AMFLAGS = -I m4
@@ -10,10 +10,6 @@ endif
 
 if ENABLE_TEST
 SUBDIRS        += test
-else
-## Short circuit `make distcheck` in package target when --disable-test
-check-recursive:
-	@true
 endif
 
 ## Check if tagged in git
