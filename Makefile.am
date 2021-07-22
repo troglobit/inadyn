@@ -1,4 +1,4 @@
-SUBDIRS         = src man examples
+SUBDIRS         = src include man examples
 doc_DATA        = README.md COPYING ChangeLog.md
 EXTRA_DIST      = README.md ChangeLog.md CONTRIBUTING.md
 ACLOCAL_AMFLAGS = -I m4
