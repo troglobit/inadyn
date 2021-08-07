@@ -1,12 +1,21 @@
 name: Bob the Builder
 
+# Run on push to any branch, except dev which is reserved for our
+# Coverity Scan runs (limited number of tokesn /24h).  Also run on any
+# pull request to check against regressions.
+#
+# Finally, make sure to run at least once a month to not trigger any
+# accound deactivation, e.g. FreeDNS.
 on:
   push:
     branches:
-      - 'master'
+      - '*'
+      - '!dev'
   pull_request:
     branches:
       - '*'
+  schedule:
+    - cron: 0 7 1 * *
 
 jobs:
   build:
@@ -51,7 +60,7 @@ jobs:
           echo "hostname = ${{ secrets.freedns_host }}" >> ~/.config/inadyn/freedns.conf
       - name: Unit Tests
         run: |
-          make check || cat test/freedns.log
+          make check || cat test/test-suite.log
   debian:
     # Verify that Debian packages can be built
     name: Debian Package
