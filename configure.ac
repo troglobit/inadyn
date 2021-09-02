@@ -128,6 +128,10 @@ if test "x$ac_enable_ssl" = "xyes"; then
       CPPFLAGS="$CPPFLAGS $GnuTLS_CFLAGS"
       AC_CHECK_LIB([gnutls], [gnutls_init], [],
                           AC_MSG_ERROR([*** SSL library (GnuTLS) not found!]))
+      dnl GnuTLS uses nettle, so this doesn't really add a new dependency. It must
+      dnl be made explicit to avoid underlinking.
+      AC_CHECK_LIB([nettle], [nettle_md5_init], [],
+                          AC_MSG_ERROR([*** Crypto library (nettle) not found!]))
       AC_CHECK_HEADERS([gnutls/gnutls.h gnutls/x509.h], [],
 			  AC_MSG_ERROR([*** Cannot find required header files!]))
       AC_DEFINE([CONFIG_GNUTLS], [], [Enable HTTPS support using GnuTLS library])
