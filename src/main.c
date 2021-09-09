@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
 	int use_syslog = 1;
 	int check_config = 0;
 	int background = 1;
-	struct option opt[] = {
+	static const struct option opt[] = {
 		{ "once",              0, 0, '1' },
 		{ "force",             0, 0, '4' },
 		{ "cache-dir",         1, 0, 128 },

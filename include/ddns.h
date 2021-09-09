@@ -218,7 +218,7 @@ extern char *user_agent;
 extern char *script_cmd;
 extern char *script_exec;
 extern char *pidfile_name;
-extern char *generic_responses[];
+extern const char * const generic_responses[];
 extern uid_t uid;
 extern gid_t gid;
 

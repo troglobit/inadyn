@@ -173,7 +173,7 @@ static int is_address_valid(int family, const char *host)
 	 * block cloudflare ips so that https://1.1.1.1/cdn-cgi/trace would work
 	 * even if 1.1.1.1 is the first ip in the response body
 	 */
-	const char *except[] = {
+	static const char *except[] = {
 		"1.1.1.1",
 		"1.0.0.1",
 		"2606:4700:4700::1111",
@@ -247,7 +247,7 @@ error:
 static int parse_ipv4_address(char *buffer, char *address, size_t len)
 {
 	int found = 0;
-	char *accept = "0123456789.";
+	static const char *accept = "0123456789.";
 	char *needle, *haystack, *end;
 	struct in_addr  addr;
 
@@ -287,7 +287,7 @@ static int parse_ipv4_address(char *buffer, char *address, size_t len)
 static int parse_ipv6_address(char *buffer, char *address, size_t len)
 {
 	int found = 0;
-	char *accept = "0123456789abcdefABCDEF:";
+	static const char *accept = "0123456789abcdefABCDEF:";
 	char *needle, *haystack, *end;
 	struct in6_addr addr;
 
