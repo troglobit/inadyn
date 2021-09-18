@@ -73,10 +73,11 @@ jobs:
           apt-get update
           apt-get install -y build-essential autoconf automake pkg-config \
                              libconfuse-dev libgnutls28-dev systemd       \
-                             dpkg-dev debhelper dh-systemd devscripts
+                             dpkg-dev debhelper devscripts
       - name: Building Debian package
         run: |
           ./autogen.sh
-          ./configure -C
+          ./configure
+          make distcheck
           make package
           cat ../inadyn*.changes
