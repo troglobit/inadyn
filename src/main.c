@@ -263,7 +263,9 @@ static int usage(int code)
 	else
 		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
-	fprintf(stderr, "Usage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
+	fprintf(stderr, "Usage:\n %s [-1hnsvC] [-c CMD] [-e CMD] [-f FILE] [-i IFNAME] [-I NAME] [-l LVL] [-p USR:GRP] [-P FILE] [-t SEC]"
+#ifndef DROP_VERBOSE_STRINGS
+        "\n\n"
 		" -1, --once                     Run only once, updates if too old or unknown\n"
 		"     --force                    Force update, even if address has not changed\n"
 		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
@@ -293,7 +295,12 @@ static int usage(int code)
 		"Bug report address: %s\n",
 		prognm, cache_dir, config,
 		prognm, prognm, pidfn,
-		PACKAGE_BUGREPORT);
+		PACKAGE_BUGREPORT
+#else
+		" --force --cache-dir=PATH --exec-mode=MODE --check-config --no-pidfile\n\n",
+		prognm
+#endif
+		);
 #ifdef PACKAGE_URL
 	fprintf(stderr, "Project homepage: %s\n", PACKAGE_URL);
 #endif
