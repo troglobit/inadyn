@@ -486,6 +486,13 @@ Check that it started properly by inspecting the system log, or:
 
     $ sudo systemctl status inadyn.service
 
+### Embedded applications
+
+When built into a router, some features aren't usually used and can be disabled
+to save space. The configure option `--enable-reduced` will build such a
+reduced-functionality binary. Currently, this disables verbose log messages and
+error strings and eliminates config file checking & some backward compatibility.
+
 
 Building from GIT
 -----------------

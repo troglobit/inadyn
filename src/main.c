@@ -263,7 +263,9 @@ static int usage(int code)
 	else
 		snprintf(pidfn, sizeof(pidfn), "%s", pidfile_name);
 
-	fprintf(stderr, "Usage:\n %s [1hnsv] [-c CMD] [-e CMD] [-f FILE] [-l LVL] [-p USR:GRP] [-t SEC]\n\n"
+	fprintf(stderr, "Usage:\n %s [-1hnsvC] [-c CMD] [-e CMD] [-f FILE] [-i IFNAME] [-I NAME] [-l LVL] [-p USR:GRP] [-P FILE] [-t SEC]"
+#ifndef DROP_VERBOSE_STRINGS
+        "\n\n"
 		" -1, --once                     Run only once, updates if too old or unknown\n"
 		"     --force                    Force update, even if address has not changed\n"
 		"     --cache-dir=PATH           Persistent cache dir of IP sent to providers.\n"
@@ -274,7 +276,9 @@ static int usage(int code)
 		"     --exec-mode=MODE           Set script run mode: compat, event:\n"
 		"                                - compat: successful DDNS update only, default\n"
 		"                                - event: any update status\n"
+#ifndef DROP_CHECK_CONFIG
 		"     --check-config             Verify syntax of configuration file and exit\n"
+#endif
 		" -f, --config=FILE              Use FILE name for configuration, default uses\n"
 		"                                ident NAME: %s\n"
 		" -h, --help                     Show summary of command line options and exit\n"
@@ -293,7 +297,16 @@ static int usage(int code)
 		"Bug report address: %s\n",
 		prognm, cache_dir, config,
 		prognm, prognm, pidfn,
-		PACKAGE_BUGREPORT);
+		PACKAGE_BUGREPORT
+#else
+		" --force --cache-dir=PATH --exec-mode=MODE"
+#ifndef DROP_CHECK_CONFIG
+		" --check-config"
+#endif
+		" --no-pidfile\n\n",
+		prognm
+#endif
+		);
 #ifdef PACKAGE_URL
 	fprintf(stderr, "Project homepage: %s\n", PACKAGE_URL);
 #endif
@@ -318,7 +331,9 @@ int main(int argc, char *argv[])
 {
 	int c, restart, rc = 0;
 	int use_syslog = 1;
+#ifndef DROP_CHECK_CONFIG
 	int check_config = 0;
+#endif
 	int background = 1;
 	static const struct option opt[] = {
 		{ "once",              0, 0, '1' },
@@ -388,11 +403,13 @@ int main(int argc, char *argv[])
 			config = strdup(optarg);
 			break;
 
+#ifndef DROP_CHECK_CONFIG
 		case 129:	/* --check-config */
 			check_config = 1;
 			background = 0;
 			use_syslog--;
 			break;
+#endif
 
 		case 'i':	/* --iface=IFNAME */
 			use_iface = iface = optarg;
@@ -449,6 +466,7 @@ int main(int argc, char *argv[])
 	/* Figure out .conf file, cache directory, and PID file name */
 	DO(compose_paths());
 
+#ifndef DROP_CHECK_CONFIG
 	if (check_config) {
 		char pidfn[80];
 
@@ -482,6 +500,7 @@ int main(int argc, char *argv[])
 
 		return RC_OK;
 	}
+#endif
 
 	if (background) {
 		if (daemon(0, 0) < 0) {
