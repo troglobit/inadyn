@@ -28,6 +28,13 @@ AC_ARG_ENABLE(openssl,
         [ac_enable_openssl="no"]
 )
 
+AC_ARG_ENABLE(reduced,
+        [AS_HELP_STRING([--enable-reduced], [Drop some features to reduce the binary size, default: disabled])],
+        [ac_enable_reduced="$enableval"],
+        [ac_enable_reduced="no"]
+)
+
+
 AC_ARG_ENABLE(simulation,
         [AS_HELP_STRING([--enable-simulation], [Developer simulation mode, do not use!])],
         [ac_enable_simulation="$enableval"],
@@ -149,6 +156,10 @@ fi
 #   https://www.happyassassin.net/2015/01/12/a-note-about-ssltls-trusted-certificate-stores-and-platforms/
 CAFILE1="/etc/ssl/certs/ca-certificates.crt"
 CAFILE2="/etc/pki/tls/certs/ca-bundle.trust.crt"
+
+if test "x$ac_enable_reduced" = "xyes"; then
+      CPPFLAGS="$CPPFLAGS -DMAX_LOG_LEVEL=LOG_ERR -DDROP_VERBOSE_STRINGS -DDROP_CHECK_CONFIG"
+fi
 
 # Add OS-specific flags
 case "$host_os" in
