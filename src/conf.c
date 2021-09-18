@@ -59,6 +59,7 @@ static void conf_errfunc(cfg_t *cfg, const char *format, va_list args)
 	vlogit(LOG_ERR, fmt, args);
 }
 
+#ifdef DROP_CHECK_CONFIG
 /*
  * Convert deprecated 'alias' setting to new 'hostname',
  * same functionality with new name.
@@ -189,6 +190,7 @@ static int validate_custom(cfg_t *cfg, cfg_opt_t *opt)
 
 	return validate_common(cfg, "custom", 1);
 }
+#endif
 
 /* server:port => server:80 if port is not given */
 static int getserver(const char *server, ddns_name_t *name)
@@ -602,10 +604,12 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 	/* Custom logging, rather than default Confuse stderr logging */
 	cfg_set_error_function(cfg, conf_errfunc);
 
+#ifdef DROP_CHECK_CONFIG
 	/* Validators */
 	cfg_set_validate_func(cfg, "period", validate_period);
 	cfg_set_validate_func(cfg, "provider", validate_provider);
 	cfg_set_validate_func(cfg, "custom", validate_custom);
+#endif
 
 	switch (cfg_parse(cfg, file)) {
 	case CFG_FILE_ERROR:
