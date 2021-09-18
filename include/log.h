@@ -25,13 +25,19 @@
 #include <stdarg.h>
 #include "os.h"
 
+#ifndef MAX_LOG_LEVEL
+#define MAX_LOG_LEVEL LOG_DEBUG
+#endif
+
 void log_init  (char *ident, int log, int bg);
 void log_exit  (void);
 
 int  log_level (char *level);
 
-void logit     (int prio, const char *fmt, ...);
+void logitf     (int prio, const char *fmt, ...);
 void vlogit    (int prio, const char *fmt, va_list args);
+
+#define logit(p, ...) do if ((p) <= MAX_LOG_LEVEL) logitf((p), __VA_ARGS__); while (0)
 
 #endif /* INADYN_LOG_H_ */
 

@@ -77,7 +77,7 @@ void vlogit(int prio, const char *fmt, va_list args)
 		vfprintf(stderr, fmt, args), fprintf(stderr, "\n");
 }
 
-void logit(int prio, const char *fmt, ...)
+void logitf(int prio, const char *fmt, ...)
 {
 	va_list args;
 
