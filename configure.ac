@@ -6,7 +6,7 @@ AM_INIT_AUTOMAKE([1.11 foreign dist-xz])
 AM_SILENT_RULES([yes])
 
 AC_CONFIG_SRCDIR([src/main.c])
-AC_CONFIG_HEADER([include/config.h])
+AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_FILES([Makefile
 		 inadyn.service
 		 src/Makefile
@@ -53,18 +53,15 @@ AC_ARG_WITH([systemd],
 )
 
 # Define necessary build flags
-AC_GNU_SOURCE
 AC_USE_SYSTEM_EXTENSIONS
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h arpa/nameser.h netinet/in.h stdlib.h stdint.h \
 	          string.h sys/ioctl.h sys/socket.h sys/types.h syslog.h unistd.h],
                   [], [],
