@@ -240,6 +240,7 @@ int ssl_open(http_t *client, char *msg)
 		return RC_HTTPS_FAILED_CONNECT;
 	}
 
+	client->connected = 1;
 	ssl_get_info(client);
 
 	/* Get server's certificate (note: beware of dynamic allocation) - opt */
@@ -267,9 +268,11 @@ int ssl_open(http_t *client, char *msg)
 int ssl_close(http_t *client)
 {
 	if (client->ssl_enabled) {
-		gnutls_bye(client->ssl, GNUTLS_SHUT_WR);
+		if (client->connected)
+			gnutls_bye(client->ssl, GNUTLS_SHUT_WR);
 		gnutls_deinit(client->ssl);
 	}
+	client->connected = 0;
 
 	return tcp_exit(&client->tcp);
 }

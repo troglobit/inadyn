@@ -57,6 +57,7 @@ typedef struct {
 #endif
 
 	int        initialized;
+	int        connected;
 } http_t;
 
 typedef struct {
