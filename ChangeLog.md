@@ -9,7 +9,20 @@ All notable changes to the project are documented in this file.
 
 ### Changes
 - Support for including provider config, e.g. username & password
-  from an external file: `include("~/.freedns.pw")
+  from an external file: `include("~/.freedns.pw")`
+- Support for a test framework, initial test cases: DynDNS and FreeDNS
+- Use native Google Domains checkip server instead of generic from Dyn
+- Code size reduction for embedded systems, by Dan Fandrich.  Enable in
+  configure script with `--enable-reduce`
+- Disable logging of base64 encoded password in debug mode
+- Drop deprecated autoconf macros
+
+### Fixes
+- Issue #347: default checkip server for DuckDNS, FreeMyIP and GiraDNS
+  changed from ipv4.wtfismyip.com to wtfismyip.com
+- Issue #351: update examples for Google Domains
+- Issue #356: handle FreeDNS authentication errors and improve logging
+- Issue #365: memory leak in OpenSSL backend when connection fails
 
 
 [v2.8.1][] - 2021-01-31

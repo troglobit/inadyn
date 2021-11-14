@@ -1,3 +1,17 @@
+inadyn (2.9.0) stable; urgency=medium
+
+  * Support for including provider config, e.g. username & password
+    from an external file: include("~/.freedns.pw")
+  * Use native Google Domains checkip server instead of generic from Dyn
+  * Disable logging of base64 encoded password in debug mode
+  * Fix issue #347: default checkip server for DuckDNS, FreeMyIP and
+    GiraDNS changed from ipv4.wtfismyip.com to wtfismyip.com
+  * Fix issue #351: update examples for Google Domains
+  * Fix issue #356: FreeDNS authentication errors and improved logging
+  * Fix issue #365: memory leak in OpenSSL backend when connection fails
+
+ -- Joachim Wiberg <troglobit@gmail.com>  Sun, 14 Nov 2021 09:20:06 +0100
+
 inadyn (2.8.1) stable; urgency=medium
 
   * Fix warnings for 'ttl' and 'proxied' settings missing in custom
