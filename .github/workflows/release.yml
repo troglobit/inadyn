@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: In-a-dyn ${{ github.ref }}
+          release_name: In-a-Dyn ${{ github.ref }}
           body_path: release.md
           draft: false
           prerelease: false
