@@ -48,7 +48,7 @@ jobs:
           ./configure
       - name: Build release ...
         run: |
-          make distcheck
+          make release
           ls -lF ../
           mkdir -p artifacts/
           mv ../*.tar.* artifacts/
