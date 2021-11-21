@@ -10,6 +10,8 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    env:
+      MAKEFLAGS: -j3
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-qemu-action@v1
