@@ -9,8 +9,11 @@ inadyn (2.9.0) stable; urgency=medium
   * Fix issue #351: update examples for Google Domains
   * Fix issue #356: FreeDNS authentication errors and improved logging
   * Fix issue #365: memory leak in OpenSSL backend when connection fails
+  * Ignore SIGPIPE so read() and SSL_read() can handle EPIPE instead of
+    having inadyn crash due to unhandled signal.  This happens every time
+    a remote end of a HTTP/HTTPS connection suddenly closes its connection
 
- -- Joachim Wiberg <troglobit@gmail.com>  Sun, 14 Nov 2021 09:20:06 +0100
+ -- Joachim Wiberg <troglobit@gmail.com>  Sun, 21 Nov 2021 10:21:31 +0100
 
 inadyn (2.8.1) stable; urgency=medium
 

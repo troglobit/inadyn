@@ -4,8 +4,8 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.9.0][UNRELEASED]
---------------------
+[v2.9.0][] - 2021-11-21
+-----------------------
 
 ### Changes
 - Support for including provider config, e.g. username & password
@@ -16,6 +16,9 @@ All notable changes to the project are documented in this file.
   configure script with `--enable-reduce`
 - Disable logging of base64 encoded password in debug mode
 - Drop deprecated autoconf macros
+- Ignore `SIGPIPE` so `SSL_read()`, `read()` et al return error with
+  `EPIPE` instead of having inadyn exiting (crashing) when the remote
+  end suddenly closes its HTTP/HTTPS connection on us
 
 ### Fixes
 - Issue #347: default checkip server for DuckDNS, FreeMyIP and GiraDNS
