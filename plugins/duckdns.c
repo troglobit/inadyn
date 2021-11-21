@@ -1,6 +1,6 @@
 /* Plugin for DuckDNS
  *
- * Copyright (C) 2010-2020  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (C) 2010-2021  Joachim Wiberg <troglobit@gmail.com>
  * Copyright (C) 2014       Andy Padavan <andy.padavan@gmail.com>
  *
  * This program is free software; you can redistribute it and/or

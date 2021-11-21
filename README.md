@@ -530,14 +530,14 @@ Origin & References
 -------------------
 
 This is the continuation of Narcis Ilisei's [original][] INADYN.  Now
-maintained by [Joachim Nilsson][].  Please file bug reports, or send
+maintained by [Joachim Wiberg][].  Please file bug reports, or send
 pull requests for bug fixes and proposed extensions at [GitHub][].
 
 [original]:         http://www.inatech.eu/inadyn/
 [DDNS]:             http://en.wikipedia.org/wiki/Dynamic_DNS
 [tunnelbroker]:     https://tunnelbroker.net/
 [Christian Eyrich]: http://eyrich-net.org/programmiertes.html
-[Joachim Nilsson]:  http://troglobit.com
+[Joachim Wiberg]:   http://troglobit.com
 [libConfuse]:       https://github.com/martinh/libconfuse
 [LibreSSL]:         http://www.libressl.org/
 [OpenSSL]:          https://www.openssl.org/
