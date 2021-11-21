@@ -19,12 +19,15 @@ All notable changes to the project are documented in this file.
 - Ignore `SIGPIPE` so `SSL_read()`, `read()` et al return error with
   `EPIPE` instead of having inadyn exiting (crashing) when the remote
   end suddenly closes its HTTP/HTTPS connection on us
+- Update maintainer last name and copyright years
+- Add support for GitHub Container Registry
 
 ### Fixes
 - Issue #347: default checkip server for DuckDNS, FreeMyIP and GiraDNS
   changed from ipv4.wtfismyip.com to wtfismyip.com
 - Issue #351: update examples for Google Domains
 - Issue #356: handle FreeDNS authentication errors and improve logging
+- Issue #361: unclear example for NameCheap DDNS
 - Issue #365: memory leak in OpenSSL backend when connection fails
 
 
