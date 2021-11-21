@@ -26,10 +26,10 @@ All notable changes to the project are documented in this file.
 - Issue #347: default checkip server for DuckDNS, FreeMyIP and GiraDNS
   changed from ipv4.wtfismyip.com to wtfismyip.com
 - Issue #351: update examples for Google Domains
+- Issue #352: add missing sub_domain=%s (prefix) to dnspod plugin
 - Issue #356: handle FreeDNS authentication errors and improve logging
 - Issue #361: unclear example for NameCheap DDNS
 - Issue #365: memory leak in OpenSSL backend when connection fails
-
 
 [v2.8.1][] - 2021-01-31
 -----------------------

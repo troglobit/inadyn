@@ -7,11 +7,13 @@ inadyn (2.9.0) stable; urgency=medium
   * Fix issue #347: default checkip server for DuckDNS, FreeMyIP and
     GiraDNS changed from ipv4.wtfismyip.com to wtfismyip.com
   * Fix issue #351: update examples for Google Domains
+  * Fix issue #352: add missing sub_domain=%s (prefix) to dnspod plugin
   * Fix issue #356: FreeDNS authentication errors and improved logging
   * Fix issue #365: memory leak in OpenSSL backend when connection fails
   * Ignore SIGPIPE so read() and SSL_read() can handle EPIPE instead of
     having inadyn crash due to unhandled signal.  This happens every time
     a remote end of a HTTP/HTTPS connection suddenly closes its connection
+  * Update maintainer last name and copyright years in all files
 
  -- Joachim Wiberg <troglobit@gmail.com>  Sun, 21 Nov 2021 10:21:31 +0100
 
