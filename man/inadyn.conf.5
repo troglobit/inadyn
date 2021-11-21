@@ -509,6 +509,15 @@ provider cloudflare.com {
     proxied = false # optional.
 }
 
+# www.namecheap.com
+custom namecheap {
+    username    = YOURDOMAIN.TLD
+    password    = mypass
+    ddns-server = dynamicdns.park-your-domain.com
+    ddns-path   = "/update?domain=%u&password=%p&host=%h"
+    hostname    = { "@", "www", "test" }
+}
+
 # Generic example, check all details for your provider!
 custom example {
     username       = myuser
