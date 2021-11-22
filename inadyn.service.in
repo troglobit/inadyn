@@ -9,7 +9,8 @@ Requires=network-online.target
 
 [Service]
 Type=simple
-ExecStart=@SBINDIR@/inadyn -n -s
+EnvironmentFile=-@SYSCONFDIR@/default/inadyn
+ExecStart=@SBINDIR@/inadyn -n -s $INADYN_OPTS $INADYN_ARGS
 
 [Install]
 WantedBy=multi-user.target
