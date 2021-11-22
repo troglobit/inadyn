@@ -200,6 +200,9 @@ AC_SUBST(SYSCONFDIR)
 SBINDIR=`eval echo $sbindir`
 SBINDIR=`eval echo $SBINDIR`
 AC_SUBST(SBINDIR)
+DOCDIR=`eval echo $docdir`
+DOCDIR=`eval echo $DOCDIR`
+AC_SUBST(DOCDIR)
 
 # Workaround for as-of-yet unreleased runstatedir support, planned for
 # autoconf 2.70, which some major distros have backported.
