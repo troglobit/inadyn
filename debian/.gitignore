@@ -1,8 +1,0 @@
-*~
-*.log
-*.debhelper
-*.substvars
-autoreconf.*
-inadyn/*
-files
-debhelper-build-stamp
