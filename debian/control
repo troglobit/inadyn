@@ -1,0 +1,63 @@
+Source: inadyn
+Section: net
+Priority: optional
+Maintainer: Joachim Wiberg <troglobit@gmail.com>
+Build-Depends: debhelper (>= 10), libgnutls28-dev, libconfuse-dev, pkg-config, systemd
+Standards-Version: 4.3.0
+Homepage: https://troglobit.com/inadyn.html
+Vcs-Git: git://github.com/troglobit/inadyn.git
+Vcs-Browser: http://github.com/troglobit/inadyn
+
+Package: inadyn
+Architecture: any
+Pre-Depends: adduser
+Depends: debconf (>= 0.2.17), ${shlibs:Depends}, ${misc:Depends}
+Provides: dyndns-client
+Description: Internet automated Dynamic DNS client
+ Inadyn is a small and simple Dynamic DNS (DDNS) client with HTTPS
+ support.  It automates the task of keeping your Internet name(s) in
+ sync with your public IP address.
+ .
+ Most people are unaware they share a pool of Internet addresses with
+ other customers of the same Internet Service Provider (ISP).  Protocols
+ like DHCP, PPPoE, or PPPoA are used to give you an address and a way to
+ connect to the Internet, but usually not a way for others to connect to
+ you.  If you want to run an Internet server on such a connection you
+ risk losing your IP address every time you reconnect.
+ .
+ The following DDNS plugins are supported natively, other providers can
+ be set up with a custom DDNS plugin, see inadyn.conf(5) for an example:
+ .
+   * <https://freedns.afraid.org>
+   * <https://www.nsupdate.info>
+   * <https://duckdns.org>
+   * <https://freemyip.com>
+   * <https://www.loopia.com>
+   * <https://www.dyndns.org>, <https://dyn.com>
+   * <https://www.noip.com>
+   * <https://www.easydns.com>
+   * <https://www.dnsomatic.com>
+   * <https://dns.he.net>
+   * <https://www.tunnelbroker.net>
+   * <https://www.sitelutions.com>
+   * <https://www.dnsexit.com>, parent of <https://www.zoneedit.com>
+   * <https://www.changeip.com>
+   * <https://www.dhis.org>
+   * <https://www.namecheap.com>
+   * <https://domains.google>
+   * <https://www.ovh.com>
+   * <https://giradns.com>
+   * <https://www.duiadns.net>
+   * <https://ddnss.de>
+   * <https://dynv6.com>
+   * <https://spdyn.de>
+   * <https://www.cloudxns.net>
+   * <https://www.pubyun.com>, formerly <http://www.3322.org>
+   * <https://www.dnspod.cn>
+   * <https://www.dynu.com>
+   * <https://www.selfhost.de>
+   * <https://connect.yandex.ru>
+   * <https://www.cloudflare.com>
+ .
+ Some of these services are free of charge for non-commercial use, others
+ take a small fee, but also provide more domains to choose from.

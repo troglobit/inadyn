@@ -1,0 +1,24 @@
+Inadyn for Debian
+-----------------
+
+This is an upstream provided pre-packaged version of Inadyn.  It comes
+in a .deb format available for any Debian based operating system, e.g.
+Debian, Ubuntu, Linux Mint, etc.
+
+Recommended reading is the upstream README
+
+    zless /usr/share/doc/inadyn/README.md.gz
+
+As well as the fine manual pages for both the daemon and its .conf file
+syntax:
+
+    man inadyn
+    man indayn.conf
+
+Note, at first install the configuration wizard will ask a series of
+questions to create a basic /etc/inadyn.conf file.  To change settings
+after install, without having to edit the file, use
+
+    dpkg-reconfigure inadyn
+
+ -- Joachim Nilsson <troglobit@gmail.com>  Thu, 27 Jul 18:10, 2017
