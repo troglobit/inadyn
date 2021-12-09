@@ -1,3 +1,14 @@
+inadyn (2.9.1) stable; urgency=medium
+
+ * Source '$INADYN_ARGS', or '$INADYN_OPTS', for the command line from an
+  'EnvironmentFile' in the systemd unit file
+ * Reference the README in the systemd unit file instead of home page
+ * Fix issue #367: fix multiple hostname composition in custom providers when
+   using printf style format specifiers in ddns-path
+ * Fix issue #368: fix build with GCC 4.8, by Fabrice Fontaine
+
+ -- Joachim Wiberg <troglobit@gmail.com>  Thu, 09 Dec 2021 20:54:17 +0100
+
 inadyn (2.9.0) stable; urgency=medium
 
   * Support for including provider config, e.g. username & password
