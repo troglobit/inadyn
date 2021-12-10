@@ -9,13 +9,13 @@ The latest release is always available from GitHub at
 Table of Contents
 -----------------
 
-* [Introduction](#introduction)
-* [Supported Providers](#supported-providers)
-* [Configuration](#configuration)
-* [Custom DDNS Providers](#custom-ddns-providers)
-* [Build & Install](#build--install)
-* [Building from GIT](#building-from-git)
-* [Origin & References](#origin--references)
+  * [Introduction](#introduction)
+  * [Supported Providers](#supported-providers)
+  * [Configuration](#configuration)
+  * [Custom DDNS Providers](#custom-ddns-providers)
+  * [Build & Install](#build--install)
+  * [Building from GIT](#building-from-git)
+  * [Origin & References](#origin--references)
 
 
 Introduction
@@ -58,36 +58,36 @@ The following tier-one providers have dedicated "plugins", even though
 many share the original DynDNS plugin.  Below is a list of known DDNS
 providers, ordered by the plugin that support them:
 
-   * <https://freedns.afraid.org>
-   * <https://www.nsupdate.info>
-   * <https://duckdns.org>
-   * <https://freemyip.com>
-   * <https://www.dyndns.org>, <https://dyn.com>
-     * <https://dns.he.net>
-     * <https://www.dnsomatic.com>
-     * <https://domains.google>
-     * <https://www.dynu.com>
-     * <https://www.loopia.com>
-     * <https://www.noip.com>
-     * <https://www.pubyun.com>, formerly <http://www.3322.org>
-     * <https://www.selfhost.de>
-     * <https://spdyn.de>
-   * <https://www.easydns.com>
-   * <https://www.tunnelbroker.net>
-   * <https://www.sitelutions.com>
-   * <https://www.dnsexit.com>, parent of <https://www.zoneedit.com>
-   * <https://www.changeip.com>
-     * <https://www.ovh.com>
-     * <https://www.strato.com>
-   * <https://www.dhis.org>
-   * <https://giradns.com>, <https://gira.de>
-   * <https://www.duiadns.net>
-   * <https://ddnss.de>
-   * <https://dynv6.com>
-   * <https://www.cloudxns.net>
-   * <https://www.dnspod.cn>
-   * <https://connect.yandex.ru>
-   * <https://www.cloudflare.com>
+  * <https://freedns.afraid.org>
+  * <https://www.nsupdate.info>
+  * <https://duckdns.org>
+  * <https://freemyip.com>
+  * <https://www.dyndns.org>, <https://dyn.com>
+    * <https://dns.he.net>
+    * <https://www.dnsomatic.com>
+    * <https://domains.google>
+    * <https://www.dynu.com>
+    * <https://www.loopia.com>
+    * <https://www.noip.com>
+    * <https://www.pubyun.com>, formerly <http://www.3322.org>
+    * <https://www.selfhost.de>
+    * <https://spdyn.de>
+  * <https://www.easydns.com>
+  * <https://www.tunnelbroker.net>
+  * <https://www.sitelutions.com>
+  * <https://www.dnsexit.com>, parent of <https://www.zoneedit.com>
+  * <https://www.changeip.com>
+    * <https://www.ovh.com>
+    * <https://www.strato.com>
+  * <https://www.dhis.org>
+  * <https://giradns.com>, <https://gira.de>
+  * <https://www.duiadns.net>
+  * <https://ddnss.de>
+  * <https://dynv6.com>
+  * <https://www.cloudxns.net>
+  * <https://www.dnspod.cn>
+  * <https://connect.yandex.ru>
+  * <https://www.cloudflare.com>
 
 DDNS providers not supported natively can be enabled using the custom,
 or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
@@ -456,8 +456,8 @@ To completely disable inadyn HTTPS support (not recommended!):
 
 For more details on the OpenSSL and GNU GPL license issue, see:
 
-* <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
-* <https://people.gnome.org/~markmc/openssl-and-the-gpl>
+  * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
+  * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
 
 ### RedHat, Fedora, CentOS
 
