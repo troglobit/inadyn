@@ -372,7 +372,7 @@ your respective distribution:
   * https://packages.ubuntu.com/jammy/inadyn
 
 > **Note:** the project's packaging files have been moved to a separate
-> 'debian' branch in the GIT repository.  It is not be actively updated
+> [debian][] branch in the GIT repository.  It is not actively updated
 > or supported for releases.  To use it, check out the branch and edit
 > `debian/changelog`) to build new `.deb` files for your system.
 
@@ -549,6 +549,7 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 [buildsystem]:      https://airs.com/ian/configure/
 [License]:          https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 [License Badge]:    https://img.shields.io/badge/License-GPL%20v2-blue.svg
+[debian]:           https://github.com/troglobit/inadyn/tree/debian/debian
 [GitHub]:           https://github.com/troglobit/inadyn/actions/workflows/build.yml/
 [GitHub Status]:    https://github.com/troglobit/inadyn/actions/workflows/build.yml/badge.svg
 [Coverity Scan]:    https://scan.coverity.com/projects/2981
