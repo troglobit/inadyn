@@ -356,11 +356,26 @@ in the last example above.
 Build & Install
 ---------------
 
-### Debian/Ubuntu
+### Debian/Ubuntu/Mint
 
-    curl -sS https://deb.troglobit.com/pubkey.gpg | sudo apt-key add -
-    echo "deb [arch=amd64] https://deb.troglobit.com/debian stable main" | sudo tee /etc/apt/sources.list.d/troglobit.list
-    sudo apt-get update && sudo apt-get install inadyn
+For a long time, the project maintained its own `.deb` packaging and
+basic apt infrastructure.  However, the increasing level of features in
+In-a-dyn, and thus amount of dependencies, as well as the demands for
+supporting more architectures and different distributions, the pre-built
+`.deb` support has been discontinued as of v2.9.1.
+
+The Debian project now has an active maintainer for inadyn, which is the
+upstream for Ubuntu and others.  Please report issues and requests to
+your respective distribution:
+
+  * https://packages.debian.org/sid/inadyn
+  * https://packages.ubuntu.com/jammy/inadyn
+
+> **Note:** the project's packaging files have been moved to a separate
+> 'debian' branch in the GIT repository.  It is not be actively updated
+> or supported for releases.  To use it, check out the branch and edit
+> `debian/changelog`) to build new `.deb` files for your system.
+
 
 ### Docker
 
