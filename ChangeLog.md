@@ -10,7 +10,7 @@ All notable changes to the project are documented in this file.
 ### Changes
 - `debian/` directory and packaging dropped in favor of downstream
   official packaging.  Too difficult to support different versions and
-  derivatives, not just Debian but also Ubuntu, etc.
+  derivatives, not just Debian but also Ubuntu, etc.  Issue #366
 - Source `$INADYN_ARGS`, or `$INADYN_OPTS`, for the command line from an
   `EnvironmentFile` in the systemd unit file
 - Reference the README in the systemd unit file instead of home page
