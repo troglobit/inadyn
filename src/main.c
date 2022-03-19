@@ -520,6 +520,11 @@ int main(int argc, char *argv[])
 		force = 0;
 	}
 
+    /* Initialization done, create pidfile to indicate we are running */
+    if (once == 0 && pidfile_name[0] && pidfile(pidfile_name)) {
+        logit(LOG_WARNING, "Failed creating pidfile: %s", strerror(errno));
+    }
+
 	if (drop_privs()) {
 		logit(LOG_WARNING, "Failed dropping privileges: %s", strerror(errno));
 		rc = RC_OS_CHANGE_PERSONA_FAILURE;
