@@ -137,6 +137,9 @@ typedef struct di {
 	char           server_response[MAX_NUM_RESPONSES][MAX_RESPONSE_LEN];
 	size_t         server_response_num;
 
+	/* Interface for IP */
+	char           *ifname;
+
 	/* Address of "What's my IP" checker */
 	ddns_name_t    checkip_name;
 	char           checkip_url[SERVER_URL_LEN];
