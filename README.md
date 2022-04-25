@@ -21,6 +21,9 @@ Table of Contents
 Introduction
 ------------
 
+> **Tip:** the HTML UNIX manual is at https://man.troglobit.com, e.g.,
+> [inadyn.conf(5)](https://man.troglobit.com/man5/inadyn.conf.5.html)
+
 Inadyn, or In-a-Dyn, is a small and simple Dynamic DNS, [DDNS][], client
 with HTTPS support.  Commonly available in many GNU/Linux distributions,
 used in off the shelf routers and Internet gateways to automate the task
@@ -197,10 +200,15 @@ This looks for the default `.conf` file, to check any file, use:
         hostname    = 1234534245321           # tunnel-id
 	}
 
+    # dynv6.com update using a custom checkip-command, which works
+    # if you have access to an Internet-connected interface.  Make
+    # sure to verify the command works on your system first
+    allow-ipv6 = true                # required option for IPv6 atm.
     provider dynv6.com {
         username = your_token
-        password = n/a
+        password = not_used
         hostname = { host1.dynv6.net, host2.dynv6.net }
+        checkip-command = "/sbin/ip -6 addr | grep inet6 | awk -F '[ \t]+|/' '{print $3}' | grep -v ^::1 | grep -v ^fe80"
     }
 
     provider cloudxns.net {
@@ -245,6 +253,11 @@ The last system defined is the IPv6 <https://tunnelbroker.net> service
 provided by Hurricane Electric.  Here `hostname` is set to the tunnel ID
 and password **must** be the *Update key* found in the *Advanced*
 configuration tab.
+
+> **Note:** the `checkip-command` for dynv6, above, is just one way to
+> do it.  Here's another variant, from their own script: `ip -6
+> addr list scope global $device | grep -v " fd" | sed -n 's/.*inet6
+> \([0-9a-f:]\+\).*/\1/p' | head -n 1`
 
 Sometimes the default `checkip-server` for a DDNS provider can be very
 slow to respond, to this end In-a-dyn now support overriding it with a
