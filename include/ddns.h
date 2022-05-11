@@ -47,7 +47,7 @@
  */
 #define DDNS_MY_IP_SERVER       "api.ipify.org"
 #define DDNS_MY_CHECKIP_URL	"/"
-#define DDNS_MY_IP_SSL          DDNS_CHECKIP_SSL_SUPPORTED
+#define DDNS_MY_IP_SSL          DDNS_CHECKIP_SSL_UNSUPPORTED
 
 /* Some default settings */
 #define DDNS_DEFAULT_STARTUP_SLEEP        0       /* sec */
