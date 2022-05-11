@@ -211,7 +211,8 @@ static int getserver(const char *server, ddns_name_t *name)
 		if (-1 == name->port)
 			name->port = HTTP_DEFAULT_PORT;
 	} else {
-		name->port = HTTP_DEFAULT_PORT;
+		/* Let *ssl.c and tcp.c figure it out later */
+		name->port = 0;
 	}
 
 	strlcpy(name->name, str, sizeof(name->name));

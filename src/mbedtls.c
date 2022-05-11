@@ -11,12 +11,15 @@ void ssl_exit(void) {}
 
 int ssl_open(http_t *client, char *msg)
 {
+	int port = 0;
 	int rc;
 
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
 
-	tcp_set_port(&client->tcp, HTTPS_DEFAULT_PORT);
+	http_get_port(client, &port);
+	if (!port)
+		http_set_port(client, HTTPS_DEFAULT_PORT);
 	rc = tcp_init(&client->tcp, msg);
 	if (rc)
 		return rc;
