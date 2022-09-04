@@ -300,6 +300,13 @@ A custom DDNS provider can be setup like this:
         hostname       = myhostname.example.net
 	}
 
+The following variables can be substituted into the configuration:
+
+     %u - username
+     %p - password, if HTTP basic auth is not used
+     %h - hostname
+     %i - IP address
+    
 For <https://www.namecheap.com> it can look as follows.  Notice how the
 hostname syntax differs from above:
 
@@ -307,9 +314,9 @@ hostname syntax differs from above:
         username    = YOURDOMAIN.TLD
         password    = mypass
         ddns-server = dynamicdns.park-your-domain.com
-        ddns-path   = "/update?domain=%u&password=%p&host=%h"
+        ddns-path   = "/update?domain=%u&password=%p&host=%h&ip=%i"
         hostname    = { "@", "www", "test" }
-	}
+    }
 
 Here three hostnames are updated, one HTTP GET update request for every
 listed hostname.  Some providers, like FreeDNS, support setting up CNAME
