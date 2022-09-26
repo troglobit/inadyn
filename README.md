@@ -556,6 +556,9 @@ This is the continuation of Narcis Ilisei's [original][] INADYN.  Now
 maintained by [Joachim Wiberg][].  Please file bug reports, or send
 pull requests for bug fixes and proposed extensions at [GitHub][].
 
+> A personal *Thank you!* goes out to Robert Högberg, who sponsored a
+> little D-Link DIR-645 router so I could get back on the interwebs :-)
+
 [original]:         http://www.inatech.eu/inadyn/
 [DDNS]:             http://en.wikipedia.org/wiki/Dynamic_DNS
 [tunnelbroker]:     https://tunnelbroker.net/
