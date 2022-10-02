@@ -124,6 +124,7 @@ static int ssl_set_ca_location(void)
 
 	/* A user defined CA PEM bundle overrides any built-ins or fall-backs */
 	if (ca_trust_file) {
+		logit(LOG_DEBUG, "Using CA PEM bundle: %s", ca_trust_file);
 		num = gnutls_certificate_set_x509_trust_file(xcred, ca_trust_file, GNUTLS_X509_FMT_PEM);
 		goto done;
 	}
@@ -154,11 +155,6 @@ int ssl_init(void)
 
 	/* X509 stuff */
 	gnutls_certificate_allocate_credentials(&xcred);
-
-	/* Try to figure out location of trusted CA certs on system */
-	if (ssl_set_ca_location())
-		return RC_HTTPS_NO_TRUSTED_CA_STORE;
-
 	gnutls_certificate_set_verify_function(xcred, verify_certificate_callback);
 
 	return 0;
@@ -199,6 +195,10 @@ int ssl_open(http_t *client, char *msg)
 
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
+
+	/* Try to figure out location of trusted CA certs on system */
+	if (ssl_set_ca_location())
+		return RC_HTTPS_NO_TRUSTED_CA_STORE;
 
 	/* Initialize TLS session */
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
