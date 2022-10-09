@@ -181,17 +181,26 @@ void ssl_get_info(http_t *client)
 #endif
 }
 
+int ssl_fail(http_t *client, int rc)
+{
+	if (!client)
+		return rc;
+
+	ssl_close(client);
+
+	return rc;
+}
 
 int ssl_open(http_t *client, char *msg)
 {
-	int ret;
-	char buf[256];
-	size_t len;
-	const char *sn, *err;
 	const gnutls_datum_t *cert_list;
 	unsigned int cert_list_size = 0;
 	gnutls_x509_crt_t cert;
+	const char *sn, *err;
+	char buf[256];
 	int port = 0;
+	size_t len;
+	int ret;
 
 	if (!client->ssl_enabled)
 		return tcp_init(&client->tcp, msg);
@@ -202,13 +211,17 @@ int ssl_open(http_t *client, char *msg)
 
 	/* Initialize TLS session */
 	logit(LOG_INFO, "%s, initiating HTTPS ...", msg);
-	gnutls_init(&client->ssl, GNUTLS_CLIENT);
+	ret = gnutls_init(&client->ssl, GNUTLS_CLIENT);
+	if (ret) {
+		logit(LOG_ERR, "Failed initializing HTTPS: %s", gnutls_strerror(ret));
+		return RC_HTTPS_OUT_OF_MEMORY;
+	}
 
 	/* SSL SNI support: tell the servername we want to speak to */
 	http_get_remote_name(client, &sn);
 	gnutls_session_set_ptr(client->ssl, (void *)sn);
 	if (gnutls_server_name_set(client->ssl, GNUTLS_NAME_DNS, sn, strlen(sn)))
-		return RC_HTTPS_SNI_ERROR;
+		return ssl_fail(client, RC_HTTPS_SNI_ERROR);
 
 	/* Use default priorities */
 	ret = gnutls_priority_set_direct(client->ssl, "NORMAL", &err);
@@ -216,7 +229,7 @@ int ssl_open(http_t *client, char *msg)
 		if (ret == GNUTLS_E_INVALID_REQUEST)
 			logit(LOG_ERR, "Syntax error at: %s", err);
 
-		return RC_HTTPS_INVALID_REQUEST;
+		return ssl_fail(client, RC_HTTPS_INVALID_REQUEST);
 	}
 
 	/* put the x509 credentials to the current session */
@@ -240,7 +253,7 @@ int ssl_open(http_t *client, char *msg)
 
 	if (gnutls_error_is_fatal(ret)) {
 		logit(LOG_ERR, "SSL handshake with %s failed: %s", sn, gnutls_strerror(ret));
-		return RC_HTTPS_FAILED_CONNECT;
+		return ssl_fail(client, RC_HTTPS_FAILED_CONNECT);
 	}
 
 	client->connected = 1;
@@ -250,7 +263,7 @@ int ssl_open(http_t *client, char *msg)
 	cert_list = gnutls_certificate_get_peers(client->ssl, &cert_list_size);
 	if (cert_list_size > 0) {
 		if (gnutls_x509_crt_init(&cert))
-			return RC_HTTPS_FAILED_GETTING_CERT;
+			return ssl_fail(client, RC_HTTPS_FAILED_GETTING_CERT);
 
 		gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER);
 
@@ -291,8 +304,10 @@ int ssl_send(http_t *client, const char *buf, int len)
 		ret = gnutls_record_send(client->ssl, buf, len);
 	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-	if (ret < 0)
+	if (ret < 0) {
+		logit(LOG_WARNING, "Failed sending HTTPS request: %s", gnutls_strerror(ret));
 		return RC_HTTPS_SEND_ERROR;
+	}
 
 	logit(LOG_DEBUG, "Successfully sent HTTPS request!");
 
