@@ -460,6 +460,7 @@ a few useful options that are recommended to use:
 
 You may want to remove the `--prefix=/usr` option.
 
+
 ### SSL/TLS Support
 
 By default inadyn tries to build with GnuTLS for HTTPS support.  GnuTLS
@@ -478,6 +479,16 @@ For more details on the OpenSSL and GNU GPL license issue, see:
 
   * <https://lists.debian.org/debian-legal/2004/05/msg00595.html>
   * <https://people.gnome.org/~markmc/openssl-and-the-gpl>
+
+
+### Static Build
+
+Some people want to build statically, to do this with `autoconf` add the
+following `LDFLAGS=` *after* the configure script.  You may also need to
+add `LIBS=...`, which will depend on your particular system:
+
+    ./configure LDFLAGS="-static" ...
+
 
 ### RedHat, Fedora, CentOS
 
@@ -508,6 +519,11 @@ simply call `systemctl` to enable and start `inadyn`:
 Check that it started properly by inspecting the system log, or:
 
     $ sudo systemctl status inadyn.service
+
+To stop the service:
+
+    $ sudo systemctl stop   inadyn.service
+
 
 ### Embedded applications
 
