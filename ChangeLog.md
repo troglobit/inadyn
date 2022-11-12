@@ -4,6 +4,25 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.10.0][] - 2022-11-12
+------------------------
+
+### Changes
+- Add support for MbedTLS, courtesy of Vicente Bergas
+- Add support for per-provider interface to bind to, by Iain Henderson
+- Use HTTP-only for api.ipify.org, default (fallback) checkip service
+- Mention static builds and how to stop a systemd service in README
+
+### Fixes
+- Issue #374: handle easyDNS `no update required` as OK status
+- Issue #382: update docs on how to use IPv6 and dynv6
+- Issue #385: use configured server:port, don't force port 443 for HTTPS
+- Issue #388: update docs on how to use custom config with format
+  specifiers, and fix the Namecheap URL in the process, by Martin Butt
+- Issue #390: serious memory leak in GnuTLS backend (Debian default)
+- Issue #391: ca-trust-file has no effect for GnuTLS
+
+
 [v2.9.1][] - 2021-12-09
 -----------------------
 
