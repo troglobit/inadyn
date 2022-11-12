@@ -160,15 +160,15 @@ This looks for the default `.conf` file, to check any file, use:
         username    = ian
         password    = secret
         hostname    = flemming.no-ip.com
-		user-agent  = inadyn/2.2
-	}
+        user-agent  = inadyn/2.2
+    }
 
     # With multiple usernames at the same provider, index with :#
     provider no-ip.com:2 {
         username       = james
         password       = bond
         hostname       = spectre.no-ip.com
-		checkip-ssl    = false
+        checkip-ssl    = false
         checkip-server = api.ipify.org
     }
 
@@ -186,6 +186,7 @@ This looks for the default `.conf` file, to check any file, use:
         username = your_username
         password = your_password
     }
+
     # Wildcard subdomains - notice the quotes (required!)
     provider domains.google.com:2 {
         hostname = "*.mydomain.com"
@@ -198,7 +199,7 @@ This looks for the default `.conf` file, to check any file, use:
         username    = futurekid
         password    = dreoadsad/+dsad21321    # update-key-in-advanced-tab
         hostname    = 1234534245321           # tunnel-id
-	}
+    }
 
     # dynv6.com update using a custom checkip-command, which works
     # if you have access to an Internet-connected interface.  Make
@@ -298,7 +299,7 @@ A custom DDNS provider can be setup like this:
         ddns-server    = update.example.com
         ddns-path      = "/update?hostname="
         hostname       = myhostname.example.net
-	}
+    }
 
 The following variables can be substituted into the configuration:
 
@@ -340,7 +341,7 @@ under an API section, or similar.
         ddns-server = members.dyndns.org
         ddns-path   = "/nic/update?hostname=%h.dyndns.org&myip=%i"
         hostname    = { YOURHOST, alias }
-	}
+    }
 
 Here a fully custom `ddns-path` with format specifiers are used, see the
 `inadyn.conf(5)` man page for details on this.
