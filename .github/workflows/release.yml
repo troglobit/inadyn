@@ -14,7 +14,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       release_id: ${{ steps.create_release.outputs.id }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Extract ChangeLog entry ...
         # Hack to extract latest entry for body_path below
         run: |
@@ -38,7 +38,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Installing dependencies ...
         run: |
           sudo apt-get install -y libconfuse-dev libgnutls28-dev
