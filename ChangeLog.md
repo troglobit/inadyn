@@ -915,7 +915,8 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.9.1...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.10.0...HEAD
+[v2.10.0]: https://github.com/troglobit/inadyn/compare/v2.9.1...v2.10.0
 [v2.9.1]: https://github.com/troglobit/inadyn/compare/v2.9.0...v2.9.1
 [v2.9.0]: https://github.com/troglobit/inadyn/compare/v2.8.1...v2.9.0
 [v2.8.1]: https://github.com/troglobit/inadyn/compare/v2.8...v2.8.1
