@@ -40,7 +40,7 @@
 	"User-Agent: %s\r\n\r\n"
 
 const char * const generic_responses[] =
-    { "OK", "good", "true", "updated", "nochg", NULL };
+    { "OK", "good", "true", "updated", "success", "nochg", NULL };
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
