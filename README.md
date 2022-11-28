@@ -346,9 +346,20 @@ under an API section, or similar.
 Here a fully custom `ddns-path` with format specifiers are used, see the
 `inadyn.conf(5)` man page for details on this.
 
+Another example:
+
+    # Custom configuration for dnsmadeeasy
+    custom dyn {
+        username    = DNSMADEEASYUSERNAME
+        password    = DNSMADEEASYPASSWORDFORTHISHOST
+        ddns-server = cp.dnsmadeeasy.com
+        ddns-path   = "/servlet/updateip?username=%u&password=%p&id=DNSMADEEASYHOSTID&ip=%i"
+        hostname    = HOST
+    }      
+
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  By default Inadyn looks for a `200 HTTP` response OK
-code and the strings `"good"`, `"OK"`, `"true"`, or `"updated"` in the
+code and the strings `"good"`, `"OK"`, `"true"`, `"success"`, or `"updated"` in the
 HTTP response body.  If the DDNS provider returns something else you can
 add a list of possible `ddns-response = { Arrr, kilroy }`, or just a
 single `ddns-response = Cool` -- if your provider does give any response
