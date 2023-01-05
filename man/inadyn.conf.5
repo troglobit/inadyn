@@ -332,6 +332,8 @@ by Hurricane Electric.
 .Aq https://connect.yandex.ru
 .It Cm default@cloudflare.com
 .Aq https://www.cloudflare.com
+.It Cm default@goip.de
+.Aq https://www.goip.de
 .El
 .It Cm custom some@identifier {}
 Specific to the custom provider section are the following settings:
@@ -513,6 +515,13 @@ provider cloudflare.com {
     hostname = hostname.zone.name
     ttl = 1 # optional, value of 1 is 'automatic'.
     proxied = false # optional.
+}
+
+# www.goip.de
+provider goip.de {
+    username = username
+    password = password
+    hostname = hostname.goip.de
 }
 
 # www.namecheap.com
