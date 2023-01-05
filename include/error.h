@@ -55,6 +55,7 @@
 #define RC_DDNS_RSP_NOTOK               48
 #define RC_DDNS_RSP_RETRY_LATER         49
 #define RC_DDNS_RSP_AUTH_FAIL           50
+#define RC_DDNS_RSP_TOO_FREQUENT        51
 
 #define RC_OS_INVALID_IP_ADDRESS        61
 #define RC_OS_FORK_FAILURE              62
