@@ -91,6 +91,7 @@ providers, ordered by the plugin that support them:
   * <https://www.dnspod.cn>
   * <https://connect.yandex.ru>
   * <https://www.cloudflare.com>
+  * <https://www.goip.de>
 
 DDNS providers not supported natively can be enabled using the custom,
 or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
@@ -232,6 +233,12 @@ This looks for the default `.conf` file, to check any file, use:
         hostname = hostname.zone.name
         ttl = 1 # optional, value of 1 is 'automatic'.
         proxied = false # optional.
+    }
+
+    provider goip.de {
+        username = user.name
+        password = user.password
+        hostname = hostname.zone.name
     }
 
 Notice how the config has three different users of the No-IP provider --

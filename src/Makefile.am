@@ -41,4 +41,5 @@ inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c		\
 		   ../plugins/freemyip.c	../plugins/generic.c		\
 		   ../plugins/giradns.c						\
 		   ../plugins/sitelutions.c	../plugins/tunnelbroker.c	\
-		   ../plugins/yandex.c		../plugins/zoneedit.c
+		   ../plugins/yandex.c		../plugins/zoneedit.c \
+		   ../plugins/goip.c
