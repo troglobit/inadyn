@@ -79,10 +79,11 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "NOERROR") || strstr(resp, "no update required"))
+	if (strstr(resp, "NOERROR") || strstr(resp, "no update required") || strstr(resp, "OK"))
 		return 0;
-
 	if (strstr(resp, "TOOSOON"))
+		return RC_DDNS_RSP_RETRY_LATER;
+	if (strstr(resp, "TOO_FREQ"))
 		return RC_DDNS_RSP_RETRY_LATER;
 
 	return RC_DDNS_RSP_NOTOK;
