@@ -31,6 +31,16 @@
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
 
+#define GOIP_UPDATE_IP6_REQUEST						\
+	"GET %s?"							\
+	"username=%s&"							\
+	"password=%s&"							\
+	"subdomain=%s&"							\
+	"ip6=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: %s\r\n\r\n"
+
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
@@ -48,9 +58,34 @@ static ddns_system_t plugin = {
 	.server_url   =  "/setip"
 };
 
+static ddns_system_t plugin_v6 = {
+	.name         = "ipv6@goip.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "www.goip.de",
+	.server_url   =  "/setip"
+};
+
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	return snprintf(ctx->request_buf, ctx->request_buflen,
+	if (strstr(info->system->name, "ipv6")) {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			GOIP_UPDATE_IP6_REQUEST,
+			info->server_url,
+			info->creds.username,
+			info->creds.password,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->user_agent);
+	} else {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
 			GOIP_UPDATE_IP_REQUEST,
 			info->server_url,
 			info->creds.username,
@@ -59,6 +94,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			info->server_name.name,
 			info->user_agent);
+	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -79,11 +115,13 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
+	plugin_register(&plugin_v6);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&plugin);
+	plugin_unregister(&plugin_v6);
 }
 
 /**
