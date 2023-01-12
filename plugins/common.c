@@ -73,17 +73,20 @@ int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(body, "good") || strstr(body, "nochg"))
+	if (strstr(body, "good") || strstr(body, "nochg")  || strstr(body, "OK"))
 		return 0;
 
-	if (strstr(body, "dnserr") || strstr(body, "911"))
+	if (strstr(body, "dnserr") || strstr(body, "911") || strstr(body, "abuse"))
 		return RC_DDNS_RSP_RETRY_LATER;
 
-	if (strstr(body, "badauth"))
+	if (strstr(body, "badauth") || strstr(body, "!donator"))
 		return RC_DDNS_RSP_AUTH_FAIL;
 
 	/* Loopia responds "[200 OK] nohost" when no DNS record exists */
 	if (strstr(body, "nohost"))
+		return RC_DDNS_RSP_NOHOST;
+
+	if (strstr(body, "nofqdn"))
 		return RC_DDNS_RSP_NOHOST;
 
 	return RC_DDNS_RSP_NOTOK;

@@ -53,6 +53,19 @@ static ddns_system_t plugin = {
 	.server_url   =  "/?"
 };
 
+static ddns_system_t plugin_ipv6 = {
+	.name         = "ipv6@dhis.org",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "ipv6@wtfismyip.com",
+	.checkip_url  = "/text",
+
+	.server_name  = "is6.dhis.org",
+	.server_url   =  "/?"
+};
+
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
@@ -83,6 +96,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
+	plugin_register(&plugin_ipv6);
 }
 
 PLUGIN_EXIT(plugin_exit)

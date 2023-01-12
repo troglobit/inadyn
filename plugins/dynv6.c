@@ -50,7 +50,7 @@ static ddns_system_t plugin4 = {
 };
 
 static ddns_system_t plugin6 = {
-	.name         = "default@dynv6.com",
+	.name         = "ipv6@dynv6.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
