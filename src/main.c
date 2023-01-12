@@ -99,7 +99,6 @@ static int alloc_context(ddns_t **pctx)
 		ctx->update_period = DDNS_DEFAULT_PERIOD;
 		ctx->total_iterations = DDNS_DEFAULT_ITERATIONS;
 		ctx->cmd_check_period = DDNS_DEFAULT_CMD_CHECK_PERIOD;
-		ctx->force_addr_update = 0;
 
 		ctx->initialized = 0;
 	}

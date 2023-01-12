@@ -39,7 +39,20 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "wtfismyip.com",
+	.checkip_name = "ipv4.wtfismyip.com",
+	.checkip_url  = "/text",
+
+	.server_name  = "homeserver.gira.de",
+	.server_url   = "/hsdyndns.php"
+};
+
+static ddns_system_t plugin_v6 = {
+	.name         = "default@gira.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "ipv6@wtfismyip.com",
 	.checkip_url  = "/text",
 
 	.server_name  = "homeserver.gira.de",
@@ -75,11 +88,13 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
+	plugin_register(&plugin_v6);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&plugin);
+	plugin_unregister(&plugin_v6);
 }
 
 /**

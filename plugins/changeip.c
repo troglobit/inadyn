@@ -63,6 +63,7 @@ static ddns_system_t ovh = {
 	.server_url   = "/nic/update"
 };
 
+
 static ddns_system_t strato = {
 	.name         = "default@strato.com",
 
@@ -98,7 +99,9 @@ PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
 	plugin_register(&ovh);
+	plugin_register_v6(&ovh);
 	plugin_register(&strato);
+	plugin_register_v6(&strato);
 }
 
 PLUGIN_EXIT(plugin_exit)

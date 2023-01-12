@@ -79,7 +79,7 @@
 # define MAX_ADDRESS_LEN                  46
 #endif
 
-#define MAX_NUM_RESPONSES                 5
+#define MAX_NUM_RESPONSES                 6
 #define MAX_RESPONSE_LEN                  32
 
 typedef enum {
@@ -110,6 +110,7 @@ typedef struct {
 } ddns_name_t;
 
 typedef struct {
+	int            force_addr_update;
 	int            ip_has_changed;
 	char           address[MAX_ADDRESS_LEN];
 
@@ -193,7 +194,6 @@ typedef struct {
 	int            num_iterations;
 	int            initialized;
 	int            change_persona;
-	int            force_addr_update;
 	int            use_proxy;
 	int            abort;
 

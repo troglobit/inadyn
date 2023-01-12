@@ -75,7 +75,7 @@ static int nslookup(ddns_alias_t *alias)
 	return 1;
 }
 
-static void read_one(ddns_alias_t *alias, int nonslookup)
+static void read_one(ddns_alias_t *alias, const char *name, int nonslookup)
 {
 	FILE *fp;
 	char path[256];
@@ -83,7 +83,7 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 	alias->last_update = 0;
 	memset(alias->address, 0, sizeof(alias->address));
 
-	cache_file(alias->name, path, sizeof(path));
+	cache_file(alias->name, name, path, sizeof(path));
 	fp = fopen(path, "r");
 	if (!fp) {
 		/* Exception for dnsomatic's special global hostname */
@@ -111,12 +111,12 @@ static void read_one(ddns_alias_t *alias, int nonslookup)
 	}
 }
 
-char *cache_file(char *name, char *buf, size_t len)
+char *cache_file(char *name, const char *sysname, char *buf, size_t len)
 {
 	if (!buf || !name)
 		return NULL;
 
-	if (snprintf(buf, len, "%s/%s.cache", cache_dir, name) >= (int)len)
+	if (snprintf(buf, len, "%s/%s-%s.cache", cache_dir, sysname, name) >= (int)len)
 		logit(LOG_WARNING, "Too long name for buffer: '%s/' + '%s' + '.cache'", cache_dir, name);
 
 	return buf;
@@ -164,7 +164,7 @@ int read_cache_file(ddns_t *ctx)
 
 // XXX: TODO better plugin identifiction here
 		for (j = 0; j < info->alias_count; j++)
-			read_one(&info->alias[j], nonslookup);
+			read_one(&info->alias[j], name, nonslookup);
 
 		info = conf_info_iterator(0);
 	}
@@ -176,12 +176,12 @@ int read_cache_file(ddns_t *ctx)
  * Update cache with new IP
  * /var/cache/inadyn/my.server.name.cache { LAST-IPADDR } MTIME
  */
-int write_cache_file(ddns_alias_t *alias)
+int write_cache_file(ddns_alias_t *alias, const char *name)
 {
 	FILE *fp;
-	char path[256];
+	char path[256];	
 
-	cache_file(alias->name, path, sizeof(path));
+	cache_file(alias->name, name, path, sizeof(path));
 	fp = fopen(path, "w");
 	if (fp) {
 		logit(LOG_NOTICE, "Updating cache for %s", alias->name);

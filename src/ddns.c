@@ -564,7 +564,7 @@ static int time_to_check(ddns_t *ctx, ddns_alias_t *alias)
 {
 	time_t past_time = time(NULL) - alias->last_update;
 
-	return ctx->force_addr_update ||
+	return alias->force_addr_update ||
 		(past_time > ctx->forced_update_period_sec);
 }
 
@@ -618,7 +618,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	rc = http_init(client, "Sending IP# update to DDNS server");
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
-		ctx->force_addr_update = 1;
+		alias->force_addr_update = 1;
 		return rc;
 	}
 
@@ -650,7 +650,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		logit(LOG_WARNING, "HTTP(S) Transaction failed, error %d: %s", rc, error_str(rc));
 		logit(LOG_INFO, "Update failed, forced update/retry in %d sec ...", ctx->cmd_check_period);
-		ctx->force_addr_update = 1;
+		alias->force_addr_update = 1;
 		goto exit;
 	}
 	logit(LOG_DEBUG, "DDNS server response: %s", trans.rsp);
@@ -659,16 +659,16 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 	if (rc) {
 		logit(LOG_WARNING, "%s error in DDNS server response:",
 		      rc == RC_DDNS_RSP_RETRY_LATER || rc == RC_DDNS_RSP_TOO_FREQUENT ? "Temporary" : "Fatal");
-		logit(LOG_WARNING, "[%d %s] %s", trans.status, trans.status_desc,
-		      trans.rsp_body != trans.rsp ? trans.rsp_body : "");
+		logit(LOG_WARNING, "[%d %s]", trans.status, trans.status_desc);
+		logit(LOG_DEBUG, "%s", trans.rsp_body != trans.rsp ? trans.rsp_body : "");
 
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
-		ctx->force_addr_update = 1;
+		alias->force_addr_update = 1;
 	} else {
 		logit(LOG_INFO, "Successful alias table update for %s => new IP# %s",
 		      alias->name, alias->address);
 
-		ctx->force_addr_update = 0;
+		alias->force_addr_update = 0;
 		if (changed)
 			(*changed)++;
 	}
@@ -686,7 +686,7 @@ static int update_alias_table(ddns_t *ctx)
 	ddns_info_t *info;
 
 	/* Issue #15: On external trig. force update to random addr. */
-	if (ctx->force_addr_update && ctx->forced_update_fake_addr) {
+	if (ctx->forced_update_fake_addr) {
 		/* If the DDNS server responds with an error, we ignore it here,
 		 * since this is just to fool the DDNS server to register a a
 		 * change, i.e., an active user. */
@@ -696,15 +696,17 @@ static int update_alias_table(ddns_t *ctx)
 
 			for (i = 0; i < info->alias_count; i++) {
 				ddns_alias_t *alias = &info->alias[i];
-				char backup[sizeof(alias->address)];
+				if (alias->force_addr_update) {
+					char backup[sizeof(alias->address)];
 
-				strlcpy(backup, alias->address, sizeof(backup));
+					strlcpy(backup, alias->address, sizeof(backup));
 
-				/* Picking random address in 203.0.113.0/24 ... */
-				snprintf(alias->address, sizeof(alias->address), "203.0.113.%d", (rand() + 1) % 255);
-				TRY(send_update(ctx, info, alias, NULL));
+					/* Picking random address in 203.0.113.0/24 ... */
+					snprintf(alias->address, sizeof(alias->address), "203.0.113.%d", (rand() + 1) % 255);
+					TRY(send_update(ctx, info, alias, NULL));
 
-				strlcpy(alias->address, backup, sizeof(alias->address));
+					strlcpy(alias->address, backup, sizeof(alias->address));
+				}
 			}
 
 			info = conf_info_iterator(0);
@@ -737,7 +739,7 @@ static int update_alias_table(ddns_t *ctx)
 				alias->last_update = time(NULL);
 
 				/* Update cache file for this entry */
-				write_cache_file(alias);
+				write_cache_file(alias, info->system->name);
 			}
 
 			/* Run command or script on successful update. */
@@ -933,6 +935,7 @@ static int check_error(ddns_t *ctx, int rc)
 int ddns_main_loop(ddns_t *ctx)
 {
 	int rc = 0;
+	ddns_info_t *info;
 	static int first_startup = 1;
 
 	if (!ctx)
@@ -961,7 +964,15 @@ int ddns_main_loop(ddns_t *ctx)
 		}
 		if (ctx->cmd == CMD_FORCED_UPDATE) {
 			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
-			ctx->force_addr_update = 1;
+			info = conf_info_iterator(1);
+			while (info) {
+				size_t i;
+				for (i = 0; i < info->alias_count; i++) {
+					ddns_alias_t *alias = &info->alias[i];
+					alias->force_addr_update = 1;
+				}
+				info = conf_info_iterator(0);
+			}
 			ctx->cmd = NO_CMD;
 		} else if (ctx->cmd == CMD_CHECK_NOW) {
 			logit(LOG_INFO, "CHECK_NOW command received, leaving startup delay.");
@@ -973,9 +984,17 @@ int ddns_main_loop(ddns_t *ctx)
 	DO(read_cache_file(ctx));
 	DO(get_encoded_user_passwd());
 
-	if (once && force)
-		ctx->force_addr_update = 1;
-
+	if (once && force) {
+			info = conf_info_iterator(1);
+			while (info) {
+				size_t i;
+				for (i = 0; i < info->alias_count; i++) {
+					ddns_alias_t *alias = &info->alias[i];
+					alias->force_addr_update = 1;
+				}
+				info = conf_info_iterator(0);
+			}
+	}
 	/* Initialization done, create pidfile to indicate we are ready to communicate */
 	if (once == 0 && pidfile_name[0] && pidfile(pidfile_name))
 		logit(LOG_WARNING, "Failed creating pidfile: %s", strerror(errno));
@@ -1015,7 +1034,16 @@ int ddns_main_loop(ddns_t *ctx)
 		}
 		if (ctx->cmd == CMD_FORCED_UPDATE) {
 			logit(LOG_INFO, "FORCED_UPDATE command received, updating now.");
-			ctx->force_addr_update = 1;
+
+			info = conf_info_iterator(1);
+			while (info) {
+				size_t i;
+				for (i = 0; i < info->alias_count; i++) {
+					ddns_alias_t *alias = &info->alias[i];
+					alias->force_addr_update = 1;
+				}
+				info = conf_info_iterator(0);
+			}
 			ctx->cmd = NO_CMD;
 			continue;
 		}
