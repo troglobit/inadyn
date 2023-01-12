@@ -283,7 +283,6 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&_3322);
 	plugin_register_v6(&_3322);
 	plugin_register(&henet);
-	plugin_register_v6(&henet);
 	plugin_register(&tunnelbroker);
 	plugin_register(&spdyn);
 	plugin_register(&spdyn_v6);
