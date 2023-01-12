@@ -75,9 +75,7 @@ int plugin_unregister(ddns_system_t *plugin)
 
 	ddns_system_t *plugin_v6 = plugin_find(name, 0);
 	if (plugin_v6) {
-		free(plugin_v6->name);
 		TAILQ_REMOVE(&plugins, plugin_v6, link);	
-		free(plugin_v6);
 	}
 	free(name);
 	/* XXX: Unfinished, add cleanup code here! */
