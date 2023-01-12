@@ -59,6 +59,7 @@ typedef struct ddns_system {
 
 	const char    *server_name;
 	const char    *server_url;
+	int            cloned; /* marks this plugin as a clone */
 } ddns_system_t;
 
 /* Public plugin API */

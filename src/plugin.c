@@ -59,6 +59,7 @@ int plugin_register_v6(ddns_system_t *plugin)
 	memcpy(plugin_v6, plugin, sizeof(*plugin));
 	/* default@foo.org -> ipv6@foo.org */
 	plugin_v6->name = strdup(plugin->name);
+	plugin_v6->cloned = 1;
 	sprintf(plugin_v6->name, "ipv6%s", plugin->name + 7);
 	return plugin_register(plugin_v6);
 }
@@ -72,10 +73,11 @@ int plugin_unregister(ddns_system_t *plugin)
 	if (strstr(name, "default@"))
 		sprintf(name, "ipv6%s", plugin->name + 7);
 	TAILQ_REMOVE(&plugins, plugin, link);
-
 	ddns_system_t *plugin_v6 = plugin_find(name, 0);
-	if (plugin_v6) {
-		TAILQ_REMOVE(&plugins, plugin_v6, link);	
+	if (plugin_v6 && plugin_v6->cloned) {
+		TAILQ_REMOVE(&plugins, plugin_v6, link);
+		free(plugin_v6->name);
+		free(plugin_v6);
 	}
 	free(name);
 	/* XXX: Unfinished, add cleanup code here! */
