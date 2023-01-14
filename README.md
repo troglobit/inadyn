@@ -427,6 +427,14 @@ A Dockerfile is provided to simplify building and running `inadyn`.
     docker build -t inadyn:latest .
     docker run --rm -v "$PWD/inadyn.conf:/etc/inadyn.conf" inadyn:latest
 
+**How to update ip periodically using cronjob :**
+* Create your `inadyn.conf` file
+* Create folder for cache
+* Add the following line inside crontab `crontab -e`
+```bash
+* * * * * docker run --rm -v "path/to/inadyn.conf:/etc/inadyn.conf" -v "path/to/cache:/var/cache/inadyn" troglobit/inadyn:latest -1 --cache-dir=/var/cache/inadyn > /dev/null 2>&1
+```
+
 ### Homebrew (macOS)
 
 To run the latest stable version on macOS, type:
