@@ -287,6 +287,76 @@ static ddns_system_t dode = {
 	.server_url   = "/nic/update"
 };
 
+static ddns_system_t domopoli = {
+	.name         = "default@domopoli",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dyndns.domopoli.de",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t inwx = {
+	.name         = "default@inwx.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dyndns.inwx.com",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t itsdns = {
+	.name         = "default@itsdns.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "www.itsdns.de",
+	.server_url   = "/update.php"
+};
+
+static ddns_system_t opendns = {
+	.name         = "default@opendns.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "updates.opendns.com",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t joker = {
+	.name         = "default@joker.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "svc.joker.com",
+	.server_url   = "/nic/update"
+};
+
 static ddns_system_t myonlineportal = {
 	.name         = "default@myonlineportal.net",
 
@@ -347,8 +417,19 @@ PLUGIN_INIT(plugin_init)
 	plugin_register_v6(&googledomains);
 	plugin_register(&dynu);
 	plugin_register_v6(&dynu);
+	plugin_register(&dyfi);
 	plugin_register_v6(&dyfi);
+	plugin_register(&dode);
 	plugin_register_v6(&dode);
+	plugin_register(&domopoli);
+	plugin_register_v6(&domopoli);
+	plugin_register(&inwx);
+	plugin_register_v6(&inwx);
+	plugin_register(&itsdns);
+	plugin_register_v6(&itsdns);
+	plugin_register(&opendns);
+	plugin_register_v6(&opendns);
+	plugin_register(&joker);
 	plugin_register(&myonlineportal);
 	plugin_register(&myonlineportal_v6);
 }
@@ -372,6 +453,11 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dynu);
 	plugin_unregister(&dyfi);
 	plugin_unregister(&dode);
+	plugin_unregister(&domopoli);
+	plugin_unregister(&inwx);
+	plugin_unregister(&itsdns);
+	plugin_unregister(&opendns);
+	plugin_unregister(&joker);
 	plugin_unregister(&myonlineportal);
 	plugin_unregister(&myonlineportal_v6);
 }
