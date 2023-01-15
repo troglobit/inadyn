@@ -5,4 +5,5 @@ inadyn_SOURCES += common.c	changeip.c	cloudflare.c	\
 		  easydns.c	freedns.c	freemyip.c	\
 		  generic.c	giradns.c			\
 		  sitelutions.c	tunnelbroker.c			\
-		  yandex.c	zoneedit.c	goip.c
+		  yandex.c	zoneedit.c	goip.c		\
+		  desec.	domaindiscount24.c
