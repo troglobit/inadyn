@@ -1,6 +1,6 @@
-/* Plugin for DHIS.org
+/* Plugin for goip.de
  *
- * Copyright (C) 2023       Sebastian Gottschall <s.gottschall@dd-wrt.com>
+ * Copyright (C) 2023 Sebastian Gottschall <s.gottschall@dd-wrt.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -64,9 +64,9 @@ static ddns_system_t plugin_v6 = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.checkip_name = "dns64.cloudflare-dns.com",
+	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "www.goip.de",
 	.server_url   =  "/setip"

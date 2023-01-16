@@ -357,6 +357,48 @@ static ddns_system_t joker = {
 	.server_url   = "/nic/update"
 };
 
+static ddns_system_t schokokeks = {
+	.name         = "default@schokokeks.org",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dyndns.schokokeks.org",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t variomedia = {
+	.name         = "default@variomedia.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dyndns.variomedia.de",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t udmedia = {
+	.name         = "default@udmedia.de",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "www.udmedia.de",
+	.server_url   = "/nic/update"
+};
+
 static ddns_system_t myonlineportal = {
 	.name         = "default@myonlineportal.net",
 
@@ -430,6 +472,12 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&opendns);
 	plugin_register_v6(&opendns);
 	plugin_register(&joker);
+	plugin_register(&schokokeks);
+	plugin_register_v6(&schokokeks);
+	plugin_register(&variomedia);
+	plugin_register_v6(&variomedia);
+	plugin_register(&udmedia);
+	plugin_register_v6(&udmedia);
 	plugin_register(&myonlineportal);
 	plugin_register(&myonlineportal_v6);
 }
@@ -458,6 +506,9 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&itsdns);
 	plugin_unregister(&opendns);
 	plugin_unregister(&joker);
+	plugin_unregister(&schokokeks);
+	plugin_unregister(&variomedia);
+	plugin_unregister(&udmedia);
 	plugin_unregister(&myonlineportal);
 	plugin_unregister(&myonlineportal_v6);
 }

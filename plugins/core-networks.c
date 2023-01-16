@@ -1,6 +1,6 @@
-/* Plugin for ddnss.de
+/* Plugin for core-networks.de
  *
- * Copyright (C) 2016  Sven Hoefer <sven@svenhoefer.com>
+ * Copyright (C) 2023 Sebastian Gottschall <s.gottschall@dd-wrt.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,21 +21,22 @@
 
 #include "plugin.h"
 
-#define DDNSS_UPDATE_IP_REQUEST						\
+#define CORE_NETWORKS_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
-	"user=%s&"							\
-	"pwd=%s&"							\
-	"host=%s"							\
-	" "								\
+	"hostname=%s&"							\
+	"myip=%s&"							\
+	"%s "								\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
 	"User-Agent: %s\r\n\r\n"
+
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin = {
-	.name         = "default@ddnss.de",
+	.name         = "default@core-networks.de",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -44,32 +45,39 @@ static ddns_system_t plugin = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "ddnss.de",
-	.server_url   = "/upd.php"
+	.server_name  = "dyndns.core-networks.de",
+	.server_url   =  "/"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
+	char *keepip;
+	if (strstr(info->system->name, "ipv6"))
+		keepip = "keepipv4=1";
+	else
+		keepip = "keepipv6=1";
+
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			DDNSS_UPDATE_IP_REQUEST,
+			CORE_NETWORKS_UPDATE_IP_REQUEST,
 			info->server_url,
-			info->creds.username,
-			info->creds.password,
 			alias->name,
+			alias->address,
+			keepip,
 			info->server_name.name,
+			info->creds.encoded_password,
 			info->user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->rsp_body;
+	char *rsp = trans->rsp_body;
 
 	(void)info;
 	(void)alias;
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "Updated") || strstr(resp, "No change"))
+	if (strstr(rsp, "good"))
 		return 0;
 
 	return RC_DDNS_RSP_NOTOK;
@@ -78,6 +86,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
+	plugin_register_v6(&plugin);
 }
 
 PLUGIN_EXIT(plugin_exit)

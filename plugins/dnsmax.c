@@ -1,6 +1,6 @@
-/* Plugin for ddnss.de
+/* Plugin for dnsmax.com
  *
- * Copyright (C) 2016  Sven Hoefer <sven@svenhoefer.com>
+ * Copyright (C) 2023 Sebastian Gottschall <s.gottschall@dd-wrt.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,21 +21,40 @@
 
 #include "plugin.h"
 
-#define DDNSS_UPDATE_IP_REQUEST						\
+#define DNSMAX_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
-	"user=%s&"							\
-	"pwd=%s&"							\
-	"host=%s"							\
-	" "								\
+	"username=%s&"							\
+	"password=%s&"							\
+	"resellerid=1&"							\
+	"clientname=inadyn&"						\
+	"clientversion=2.10&"						\
+	"protocolversion=2.0&"						\
+	"updatehostname=%s&"							\
+	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
 
+#define THATIP_UPDATE_IP_REQUEST						\
+	"GET %s?"							\
+	"username=%s&"							\
+	"password=%s&"							\
+	"resellerid=2&"							\
+	"clientname=inadyn&"						\
+	"clientversion=2.10&"						\
+	"protocolversion=2.0&"						\
+	"updatehostname=%s&"							\
+	"ip=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: %s\r\n\r\n"
+
+
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
-static ddns_system_t plugin = {
-	.name         = "default@ddnss.de",
+static ddns_system_t dnsmax_plugin = {
+	.name         = "default@dnsmax.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -44,32 +63,60 @@ static ddns_system_t plugin = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "ddnss.de",
-	.server_url   = "/upd.php"
+	.server_name  = "update.dnsmax.com",
+	.server_url   =  "/update/"
 };
+
+static ddns_system_t thatip_plugin = {
+	.name         = "default@thatip.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "update.dnsmax.com",
+	.server_url   =  "/update/"
+};
+
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	return snprintf(ctx->request_buf, ctx->request_buflen,
-			DDNSS_UPDATE_IP_REQUEST,
+	if (strstr(info->system->name, "thatip")) {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			THATIP_UPDATE_IP_REQUEST,
 			info->server_url,
 			info->creds.username,
 			info->creds.password,
 			alias->name,
+			alias->address,
 			info->server_name.name,
 			info->user_agent);
+	} else {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			DNSMAX_UPDATE_IP_REQUEST,
+			info->server_url,
+			info->creds.username,
+			info->creds.password,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->user_agent);
+	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *resp = trans->rsp_body;
+	char *rsp = trans->rsp_body;
 
 	(void)info;
 	(void)alias;
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(resp, "Updated") || strstr(resp, "No change"))
+	if (strstr(rsp, alias->address))
 		return 0;
 
 	return RC_DDNS_RSP_NOTOK;
@@ -77,12 +124,14 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
+	plugin_register(&dnsmax_plugin);
+	plugin_register(&thatip_plugin);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
-	plugin_unregister(&plugin);
+	plugin_unregister(&dnsmax_plugin);
+	plugin_unregister(&thatip_plugin);
 }
 
 /**
