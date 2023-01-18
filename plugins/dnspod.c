@@ -49,6 +49,21 @@ static ddns_system_t plugin = {
 	.server_url   = ""
 };
 
+static ddns_system_t plugin_v6 = {
+	.name         = "ipv6@dnspod.cn",
+
+	.setup        = (setup_fn_t)setup,
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = "dns64.cloudflare-dns.com",
+	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
+
+	.server_name  = "dnsapi.cn",
+	.server_url   = ""
+};
+
 static int fetch_record_id(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, char *domain, char *prefix)
 {
 	http_trans_t trans;
@@ -148,6 +163,12 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	char buffer[SERVER_NAME_LEN], domain[SERVER_NAME_LEN], prefix[SERVER_NAME_LEN];
 	int record_id;
 	int len;
+	char *record_type;
+	
+	if (strstr(info->system->name, "ipv6"))
+		record_type="AAAA";
+	else
+		record_type="A";
 
 	strlcpy(buffer, alias->name, sizeof(buffer));
 	tmp = strchr(buffer, '.');
@@ -174,9 +195,9 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 	logit(LOG_DEBUG, "DNSPod Record: '%s' ID: %u", prefix, record_id);
 	len = snprintf(buffer, sizeof(buffer),
-		       "login_token=%s%%2C%s&format=json&domain=%s&record_id=%d&record_line=%s&value=%s&sub_domain=%s",
+		       "login_token=%s%%2C%s&format=json&domain=%s&record_type=%s&record_id=%d&record_line=%s&value=%s&sub_domain=%s",
 		       info->creds.username, info->creds.password,
-		       domain, record_id, "%E9%BB%98%E8%AE%A4", alias->address, prefix);
+		       domain, record_type, record_id, "%E9%BB%98%E8%AE%A4", alias->address, prefix);
 	if (len >= (int)sizeof(buffer))
 		return RC_BUFFER_OVERFLOW;
 
@@ -240,11 +261,13 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 PLUGIN_INIT(plugin_init)
 {
 	plugin_register(&plugin);
+	plugin_register(&plugin_v6);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&plugin);
+	plugin_unregister(&plugin_v6);
 }
 
 /**

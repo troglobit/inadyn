@@ -399,30 +399,60 @@ static ddns_system_t udmedia = {
 	.server_url   = "/nic/update"
 };
 
-static ddns_system_t myonlineportal = {
-	.name         = "default@myonlineportal.net",
+static ddns_system_t dyndnsit = {
+	.name         = "default@dyndns.it",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "ipv4.myonlineportal.net",
-	.checkip_url  = "/checkip",
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "myonlineportal.net",
-	.server_url   = "/updateddns"
+	.server_name  = "update.dyndns.it",
+	.server_url   = "/nic/update"
 };
 
-static ddns_system_t myonlineportal_v6 = {
-	.name         = "ipv6@myonlineportal.net",
+static ddns_system_t infomaniak = {
+	.name         = "default@infomaniak.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "ipv6.myonlineportal.net",
-	.checkip_url  = "/checkip",
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "myonlineportal.net",
-	.server_url   = "/updateddns"
+	.server_name  = "infomaniak.com",
+	.server_url   = "/nic/update"
+};
+
+static ddns_system_t oray = {
+	.name         = "default@oray.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "ddns.oray.com",
+	.server_url   = "/ph/update"
+};
+
+static ddns_system_t simply = {
+	.name         = "default@simply.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "api.simply.com",
+	.server_url   = "/2/ddns/"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
@@ -478,8 +508,12 @@ PLUGIN_INIT(plugin_init)
 	plugin_register_v6(&variomedia);
 	plugin_register(&udmedia);
 	plugin_register_v6(&udmedia);
-	plugin_register(&myonlineportal);
-	plugin_register(&myonlineportal_v6);
+	plugin_register(&dyndnsit);
+	plugin_register(&infomaniak);
+	plugin_register_v6(&infomaniak);
+	plugin_register(&oray);
+	plugin_register(&simply);
+	plugin_register_v6(&simply);
 }
 
 PLUGIN_EXIT(plugin_exit)
@@ -509,8 +543,10 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&schokokeks);
 	plugin_unregister(&variomedia);
 	plugin_unregister(&udmedia);
-	plugin_unregister(&myonlineportal);
-	plugin_unregister(&myonlineportal_v6);
+	plugin_unregister(&dyndnsit);
+	plugin_unregister(&infomaniak);
+	plugin_unregister(&oray);
+	plugin_unregister(&simply);
 }
 
 /**

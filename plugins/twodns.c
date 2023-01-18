@@ -1,4 +1,4 @@
-/* Plugin for domaindiscount24.com
+/* Plugin for twodns.de
  *
  * Copyright (C) 2023 Sebastian Gottschall <s.gottschall@dd-wrt.com>
  *
@@ -21,21 +21,21 @@
 
 #include "plugin.h"
 
-
-#define DDC24_UPDATE_IP_REQUEST						\
+#define TWODNS_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"hostname=%s&"							\
-	"password=%s&"							\
 	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
 	"User-Agent: %s\r\n\r\n"
+
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
-static ddns_system_t plugin_ddc24 = {
-	.name         = "default@domaindiscount24.com",
+static ddns_system_t plugin = {
+	.name         = "default@twodns.de",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -44,32 +44,16 @@ static ddns_system_t plugin_ddc24 = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "dynamicdns.key-systems.net",
-	.server_url   =  "/update.php"
+	.server_name  = "update.twodns.de",
+	.server_url   =  "/update"
 };
-
-static ddns_system_t plugin_moniker = {
-	.name         = "default@moniker.com",
-
-	.request      = (req_fn_t)request,
-	.response     = (rsp_fn_t)response,
-
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
-
-	.server_name  = "dynamicdns.key-systems.net",
-	.server_url   =  "/update.php"
-};
-
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-		DDC24_UPDATE_IP_REQUEST,
+		TWODNS_UPDATE_IP_REQUEST,
 		info->server_url,
 		alias->name,
-		info->creds.password,
 		alias->address,
 		info->server_name.name,
 		info->user_agent);
@@ -77,29 +61,22 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *rsp = trans->rsp_body;
-
 	(void)info;
 	(void)alias;
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(rsp, "success"))
-		return 0;
-
-	return RC_DDNS_RSP_NOTOK;
+	return 0;
 }
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin_ddc24);
-	plugin_register(&plugin_moniker);
+	plugin_register(&plugin);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
-	plugin_unregister(&plugin_ddc24);
-	plugin_unregister(&plugin_moniker);
+	plugin_unregister(&plugin);
 }
 
 /**
