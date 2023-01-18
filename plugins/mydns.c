@@ -1,4 +1,4 @@
-/* Plugin for domaindiscount24.com
+/* Plugin for mydns.jp
  *
  * Copyright (C) 2023 Sebastian Gottschall <s.gottschall@dd-wrt.com>
  *
@@ -21,12 +21,21 @@
 
 #include "plugin.h"
 
-
-#define DDC24_UPDATE_IP_REQUEST						\
+#define MYDNS_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
-	"hostname=%s&"							\
-	"password=%s&"							\
-	"ip=%s "							\
+	"MID=%s&"							\
+	"PWD=%s&"							\
+	"IPV4ADDR=%s "							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: %s\r\n\r\n"
+
+#define MYDNS_UPDATE_IP6_REQUEST						\
+	"GET %s?"							\
+	"MID=%s&"							\
+	"PWD=%s&"							\
+	"IPV6ADDR=%s "							\
+	"GET %s?"							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
@@ -34,8 +43,8 @@
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
-static ddns_system_t plugin_ddc24 = {
-	.name         = "default@domaindiscount24.com",
+static ddns_system_t plugin = {
+	.name         = "default@mydns.jp",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -44,35 +53,45 @@ static ddns_system_t plugin_ddc24 = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "dynamicdns.key-systems.net",
-	.server_url   =  "/update.php"
+	.server_name  = "www.mydns.jp",
+	.server_url   =  "/directip.html"
 };
 
-static ddns_system_t plugin_moniker = {
-	.name         = "default@moniker.com",
+static ddns_system_t plugin_v6 = {
+	.name         = "ipv6@mydns.jp",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.checkip_name = "dns64.cloudflare-dns.com",
+	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
-	.server_name  = "dynamicdns.key-systems.net",
-	.server_url   =  "/update.php"
+	.server_name  = "www.mydns.jp",
+	.server_url   =  "/directip.html"
 };
-
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	return snprintf(ctx->request_buf, ctx->request_buflen,
-		DDC24_UPDATE_IP_REQUEST,
-		info->server_url,
-		alias->name,
-		info->creds.password,
-		alias->address,
-		info->server_name.name,
-		info->user_agent);
+	if (strstr(info->system->name, "ipv6")) {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			MYDNS_UPDATE_IP6_REQUEST,
+			info->server_url,
+			info->creds.username,
+			info->creds.password,
+			alias->address,
+			info->server_name.name,
+			info->user_agent);
+	} else {
+		return snprintf(ctx->request_buf, ctx->request_buflen,
+			MYDNS_UPDATE_IP_REQUEST,
+			info->server_url,
+			info->creds.username,
+			info->creds.password,
+			alias->address,
+			info->server_name.name,
+			info->user_agent);
+	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -84,22 +103,19 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(rsp, "success"))
-		return 0;
-
 	return RC_DDNS_RSP_NOTOK;
 }
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin_ddc24);
-	plugin_register(&plugin_moniker);
+	plugin_register(&plugin);
+	plugin_register(&plugin_v6);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
-	plugin_unregister(&plugin_ddc24);
-	plugin_unregister(&plugin_moniker);
+	plugin_unregister(&plugin);
+	plugin_unregister(&plugin_v6);
 }
 
 /**
