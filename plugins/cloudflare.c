@@ -237,7 +237,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	http_set_remote_name(&client, info->server_name.name);
 
 	client.ssl_enabled = info->ssl_enabled;
-	CHECK(http_init(&client, "Id query"));
+	CHECK(http_init(&client, "Id query",strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4));
 
 	trans.req = request;
 	trans.req_len = request_len;

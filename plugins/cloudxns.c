@@ -160,7 +160,7 @@ static int http_send(struct http *http, char *msg, char *fmt, ...)
 	http_set_remote_name(&client, info->server_name.name);
 	client.ssl_enabled = info->ssl_enabled;
 
-	rc = http_init(&client, msg);
+	rc = http_init(&client, msg, TCP_AUTO);
 	if (rc)
 		goto err;
 

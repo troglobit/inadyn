@@ -276,7 +276,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	http_set_remote_name(&client, info->server_name.name);
 
 	client.ssl_enabled = info->ssl_enabled;
-	rc = http_init(&client, "Sending records list query");
+	rc = http_init(&client, "Sending records list query", TCP_AUTO);
 	if (rc) {
 		http_destruct(&client, 1);
 		return rc;
