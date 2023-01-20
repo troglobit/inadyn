@@ -96,7 +96,7 @@ static int fetch_record_id(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, 
 	http_set_remote_name(&client, info->server_name.name);
 	client.ssl_enabled = info->ssl_enabled;
 
-	rc = http_init(&client, "Sending record list query");
+	rc = http_init(&client, "Sending record list query",strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4);
 	if (rc)
 		return -rc;
 

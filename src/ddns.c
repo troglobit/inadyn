@@ -136,7 +136,7 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	client = &provider->checkip;
 	client->ssl_enabled = provider->checkip_ssl;
-	DO(http_init(client, "Checking for IP# change"));
+	DO(http_init(client, "Checking for IP# change", strstr(provider->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4));
 
 	/* Prepare request for IP server */
 	memset(ctx->work_buf, 0, ctx->work_buflen);
@@ -615,7 +615,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		DO(info->system->setup(ctx, info, alias));
 
 	client->ssl_enabled = info->ssl_enabled;
-	rc = http_init(client, "Sending IP# update to DDNS server");
+	rc = http_init(client, "Sending IP# update to DDNS server", strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4);
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		alias->force_addr_update = 1;
@@ -657,9 +657,9 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 
 	rc = info->system->response(&trans, info, alias);
 	if (rc) {
-		logit(LOG_WARNING, "%s error in DDNS server response:",
-		      rc == RC_DDNS_RSP_RETRY_LATER || rc == RC_DDNS_RSP_TOO_FREQUENT ? "Temporary" : "Fatal");
-		logit(LOG_WARNING, "[%d %s]", trans.status, trans.status_desc);
+		logit(LOG_WARNING, "%s error in DDNS server response: %s",
+		      rc == RC_DDNS_RSP_RETRY_LATER || rc == RC_DDNS_RSP_TOO_FREQUENT ? "Temporary" : "Fatal", error_str(rc));
+//		logit(LOG_WARNING, "[%d %s]", trans.status, trans.status_desc);
 		logit(LOG_DEBUG, "%s", trans.rsp_body != trans.rsp ? trans.rsp_body : "");
 
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
