@@ -55,7 +55,7 @@ static ddns_system_t plugin = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "update.desec.io",
+	.server_name  = "update.dedyn.io",
 	.server_url   =  "/update.php"
 };
 
@@ -69,7 +69,7 @@ static ddns_system_t plugin_v6 = {
 	.checkip_url  = "/cdn-cgi/trace",
 	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
-	.server_name  = "update6.desec.io",
+	.server_name  = "update6.dedyn.io",
 	.server_url   =  "/update.php"
 };
 
