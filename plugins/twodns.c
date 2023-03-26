@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-#define TWODNS_UPDATE_IP_REQUEST						\
+#define TWODNS_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
 	"hostname=%s&"							\
 	"ip=%s "							\
@@ -56,6 +56,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		alias->name,
 		alias->address,
 		info->server_name.name,
+		info->creds.encoded_password,
 		info->user_agent);
 }
 
