@@ -30,12 +30,11 @@
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
 
-#define MYDNS_UPDATE_IP6_REQUEST						\
+#define MYDNS_UPDATE_IP6_REQUEST					\
 	"GET %s?"							\
 	"MID=%s&"							\
 	"PWD=%s&"							\
 	"IPV6ADDR=%s "							\
-	"GET %s?"							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
