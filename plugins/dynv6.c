@@ -24,7 +24,7 @@
 
 #define DYNV6_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
-	"%s=auto&"							\
+	"%s=%s&"							\
 	"hostname=%s&"							\
 	"token=%s"							\
 	" "								\
@@ -66,14 +66,19 @@ static ddns_system_t plugin6 = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	const char *ver = "ipv6";
+	char *addr;
 
 	if (strstr(info->system->name, "ipv4"))
 		ver = "ipv4";
+	if (alias->address[0])
+		addr = alias->address;
+	else
+		addr = "auto";	/* ipv6=auto, or ipv4=auto */
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			DYNV6_UPDATE_IP_REQUEST,
 			info->server_url,
-			ver,			/* ipv6=auto, or ipv4=auto */
+			ver, addr,
 			alias->name,
 			info->creds.username,
 			info->server_name.name,
