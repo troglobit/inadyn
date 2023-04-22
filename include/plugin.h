@@ -71,6 +71,8 @@ int            plugin_register_v6 (ddns_system_t *system, const char *req);
 int            plugin_unregister  (ddns_system_t *system);
 
 /* Helper API */
+int            plugin_list (void);
+int            plugin_show (char *name);
 ddns_system_t *plugin_find (const char *name, int loose);
 
 /* Looks ugly, placed here due to deps. and to make it easier for plugin devs */

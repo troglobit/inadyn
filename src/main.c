@@ -285,12 +285,14 @@ static int usage(int code)
 		" -I, --ident=NAME               Identity for config file, PID file, cache dir,\n"
 		"                                and syslog messages.  Defaults to: %s\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
+		" -L, --list-providers           List available DDNS providers\n"
 		" -n, --foreground               Run in foreground with logging to stdout/stderr\n"
 		" -p, --drop-privs=USER[:GROUP]  Drop privileges after start to USER:GROUP\n"
 		"     --no-pidfile               Do not create PID file, for use with systemd\n"
 		" -P, --pidfile=FILE             File to store process ID for signaling %s\n"
 		"                                Default uses ident NAME: %s\n"
 		" -s, --syslog                   Log to syslog, default unless --foreground\n"
+		" -S, --show-provider NAME       Show information about DDNS provider NAME\n"
 		" -t, --startup-delay=SEC        Initial startup delay, default none\n"
 		" -v, --version                  Show program version and exit\n\n"
 		"Bug report address: %s\n",
@@ -347,12 +349,14 @@ int main(int argc, char *argv[])
 		{ "iface",             1, 0, 'i' },
 		{ "ident",             1, 0, 'I' },
 		{ "loglevel",          1, 0, 'l' },
+		{ "list-providers",    0, 0, 'L' },
 		{ "help",              0, 0, 'h' },
 		{ "foreground",        0, 0, 'n' },
 		{ "no-pidfile",        0, 0, 'N' },
 		{ "pidfile",           1, 0, 'P' },
 		{ "drop-privs",        1, 0, 'p' },
 		{ "syslog",            0, 0, 's' },
+		{ "show-provider",     0, 0, 'S' },
 		{ "startup-delay",     1, 0, 't' },
 		{ "version",           0, 0, 'v' },
 		{ NULL,                0, 0, 0   }
@@ -363,7 +367,7 @@ int main(int argc, char *argv[])
 	parse_privs(NULL);
 
 	prognm = ident = progname(argv[0]);
-	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:nNp:P:st:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:LnNp:P:sS:t:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -424,6 +428,9 @@ int main(int argc, char *argv[])
 				return usage(1);
 			break;
 
+		case 'L':
+			return plugin_list();
+
 		case 'n':	/* --foreground */
 			background = 0;
 			use_syslog--;
@@ -445,6 +452,9 @@ int main(int argc, char *argv[])
 		case 's':	/* --syslog */
 			use_syslog++;
 			break;
+
+		case 'S':
+			return plugin_show(optarg);
 
 		case 't':	/* --startup-delay=SEC */
 			startup_delay = atoi(optarg);

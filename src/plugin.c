@@ -118,6 +118,76 @@ static ddns_system_t *search_plugin(const char *name, int loose)
 	return NULL;
 }
 
+/**
+ * plugin_list - List all plugins
+ *
+ * Returns:
+ * Always successful, returning POSIX OK(0).
+ */
+int plugin_list(void)
+{
+	ddns_system_t *p, *tmp;
+
+	printf("\e[7m%-32s  %-32s  %-15s\e[0m\n", "PROVIDER", "CHECKIP/UPDATE SERVER", "URL");
+	PLUGIN_ITERATOR(p, tmp) {
+		printf("%-32s  %-32s %s\n", p->name, p->checkip_name, p->checkip_url);
+		printf("%-32s  %-32s %s\n", "", p->server_name, p->server_url);
+	}
+
+	return 0;
+}
+
+/**
+ * plugin_show - Show a specific plugin
+ * @name: full name of plugin, including default@ or ipv6@
+ *
+ * Returns:
+ * POSIX OK(0) when found, otherise 1.
+ */
+int plugin_show(char *name)
+{
+	ddns_system_t *p;
+	char *req;
+
+	p = plugin_find(name, 0);
+	if (!p)
+		p = plugin_find(name, 1);
+	if (!p) {
+		fprintf(stderr, "No such plugin '%s', even tried substring match\n", name);
+		return 1;
+	}
+
+	if (p->server_req) {
+		size_t i, pos = 0, len = strlen(p->server_req);
+
+		req = malloc(len * 2);
+		for (i = 0; i < len; i++) {
+			char c = p->server_req[i];
+
+			if (c == '\\')
+				req[pos++] = '\\';
+			req[pos++] = c;
+		}
+		req[pos++] = 0;
+	} else
+		req = strdup("");
+
+	printf("Name           : %s\n"
+	       "nousername     : %s\n"
+	       "checkip server : %s\n"
+	       "checkip URL    : %s\n"
+	       "update server  : %s\n"
+	       "update URL     : %s\n"
+	       "update REQ     : ",
+	       p->name,
+	       p->nousername ? "true" : "false",
+	       p->checkip_name, p->checkip_url,
+	       p->server_name, p->server_url);
+	puts(req);
+	free(req);
+
+	return 0;
+}
 
 /**
  * plugin_find - Find a plugin by name
