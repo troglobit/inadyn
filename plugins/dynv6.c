@@ -24,10 +24,18 @@
 
 #define DYNV6_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
-	"%s=%s&"							\
+	"ipv4=%s&"							\
 	"hostname=%s&"							\
 	"token=%s"							\
-	" "								\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"User-Agent: %s\r\n\r\n"
+
+#define DYNV6_UPDATE_IP6_REQUEST					\
+	"GET %s?"							\
+	"ipv6=%s&"							\
+	"hostname=%s&"							\
+	"token=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
@@ -65,20 +73,17 @@ static ddns_system_t plugin6 = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	const char *ver = "ipv6";
 	char *addr;
 
-	if (strstr(info->system->name, "ipv4"))
-		ver = "ipv4";
 	if (alias->address[0])
 		addr = alias->address;
 	else
 		addr = "auto";	/* ipv6=auto, or ipv4=auto */
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			DYNV6_UPDATE_IP_REQUEST,
+			info->system->server_req,
 			info->server_url,
-			ver, addr,
+			addr,
 			alias->name,
 			info->creds.username,
 			info->server_name.name,
@@ -102,8 +107,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin4);
-	plugin_register(&plugin6);
+	plugin_register(&plugin4, DYNV6_UPDATE_IP_REQUEST);
+	plugin_register(&plugin6, DYNV6_UPDATE_IP6_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

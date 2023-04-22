@@ -36,6 +36,22 @@
 
 #include "plugin.h"
 
+/*
+ * dyndns.org specific update address format
+ *
+ * Also applies to other dyndns2 api compatible services, like:
+ * DNS-O-Matic, no-ip, 3322, HE and nsupdate.info.
+ */
+#define DYNDNS_UPDATE_IP_HTTP_REQUEST					\
+	"GET %s?"							\
+	"hostname=%s&"							\
+	"myip=%s"							\
+	"%s "      							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
+	"User-Agent: %s\r\n\r\n"
+
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
@@ -467,53 +483,53 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&dyndns);
-	plugin_register(&dnsomatic);
-	plugin_register_v6(&dnsomatic);
-	plugin_register(&selfhost);
-	plugin_register_v6(&selfhost);
-	plugin_register(&no_ip);
-	plugin_register_v6(&no_ip);
-	plugin_register(&noip);
-	plugin_register_v6(&noip);
-	plugin_register(&_3322);
-	plugin_register_v6(&_3322);
-	plugin_register(&henet);
-	plugin_register(&tunnelbroker);
-	plugin_register(&spdyn);
-	plugin_register(&spdyn_v6);
-	plugin_register(&nsupdate_info_ipv4);
-	plugin_register(&nsupdate_info_ipv6);
-	plugin_register(&loopia);
-	plugin_register(&googledomains);
-	plugin_register_v6(&googledomains);
-	plugin_register(&dynu);
-	plugin_register_v6(&dynu);
-	plugin_register(&dyfi);
-	plugin_register_v6(&dyfi);
-	plugin_register(&dode);
-	plugin_register_v6(&dode);
-	plugin_register(&domopoli);
-	plugin_register_v6(&domopoli);
-	plugin_register(&inwx);
-	plugin_register_v6(&inwx);
-	plugin_register(&itsdns);
-	plugin_register_v6(&itsdns);
-	plugin_register(&opendns);
-	plugin_register_v6(&opendns);
-	plugin_register(&joker);
-	plugin_register(&schokokeks);
-	plugin_register_v6(&schokokeks);
-	plugin_register(&variomedia);
-	plugin_register_v6(&variomedia);
-	plugin_register(&udmedia);
-	plugin_register_v6(&udmedia);
-	plugin_register(&dyndnsit);
-	plugin_register(&infomaniak);
-	plugin_register_v6(&infomaniak);
-	plugin_register(&oray);
-	plugin_register(&simply);
-	plugin_register_v6(&simply);
+	plugin_register(&dyndns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dnsomatic, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dnsomatic, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&selfhost, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&selfhost, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&no_ip, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&no_ip, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&noip, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&noip, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&_3322, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&_3322, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&henet, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&tunnelbroker, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&spdyn, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&spdyn_v6, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&nsupdate_info_ipv4, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&nsupdate_info_ipv6, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&loopia, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&googledomains, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&googledomains, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dynu, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dynu, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dyfi, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dyfi, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dode, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dode, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&domopoli, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&domopoli, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&inwx, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&inwx, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&itsdns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&itsdns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&opendns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&opendns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&joker, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&schokokeks, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&schokokeks, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&variomedia, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&variomedia, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&udmedia, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&udmedia, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&dyndnsit, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&oray, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

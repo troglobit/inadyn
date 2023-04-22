@@ -57,7 +57,7 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			EASYDNS_UPDATE_IP_REQUEST,
+			info->system->server_req,
 			info->server_url,
 			alias->name,
 			alias->address,
@@ -93,8 +93,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register_v6(&plugin);
+	plugin_register(&plugin, EASYDNS_UPDATE_IP_REQUEST);
+	plugin_register_v6(&plugin, EASYDNS_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

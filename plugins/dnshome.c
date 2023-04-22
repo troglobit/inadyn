@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-#define DNSHOME_UPDATE_IP_REQUEST						\
+#define DNSHOME_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
 	"hostname=%s&"							\
 	"ip=%s "							\
@@ -30,7 +30,7 @@
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: %s\r\n\r\n"
 
-#define DNSHOME_UPDATE_IP6_REQUEST						\
+#define DNSHOME_UPDATE_IP6_REQUEST					\
 	"GET %s?"							\
 	"hostname=%s&"							\
 	"ip6=%s "							\
@@ -73,25 +73,24 @@ static ddns_system_t plugin_v6 = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	if (strstr(info->system->name, "ipv6")) {
+	if (strstr(info->system->name, "ipv6"))
 		return snprintf(ctx->request_buf, ctx->request_buflen,
-			DNSHOME_UPDATE_IP6_REQUEST,
+			info->system->server_req,
 			info->server_url,
 			alias->name,
 			alias->address,
 			info->server_name.name,
 			info->creds.encoded_password,
 			info->user_agent);
-	} else {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			DNSHOME_UPDATE_IP_REQUEST,
+
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
 			info->server_url,
 			alias->name,
 			alias->address,
 			info->server_name.name,
 			info->creds.encoded_password,
 			info->user_agent);
-	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -106,8 +105,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register(&plugin_v6);
+	plugin_register(&plugin, DNSHOME_UPDATE_IP_REQUEST);
+	plugin_register(&plugin_v6, DNSHOME_UPDATE_IP6_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

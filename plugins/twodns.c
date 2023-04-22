@@ -51,13 +51,13 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-		TWODNS_UPDATE_IP_REQUEST,
-		info->server_url,
-		alias->name,
-		alias->address,
-		info->server_name.name,
-		info->creds.encoded_password,
-		info->user_agent);
+			info->system->server_req,
+			info->server_url,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -72,7 +72,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
+	plugin_register(&plugin, TWODNS_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

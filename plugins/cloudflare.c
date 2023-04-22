@@ -378,7 +378,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			content_len, json_data);
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			CLOUDFLARE_HOSTNAME_UPDATE_REQUEST,
+			info->system->server_req,
 			data->zone_id,
 			data->hostname_id,
 			info->user_agent,
@@ -402,8 +402,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostna
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register_v6(&plugin);
+	plugin_register(&plugin, CLOUDFLARE_HOSTNAME_UPDATE_REQUEST);
+	plugin_register_v6(&plugin, CLOUDFLARE_HOSTNAME_UPDATE_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

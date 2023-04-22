@@ -77,25 +77,14 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		snprintf(name, sizeof(name), "%s", alias->name);
 	}
 
-	if (strstr(info->system->name, "ipv6")) {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-				DUCKDNS_UPDATE_IP6_HTTP_REQUEST,
-				info->server_url,
-				name,
-				info->creds.username,
-				alias->address,
-				info->server_name.name,
-				info->user_agent);
-	} else {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-				DUCKDNS_UPDATE_IP_HTTP_REQUEST,
-				info->server_url,
-				name,
-				info->creds.username,
-				alias->address,
-				info->server_name.name,
-				info->user_agent);
-	}
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
+			info->server_url,
+			name,
+			info->creds.username,
+			alias->address,
+			info->server_name.name,
+			info->user_agent);
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -115,8 +104,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register_v6(&plugin);
+	plugin_register(&plugin, DUCKDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&plugin, DUCKDNS_UPDATE_IP6_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

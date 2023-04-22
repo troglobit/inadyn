@@ -158,7 +158,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		return 0;
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			FREEDNS_UPDATE_IP_REQUEST,
+			info->system->server_req,
 			info->server_url,
 			hash, alias->address,
 			info->server_name.name,
@@ -190,8 +190,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register_v6(&plugin);
+	plugin_register(&plugin, FREEDNS_UPDATE_IP_REQUEST);
+	plugin_register_v6(&plugin, FREEDNS_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

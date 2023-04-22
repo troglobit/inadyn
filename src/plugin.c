@@ -32,7 +32,7 @@
 static char *plugpath = NULL;   /* Set by first load. */
 static TAILQ_HEAD(, ddns_system) plugins = TAILQ_HEAD_INITIALIZER(plugins);
 
-int plugin_register(ddns_system_t *plugin)
+int plugin_register(ddns_system_t *plugin, const char *req)
 {
 	if (!plugin) {
 		errno = EINVAL;
@@ -47,23 +47,28 @@ int plugin_register(ddns_system_t *plugin)
 		return 0;
 	}
 
+	plugin->server_req = req;
 	TAILQ_INSERT_TAIL(&plugins, plugin, link);
 
 	return 0;
 }
 
-int plugin_register_v6(ddns_system_t *plugin)
+/* clones v4 plugin to create from default@foo.org -> ipv6@foo.org */
+int plugin_register_v6(ddns_system_t *plugin, const char *req)
 {
-	ddns_system_t *plugin_v6 = (ddns_system_t *)malloc(sizeof(*plugin));
+	ddns_system_t *p;
 
-	/* create a clone of it */
-	memcpy(plugin_v6, plugin, sizeof(*plugin));
+	p = malloc(sizeof(*p));
+	if (!p)
+		return 1;
+
+	memcpy(p, plugin, sizeof(*plugin));
 	/* default@foo.org -> ipv6@foo.org */
-	plugin_v6->name = strdup(plugin->name);
-	plugin_v6->cloned = 1;
-	sprintf(plugin_v6->name, "ipv6%s", plugin->name + 7);
+	p->name = strdup(plugin->name);
+	p->cloned = 1;
+	sprintf(p->name, "ipv6%s", plugin->name + 7);
 
-	return plugin_register(plugin_v6);
+	return plugin_register(p, req);
 }
 
 int plugin_unregister(ddns_system_t *plugin)

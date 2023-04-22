@@ -21,29 +21,15 @@
 
 #include "plugin.h"
 
-#define DNSMAX_UPDATE_IP_REQUEST						\
+#define DNSMAX_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
 	"username=%s&"							\
 	"password=%s&"							\
 	"resellerid=1&"							\
-	"clientname=inadyn&"						\
-	"clientversion=2.10&"						\
+	"clientname=" PACKAGE_NAME "&"					\
+	"clientversion=" PACKAGE_VERSION "&"				\
 	"protocolversion=2.0&"						\
-	"updatehostname=%s&"							\
-	"ip=%s "							\
-	"HTTP/1.0\r\n"							\
-	"Host: %s\r\n"							\
-	"User-Agent: %s\r\n\r\n"
-
-#define THATIP_UPDATE_IP_REQUEST						\
-	"GET %s?"							\
-	"username=%s&"							\
-	"password=%s&"							\
-	"resellerid=2&"							\
-	"clientname=inadyn&"						\
-	"clientversion=2.10&"						\
-	"protocolversion=2.0&"						\
-	"updatehostname=%s&"							\
+	"updatehostname=%s&"						\
 	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -84,9 +70,8 @@ static ddns_system_t thatip_plugin = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	if (strstr(info->system->name, "thatip")) {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			THATIP_UPDATE_IP_REQUEST,
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
 			info->server_url,
 			info->creds.username,
 			info->creds.password,
@@ -94,17 +79,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			info->server_name.name,
 			info->user_agent);
-	} else {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			DNSMAX_UPDATE_IP_REQUEST,
-			info->server_url,
-			info->creds.username,
-			info->creds.password,
-			alias->name,
-			alias->address,
-			info->server_name.name,
-			info->user_agent);
-	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -124,8 +98,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&dnsmax_plugin);
-	plugin_register(&thatip_plugin);
+	plugin_register(&dnsmax_plugin, DNSMAX_UPDATE_IP_REQUEST);
+	plugin_register(&thatip_plugin, DNSMAX_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

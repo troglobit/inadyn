@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-#define CORE_NETWORKS_UPDATE_IP_REQUEST						\
+#define CORE_NETWORKS_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
 	"hostname=%s&"							\
 	"myip=%s&"							\
@@ -58,7 +58,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 		keepip = "keepipv6=1";
 
 	return snprintf(ctx->request_buf, ctx->request_buflen,
-			CORE_NETWORKS_UPDATE_IP_REQUEST,
+			info->system->server_req,
 			info->server_url,
 			alias->name,
 			alias->address,
@@ -85,8 +85,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register_v6(&plugin);
+	plugin_register(&plugin, CORE_NETWORKS_UPDATE_IP_REQUEST);
+	plugin_register_v6(&plugin, CORE_NETWORKS_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

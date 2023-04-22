@@ -77,7 +77,11 @@ static int fetch_record_id(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, 
 
 	/* login_token=API_ID,API_TOKEN */
 	len = snprintf(buffer, sizeof(buffer),
-		       "login_token=%s%%2C%s&format=json&domain=%s&length=1&sub_domain=%s",
+		       "login_token=%s%%2C%s&"
+		       "format=json&"
+		       "domain=%s&"
+		       "length=1&"
+		       "sub_domain=%s",
 		       info->creds.username, info->creds.password, domain, prefix);
 	if (len >= (int)sizeof(buffer))
 		return -RC_BUFFER_OVERFLOW;
@@ -195,7 +199,14 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 	logit(LOG_DEBUG, "DNSPod Record: '%s' ID: %u", prefix, record_id);
 	len = snprintf(buffer, sizeof(buffer),
-		       "login_token=%s%%2C%s&format=json&domain=%s&record_type=%s&record_id=%d&record_line=%s&value=%s&sub_domain=%s",
+		       "login_token=%s%%2C%s&"
+		       "format=json&"
+		       "domain=%s&"
+		       "record_type=%s&"
+		       "record_id=%d&"
+		       "record_line=%s&"
+		       "value=%s&"
+		       "sub_domain=%s",
 		       info->creds.username, info->creds.password,
 		       domain, record_type, record_id, "%E9%BB%98%E8%AE%A4", alias->address, prefix);
 	if (len >= (int)sizeof(buffer))
@@ -221,8 +232,12 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 	post = (char *)info->data;
 	len  = strlen(post);
 
-	return snprintf(ctx->request_buf, ctx->request_buflen, DNSPOD_API_REQUEST, "Record.Ddns",
-			info->server_name.name, info->user_agent, len, post);
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
+			"Record.Ddns",
+			info->server_name.name,
+			info->user_agent,
+			len, post);
 }
 
 /*
@@ -260,8 +275,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register(&plugin_v6);
+	plugin_register(&plugin, DNSPOD_API_REQUEST);
+	plugin_register(&plugin_v6, DNSPOD_API_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)

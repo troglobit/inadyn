@@ -74,9 +74,8 @@ static ddns_system_t plugin_v6 = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	if (strstr(info->system->name, "ipv6")) {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			GOIP_UPDATE_IP6_REQUEST,
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
 			info->server_url,
 			info->creds.username,
 			info->creds.password,
@@ -84,17 +83,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 			alias->address,
 			info->server_name.name,
 			info->user_agent);
-	} else {
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			GOIP_UPDATE_IP_REQUEST,
-			info->server_url,
-			info->creds.username,
-			info->creds.password,
-			alias->name,
-			alias->address,
-			info->server_name.name,
-			info->user_agent);
-	}
 }
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
@@ -114,8 +102,8 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin);
-	plugin_register(&plugin_v6);
+	plugin_register(&plugin, GOIP_UPDATE_IP_REQUEST);
+	plugin_register(&plugin_v6, GOIP_UPDATE_IP6_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
