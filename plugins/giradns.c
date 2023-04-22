@@ -47,7 +47,7 @@ static ddns_system_t plugin = {
 };
 
 static ddns_system_t plugin_v6 = {
-	.name         = "default@gira.de",
+	.name         = "ipv6@gira.de",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
