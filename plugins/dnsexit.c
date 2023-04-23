@@ -73,8 +73,13 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 	DO(http_status_valid(trans->status));
 
 	tmp = strstr(trans->rsp_body, "\n");
-	if (tmp)
-		sscanf(++tmp, "%4d=", &code);
+	if (tmp) {
+		int rc;
+
+		rc = sscanf(++tmp, "%4d=", &code);
+		if (rc < 1)
+			goto err;
+	}
 
 	switch (code) {
 	case 0:
@@ -86,7 +91,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 	default:
 		break;
 	}
-
+err:
 	return RC_DDNS_RSP_NOTOK;
 }
 
