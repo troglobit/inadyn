@@ -89,15 +89,15 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *rsp = trans->rsp_body;
+	char *body = trans->rsp_body;
 
 	(void)info;
 	(void)alias;
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(rsp, alias->address))
-		return 0;
+	if (strstr(body, "good") || strstr(body, alias->address))
+		return RC_OK;
 
 	return RC_DDNS_RSP_NOTOK;
 }
