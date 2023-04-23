@@ -25,7 +25,7 @@
 #define DESEC_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"username=%s&"							\
-	"passwword=%s&"							\
+	"password=%s&"							\
 	"hostname=%s&"							\
 	"myipv4=%s "							\
 	"HTTP/1.0\r\n"							\
@@ -35,7 +35,7 @@
 #define DESEC_UPDATE_IP6_REQUEST					\
 	"GET %s?"							\
 	"username=%s&"							\
-	"passwword=%s&"							\
+	"password=%s&"							\
 	"hostname=%s&"							\
 	"myipv6=%s "							\
 	"HTTP/1.0\r\n"							\
