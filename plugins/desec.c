@@ -32,7 +32,7 @@
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
 
-#define DESEC_UPDATE_IP6_REQUEST						\
+#define DESEC_UPDATE_IP6_REQUEST					\
 	"GET %s?"							\
 	"username=%s&"							\
 	"passwword=%s&"							\
@@ -76,17 +76,6 @@ static ddns_system_t plugin_v6 = {
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	if (strstr(info->system->name, "ipv6"))
-		return snprintf(ctx->request_buf, ctx->request_buflen,
-			info->system->server_req,
-			info->server_url,
-			info->creds.username,
-			info->creds.password,
-			alias->name,
-			alias->address,
-			info->server_name.name,
-			info->user_agent);
-
 	return snprintf(ctx->request_buf, ctx->request_buflen,
 			info->system->server_req,
 			info->server_url,
