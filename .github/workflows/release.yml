@@ -7,34 +7,7 @@ on:
 
 jobs:
   release:
-    name: Create GitHub release
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      release_id: ${{ steps.create_release.outputs.id }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Extract ChangeLog entry ...
-        # Hack to extract latest entry for body_path below
-        run: |
-          awk '/-----*/{if (x == 1) exit; x=1;next}x' ChangeLog.md \
-              |head -n -1 > release.md
-          cat release.md
-      - name: Create release ...
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: In-a-Dyn ${{ github.ref }}
-          body_path: release.md
-          draft: false
-          prerelease: false
-  tarball:
     name: Build and upload release tarball
-    needs: release
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
@@ -52,10 +25,13 @@ jobs:
           ls -lF ../
           mkdir -p artifacts/
           mv ../*.tar.* artifacts/
-      - name: Upload release artifacts ...
-        uses: skx/github-action-publish-binaries@release-0.15
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract ChangeLog entry ...
+        run: |
+          awk '/-----*/{if (x == 1) exit; x=1;next}x' ChangeLog.md \
+              |head -n -1 > release.md
+          cat release.md
+      - uses: ncipollo/release-action@v1
         with:
-          releaseId: ${{ needs.release.outputs.release_id }}
-          args: artifacts/*
+          name: In-a-Dyn ${{ github.ref_name }}
+          bodyFile: "release.md"
+          artifacts: "artifacts/*"
