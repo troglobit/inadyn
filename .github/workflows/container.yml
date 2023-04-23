@@ -13,10 +13,10 @@ jobs:
     env:
       MAKEFLAGS: -j3
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
-      - uses: docker/setup-buildx-action@v1
-      - uses: docker/login-action@v1
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -25,8 +25,8 @@ jobs:
         run: |
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           [ "$VERSION" == "master" ] && VERSION=latest
-          echo ::set-output name=ver::${VERSION}
-      - uses: docker/build-push-action@v2
+          echo "ver=${VERSION}" >> $GITHUB_OUTPUT
+      - uses: docker/build-push-action@v4
         with:
           push: true
           tags: troglobit/inadyn:${{ steps.vars.outputs.ver }}
@@ -40,7 +40,7 @@ jobs:
       MAKEFLAGS: -j3
       IMAGE_NAME: inadyn
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       - name: Log in to registry
