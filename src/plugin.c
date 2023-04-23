@@ -62,7 +62,7 @@ int plugin_register_v6(ddns_system_t *plugin, const char *req)
 	if (!p)
 		return 1;
 
-	memcpy(p, plugin, sizeof(*plugin));
+	memcpy(p, plugin, sizeof(*p));
 	/* default@foo.org -> ipv6@foo.org */
 	p->name = strdup(plugin->name);
 	p->cloned = 1;
