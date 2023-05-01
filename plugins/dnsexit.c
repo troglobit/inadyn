@@ -42,7 +42,7 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "ip.dnsexit.com",
+	.checkip_name = "ip3.dnsexit.com",
 	.checkip_url  = "/",
 
 	.server_name  = "update.dnsexit.com",
