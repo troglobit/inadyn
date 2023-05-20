@@ -462,7 +462,7 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 {
 	char name[sizeof(info->checkip_name.name)];
 	char url[sizeof(info->checkip_url)];
-	int rc;
+	int ssl, rc;
 
 	logit(LOG_DEBUG, "Get address for %s", info->system->name);
 	memset(address, 0, len);
@@ -489,20 +489,23 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 	if (strstr(info->checkip_name.name, DDNS_MY_IP_SERVER))
 		goto error;
 
-	logit(LOG_WARNING, "Retrying with built-in 'default', api.ipify.org ...");
+	logit(LOG_WARNING, "Retrying with built-in 'default', http://ifconfig.me/ip ...");
 
 	/* keep backup, for now, future extension: count failures and replace permanently */
 	strlcpy(name, info->checkip_name.name, sizeof(name));
 	strlcpy(url, info->checkip_url, sizeof(url));
+	ssl = info->checkip_ssl;
 
-	/* Retry with http(s)://api.ipify.org/ */
+	/* Retry with http(s)://ifconfig.me/ip */
 	strlcpy(info->checkip_name.name, DDNS_MY_IP_SERVER, sizeof(info->checkip_name.name));
-	strlcpy(info->checkip_url, "/", sizeof(info->checkip_url));
+	strlcpy(info->checkip_url, DDNS_MY_CHECKIP_URL, sizeof(info->checkip_url));
+	info->checkip_ssl = DDNS_MY_IP_SSL;
 	rc = get_address_remote(ctx, info, address, len);
 
 	/* restore backup, for now, the official server may just have temporary problems */
 	strlcpy(info->checkip_name.name, name, sizeof(info->checkip_name.name));
 	strlcpy(info->checkip_url, url, sizeof(info->checkip_url));
+	info->checkip_ssl = ssl;
 
 	if (!rc) {
 		logit(LOG_WARNING, "Please note, %s seems unstable, consider overriding it "

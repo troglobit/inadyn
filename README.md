@@ -135,7 +135,7 @@ This looks for the default `.conf` file, to check any file, use:
     }
 
     # We override checkip server with the In-a-dyn built-in 'default',
-    # api.ipify.org, for details on this, see below.
+    # http://ifconfig.me/ip, for details on this, see below.
     provider freemyip {
         password       = YOUR_TOKEN
         hostname       = YOUR_DOMAIN.freemyip.com
@@ -170,7 +170,8 @@ This looks for the default `.conf` file, to check any file, use:
         password       = bond
         hostname       = spectre.no-ip.com
         checkip-ssl    = false
-        checkip-server = api.ipify.org
+        checkip-server = ifconfig.me
+        checkip-path   = /ip
     }
 
     # With multiple usernames at the same provider, index with :#
@@ -267,12 +268,13 @@ configuration tab.
 > addr list scope global $device | grep -v " fd" | sed -n 's/.*inet6
 > \([0-9a-f:]\+\).*/\1/p' | head -n 1`
 
-Sometimes the default `checkip-server` for a DDNS provider can be very
-slow to respond, to this end In-a-dyn now support overriding it with a
-custom one, or a custom command.  The easiest way to change it is to set
-`checkip-server = default`, triggering In-a-dyn to use `api.ipify.org`,
-which it also use for custom DDNS providers.  See the man pages, or the
-below section, for more information.
+Sometimes the default `checkip-server` for a DDNS provider can be slow
+to respond, even time out.  In-a-dyn support overriding the provider's
+default with a custom one, or a custom command.  The easiest way to
+change it is to set `checkip-server = default` in you provider config,
+triggering In-a-dyn to use the default `http://ifconfig.me/ip`, which
+also is the default for any custom DDNS configuration.  See the man
+pages, or the below section, for more information.
 
 Some providers require using a specific browser to send updates, this
 can be worked around using the `user-agent = STRING` setting, as shown
@@ -362,7 +364,7 @@ Another example:
         ddns-server = cp.dnsmadeeasy.com
         ddns-path   = "/servlet/updateip?username=%u&password=%p&id=DNSMADEEASYHOSTID&ip=%i"
         hostname    = HOST
-    }      
+    }
 
 When using the generic plugin you should first inspect the response from
 the DDNS provider.  By default Inadyn looks for a `200 HTTP` response OK
@@ -373,10 +375,12 @@ single `ddns-response = Cool` -- if your provider does give any response
 then use `ddns-response = ""`.
 
 If your DDNS provider does not provide you with a `checkip-server`, you
-can use other services, like http://ipify.org, which is the default if
-you do not specify one for your custom provider config:
+can use other services, like http://ifconfig.me/ip, which is the default
+if you do not specify one for your custom provider config:
 
-    checkip-server = api.ipify.org
+    checkip-server = ifconfig.me
+    checkip-path   = /ip
+    checkip-ssl    = false
 
 or even use a script or command:
 
