@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Installing dependencies
         run: |
-          sudo apt-get update
+          sudo apt-get -y update
           sudo apt-get install -qq -y tree libconfuse-dev libgnutls28-dev
       - uses: actions/checkout@v3
       - name: Configure
