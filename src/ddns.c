@@ -508,8 +508,9 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 	info->checkip_ssl = ssl;
 
 	if (!rc) {
-		logit(LOG_WARNING, "Please note, %s seems unstable, consider overriding it "
-		      "in your configuration with 'checkip-server = default'", info->checkip_name.name);
+		logit(LOG_WARNING, "Please note, http%s://%s%s seems unstable, consider overriding it in"
+		      "your configuration with 'checkip-server = default'", info->checkip_ssl ? "s" : "",
+		      info->checkip_name.name, info->checkip_url);
 		return 0;
 	}
 
