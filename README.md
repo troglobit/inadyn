@@ -92,6 +92,7 @@ providers, ordered by the plugin that support them:
   * <https://connect.yandex.ru>
   * <https://www.cloudflare.com>
   * <https://www.goip.de>
+  * <https://www.dnshome.de>
 
 DDNS providers not supported natively can be enabled using the custom,
 or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
