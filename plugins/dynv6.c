@@ -26,7 +26,7 @@
 	"GET %s?"							\
 	"ipv4=%s&"							\
 	"hostname=%s&"							\
-	"token=%s"							\
+	"token=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
 	"User-Agent: %s\r\n\r\n"
