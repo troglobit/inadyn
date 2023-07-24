@@ -93,6 +93,7 @@ providers, ordered by the plugin that support them:
   * <https://www.cloudflare.com>
   * <https://www.goip.de>
   * <https://www.dnshome.de>
+  * <https://ipv64.net>
 
 DDNS providers not supported natively can be enabled using the custom,
 or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
