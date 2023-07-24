@@ -49,8 +49,8 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_name = "ifconfig.me",
+	.checkip_url  = "/ip",
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ipv4.ipv64.net",
@@ -63,8 +63,8 @@ static ddns_system_t plugin_v6 = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_name = "ifconfig.me",
+	.checkip_url  = "/ip",
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ipv6.ipv64.net",
