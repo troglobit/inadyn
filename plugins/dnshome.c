@@ -23,7 +23,7 @@
 
 #define DNSHOME_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
-	"hostname=%s&"							\
+	"u=%s&"							        \
 	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -32,7 +32,7 @@
 
 #define DNSHOME_UPDATE_IP6_REQUEST					\
 	"GET %s?"							\
-	"hostname=%s&"							\
+	"u=%s&"		  		  	 	 	        \
 	"ip6=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -49,8 +49,8 @@ static ddns_system_t plugin = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_name = "ip4.dnshome.de",
+	.checkip_url  = "/",
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "www.dnshome.de",
@@ -63,8 +63,8 @@ static ddns_system_t plugin_v6 = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "dns64.cloudflare-dns.com",
-	.checkip_url  = "/cdn-cgi/trace",
+	.checkip_name = "ip6.dnshome.de",
+	.checkip_url  = "/",
 	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "www.dnshome.de",
