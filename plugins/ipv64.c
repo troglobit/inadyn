@@ -22,21 +22,21 @@
 #include "plugin.h"
 
 #define IPV64_UPDATE_IP_REQUEST					\
-	"GET %s?"							                \
-	"token=%s&"							              \
-	"ip=%s "						                	\
-	"HTTP/1.0\r\n"					          		\
-	"Host: %s\r\n"					          		\
-	"Authorization: Basic %s\r\n"					\
+	"GET %s?"						\
+	"token=%s&"						\
+	"ip=%s "						\
+	"HTTP/1.0\r\n"					        \
+	"Host: %s\r\n"					        \
+	"Authorization: Basic %s\r\n"				\
 	"User-Agent: %s\r\n\r\n"
 
 #define IPV64_UPDATE_IP6_REQUEST				\
-	"GET %s?"						                	\
-	"token=%s&"		  		  	 	 	          \
-	"ip6=%s "					                		\
-	"HTTP/1.0\r\n"					          		\
-	"Host: %s\r\n"					          		\
-	"Authorization: Basic %s\r\n"					\
+	"GET %s?"						\
+	"token=%s&"		  		  	 	\
+	"ip6=%s "					        \
+	"HTTP/1.0\r\n"					        \
+	"Host: %s\r\n"					        \
+	"Authorization: Basic %s\r\n"				\
 	"User-Agent: %s\r\n\r\n"
 
 
