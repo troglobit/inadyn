@@ -13,6 +13,7 @@ Table of Contents
   * [Supported Providers](#supported-providers)
   * [Configuration](#configuration)
   * [Custom DDNS Providers](#custom-ddns-providers)
+  * [Troubleshooting](#troubleshooting)
   * [Build & Install](#build--install)
   * [Building from GIT](#building-from-git)
   * [Origin & References](#origin--references)
@@ -271,10 +272,10 @@ configuration tab.
 > \([0-9a-f:]\+\).*/\1/p' | head -n 1`
 
 Sometimes the default `checkip-server` for a DDNS provider can be slow
-to respond, even time out.  In-a-dyn support overriding the provider's
+to respond, even time out.  In-a-Dyn support overriding the provider's
 default with a custom one, or a custom command.  The easiest way to
 change it is to set `checkip-server = default` in you provider config,
-triggering In-a-dyn to use the default `http://ifconfig.me/ip`, which
+triggering In-a-Dyn to use the default `http://ifconfig.me/ip`, which
 also is the default for any custom DDNS configuration.  See the man
 pages, or the below section, for more information.
 
@@ -398,6 +399,32 @@ need to encode your DNS hostname in the `ddns-path` instead, as is done
 in the last example above.
 
 
+Troubleshooting
+---------------
+
+A common problem is getting started, which is understandable since In-a-Dyn
+has a lot of confusing options.
+
+### Initial Connection
+
+Having saved your `/etc/inadyn.conf`, first try starting it in the
+foreground with full debug logs:
+
+    inadyn -l debug --foreground --force
+
+Any misconfiguration or bad server responses should be a lot easier to
+spot.  Remember to censor your logs from any passwords and domain info
+if you file a bug report or ask a question in the forum/irc!
+
+### Not Updating
+
+Try clearing the cache:
+
+ 1. `sudo systemctl stop inadyn.service`
+ 2. `sudo rm -rf /var/cache/inadyn/*`
+ 3. `sudo systemctl restart inadyn.service`
+
+
 Build & Install
 ---------------
 
@@ -405,7 +432,7 @@ Build & Install
 
 For a long time, the project maintained its own `.deb` packaging and
 basic apt infrastructure.  However, the increasing level of features in
-In-a-dyn, and thus amount of dependencies, as well as the demands for
+In-a-Dyn, and thus amount of dependencies, as well as the demands for
 supporting more architectures and different distributions, the pre-built
 `.deb` support has been discontinued as of v2.9.1.
 
