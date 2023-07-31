@@ -44,7 +44,8 @@ static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin4 = {
-	.name         = "default@ipv4.dynv6.com",
+	.name         = "ipv4@dynv6.com",
+	.alias        = "default@ipv4.dynv6.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -59,6 +60,7 @@ static ddns_system_t plugin4 = {
 
 static ddns_system_t plugin6 = {
 	.name         = "ipv6@dynv6.com",
+	.alias        = "default@dynv6.com",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,

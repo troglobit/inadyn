@@ -41,6 +41,7 @@ static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias
 
 static ddns_system_t plugin = {
 	.name         = "ipv6@he.net",
+	.alias        = "ipv6tb@he.net",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,

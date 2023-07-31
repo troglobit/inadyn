@@ -105,6 +105,8 @@ static ddns_system_t *search_plugin(const char *name, int loose)
 		PLUGIN_ITERATOR(p, tmp) {
 			if (strcasestr(p->name, name))
 				return p;
+			if (p->alias && strcasestr(p->alias, name))
+				return p;
 		}
 
 		return NULL;
@@ -112,6 +114,8 @@ static ddns_system_t *search_plugin(const char *name, int loose)
 
 	PLUGIN_ITERATOR(p, tmp) {
 		if (!strcasecmp(p->name, name))
+			return p;
+		if (p->alias && !strcasecmp(p->alias, name))
 			return p;
 	}
 

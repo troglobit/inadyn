@@ -130,6 +130,7 @@ static ddns_system_t noip = {
 /* http://www.pubyun.com/wiki/%E5%B8%AE%E5%8A%A9:api#%E6%8E%A5%E5%8F%A3%E5%9C%B0%E5%9D%80 */
 static ddns_system_t _3322 = {
 	.name         = "default@3322.org",
+	.alias        = "dyndns@3322.org",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -144,6 +145,7 @@ static ddns_system_t _3322 = {
 /* See also tunnelbroker.c for Hurricate Electric's IPv6 service */
 static ddns_system_t henet = {
 	.name         = "default@he.net",
+	.alias        = "dyndns@he.net",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -243,7 +245,7 @@ static ddns_system_t loopia = {
 	.response     = (rsp_fn_t)response,
 
 	.checkip_name = "dns.loopia.se",
-	.checkip_url  = "/checkip/checkip.php",
+	.checkip_url  = "/checkip",
 
 	.server_name  = "dns.loopia.se",
 	.server_url   = "/XDynDNSServer/XDynDNS.php"
