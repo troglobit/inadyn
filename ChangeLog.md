@@ -4,6 +4,33 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.12.0][UNRELEASED]
+------------------------
+
+### Changes
+- Add support for IPv64.net (IPv4 and IPv6), by Dennis Schröder
+- Clarify warning when provider's checkip server times out
+- Update example config for Dyn.com, by Fredrik Lanker
+- Add OVH example config, by Lana Heyrendt
+- Add support for JSON output in DDNS provider listing, i.e.
+
+        inadyn --list-providers --json
+
+### Fixes
+- Issue #433: dynv6.com not working at all, regression in v2.11.0
+- Issue #434: fix regression in DDNS provider names, introduced in
+  v2.11.0.  This change adds support for a provider name alias that
+  restores support for:
+  - dyndns@3322.org
+  - dyndns@he.net
+  - default@dynv6.com
+  - ipv6tb@he.net
+- Issue #435: dnsHome.de provider updated with new checkip servers
+  and fixes to update URLs (IPv4 and IPv6)
+- Issue #436: speculative fix for IPv6 support for dyndns.inwx.com,
+  introduced in v2.11.0
+
+
 [v2.11.0][] - 2023-05-20
 ------------------------
 
