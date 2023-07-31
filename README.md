@@ -644,14 +644,13 @@ pull requests for bug fixes and proposed extensions at [GitHub][].
 > little D-Link DIR-645 router so I could get back on the interwebs :-)
 
 [original]:         http://www.inatech.eu/inadyn/
-[DDNS]:             http://en.wikipedia.org/wiki/Dynamic_DNS
+[DDNS]:             https://en.wikipedia.org/wiki/Dynamic_DNS
 [tunnelbroker]:     https://tunnelbroker.net/
-[Christian Eyrich]: http://eyrich-net.org/programmiertes.html
-[Joachim Wiberg]:   http://troglobit.com
+[Joachim Wiberg]:   https://troglobit.com
 [libConfuse]:       https://github.com/martinh/libconfuse
-[LibreSSL]:         http://www.libressl.org/
+[LibreSSL]:         https://www.libressl.org/
 [OpenSSL]:          https://www.openssl.org/
-[GnuTLS]:           http://www.gnutls.org/
+[GnuTLS]:           https://www.gnutls.org/
 [GitHub]:           https://github.com/troglobit/inadyn
 [buildsystem]:      https://airs.com/ian/configure/
 [License]:          https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
