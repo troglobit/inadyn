@@ -44,7 +44,8 @@ static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
 static ddns_system_t plugin = {
-	.name         = "default@ipv64.net",
+	.name         = "ipv4@ipv64.net",
+	.alias        = "default@ipv64.net",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -58,7 +59,7 @@ static ddns_system_t plugin = {
 };
 
 static ddns_system_t plugin_v6 = {
-	.name         = "default@ipv64.net",
+	.name         = "ipv6@ipv64.net",
 
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
@@ -112,6 +113,7 @@ PLUGIN_INIT(plugin_init)
 PLUGIN_EXIT(plugin_exit)
 {
 	plugin_unregister(&plugin);
+	plugin_unregister(&plugin_v6);
 }
 
 /**
