@@ -52,6 +52,16 @@
 	"Authorization: Basic %s\r\n"					\
 	"User-Agent: %s\r\n\r\n"
 
+#define DYNDNS_UPDATE_IPV6_HTTP_REQUEST					\
+	"GET %s?"							\
+	"hostname=%s&"							\
+	"myipv6=%s"							\
+	"%s "      							\
+	"HTTP/1.0\r\n"							\
+	"Host: %s\r\n"							\
+	"Authorization: Basic %s\r\n"					\
+	"User-Agent: %s\r\n\r\n"
+
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
 
@@ -333,6 +343,20 @@ static ddns_system_t inwx = {
 	.server_url   = "/nic/update"
 };
 
+static ddns_system_t inwxv6 = {
+	.name         = "ipv6@inwx.com",
+
+	.request      = (req_fn_t)request,
+	.response     = (rsp_fn_t)response,
+
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+
+	.server_name  = "dyndns.inwx.com",
+	.server_url   = "/nic/update"
+};
+
 static ddns_system_t itsdns = {
 	.name         = "default@itsdns.de",
 
@@ -514,7 +538,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&domopoli, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&domopoli, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&inwx, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register_v6(&inwx, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&inwxv6, DYNDNS_UPDATE_IPV6_HTTP_REQUEST);
 	plugin_register(&itsdns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&itsdns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&opendns, DYNDNS_UPDATE_IP_HTTP_REQUEST);
@@ -555,6 +579,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dode);
 	plugin_unregister(&domopoli);
 	plugin_unregister(&inwx);
+	plugin_unregister(&inwxv6);
 	plugin_unregister(&itsdns);
 	plugin_unregister(&opendns);
 	plugin_unregister(&joker);
