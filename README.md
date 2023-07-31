@@ -96,6 +96,9 @@ providers, ordered by the plugin that support them:
   * <https://www.dnshome.de>
   * <https://ipv64.net>
 
+For the complete list, see `inadyn -L`, for machine friendly JSON
+output, use `inadyn -L -j`.
+
 DDNS providers not supported natively can be enabled using the custom,
 or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
 for configuration examples.

@@ -128,15 +128,34 @@ static ddns_system_t *search_plugin(const char *name, int loose)
  * Returns:
  * Always successful, returning POSIX OK(0).
  */
-int plugin_list(void)
+int plugin_list(int json)
 {
 	ddns_system_t *p, *tmp;
 
-	printf("\e[7m%-28s %-22s %-26s %-20s %-30s %-15s\e[0m\n", "PROVIDER", "ALIAS", "CHECKIP SERVER", "URL", "UPDATE SERVER", "URL");
-	PLUGIN_ITERATOR(p, tmp) {
-		printf("%-28s %-22s %-26s %-20s %-30s %s\n", p->name, p->alias ?: "",
-		       p->checkip_name, p->checkip_url,
-		       p->server_name, p->server_url);
+	if (json) {
+		int prev = 0;
+
+		printf("[");
+		PLUGIN_ITERATOR(p, tmp) {
+			printf("%s{\"name\":\"%s\",", prev ? "," : "", p->name);
+			if (p->alias)
+				printf("\"alias\":\"%s\",", p->alias);
+			printf("\"checkip-server\":\"%s\","
+			       "\"checkip-url\":\"%s\","
+			       "\"update-server\":\"%s\","
+			       "\"update-url\":\"%s\"}",
+			       p->checkip_name, p->checkip_url,
+			       p->server_name, p->server_url);
+			prev++;
+		}
+		puts("]");
+	} else {
+		printf("\e[7m%-28s %-22s %-26s %-20s %-30s %-15s\e[0m\n", "PROVIDER", "ALIAS", "CHECKIP SERVER", "URL", "UPDATE SERVER", "URL");
+		PLUGIN_ITERATOR(p, tmp) {
+			printf("%-28s %-22s %-26s %-20s %-30s %s\n", p->name, p->alias ?: "",
+			       p->checkip_name, p->checkip_url,
+			       p->server_name, p->server_url);
+		}
 	}
 
 	return 0;

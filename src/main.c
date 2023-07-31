@@ -284,6 +284,7 @@ static int usage(int code)
 		" -i, --iface=IFNAME             Check IP of IFNAME instead of external server\n"
 		" -I, --ident=NAME               Identity for config file, PID file, cache dir,\n"
 		"                                and syslog messages.  Defaults to: %s\n"
+		" -j, --json                     JSON output format (-L only)\n"
 		" -l, --loglevel=LEVEL           Set log level: none, err, info, notice*, debug\n"
 		" -L, --list-providers           List available DDNS providers\n"
 		" -n, --foreground               Run in foreground with logging to stdout/stderr\n"
@@ -335,6 +336,7 @@ int main(int argc, char *argv[])
 #ifndef DROP_CHECK_CONFIG
 	int check_config = 0;
 #endif
+	int list = 0, json = 0;
 	int background = 1;
 	static const struct option opt[] = {
 		{ "once",              0, 0, '1' },
@@ -348,6 +350,7 @@ int main(int argc, char *argv[])
 		{ "check-config",      0, 0, 129 },
 		{ "iface",             1, 0, 'i' },
 		{ "ident",             1, 0, 'I' },
+		{ "json",              0, 0, 'j' },
 		{ "loglevel",          1, 0, 'l' },
 		{ "list-providers",    0, 0, 'L' },
 		{ "help",              0, 0, 'h' },
@@ -367,7 +370,7 @@ int main(int argc, char *argv[])
 	parse_privs(NULL);
 
 	prognm = ident = progname(argv[0]);
-	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:l:LnNp:P:sS:t:v", opt, NULL)) != EOF) {
+	while ((c = getopt_long(argc, argv, "1c:Ce:f:h?i:I:jl:LnNp:P:sS:t:v", opt, NULL)) != EOF) {
 		switch (c) {
 		case '1':	/* --once */
 			once = 1;
@@ -422,6 +425,10 @@ int main(int argc, char *argv[])
 			ident = optarg;
 			break;
 
+		case 'j':
+			json = 1;
+			break;
+
 		case 'l':	/* --loglevel=LEVEL */
 			rc = log_level(optarg);
 			if (-1 == rc)
@@ -429,7 +436,8 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'L':
-			return plugin_list();
+			list = 1;
+			break;
 
 		case 'n':	/* --foreground */
 			background = 0;
@@ -471,6 +479,9 @@ int main(int argc, char *argv[])
 			return usage(0);
 		}
 	}
+
+	if (list)
+		return plugin_list(json);
 
 	/* Figure out .conf file, cache directory, and PID file name */
 	DO(compose_paths());
