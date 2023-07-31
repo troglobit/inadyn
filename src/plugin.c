@@ -132,10 +132,11 @@ int plugin_list(void)
 {
 	ddns_system_t *p, *tmp;
 
-	printf("\e[7m%-32s  %-32s  %-15s\e[0m\n", "PROVIDER", "CHECKIP/UPDATE SERVER", "URL");
+	printf("\e[7m%-28s %-22s %-26s %-20s %-30s %-15s\e[0m\n", "PROVIDER", "ALIAS", "CHECKIP SERVER", "URL", "UPDATE SERVER", "URL");
 	PLUGIN_ITERATOR(p, tmp) {
-		printf("%-32s  %-32s %s\n", p->name, p->checkip_name, p->checkip_url);
-		printf("%-32s  %-32s %s\n", "", p->server_name, p->server_url);
+		printf("%-28s %-22s %-26s %-20s %-30s %s\n", p->name, p->alias ?: "",
+		       p->checkip_name, p->checkip_url,
+		       p->server_name, p->server_url);
 	}
 
 	return 0;
