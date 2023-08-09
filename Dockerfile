@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+WORKDIR /root
+COPY . ./
 RUN apk --update --no-cache add --virtual .build-dependencies \
   autoconf \
   automake \
@@ -8,11 +10,8 @@ RUN apk --update --no-cache add --virtual .build-dependencies \
   gnutls-dev \
   libc-dev \
   libtool \
-  make
-
-WORKDIR /root
-COPY . ./
-RUN ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install
+  make \
+  && ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var && make install
 
 
 FROM alpine:latest
