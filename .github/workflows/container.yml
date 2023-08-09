@@ -24,12 +24,15 @@ jobs:
         id: vars
         run: |
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [ "$VERSION" == "master" ] && VERSION=latest
-          echo "ver=${VERSION}" >> $GITHUB_OUTPUT
+          if [ "$VERSION" = "master" ]; then
+            echo "tags=troglobit/inadyn:build-${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          else
+            echo "tags=troglobit/inadyn:$VERSION,troglobit/inadyn:latest" >> $GITHUB_OUTPUT
+          fi
       - uses: docker/build-push-action@v4
         with:
           push: true
-          tags: troglobit/inadyn:${{ steps.vars.outputs.ver }}
+          tags: ${{ steps.vars.outputs.tags }}
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le
   ghcr:
     runs-on: ubuntu-latest
@@ -52,9 +55,14 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
+          if [ "$VERSION" = "master" ]; then
+            VERSION="build-${GITHUB_RUN_NUMBER}"
+          else
+            VERSION="$VERSION latest"
+          fi
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          for ver in $VERSION; do
+            docker tag $IMAGE_NAME $IMAGE_ID:$ver
+            docker push $IMAGE_ID:$ver
+          done
