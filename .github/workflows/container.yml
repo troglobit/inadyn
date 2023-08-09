@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAKEFLAGS: -j3
+      SOURCE_COMMIT: ${GITHUB_SHA}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2
@@ -42,6 +43,7 @@ jobs:
     env:
       MAKEFLAGS: -j3
       IMAGE_NAME: inadyn
+      SOURCE_COMMIT: ${GITHUB_SHA}
     steps:
       - uses: actions/checkout@v3
       - name: Build image
