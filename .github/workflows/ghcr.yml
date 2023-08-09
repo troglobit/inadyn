@@ -16,12 +16,11 @@ jobs:
     env:
       MAKEFLAGS: -j3
       IMAGE_NAME: inadyn
-      REVISION: ${GITHUB_SHA}
     steps:
       - uses: actions/checkout@v3
       - name: Build image
         run: |
-          docker buildx build . --build-arg "revision=$REVISION" --tag $IMAGE_NAME
+          docker buildx build . --build-arg "revision=${GITHUB_SHA}" --tag $IMAGE_NAME
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push image
@@ -38,7 +37,7 @@ jobs:
           fi
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          echo REVISION=$REVISION
+          echo REVISION=${GITHUB_SHA}
           for ver in $VERSION; do
             docker tag $IMAGE_NAME $IMAGE_ID:$ver
             docker push $IMAGE_ID:$ver
