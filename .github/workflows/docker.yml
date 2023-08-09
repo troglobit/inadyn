@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAKEFLAGS: -j3
-      SOURCE_COMMIT: ${GITHUB_SHA}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2
@@ -30,6 +29,7 @@ jobs:
           fi
       - uses: docker/build-push-action@v4
         with:
+          build-args: revision="${GITHUB_SHA}"
           push: true
           tags: ${{ steps.vars.outputs.tags }}
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le
