@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk --no-cache add --virtual .build-dependencies \
+RUN apk --update --no-cache add --virtual .build-dependencies \
   autoconf \
   automake \
   confuse-dev \
@@ -17,7 +17,7 @@ RUN ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=
 
 FROM alpine:latest
 
-RUN apk --no-cache add \
+RUN apk --update --no-cache add \
   ca-certificates \
   confuse \
   gnutls
