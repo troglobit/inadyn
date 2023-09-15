@@ -7,13 +7,11 @@ RUN apk --update --no-cache add --virtual .build-dependencies \
   automake \
   confuse-dev \
   gcc \
-  git \
   gnutls-dev \
   libc-dev \
   libtool \
   make
 
-RUN git clean -fdx
 RUN ./autogen.sh
 RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 RUN make install
@@ -24,8 +22,6 @@ LABEL org.opencontainers.image.title="In-a-Dyn"
 LABEL org.opencontainers.image.description="A dynamic DNS (DDNS) client with multiple SSL/TLS library support"
 LABEL org.opencontainers.image.url="https://github.com/troglobit/inadyn"
 LABEL org.opencontainers.image.licenses="GPL-2.0"
-LABEL org.opencontainers.image.revision="$revision"
-LABEL org.opencontainers.image.source="https://github.com/troglobit/inadyn/tree/${revision:-master}/"
 
 RUN apk --update --no-cache add \
   ca-certificates \
