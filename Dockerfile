@@ -7,13 +7,11 @@ RUN apk --update --no-cache add --virtual .build-dependencies \
   automake \
   confuse-dev \
   gcc \
-  git \
   gnutls-dev \
   libc-dev \
   libtool \
   make
 
-RUN git clean -fdx
 RUN ./autogen.sh
 RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 RUN make install
