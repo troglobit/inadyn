@@ -22,8 +22,6 @@ LABEL org.opencontainers.image.title="In-a-Dyn"
 LABEL org.opencontainers.image.description="A dynamic DNS (DDNS) client with multiple SSL/TLS library support"
 LABEL org.opencontainers.image.url="https://github.com/troglobit/inadyn"
 LABEL org.opencontainers.image.licenses="GPL-2.0"
-LABEL org.opencontainers.image.revision="$revision"
-LABEL org.opencontainers.image.source="https://github.com/troglobit/inadyn/tree/${revision:-master}/"
 
 RUN apk --update --no-cache add \
   ca-certificates \
