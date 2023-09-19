@@ -4,7 +4,7 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
-[v2.12.0][UNRELEASED]
+[v2.12.0][] - 2023-09-19
 ------------------------
 
 ### Changes
@@ -17,6 +17,9 @@ All notable changes to the project are documented in this file.
         inadyn --list-providers --json
 
 ### Fixes
+- Issue #396: multi-arch images for both Docker Hub and GHCR
+- Issue #421: use Docker `:latest` tag only for latest release.  Builds
+  from GIT development are tagged `:edge`
 - Issue #433: dynv6.com not working at all, regression in v2.11.0
 - Issue #434: fix regression in DDNS provider names, introduced in
   v2.11.0.  This change adds support for a provider name alias that
