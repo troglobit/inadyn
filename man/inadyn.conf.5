@@ -512,13 +512,22 @@ provider dnspod.cn {
     hostname = yourhost.example.com
 }
 
-# www.cloudflare.com
+# www.cloudflare.com #1
 provider cloudflare.com {
     username = zone.name
-    password = api_token # Create a unique custom api token with the following permissions: Zone.Zone - Read, Zone.DNS - Edit.
+    password = api_token             # Create a unique custom api token with the following permissions: Zone.Zone - Read, Zone.DNS - Edit.
     hostname = hostname.zone.name
-    ttl = 1 # optional, value of 1 is 'automatic'.
-    proxied = false # optional.
+    ttl = 1                          # optional, value of 1 is 'automatic'.
+    proxied = false                  # optional.
+}
+
+# www.cloudflare.com #2
+provider cloudflare.com {
+    username = zone.name
+    password = api_token                           # Create a unique custom api token with the following permissions: Zone.Zone - Read, Zone.DNS - Edit.
+    hostname = fc9f4f7feb9f9ff8710c2b4f3fb6b5a0    # The Cloudflare identifier of this dns record. Useful when updating round-robin DNS entries.
+    ttl = 1                                        # optional, value of 1 is 'automatic'.
+    proxied = false                                # optional.
 }
 
 # www.goip.de
