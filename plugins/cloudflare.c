@@ -27,27 +27,31 @@
 #define API_HOST "api.cloudflare.com"
 #define API_URL "/client/v4"
 
+/* https://developers.cloudflare.com/api/operations/zones-get */
 static const char *CLOUDFLARE_ZONE_ID_REQUEST = "GET " API_URL "/zones?name=%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
-	
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-dns-record-details */	
 static const char *CLOUDFLARE_HOSTNAME_NAME_REQUEST_BY_ID	= "GET " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
-	
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-list-dns-records */	
 static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST_BY_NAME	= "GET " API_URL "/zones/%s/dns_records?type=%s&name=%s%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
-	
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-create-dns-record */	
 static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/%s/dns_records HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
@@ -57,6 +61,7 @@ static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-update-dns-record */
 static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
@@ -332,9 +337,15 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data->zone_id);
 
 	if (strlen(hostname->name) == 32 && strtoull(hostname->name, NULL, 16) == ULLONG_MAX) {
-		/* hostname contains a cloudflare id (32 chars and only hex digits): Query its name. */
+		/* hostname contains a cloudflare id (32 chars and only hex digits). 
+
+		   This is needed to update Round-Robin DNS entries.
+		   https://developers.cloudflare.com/dns/manage-dns-records/how-to/round-robin-dns */
+
+		/* Use the id already provided by the user */
 		strcpy(data->hostname_id, hostname->name);
 
+		/* Query the hostname */
 		len = snprintf(ctx->request_buf, ctx->request_buflen,
 				CLOUDFLARE_HOSTNAME_NAME_REQUEST_BY_ID,
 				data->zone_id,
@@ -349,7 +360,10 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 
 		rc = json_extract(hostname->name, MAX_ID, info, ctx->request_buf, ctx->request_buflen, "name");
 	} else {
-		/* hostname contains a hostname: Query its cloudflare id. */
+		/* hostname contains a hostname. This is the default inadyn behavior across all plugins. */
+
+		/* Query the unique cloudflare id from hostname.
+		   If more than one record is returned (round-robin dns) use only the first and ignore the others. */
 		len = snprintf(ctx->request_buf, ctx->request_buflen,
 				CLOUDFLARE_HOSTNAME_ID_REQUEST_BY_NAME,
 				data->zone_id,
