@@ -27,20 +27,31 @@
 #define API_HOST "api.cloudflare.com"
 #define API_URL "/client/v4"
 
+/* https://developers.cloudflare.com/api/operations/zones-get */
 static const char *CLOUDFLARE_ZONE_ID_REQUEST = "GET " API_URL "/zones?name=%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
-	
-static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST	= "GET " API_URL "/zones/%s/dns_records?type=%s&name=%s%s HTTP/1.0\r\n"	\
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-dns-record-details */	
+static const char *CLOUDFLARE_HOSTNAME_NAME_REQUEST_BY_ID	= "GET " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
 	"Authorization: Bearer %s\r\n"	\
 	"Content-Type: application/json\r\n\r\n";
-	
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-list-dns-records */	
+static const char *CLOUDFLARE_HOSTNAME_ID_REQUEST_BY_NAME	= "GET " API_URL "/zones/%s/dns_records?type=%s&name=%s%s HTTP/1.0\r\n"	\
+	"Host: " API_HOST "\r\n"		\
+	"User-Agent: %s\r\n"			\
+	"Accept: */*\r\n"				\
+	"Authorization: Bearer %s\r\n"	\
+	"Content-Type: application/json\r\n\r\n";
+
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-create-dns-record */	
 static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/%s/dns_records HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
@@ -50,6 +61,7 @@ static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 
+/* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-update-dns-record */
 static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
@@ -217,11 +229,11 @@ static int json_copy_value(char *dest, size_t dest_size, const char *json, const
 	return 0;
 }
 
-static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *request, size_t request_len)
+static int json_extract(char *dest, size_t dest_size, const ddns_info_t *info, char *request, size_t request_len, const char *key)
 {
 	const char   *body;
 	http_trans_t  trans;
-	jsmntok_t     id;
+	jsmntok_t     key_value;
 	http_t        client;
 	char         *response_buf;
 	size_t        response_buflen = DDNS_HTTP_RESPONSE_BUFFER_SIZE;
@@ -237,7 +249,7 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	http_set_remote_name(&client, info->server_name.name);
 
 	client.ssl_enabled = info->ssl_enabled;
-	CHECK(http_init(&client, "Id query",strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4));
+	CHECK(http_init(&client, "Json query",strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4));
 
 	trans.req = request;
 	trans.req_len = request_len;
@@ -254,16 +266,16 @@ static int get_id(char *dest, size_t dest_size, const ddns_info_t *info, char *r
 	CHECK(check_response_code(trans.status));
 
 	body = trans.rsp_body;
-	if (get_result_value(body, "id", &id) < 0) {
+	if (get_result_value(body, key, &key_value) < 0) {
 		rc = RC_DDNS_RSP_NOHOST;
 		goto cleanup;
 	}
 
-	if (json_copy_value(dest, dest_size, body, &id) < 0) {
-		logit(LOG_ERR, "Id did not fit into buffer.");
+	if (json_copy_value(dest, dest_size, body, &key_value) < 0) {
+		logit(LOG_ERR, "Key value did not fit into buffer.");
 		rc = RC_BUFFER_OVERFLOW;
 	}
-	logit(LOG_DEBUG, "ID value: %s", dest);
+	logit(LOG_DEBUG, "Key '%s' = %s", key, dest);
 
 cleanup:
 	free(response_buf);
@@ -316,7 +328,7 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 		return RC_BUFFER_OVERFLOW;
 	}
 
-	rc = get_id(data->zone_id, MAX_ID, info, ctx->request_buf, len);
+	rc = json_extract(data->zone_id, MAX_ID, info, ctx->request_buf, len, "id");
 	if (rc != RC_OK) {
 		logit(LOG_ERR, "Zone '%s' not found.", zone_name);
 		return rc;
@@ -324,21 +336,51 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	
 	logit(LOG_DEBUG, "Cloudflare Zone: '%s' Id: %s", zone_name, data->zone_id);
 
-	len = snprintf(ctx->request_buf, ctx->request_buflen,
-		       CLOUDFLARE_HOSTNAME_ID_REQUEST,
-		       data->zone_id,
-		       record_type,
-		       info->wildcard ? "*." : "",
-		       hostname->name,
-		       info->user_agent,
-		       info->creds.password);
-	if (len >= ctx->request_buflen) {
-		logit(LOG_ERR, "Request for zone '%s', id %s did not fit into buffer.",
-		      zone_name, data->zone_id);
-		return RC_BUFFER_OVERFLOW;
+	if (strlen(hostname->name) == 32 && strtoull(hostname->name, NULL, 16) == ULLONG_MAX) {
+		/* hostname contains a cloudflare id (32 chars and only hex digits). 
+
+		   This is needed to update Round-Robin DNS entries.
+		   https://developers.cloudflare.com/dns/manage-dns-records/how-to/round-robin-dns */
+
+		/* Use the id already provided by the user */
+		strcpy(data->hostname_id, hostname->name);
+
+		/* Query the hostname */
+		len = snprintf(ctx->request_buf, ctx->request_buflen,
+				CLOUDFLARE_HOSTNAME_NAME_REQUEST_BY_ID,
+				data->zone_id,
+				data->hostname_id,
+				info->user_agent,
+				info->creds.password);
+		if (len >= ctx->request_buflen) {
+			logit(LOG_ERR, "Request for zone '%s', id %s did not fit into buffer.",
+				zone_name, data->zone_id);
+			return RC_BUFFER_OVERFLOW;
+		}
+
+		rc = json_extract(hostname->name, MAX_ID, info, ctx->request_buf, ctx->request_buflen, "name");
+	} else {
+		/* hostname contains a hostname. This is the default inadyn behavior across all plugins. */
+
+		/* Query the unique cloudflare id from hostname.
+		   If more than one record is returned (round-robin dns) use only the first and ignore the others. */
+		len = snprintf(ctx->request_buf, ctx->request_buflen,
+				CLOUDFLARE_HOSTNAME_ID_REQUEST_BY_NAME,
+				data->zone_id,
+				record_type,
+				info->wildcard ? "*." : "",
+				hostname->name,
+				info->user_agent,
+				info->creds.password);
+		if (len >= ctx->request_buflen) {
+			logit(LOG_ERR, "Request for zone '%s', id %s did not fit into buffer.",
+				zone_name, data->zone_id);
+			return RC_BUFFER_OVERFLOW;
+		}
+
+		rc = json_extract(data->hostname_id, MAX_ID, info, ctx->request_buf, ctx->request_buflen, "id");
 	}
 
-	rc = get_id(data->hostname_id, MAX_ID, info, ctx->request_buf, ctx->request_buflen);
 	if (rc == RC_OK) {
 		logit(LOG_DEBUG, "Cloudflare Host: '%s' Id: %s", hostname->name, data->hostname_id);
 	} else if (rc == RC_DDNS_RSP_NOHOST) {
