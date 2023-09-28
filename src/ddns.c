@@ -352,9 +352,6 @@ static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, siz
 
 static int get_address_cmd(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
 {
-	if (!info->checkip_cmd || !info->checkip_cmd[0])
-		return 1;
-
 	DO(shell_transaction(ctx, info, info->checkip_cmd));
 	logit(LOG_DEBUG, "Command response:");
 	logit(LOG_DEBUG, "%s", ctx->work_buf);
@@ -402,9 +399,6 @@ static int get_address_iface(ddns_t *ctx, const char *ifname, char *address, siz
 {
 	char *ptr, trailer[IFNAMSIZ + 2];
 	struct ifaddrs *ifaddr, *ifa;
-
-	if (!ifname || !ifname[0])
-		return 1;
 
 	/* Trailer to strip, if set by getnameinfo() */
 	snprintf(trailer, sizeof(trailer), "%%%s", ifname);
@@ -467,17 +461,22 @@ static int get_address_backend(ddns_t *ctx, ddns_info_t *info, char *address, si
 	logit(LOG_DEBUG, "Get address for %s", info->system->name);
 	memset(address, 0, len);
 
-	if (!get_address_cmd   (ctx, info, address, len))
-		return 0;
+	if (info->checkip_cmd && info->checkip_cmd[0]) {
+		/* Get address from command */
+		return get_address_cmd(ctx, info, address, len);
+	}
+	
+	if (info->ifname && info->ifname[0]) {
+		/* Get address from specific interface */
+		return get_address_iface(ctx, info->ifname, address, len);
+	}
+	
+	if (iface && iface[0]) {
+		/* Get address from global interface */
+		return get_address_iface(ctx, iface, address, len);
+	}
 
-	/* Check info specific interface */
-	if (!get_address_iface (ctx, info->ifname, address, len))
-		return 0;
-
-	/* Check the global interface */
-	if (!get_address_iface (ctx, iface, address, len))
-		return 0;
-
+	/* Get address from remote service */
 	if (!get_address_remote(ctx, info, address, len))
 		return 0;
 
