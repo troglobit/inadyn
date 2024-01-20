@@ -100,8 +100,7 @@ For the complete list, see `inadyn -L`, for machine friendly JSON
 output, use `inadyn -L -j`.
 
 DDNS providers not supported natively can be enabled using the custom,
-or generic, DDNS plugin.  E.g. <https://www.namecheap.com>.  See below
-for configuration examples.
+or generic, DDNS plugin. See below for configuration examples.
 
 In-A-Dyn defaults to HTTPS, but not all providers may support this, so
 try disabling SSL for the update (`ssl = false`) or the checkip phase
@@ -332,6 +331,7 @@ hostname syntax differs from above:
         ddns-server = dynamicdns.park-your-domain.com
         ddns-path   = "/update?domain=%u&password=%p&host=%h&ip=%i"
         hostname    = { "@", "www", "test" }
+        ddns-response = "<ErrCount>0</ErrCount>"
     }
 
 Here three hostnames are updated, one HTTP GET update request for every

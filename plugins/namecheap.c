@@ -23,9 +23,9 @@
 
 #define NAMECHEAP_UPDATE_IP_REQUEST					\
 	"GET %s?"							\
-	"host=%s&"							\
-	"password=%s&"							\
 	"domain=%s&"							\
+	"password=%s&"							\
+	"host=%s&"							\
 	"ip=%s "							\
 	"HTTP/1.0\r\n"							\
 	"Host: %s\r\n"							\
@@ -72,7 +72,7 @@ static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 
 	DO(http_status_valid(trans->status));
 
-	if (strstr(rsp, "good") || strstr(rsp, "nochg"))
+	if (strstr(rsp, "<ErrCount>0</ErrCount>"))
 		return 0;
 
 	return RC_DDNS_RSP_NOTOK;
