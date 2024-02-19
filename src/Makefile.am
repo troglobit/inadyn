@@ -33,6 +33,7 @@ endif
 ## and be installed into $libdir/inadyn/plugins/ as *.so files
 inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c		\
 		   ../plugins/cloudflare.c	../plugins/cloudxns.c		\
+		   ../plugins/porkbun.c	../plugins/cloudxns.c		\
 		   ../plugins/ddnss.c		../plugins/dhis.c		\
 		   ../plugins/dnsexit.c		../plugins/dnspod.c		\
 		   ../plugins/duckdns.c		../plugins/duiadns.c		\
