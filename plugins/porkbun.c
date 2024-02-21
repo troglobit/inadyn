@@ -23,7 +23,6 @@
 #include "json.h"
 
 #define CHECK(fn)       { rc = (fn); if (rc) goto cleanup; }
-#define KEY_SUCCESS		"success"
 
 #define API_HOST "api.porkbun.com"
 #define API_URL "/client/v4"
@@ -125,7 +124,7 @@ static int check_success(const char *json, const jsmntok_t tokens[], const int n
 	for (i = 1; i < num_tokens; i++) {
 		int set;
 
-		if (jsoneq(json, tokens + i, KEY_SUCCESS) != 0)
+		if (jsoneq(json, tokens + i, "success") != 0)
 			continue;
 
 		if (i < num_tokens - 1 && json_bool(json, tokens + i + 1, &set) == 0)
@@ -167,7 +166,7 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 		goto cleanup;
 	}
 
-	if (json_bool(json, tokens + i + 1, &num_tokens) == -1) {
+	if (check_success(json, tokens + i + 1, &num_tokens) == -1) {
 		logit(LOG_ERR, "Request was unsuccessful.");
 		goto cleanup;
 	}
@@ -377,17 +376,18 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			content_len, json_data);
 }
 
-static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
+static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *hostname)
 {
-	char *resp = trans->rsp_body;
+	int rc;
 
 	(void)info;
-	DO(http_status_valid(trans->status));
+	(void)hostname;
 
-	if (strstr(resp, alias->address))
-		return 0;
+	rc = check_response_code(trans->status);
+	if (rc == RC_OK && check_success_only(trans->rsp_body) < 0)
+		rc = RC_DDNS_RSP_NOTOK;
 
-	return RC_DDNS_RSP_NOTOK;
+	return rc;
 }
 
 PLUGIN_INIT(plugin_init)
