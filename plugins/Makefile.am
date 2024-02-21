@@ -1,4 +1,4 @@
-inadyn_SOURCES += common.c	changeip.c	cloudflare.c	\
+inadyn_SOURCES += common.c	changeip.c	cloudflare.c porkbun.c	\
 		  cloudxns.c	ddnss.c		dhis.c		\
 		  dnsexit.c	dnspod.c	duckdns.c	\
 		  duiadns.c	dyndns.c	dynv6.c		\
