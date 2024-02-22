@@ -166,7 +166,7 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 		goto cleanup;
 	}
 
-	if (check_success(json, tokens + i + 1, &num_tokens) == -1) {
+	if (check_success(json, tokens + i + 1, num_tokens) == -1) {
 		logit(LOG_ERR, "Request was unsuccessful.");
 		goto cleanup;
 	}
