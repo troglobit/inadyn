@@ -530,7 +530,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&googledomains, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&googledomains, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&dynu, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register_v6(&dynu, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&dynu, DYNDNS_UPDATE_IPV6_HTTP_REQUEST);
 	plugin_register(&dyfi, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&dyfi, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&dode, DYNDNS_UPDATE_IP_HTTP_REQUEST);
