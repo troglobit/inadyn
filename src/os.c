@@ -266,7 +266,7 @@ int os_check_perms(void)
 			}
 		}
 
-		pidfile_dir = dirname(strdupa(pidfn));
+		pidfile_dir = dirname(pidfn);
 		if (access(pidfile_dir, F_OK)) {
 			if (mkpath(pidfile_dir, 0755) && errno != EEXIST)
 				logit(LOG_ERR, "No write permission to %s, aborting.", pidfile_dir);

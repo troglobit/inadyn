@@ -29,14 +29,14 @@
 #include <unistd.h>
 #include <sys/param.h> /* MAX(), isset(), setbit(), TRUE, FALSE, et consortes. :-) */
 #include <sys/types.h>
-#include "strdupa.h"
 
 /* From The Practice of Programming, by Kernighan and Pike */
 #ifndef NELEMS
 #define NELEMS(array) (sizeof(array) / sizeof(array[0]))
 #endif
 
-int     mkpath     (char *dir, mode_t mode);
+int     mkpath     (const char *dir, mode_t mode);
+int     makepath   (const char *dir);
 
 #ifndef pidfile
 int     pidfile    (const char *basename);
