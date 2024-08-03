@@ -154,7 +154,8 @@ static int check_success_only(const char *json)
 static int get_result_value(const char *json, const char *key, jsmntok_t *out_result)
 {
 	jsmntok_t *tokens;
-	int i, num_tokens;
+	int num_tokens;
+	int i = 0;
 
 	num_tokens = parse_json(json, &tokens);
 	if (num_tokens < 0)
