@@ -64,7 +64,6 @@ static const char *PORKBUN_UPDATE_JSON_FORMAT = "{\"apikey\":\"%s\",\"secretapik
 
 static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
-static const char *KEY_STATUS = "status";
 
 static int setup    (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *hostname);
@@ -269,11 +268,10 @@ static const char* get_record_type(const char *address)
 
 static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 {
-	const char *record_type;
-	struct pbdata *data;
-	size_t len;
 	const char *zone_name = hostname->name;
+	struct pbdata *data;
 	int rc = RC_OK;
+	size_t len;
 
 	if (*zone_name == '\0' || !strchr(zone_name, '.'))
 	{
@@ -288,8 +286,6 @@ static int setup(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	if (info->data)
 		free(info->data);
 	info->data = data;
-
-	record_type = get_record_type(hostname->address);
 
 	logit(LOG_DEBUG, "Zone: %s", zone_name);
 

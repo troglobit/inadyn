@@ -84,8 +84,6 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
-	char *rsp = trans->rsp_body;
-
 	(void)info;
 	(void)alias;
 
