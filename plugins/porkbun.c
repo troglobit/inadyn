@@ -188,7 +188,7 @@ static int get_result_value(const char *json, const char *key, jsmntok_t *out_re
 	return -1;
 }
 
-	static int json_copy_value(char *dest, size_t dest_size, const char *json, const jsmntok_t *token)
+static int json_copy_value(char *dest, size_t dest_size, const char *json, const jsmntok_t *token)
 {
 	size_t length;
 
