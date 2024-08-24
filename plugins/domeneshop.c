@@ -24,10 +24,7 @@
 /*
  * https://api.domeneshop.no/docs/#tag/ddns/paths/~1dyndns~1update/get
  */
-#define API_HOST "api.domeneshop.no"
-#define API_URL "/v0/dyndns/update"
 
-// TODO Check this
 #define DOMENESHOP_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"hostname=%s&"							\
@@ -39,6 +36,7 @@
 
 static int request  (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 static int response (http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);
+static int check_response_code (int status);
 
 static ddns_system_t domeneshop = {
 	.name         = "default@domene.shop",
@@ -50,60 +48,54 @@ static ddns_system_t domeneshop = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = API_HOST,
-	.server_url   = API_URL
+	.server_name  = "api.domeneshop.no",
+	.server_url   = "/v0/dyndns/update"
 };
 
-// TODO See if this works
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
-	return common_request(ctx, info, alias);
+	return snprintf(ctx->request_buf, ctx->request_buflen,
+			info->system->server_req,
+			info->server_url,
+			alias->name,
+			alias->address,
+			info->server_name.name,
+			info->creds.encoded_password,
+			info->user_agent);
 }
 
-// static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
-// {
-// 	return snprintf(ctx->request_buf, ctx->request_buflen,
-// 			info->system->server_req,
-// 			info->server_url,
-// 			alias->name,
-// 			alias->address,
-//             wildcard,
-// 			info->server_name.name,
-// 			info->creds.encoded_password,
-// 			info->user_agent);
-// }
+static int check_response_code(int status)
+{
+    if (status == 204)
+        return RC_OK;
+        
+    return http_status_valid(status);
+}
 
 static int response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias)
 {
+	int rc;
 	char *body = trans->rsp_body;
 
 	(void)info;
 	(void)alias;
 
-	DO(check_response_code(trans->status));
+	rc = check_response_code(trans->status);
 
-	if (strstr(body, ""))
-		return 0;
+	if (rc == RC_OK && !strstr(body, ""))
+		rc = RC_DDNS_RSP_NOTOK;
 
-	return RC_DDNS_RSP_NOTOK;
-}
-
-static int check_response_code(int status){
-    if (status == 204){
-        return RC_OK;
-        
-    DO(http_status_valid(trans->status));
+	return rc;
 }
 
 PLUGIN_INIT(plugin_init)
 {
-	plugin_register(&plugin, DHIS_UPDATE_IP_REQUEST);
-	plugin_register(&plugin_ipv6, DHIS_UPDATE_IP_REQUEST);
+	plugin_register(&domeneshop, DOMENESHOP_UPDATE_IP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
 {
-	plugin_unregister(&plugin);
+	plugin_unregister(&domeneshop);
 }
 
 /**
