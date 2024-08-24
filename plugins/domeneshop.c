@@ -1,5 +1,5 @@
 /* Plugin for domene.shop
-*
+ *
  * Copyright (C) 2024 Kenan Amundsen Elkoca <kenan@elkoca.com>
  *
  * This program is free software; you can redistribute it and/or
