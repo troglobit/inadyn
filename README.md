@@ -95,6 +95,7 @@ providers, ordered by the plugin that support them:
   * <https://www.goip.de>
   * <https://www.dnshome.de>
   * <https://ipv64.net>
+  * <https://domene.shop>
 
 For the complete list, see `inadyn -L`, for machine friendly JSON
 output, use `inadyn -L -j`.

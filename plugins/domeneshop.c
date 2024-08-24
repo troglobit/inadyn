@@ -21,10 +21,7 @@
 
 #include "plugin.h"
 
-/*
- * https://api.domeneshop.no/docs/#tag/ddns/paths/~1dyndns~1update/get
- */
-
+/* https://api.domeneshop.no/docs/#tag/ddns/paths/~1dyndns~1update/get */
 #define DOMENESHOP_UPDATE_IP_REQUEST						\
 	"GET %s?"							\
 	"hostname=%s&"							\
