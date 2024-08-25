@@ -49,4 +49,5 @@ inadyn_SOURCES  += ../plugins/common.c		../plugins/changeip.c		\
 		   ../plugins/dnsmax.c		../plugins/mydns.c		\
 		   ../plugins/myonlineportal.c	../plugins/namecheap.c		\
 		   ../plugins/regfish.c		../plugins/twodns.c		\
-		   ../plugins/ipv64.c ../plugins/porkbun.c
+		   ../plugins/ipv64.c ../plugins/porkbun.c		\
+		   ../plugins/domeneshop.c

@@ -10,4 +10,4 @@ inadyn_SOURCES += common.c	changeip.c	cloudflare.c porkbun.c	\
 		  core-networks.c	dnsever.c	dnshome.c \
 		  dnsmadeeasy.c		dnsmax.c	mydns.c \
 		  myonlineportal.c	namecheap.c	regfish.c \
-		  twodns.c	ipv64.c
+		  twodns.c			ipv64.c		domeneshop.c
