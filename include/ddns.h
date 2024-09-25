@@ -222,6 +222,7 @@ extern uid_t uid;
 extern gid_t gid;
 
 int ddns_main_loop (ddns_t *ctx);
+int ddns_get_tcp_force(const ddns_info_t *info);
 
 int common_request (ddns_t       *ctx,   ddns_info_t *info, ddns_alias_t *alias);
 int common_response(http_trans_t *trans, ddns_info_t *info, ddns_alias_t *alias);

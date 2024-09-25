@@ -69,7 +69,7 @@ static char *fetch_keys(ddns_t *ctx, ddns_info_t *info)
 	http_set_remote_name(&client, info->server_name.name);
 
 	client.ssl_enabled = info->ssl_enabled;
-	rc = http_init(&client, "Fetching account API key",strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4);
+	rc = http_init(&client, "Fetching account API key", ddns_get_tcp_force(info));
 	if (rc)
 		return NULL;
 
