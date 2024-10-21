@@ -184,7 +184,7 @@ int write_cache_file(ddns_alias_t *alias, const char *name)
 	cache_file(alias->name, name, path, sizeof(path));
 	fp = fopen(path, "w");
 	if (fp) {
-		if (strstr(name, "v6"))
+		if (strstr(name, "ipv6") == name)
 			logit(LOG_NOTICE, "Updating IPv6 cache for %s", alias->name);
 		else
 			logit(LOG_NOTICE, "Updating IPv4 cache for %s", alias->name);
