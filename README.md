@@ -489,6 +489,14 @@ To run the latest version from the master branch, install the git tap instead:
 
 Either of these will install all dependencies.
 
+### MacPorts (macOS)
+
+You can also install In-A-Dyn on macOS using [MacPorts](https://www.macports.org):
+
+    sudo port install inadyn
+
+You can find more information at In-A-Dyn's [ports page](https://ports.macports.org/port/inadyn/).
+
 ### Building from Source
 
 First download the latest official In-A-Dyn release from GitHub:
