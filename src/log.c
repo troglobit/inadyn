@@ -71,10 +71,27 @@ int log_level(char *arg)
 
 void vlogit(int prio, const char *fmt, va_list args)
 {
-	if (enabled && level != INTERNAL_NOPRI)
-		vsyslog(prio, fmt, args);
-	else if (prio <= level)
-		vfprintf(stderr, fmt, args), fprintf(stderr, "\n");
+    if (enabled && level != INTERNAL_NOPRI) {
+        char new_fmt[1024];
+		/* Create a new_fmt which includes the log level */
+        for (int i = 0; prioritynames[i].c_name; i++) {
+            if (prioritynames[i].c_val == prio) {
+                snprintf(new_fmt, sizeof(new_fmt), "[%s] %s", prioritynames[i].c_name, fmt);
+                break;
+            }
+        }
+        vsyslog(prio, new_fmt, args);
+    } else if (prio <= level) {
+		/* Print the log level */
+        for (int i = 0; prioritynames[i].c_name; i++) {
+            if (prioritynames[i].c_val == prio) {
+                fprintf(stderr, "[%s] ", prioritynames[i].c_name);
+                break;
+            }
+        }
+        vfprintf(stderr, fmt, args);
+        fprintf(stderr, "\n");
+    }
 }
 
 void logitf(int prio, const char *fmt, ...)
