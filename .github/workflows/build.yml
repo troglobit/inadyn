@@ -34,7 +34,7 @@ jobs:
         run: |
           sudo apt-get -y update
           sudo apt-get install -qq -y tree libconfuse-dev libgnutls28-dev
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Configure
         run: |
           ./autogen.sh
