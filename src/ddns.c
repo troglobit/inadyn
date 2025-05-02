@@ -1066,7 +1066,8 @@ int ddns_main_loop(ddns_t *ctx)
 
 int ddns_get_tcp_force(const ddns_info_t *info) {
 	const char* name = info->system->name;
-	if (strstr(name, "ipv6") == name) {
+	const char *ipv6_prefix = "ipv6";
+	if (strncmp(name, ipv6_prefix, strlen(ipv6_prefix)) == 0) {
 		return TCP_FORCE_IPV6;
 	}
 	return TCP_FORCE_IPV4;
