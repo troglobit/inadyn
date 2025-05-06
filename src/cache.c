@@ -44,9 +44,9 @@ extern ddns_info_t *conf_info_iterator(int first);
 
 static int nslookup(ddns_alias_t *alias)
 {
-	int error;
-	struct addrinfo hints;
 	struct addrinfo *result;
+	struct addrinfo hints;
+	int error;
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET;	/* IPv4 */
@@ -77,8 +77,8 @@ static int nslookup(ddns_alias_t *alias)
 
 static void read_one(ddns_alias_t *alias, const char *name, int nonslookup)
 {
-	FILE *fp;
 	char path[256];
+	FILE *fp;
 
 	alias->last_update = 0;
 	memset(alias->address, 0, sizeof(alias->address));
@@ -178,14 +178,15 @@ int read_cache_file(ddns_t *ctx)
  */
 int write_cache_file(ddns_alias_t *alias, const char *name)
 {
-	FILE *fp;
 	char path[256];	
+	FILE *fp;
 
 	cache_file(alias->name, name, path, sizeof(path));
 	fp = fopen(path, "w");
 	if (fp) {
-		const char *ipv6_prefix = "ipv6";
-		if (strncmp(name, ipv6_prefix, strlen(ipv6_prefix)) == 0)
+		const char *prefix = "ipv6";
+
+		if (!strncmp(name, prefix, strlen(prefix)))
 			logit(LOG_NOTICE, "Updating IPv6 cache for %s", alias->name);
 		else
 			logit(LOG_NOTICE, "Updating IPv4 cache for %s", alias->name);

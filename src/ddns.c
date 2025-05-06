@@ -192,9 +192,8 @@ static int is_address_valid(int family, const char *host)
 	size_t i;
 
 	for (i = 0; i < NELEMS(except); i++) {
-		if (!strncmp(host, except[i], strlen(host))) {
+		if (!strncmp(host, except[i], strlen(host)))
 			return 0;
-		}
 	}
 
 	if (!verify_addr) {
@@ -991,6 +990,7 @@ int ddns_main_loop(ddns_t *ctx)
 			info = conf_info_iterator(1);
 			while (info) {
 				size_t i;
+
 				for (i = 0; i < info->alias_count; i++) {
 					ddns_alias_t *alias = &info->alias[i];
 					alias->force_addr_update = 1;
@@ -1041,6 +1041,7 @@ int ddns_main_loop(ddns_t *ctx)
 			info = conf_info_iterator(1);
 			while (info) {
 				size_t i;
+
 				for (i = 0; i < info->alias_count; i++) {
 					ddns_alias_t *alias = &info->alias[i];
 					alias->force_addr_update = 1;
@@ -1064,12 +1065,14 @@ int ddns_main_loop(ddns_t *ctx)
 	return rc;
 }
 
-int ddns_get_tcp_force(const ddns_info_t *info) {
+int ddns_get_tcp_force(const ddns_info_t *info)
+{
 	const char* name = info->system->name;
-	const char *ipv6_prefix = "ipv6";
-	if (strncmp(name, ipv6_prefix, strlen(ipv6_prefix)) == 0) {
+	const char *prefix = "ipv6";
+
+	if (!strncmp(name, prefix, strlen(prefix)))
 		return TCP_FORCE_IPV6;
-	}
+
 	return TCP_FORCE_IPV4;
 }
 
