@@ -52,7 +52,7 @@ static ddns_system_t plugin = {
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
 {
 	char *keepip;
-	if (strstr(info->system->name, "ipv6"))
+	if (ddns_get_tcp_force(info) == TCP_FORCE_IPV6)
 		keepip = "keepipv4=1";
 	else
 		keepip = "keepipv6=1";

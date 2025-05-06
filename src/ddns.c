@@ -136,7 +136,7 @@ static int server_transaction(ddns_t *ctx, ddns_info_t *provider)
 
 	client = &provider->checkip;
 	client->ssl_enabled = provider->checkip_ssl;
-	DO(http_init(client, "Checking for IP# change", strstr(provider->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4));
+	DO(http_init(client, "Checking for IP# change", ddns_get_tcp_force(provider)));
 
 	/* Prepare request for IP server */
 	memset(ctx->work_buf, 0, ctx->work_buflen);
@@ -618,7 +618,7 @@ static int send_update(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, int 
 		DO(info->system->setup(ctx, info, alias));
 
 	client->ssl_enabled = info->ssl_enabled;
-	rc = http_init(client, "Sending IP# update to DDNS server", strstr(info->system->name, "ipv6") ? TCP_FORCE_IPV6 : TCP_FORCE_IPV4);
+	rc = http_init(client, "Sending IP# update to DDNS server", ddns_get_tcp_force(info));
 	if (rc) {
 		/* Update failed, force update again in ctx->cmd_check_period seconds */
 		alias->force_addr_update = 1;
@@ -1062,6 +1062,15 @@ int ddns_main_loop(ddns_t *ctx)
 	cached_num_iterations = ctx->num_iterations;
 
 	return rc;
+}
+
+int ddns_get_tcp_force(const ddns_info_t *info) {
+	const char* name = info->system->name;
+	const char *ipv6_prefix = "ipv6";
+	if (strncmp(name, ipv6_prefix, strlen(ipv6_prefix)) == 0) {
+		return TCP_FORCE_IPV6;
+	}
+	return TCP_FORCE_IPV4;
 }
 
 /**
