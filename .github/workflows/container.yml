@@ -26,21 +26,21 @@ jobs:
           - linux/ppc64le
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/metadata-action@v4
+      - uses: docker/metadata-action@v5
         id: meta
         with:
           images: |
             ${{ github.repository }}
           labels: |
             org.opencontainers.image.source=https://github.com/troglobit/inadyn/tree/${{ github.sha }}/
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v4
+      - uses: docker/build-push-action@v6
         id: build
         with:
           context: .
@@ -58,17 +58,25 @@ jobs:
             annotation-index.org.opencontainers.image.licenses=GPL-2.0,
             annotation-index.org.opencontainers.image.revision=${{ github.sha }}
       - name: Export digest
+        id: digest
         run: |
+          platform=${{ matrix.platform }}
+          plat="${platform#linux/}"
+          arch="$(echo $plat | sed 's,/,,')"
+          echo "name=digest-$arch" >> $GITHUB_OUTPUT
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          fn="/tmp/digests/${digest#sha256:}"
+          echo "Saving $arch digest: $fn"
+          touch $fn
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests
+          name: ${{ steps.digest.outputs.name }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
+
   merge:
     runs-on: ubuntu-latest
     needs: build
@@ -76,13 +84,14 @@ jobs:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
-          name: digests
+          pattern: digest-*
           path: /tmp/digests
+          merge-multiple: true
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             ${{ github.repository }}
@@ -91,13 +100,13 @@ jobs:
             type=ref,event=tag
             type=edge
       - name: Log in to GHCR
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
