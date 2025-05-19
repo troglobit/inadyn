@@ -68,7 +68,7 @@
 #define USERNAME_LEN                      128     /* chars */
 #define PASSWORD_LEN                      256     /* chars */
 #define SERVER_NAME_LEN                   256     /* chars */
-#define SERVER_URL_LEN                    256     /* chars */
+#define SERVER_URL_LEN                    512     /* chars */
 #ifdef INET6_ADDRSTRLEN
 # define MAX_ADDRESS_LEN                  INET6_ADDRSTRLEN
 #else
