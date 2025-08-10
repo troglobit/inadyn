@@ -62,7 +62,7 @@ static const char *CLOUDFLARE_HOSTNAME_CREATE_REQUEST	= "POST " API_URL "/zones/
 	"%s";
 
 /* https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-update-dns-record */
-static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
+static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PATCH " API_URL "/zones/%s/dns_records/%s HTTP/1.0\r\n"	\
 	"Host: " API_HOST "\r\n"		\
 	"User-Agent: %s\r\n"			\
 	"Accept: */*\r\n"				\
@@ -71,7 +71,7 @@ static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PUT " API_URL "/zones/%
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 	
-static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s%s\",\"content\":\"%s\",\"ttl\":%li,\"proxied\":%s}";
+static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s%s\",\"content\":\"%s\",\"ttl\":%li%s}";
 
 static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
@@ -399,17 +399,23 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	struct cfdata *data = (struct cfdata *)info->data;
 	size_t content_len;
 	char json_data[256];
+	char proxied_field[32] = "";
 
 	record_type = get_record_type(hostname->address);
-	content_len = snprintf(json_data, sizeof(json_data),
-			       CLOUDFLARE_UPDATE_JSON_FORMAT,
-			       record_type,
-		       	       info->wildcard ? "*." : "",
-			       hostname->name,
-			       hostname->address,
-			       info->ttl >= 0 ? info-> ttl : 1, // Time to live for DNS record. Value of 1 is 'automatic'
-			       info->proxied ? "true" : "false");
 
+	if (info->proxied != -1)
+		snprintf(proxied_field, sizeof(proxied_field),
+				",\"proxied\":%s",
+				info->proxied ? "true" : "false");
+
+	content_len = snprintf(json_data, sizeof(json_data),
+			CLOUDFLARE_UPDATE_JSON_FORMAT,
+			record_type,
+			info->wildcard ? "*." : "",
+			hostname->name,
+			hostname->address,
+			info->ttl >= 0 ? info->ttl : 1, // Time to live for DNS record. Value of 1 is 'automatic'
+			proxied_field);
 
 	if (strlen(data->hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,

@@ -232,6 +232,15 @@ static int cfg_getserver(cfg_t *cfg, char *server, ddns_name_t *name)
 	return getserver(str, name);
 }
 
+static int cfg_getbool_or_default(cfg_t *cfg, const char *optname, int unset_value)
+{
+	/* Retrieve the boolean if there is any value configured in the provider's config for that option */
+	if (cfg_size(cfg, optname) > 0)
+		return cfg_getbool(cfg, optname);
+
+	return unset_value;
+}
+
 #if 0
 /* TODO: Move to a separate file */
 #define string_startswith(string, prefix) strncasecmp(string, prefix, strlen(prefix)) == 0
@@ -347,7 +356,7 @@ static int set_provider_opts(cfg_t *cfg, ddns_info_t *info, int custom)
 
 	info->wildcard = cfg_getbool(cfg, "wildcard");
 	info->ttl = cfg_getint(cfg, "ttl");
-	info->proxied = cfg_getbool(cfg, "proxied");
+	info->proxied = cfg_getbool_or_default(cfg, "proxied", -1);
 	info->ssl_enabled = cfg_getbool(cfg, "ssl");
 	str = cfg_getstr(cfg, "username");
 	if (str && strlen(str) <= sizeof(info->creds.username))
@@ -545,7 +554,7 @@ cfg_t *conf_parse_file(char *file, ddns_t *ctx)
 		CFG_BOOL    ("ssl",          cfg_true, CFGF_NONE),
 		CFG_BOOL    ("wildcard",     cfg_false, CFGF_NONE),
 		CFG_INT     ("ttl",          -1, CFGF_NONE),
-		CFG_BOOL    ("proxied",      cfg_false, CFGF_NONE),
+		CFG_BOOL    ("proxied",      cfg_false, CFGF_NODEFAULT),
 		CFG_STR     ("iface",          NULL, CFGF_NONE), /* interface name */
 		CFG_STR     ("checkip-server", NULL, CFGF_NONE), /* Syntax:  name:port */
 		CFG_STR     ("checkip-path",   NULL, CFGF_NONE), /* Default: "/" */
