@@ -71,7 +71,7 @@ static const char *CLOUDFLARE_HOSTNAME_UPDATE_REQUEST	= "PATCH " API_URL "/zones
 	"Content-Length: %zd\r\n\r\n" \
 	"%s";
 	
-static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s%s\",\"content\":\"%s\",\"ttl\":%li%s}";
+static const char *CLOUDFLARE_UPDATE_JSON_FORMAT = "{\"type\":\"%s\",\"name\":\"%s%s\",\"content\":\"%s\"%s}";
 
 static const char *IPV4_RECORD_TYPE = "A";
 static const char *IPV6_RECORD_TYPE = "AAAA";
@@ -399,14 +399,19 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 	struct cfdata *data = (struct cfdata *)info->data;
 	size_t content_len;
 	char json_data[256];
-	char proxied_field[32] = "";
+	char additional_fields[64] = "";
 
 	record_type = get_record_type(hostname->address);
 
 	if (info->proxied != -1)
-		snprintf(proxied_field, sizeof(proxied_field),
+		snprintf(additional_fields, sizeof(additional_fields),
 				",\"proxied\":%s",
 				info->proxied ? "true" : "false");
+
+	if (info->ttl != -1)
+		snprintf(additional_fields, sizeof(additional_fields),
+				",\"ttl\":%li",
+				info->ttl);
 
 	content_len = snprintf(json_data, sizeof(json_data),
 			CLOUDFLARE_UPDATE_JSON_FORMAT,
@@ -414,8 +419,7 @@ static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *hostname)
 			info->wildcard ? "*." : "",
 			hostname->name,
 			hostname->address,
-			info->ttl >= 0 ? info->ttl : 1, // Time to live for DNS record. Value of 1 is 'automatic'
-			proxied_field);
+			additional_fields);
 
 	if (strlen(data->hostname_id) == 0)
 		return snprintf(ctx->request_buf, ctx->request_buflen,
