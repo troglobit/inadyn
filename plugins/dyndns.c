@@ -490,9 +490,9 @@ static ddns_system_t simplycom = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = "ddns.simply.com",
-	.checkip_url  = "/myip",
-	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
+	.checkip_name = DYNDNS_MY_IP_SERVER,
+	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
+	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "ddns.simply.com",
 	.server_url   = "/nic/update"
