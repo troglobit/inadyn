@@ -492,6 +492,7 @@ static ddns_system_t simplycom = {
 
 	.checkip_name = "ddns.simply.com",
 	.checkip_url  = "/myip",
+	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "ddns.simply.com",
 	.server_url   = "/nic/update"
