@@ -483,7 +483,7 @@ static ddns_system_t oray = {
 	.server_url   = "/ph/update"
 };
 
-static ddns_system_t simply = {
+static ddns_system_t simplycom = {
 	.name         = "default@simply.com",
 
 	.request      = (req_fn_t)request,
@@ -553,7 +553,7 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&oray, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&simplycom, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
