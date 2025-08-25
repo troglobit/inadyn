@@ -489,12 +489,11 @@ static ddns_system_t simply = {
 	.request      = (req_fn_t)request,
 	.response     = (rsp_fn_t)response,
 
-	.checkip_name = DYNDNS_MY_IP_SERVER,
-	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
-	.checkip_ssl  = DYNDNS_MY_IP_SSL,
+	.checkip_name = "ddns.simply.com",
+	.checkip_url  = "/myip",
 
-	.server_name  = "api.simply.com",
-	.server_url   = "/2/ddns/"
+	.server_name  = "ddns.simply.com",
+	.server_url   = "/nic/update"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
@@ -555,7 +554,6 @@ PLUGIN_INIT(plugin_init)
 	plugin_register_v6(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&oray, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register_v6(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
@@ -589,7 +587,6 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndnsit);
 	plugin_unregister(&infomaniak);
 	plugin_unregister(&oray);
-	plugin_unregister(&simply);
 }
 
 /**
