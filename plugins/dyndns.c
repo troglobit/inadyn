@@ -556,7 +556,6 @@ PLUGIN_INIT(plugin_init)
 	plugin_register_v6(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&oray, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&simplycom, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register_v6(&simplycom, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
@@ -590,6 +589,7 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndnsit);
 	plugin_unregister(&infomaniak);
 	plugin_unregister(&oray);
+	plugin_unregister(&simplycom);
 }
 
 /**
