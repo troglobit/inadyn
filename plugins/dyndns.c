@@ -6,11 +6,12 @@
  *   - no-ip,
  *   - 3322,
  *   - Hurricane-Electric (HE)
- *   - Loopia, and
+ *   - Loopia
  *   - nsupdate.info
  *   - Google Domains
  *   - SPDYN
  *   - Dynu
+ *   - Simply.com
  *
  * Copyright (C) 2003-2004  Narcis Ilisei <inarcis2002@hotpop.com>
  * Copyright (C) 2006       Steve Horbachuk
@@ -483,7 +484,7 @@ static ddns_system_t oray = {
 	.server_url   = "/ph/update"
 };
 
-static ddns_system_t simply = {
+static ddns_system_t simplycom = {
 	.name         = "default@simply.com",
 
 	.request      = (req_fn_t)request,
@@ -493,8 +494,8 @@ static ddns_system_t simply = {
 	.checkip_url  = DYNDNS_MY_CHECKIP_URL,
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
-	.server_name  = "api.simply.com",
-	.server_url   = "/2/ddns/"
+	.server_name  = "ddns.simply.com",
+	.server_url   = "/nic/update"
 };
 
 static int request(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias)
@@ -554,8 +555,8 @@ PLUGIN_INIT(plugin_init)
 	plugin_register(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register_v6(&infomaniak, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 	plugin_register(&oray, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
-	plugin_register_v6(&simply, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register(&simplycom, DYNDNS_UPDATE_IP_HTTP_REQUEST);
+	plugin_register_v6(&simplycom, DYNDNS_UPDATE_IP_HTTP_REQUEST);
 }
 
 PLUGIN_EXIT(plugin_exit)
@@ -589,7 +590,6 @@ PLUGIN_EXIT(plugin_exit)
 	plugin_unregister(&dyndnsit);
 	plugin_unregister(&infomaniak);
 	plugin_unregister(&oray);
-	plugin_unregister(&simply);
 }
 
 /**
