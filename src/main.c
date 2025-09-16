@@ -227,8 +227,14 @@ static int compose_paths(int dryrun)
 
 			home = getenv("HOME");
 			if (!home) {
-				logit(LOG_ERR, "Cannot create fallback cache dir: %s", strerror(errno));
-				return 0;
+				/* ignore this for --check-config: the service won't start if the
+				 * main process is not given the option */
+				if (dryrun)
+					return 0;
+				logit(LOG_ERR, "%s: not writable, $HOME missing, please use --cache-dir=PATH",
+				      cache_dir);
+				free(cache_dir);
+				return 1;
 			}
 
 			/* Fallback cache dir: $HOME + "/.cache/" + "inadyn" */
