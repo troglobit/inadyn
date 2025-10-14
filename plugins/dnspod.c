@@ -46,7 +46,7 @@ static ddns_system_t plugin = {
 	.checkip_ssl  = DYNDNS_MY_IP_SSL,
 
 	.server_name  = "dnsapi.cn",
-	.server_url   = ""
+	.server_url   = "/"
 };
 
 static ddns_system_t plugin_v6 = {
@@ -61,7 +61,7 @@ static ddns_system_t plugin_v6 = {
 	.checkip_ssl  = DDNS_CHECKIP_SSL_SUPPORTED,
 
 	.server_name  = "dnsapi.cn",
-	.server_url   = ""
+	.server_url   = "/"
 };
 
 static int fetch_record_id(ddns_t *ctx, ddns_info_t *info, ddns_alias_t *alias, char *domain, char *prefix)
