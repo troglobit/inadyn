@@ -334,7 +334,7 @@ static int parse_my_address(char *buffer, char *address, size_t len)
 
 static int get_address_remote(ddns_t *ctx, ddns_info_t *info, char *address, size_t len)
 {
-	if (!info->server_url[0])
+	if (!info->checkip_name.name[0])
 		return 1;
 
 	DO(server_transaction(ctx, info));
