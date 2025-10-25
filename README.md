@@ -2,8 +2,18 @@ Internet Automated Dynamic DNS Client
 =====================================
 [![License Badge][]][License] [![GitHub Status][]][GitHub] [![Coverity Status][]][Coverity Scan]
 
-The latest release is always available from GitHub at  
-> https://github.com/troglobit/inadyn/releases
+Project Archived
+----------------
+
+As of October 2025, this project has been **archived** and is no longer maintained.
+
+After many years of development and community contributions, maintenance on this
+repository has ended. The source code remains available for reference and for
+anyone who wishes to continue development in their own fork.
+
+— Joachim Wiberg ([troglobit](https://github.com/troglobit))
+
+The last release remains available from GitHub at <https://github.com/troglobit/inadyn/releases>
 
 
 Table of Contents
