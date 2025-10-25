@@ -4,6 +4,37 @@ Change Log
 All notable changes to the project are documented in this file.
 
 
+[v2.13.0][] - 2025-10-25
+------------------------
+
+> **Note:** This is the final release of In-a-Dyn project.
+
+### Changes
+- Add support for Porkbun DDNS provider, by Steven Scobedo
+- Add support for domene.shop (Norwegian DDNS provider)
+- Add support for round-robin records to Cloudflare, by Fabrício Duarte Castelo
+- Add example config for DuckDNS IPv6
+- Add information on installing via MacPorts
+- Cloudflare: omit proxy setting if unset in config, retaining current value
+- Cloudflare: omit TTL update if unset in config, retaining current value
+- Simply.com provider fixed and re-enabled
+- Support for long ddns-path requests (increased buffer size)
+
+### Fixes
+- Issue #450: do not use an IP resolution method different than the one
+  specified in configuration
+- Issue #451: add support for round-robin records to Cloudflare
+- Issue #467: fix support for Namecheap
+- Issue #479: fix Dynu IPv6 issue
+- Issue #488: refactor `mkpath()` to drop all uses of `strdupa()`
+- Issue #492: default value -1 not used for `ttl` setting
+- Issue #497: fix IPv6 detection for providers with "v6" in their name,
+  e.g., ipv64.net and dynv6.com
+- Fix #526: dnspod error: "Communication with checkip server failed"
+- Fix #522: cache directory creation on `--help` or `--check-config`
+- Fix #525: cache directory not writeable and no `$HOME`
+
+
 [v2.12.0][] - 2023-09-19
 ------------------------
 
@@ -998,7 +1029,9 @@ First stable version.
 - port to pSOS
 
 
-[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.11.0...HEAD
+[UNRELEASED]: https://github.com/troglobit/inadyn/compare/v2.13.0...HEAD
+[v2.13.0]: https://github.com/troglobit/inadyn/compare/v2.12.0...v2.13.0
+[v2.12.0]: https://github.com/troglobit/inadyn/compare/v2.11.0...v2.12.0
 [v2.11.0]: https://github.com/troglobit/inadyn/compare/v2.10.0...v2.11.0
 [v2.10.0]: https://github.com/troglobit/inadyn/compare/v2.9.1...v2.10.0
 [v2.9.1]: https://github.com/troglobit/inadyn/compare/v2.9.0...v2.9.1
